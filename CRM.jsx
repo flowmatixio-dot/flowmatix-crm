@@ -127,6 +127,7 @@ export default function App() {
   const [tourActive, setTourActive] = useState(false);
   const [tourStep, setTourStep] = useState(0);
   const [tourCompleted, setTourCompleted] = useState(()=>{try{return localStorage.getItem("fm_tour_done")==="1";}catch{return false;}});
+  const [pendingApps, setPendingApps] = useState(0);
 
   /* i18n helper */
   const t = (key) => (T[lang]||T.en)[key] || (T.en)[key] || key;
@@ -525,6 +526,16 @@ export default function App() {
   const allClinicMsgs=useMemo(()=>msgs[activeClinicId]||[],[msgs,activeClinicId]);
   const myMsgs=useMemo(()=>allClinicMsgs.filter(m=>{const cs=getCS(m);if(inboxFilter==="all")return true;if(inboxFilter==="resolved")return cs==="resolved"||cs==="closed";if(inboxFilter==="needs_action")return["needs_medical_review","waiting_for_clinic_reply","booking_pending","human_takeover"].includes(cs);if(inboxFilter==="ai_handling")return cs==="ai_active"||cs==="collecting_photos";return cs!=="resolved"&&cs!=="closed";}),[allClinicMsgs,inboxFilter,leads]);
   const unread=useMemo(()=>allClinicMsgs.filter(m=>m.unread).length,[allClinicMsgs]);
+
+  /* Fetch pending applications count for operator badge */
+  useEffect(()=>{
+    if(!isOperator||!user)return;
+    let cancelled=false;
+    const fetchPending=async()=>{try{const stats=await fmApi.getApplicationStats();if(!cancelled&&stats?.pending)setPendingApps(stats.pending);}catch{}};
+    fetchPending();
+    const iv=setInterval(fetchPending,60000);
+    return()=>{cancelled=true;clearInterval(iv);};
+  },[isOperator,user]);
 
   /* Supabase Realtime — subscribe to message inserts for live updates */
   useEffect(()=>{
@@ -1174,7 +1185,7 @@ export default function App() {
   /* ======== NAV ======== */
   const nav=isOperator?[
     {id:"operator",icon:"📊",l:"Overview"},
-    {id:"op_applications",icon:"📩",l:"Bewerbungen"},
+    {id:"op_applications",icon:"📩",l:"Bewerbungen",badge:pendingApps||null},
     {id:"op_clinics",icon:"🏥",l:"Clinics"},
     {id:"op_onboarding",icon:"🚀",l:"Onboarding"},
     "div",

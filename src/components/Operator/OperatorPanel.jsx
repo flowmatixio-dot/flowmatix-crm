@@ -82,6 +82,7 @@ function useOperatorData() {
     await Promise.allSettled([
       load('overview', api.getPlatformOverview),
       load('health', api.getHealth),
+      load('applicationStats', api.getApplicationStats),
     ]);
     setLoading(false);
   }, [load]);
@@ -157,6 +158,46 @@ export default function OperatorPanel() {
         <span style={{ fontSize: 12, color: '#8888aa' }}>{apiConnected ? 'API Connected' : apiConnected === false ? 'API Disconnected' : 'Connecting...'}</span>
         <button onClick={reload} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: S.accent, fontSize: 12, cursor: 'pointer' }}>Refresh</button>
       </div>
+
+      {/* Pending applications alert banner */}
+      {d.applicationStats?.pending > 0 && (
+        <div
+          onClick={() => { /* navigate to applications tab if possible */ }}
+          style={{
+            marginBottom: 16,
+            padding: '12px 18px',
+            borderRadius: 12,
+            background: 'rgba(239,68,68,0.08)',
+            border: '1px solid rgba(239,68,68,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            cursor: 'pointer',
+            animation: 'opPulse 2s ease-in-out infinite',
+          }}
+        >
+          <span style={{
+            width: 10, height: 10, borderRadius: '50%',
+            background: S.red,
+            boxShadow: '0 0 8px rgba(239,68,68,0.6)',
+            flexShrink: 0,
+            animation: 'opDotPulse 1.5s ease-in-out infinite',
+          }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: S.red }}>
+            {d.applicationStats.pending} neue Bewerbung{d.applicationStats.pending !== 1 ? 'en' : ''} warten
+          </span>
+        </div>
+      )}
+      <style>{`
+        @keyframes opPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.75; }
+        }
+        @keyframes opDotPulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+          50% { transform: scale(1.3); box-shadow: 0 0 16px rgba(239,68,68,0.8); }
+        }
+      `}</style>
 
       {loading && !d.overview ? <Spin /> : (
         <>
