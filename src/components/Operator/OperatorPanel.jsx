@@ -301,8 +301,8 @@ function TabApplications({ d, load }) {
   };
 
   const planBadge = (plan) => {
-    const colors = { starter: S.accent, growth: S.green, scale: '#a855f7' };
-    const labels = { starter: 'Starter €299', growth: 'Growth €599', scale: 'Scale €999' };
+    const colors = { core: S.accent, pro: S.green, operations: '#a855f7', enterprise: '#eab308' };
+    const labels = { core: 'Core €690', pro: 'Pro €990', operations: 'Ops €1.490', enterprise: 'Enterprise €2.500+' };
     return badge(colors[plan] || S.gray, labels[plan] || plan);
   };
 
