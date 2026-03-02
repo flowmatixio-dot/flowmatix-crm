@@ -1186,6 +1186,7 @@ export default function App() {
   const nav=isOperator?[
     {id:"operator",icon:"📊",l:"Overview"},
     {id:"op_applications",icon:"📩",l:"Bewerbungen",badge:pendingApps||null},
+    {id:"op_outreach",icon:"🎯",l:"Outreach"},
     {id:"op_clinics",icon:"🏥",l:"Clinics"},
     {id:"op_onboarding",icon:"🚀",l:"Onboarding"},
     "div",

@@ -512,6 +512,38 @@ export async function rejectApplication(id, data = {}) {
   });
 }
 
+// ── Outreach ───────────────────────────────────────────────
+
+export async function getOutreachLeads(params = {}) {
+  const qs = new URLSearchParams();
+  if (params.status) qs.set('status', params.status);
+  if (params.search) qs.set('search', params.search);
+  const q = qs.toString();
+  return apiFetch(`/api/v1/ops/outreach${q ? '?' + q : ''}`);
+}
+
+export async function getOutreachStats() {
+  return apiFetch('/api/v1/ops/outreach/stats');
+}
+
+export async function updateOutreachLead(id, data) {
+  return apiFetch(`/api/v1/ops/outreach/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function createOutreachLead(data) {
+  return apiFetch('/api/v1/ops/outreach', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteOutreachLead(id) {
+  return apiFetch(`/api/v1/ops/outreach/${id}`, { method: 'DELETE' });
+}
+
 // ── Health ────────────────────────────────────────────────
 
 export async function getHealth() {
