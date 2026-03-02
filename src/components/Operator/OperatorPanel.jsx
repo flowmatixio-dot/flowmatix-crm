@@ -122,6 +122,7 @@ function useOperatorData() {
       case 'users': await Promise.allSettled([load('users', api.getUsers), load('userStats', api.getUserStats)]); break;
       case 'whatsapp': await load('clinics', api.getPlatformClinics); break;
       case 'integrations': await load('clinics', api.getPlatformClinics); break;
+      case 'applications': await Promise.allSettled([load('applications', api.getApplications), load('applicationStats', api.getApplicationStats)]); break;
       default: break;
     }
   }, [load]);
@@ -162,6 +163,7 @@ export default function OperatorPanel() {
           {tab === 'dashboard' && <TabDashboard d={d} />}
           {tab === 'clinics' && <TabClinics d={d} load={load} />}
           {tab === 'onboarding' && <TabOnboarding d={d} load={load} />}
+          {tab === 'applications' && <TabApplications d={d} load={load} />}
           {tab === 'whatsapp' && <TabWhatsApp d={d} load={load} />}
           {tab === 'integrations' && <TabIntegrations d={d} load={load} />}
           {tab === 'automations' && <TabAutomations d={d} load={load} />}
@@ -251,6 +253,195 @@ function TabDashboard({ d }) {
           )}
         </div>
       </div>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   1b) APPLICATIONS / BEWERBUNGEN
+   ═══════════════════════════════════════════════════════════ */
+function TabApplications({ d, load }) {
+  const [filter, setFilter] = useState('pending');
+  const [msg, setMsg] = useState(null);
+  const [paymentLink, setPaymentLink] = useState('');
+  const [rejectReason, setRejectReason] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+  const apps = d.applications;
+  const stats = d.applicationStats;
+
+  const refresh = () => load('applications', () => api.getApplications({ status: filter === 'all' ? undefined : filter }));
+
+  useEffect(() => {
+    load('applications', () => api.getApplications({ status: filter === 'all' ? undefined : filter }));
+  }, [filter]);
+
+  const handleApprove = async (app) => {
+    try {
+      setMsg(null);
+      await api.approveApplication(app.id, { paymentLink: paymentLink || undefined });
+      setMsg({ type: 'ok', text: `${app.clinic_name} angenommen${paymentLink ? ' — Zahlungslink gesendet' : ''}` });
+      setPaymentLink('');
+      setExpandedId(null);
+      await refresh();
+      load('applicationStats', api.getApplicationStats);
+    } catch (err) { setMsg({ type: 'err', text: err.message }); }
+  };
+
+  const handleReject = async (app) => {
+    if (!confirm(`"${app.clinic_name}" wirklich ablehnen?`)) return;
+    try {
+      setMsg(null);
+      await api.rejectApplication(app.id, { reason: rejectReason || undefined });
+      setMsg({ type: 'ok', text: `${app.clinic_name} abgelehnt` });
+      setRejectReason('');
+      setExpandedId(null);
+      await refresh();
+      load('applicationStats', api.getApplicationStats);
+    } catch (err) { setMsg({ type: 'err', text: err.message }); }
+  };
+
+  const planBadge = (plan) => {
+    const colors = { starter: S.accent, growth: S.green, scale: '#a855f7' };
+    const labels = { starter: 'Starter €299', growth: 'Growth €599', scale: 'Scale €999' };
+    return badge(colors[plan] || S.gray, labels[plan] || plan);
+  };
+
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
+
+  return (
+    <>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Bewerbungen</h2>
+
+      {/* Stats */}
+      {stats && (
+        <div style={S.grid4}>
+          <div style={S.card}>
+            <div style={S.kpiLabel}>Ausstehend</div>
+            <div style={{ ...S.kpi, color: stats.pending > 0 ? '#fbbf24' : '#fff' }}>{stats.pending}</div>
+          </div>
+          <div style={S.card}>
+            <div style={S.kpiLabel}>Angenommen</div>
+            <div style={{ ...S.kpi, color: S.green }}>{stats.approved}</div>
+          </div>
+          <div style={S.card}>
+            <div style={S.kpiLabel}>Abgelehnt</div>
+            <div style={{ ...S.kpi, color: S.gray }}>{stats.rejected}</div>
+          </div>
+          <div style={S.card}>
+            <div style={S.kpiLabel}>Letzte 7 Tage</div>
+            <div style={S.kpi}>{stats.last_7_days}</div>
+          </div>
+        </div>
+      )}
+
+      {msg && (
+        <div style={{ ...S.card, borderLeft: `3px solid ${msg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
+          <div style={{ fontSize: 13, color: msg.type === 'ok' ? S.green : S.red }}>{msg.text}</div>
+        </div>
+      )}
+
+      {/* Filter tabs */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        {['pending', 'approved', 'rejected', 'all'].map(f => (
+          <button key={f} onClick={() => setFilter(f)} style={{
+            padding: '6px 16px', borderRadius: 8, border: `1px solid ${filter === f ? S.accent : '#333366'}`,
+            background: filter === f ? S.accent + '22' : 'transparent', color: filter === f ? S.accent : '#8888aa',
+            fontWeight: filter === f ? 700 : 500, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', textTransform: 'capitalize',
+          }}>{f === 'pending' ? 'Ausstehend' : f === 'approved' ? 'Angenommen' : f === 'rejected' ? 'Abgelehnt' : 'Alle'}</button>
+        ))}
+      </div>
+
+      {/* Applications list */}
+      {!apps ? <Spin /> : !apps.applications?.length ? <Empty text="Keine Bewerbungen" /> : (
+        <div>
+          {apps.applications.map(app => (
+            <div key={app.id} style={{ ...S.card, borderLeft: `3px solid ${app.status === 'pending' ? '#fbbf24' : app.status === 'approved' ? S.green : S.gray}` }}>
+              {/* Header row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{app.clinic_name}</div>
+                  <div style={{ fontSize: 13, color: '#8888aa', marginTop: 2 }}>
+                    {app.contact_name} · {app.email}
+                    {app.phone && ` · ${app.phone}`}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {planBadge(app.selected_plan)}
+                  {app.meta_verified ? badge(S.green, 'Meta ✓') : badge(S.red, 'Meta ✗')}
+                  {statusBadge(app.status)}
+                </div>
+              </div>
+
+              {/* Quick info */}
+              <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 12, color: '#8888aa' }}>
+                {app.patients_per_month && <span>📊 {app.patients_per_month} Pat./Monat</span>}
+                {app.start_timeline && <span>📅 Start: {app.start_timeline}</span>}
+                {app.website && <span>🌐 {app.website}</span>}
+                <span style={{ marginLeft: 'auto' }}>{timeAgo(app.created_at)}</span>
+              </div>
+
+              {/* Expanded detail */}
+              {expandedId === app.id && (
+                <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #1e1e3e' }}>
+                  <div style={S.grid3}>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Klinik</div>
+                      <div style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>{app.clinic_name}</div>
+                      {app.website && <a href={app.website.startsWith('http') ? app.website : `https://${app.website}`} target="_blank" rel="noopener" style={{ fontSize: 12, color: S.accent }}>{app.website}</a>}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Kontakt</div>
+                      <div style={{ fontSize: 14, color: '#fff' }}>{app.contact_name}</div>
+                      <div style={{ fontSize: 12, color: '#8888aa' }}>{app.email}</div>
+                      {app.phone && <div style={{ fontSize: 12, color: '#8888aa' }}>{app.phone}</div>}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Qualifikation</div>
+                      <div style={{ fontSize: 13, color: '#ccc' }}>
+                        Meta: {app.meta_verified ? <span style={{ color: S.green }}>Verifiziert ✓</span> : <span style={{ color: S.red }}>Nicht verifiziert ✗</span>}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#ccc' }}>Patienten: {app.patients_per_month || '-'}/Monat</div>
+                      <div style={{ fontSize: 13, color: '#ccc' }}>Start: {app.start_timeline || '-'}</div>
+                    </div>
+                  </div>
+
+                  {app.message && (
+                    <div style={{ marginTop: 12, padding: 12, background: '#1a1a2e', borderRadius: 8, fontSize: 13, color: '#ccc', lineHeight: 1.6 }}>
+                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Nachricht</div>
+                      {app.message}
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  {app.status === 'pending' && (
+                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #1e1e3e' }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <label style={{ fontSize: 12, color: '#8888aa', display: 'block', marginBottom: 4 }}>Stripe Zahlungslink (optional — wird per Mail gesendet)</label>
+                        <input value={paymentLink} onChange={e => setPaymentLink(e.target.value)} placeholder="https://buy.stripe.com/..." style={inputStyle} />
+                      </div>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <Btn onClick={() => handleApprove(app)}>🟢 Annehmen{paymentLink ? ' & Link senden' : ''}</Btn>
+                        <Btn danger onClick={() => handleReject(app)}>🔴 Ablehnen</Btn>
+                      </div>
+                    </div>
+                  )}
+
+                  {app.status === 'approved' && app.stripe_payment_link && (
+                    <div style={{ marginTop: 12, fontSize: 12, color: '#8888aa' }}>
+                      Zahlungslink: <a href={app.stripe_payment_link} target="_blank" rel="noopener" style={{ color: S.accent }}>{app.stripe_payment_link}</a>
+                      {app.payment_status === 'paid' ? badge(S.green, 'Bezahlt') : badge(S.yellow, 'Ausstehend')}
+                    </div>
+                  )}
+
+                  {app.status === 'rejected' && app.rejection_reason && (
+                    <div style={{ marginTop: 12, fontSize: 12, color: S.red }}>Grund: {app.rejection_reason}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

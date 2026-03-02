@@ -483,6 +483,35 @@ export async function createClinic(data) {
   });
 }
 
+// ── Applications (Bewerbungen) ─────────────────────────
+
+export async function getApplications(params = {}) {
+  const qs = new URLSearchParams();
+  if (params.status) qs.set('status', params.status);
+  if (params.page) qs.set('page', params.page);
+  if (params.limit) qs.set('limit', params.limit);
+  const q = qs.toString();
+  return apiFetch(`/api/v1/ops/applications${q ? '?' + q : ''}`);
+}
+
+export async function getApplicationStats() {
+  return apiFetch('/api/v1/ops/applications/stats');
+}
+
+export async function approveApplication(id, data = {}) {
+  return apiFetch(`/api/v1/ops/applications/${id}/approve`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function rejectApplication(id, data = {}) {
+  return apiFetch(`/api/v1/ops/applications/${id}/reject`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
 // ── Health ────────────────────────────────────────────────
 
 export async function getHealth() {
