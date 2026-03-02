@@ -4,7 +4,7 @@ import { useApp } from "../../context/AppContext";
 const STEPS = {
   required: [
     { id: "profile", icon: "🏥", label: "Clinic Profile", desc: "Name, address, contact info, timezone", check: c => !!(c.name && c.address && c.phone && c.clinicEmail), action: "settings" },
-    { id: "whatsapp", icon: "💬", label: "WhatsApp Setup", desc: "Bot name, welcome message, business hours", check: c => !!(c.waName && c.welcomeMsg && c.hours), action: "settings" },
+    { id: "whatsapp", icon: "💬", label: "WhatsApp Setup", desc: "Meta Business verifizieren, Nummer verbinden, AI aktivieren", check: c => !!(c.waSetupProgress?.connection_tested), action: "whatsapp_setup" },
     { id: "ai", icon: "🤖", label: "AI Configuration", desc: "Clinic description, services, FAQ, tone", check: c => !!(c.aiConfig?.clinicDesc && c.aiConfig?.services?.length > 0), action: "ai_control" },
     { id: "calendar", icon: "📅", label: "Calendar & Appointments", desc: "Google Calendar sync, booking rules", check: c => !!(c.aiConfig?.bookingRules), action: "appointments" },
   ],

@@ -544,6 +544,57 @@ export async function deleteOutreachLead(id) {
   return apiFetch(`/api/v1/ops/outreach/${id}`, { method: 'DELETE' });
 }
 
+// ── Billing & Subscriptions ──────────────────────────────
+
+export async function getMySubscription() {
+  return apiFetch('/api/v1/ops/subscriptions/my');
+}
+
+export async function addAddon(priceId) {
+  return apiFetch('/api/v1/ops/subscriptions/addon', {
+    method: 'POST',
+    body: JSON.stringify({ priceId }),
+  });
+}
+
+export async function removeAddon(itemId) {
+  return apiFetch(`/api/v1/ops/subscriptions/addon/${itemId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function cancelSubscription(immediately = false) {
+  return apiFetch('/api/v1/ops/subscriptions/cancel', {
+    method: 'POST',
+    body: JSON.stringify({ immediately }),
+  });
+}
+
+export async function reactivateSubscription() {
+  return apiFetch('/api/v1/ops/subscriptions/reactivate', {
+    method: 'POST',
+  });
+}
+
+export async function getStripePortalUrl() {
+  return apiFetch('/api/v1/ops/subscriptions/portal', {
+    method: 'POST',
+  });
+}
+
+// ── Agent Config ─────────────────────────────────────────
+
+export async function getAgentConfig(orgId) {
+  return apiFetch(`/api/v1/ops/clinic/${orgId}/agent-config`);
+}
+
+export async function updateAgentConfig(orgId, data) {
+  return apiFetch(`/api/v1/ops/clinic/${orgId}/agent-config`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
 // ── Health ────────────────────────────────────────────────
 
 export async function getHealth() {

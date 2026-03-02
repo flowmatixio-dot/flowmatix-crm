@@ -34,6 +34,7 @@ import DashboardView from "./src/components/Dashboard/DashboardView";
 import InboxView from "./src/components/Inbox/InboxView";
 import AppointmentsView from "./src/components/Appointments/AppointmentsView";
 import AIControlView from "./src/components/AIControl/AIControlView";
+import WhatsAppSetup from "./src/components/SetupGuide/WhatsAppSetup";
 import ErrorBoundary from "./src/components/shared/ErrorBoundary";
 
 /* ═══ AUTH REDIRECT — Supabase whitelists this in Dashboard → Auth → URL Configuration ═══
@@ -1059,10 +1060,10 @@ export default function App() {
       <div style={{position:"fixed",top:20,left:24,zIndex:10}}>
         <button onClick={()=>{const next=isDemoMode?"live":"demo";try{localStorage.setItem("fm_env",next);}catch{}setIsDemoMode(next!=="live");setUser(null);setLoginErr("");setLoginMode("magic");}} style={{padding:"6px 14px",borderRadius:10,border:`1px solid ${isDemoMode?"rgba(255,138,42,0.25)":"rgba(76,201,255,0.25)"}`,background:isDemoMode?"rgba(255,138,42,0.1)":"rgba(76,201,255,0.1)",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"inherit",display:"flex",alignItems:"center",gap:6,transition:"all .15s"}}>{isDemoMode?"🧪 Demo":"🚀 Live"}</button>
       </div>
-      {/* Language flags top-right */}
-      <div style={{position:"fixed",top:20,right:24,display:"flex",gap:6,zIndex:10}}>
-        {[{code:"en",flag:"🇬🇧"},{code:"de",flag:"🇩🇪"},{code:"tr",flag:"🇹🇷"}].map(l=>
-          <button key={l.code} onClick={()=>setLoginLang(l.code)} style={{width:38,height:38,borderRadius:10,background:loginLang===l.code?"rgba(76,201,255,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${loginLang===l.code?"rgba(76,201,255,0.3)":"rgba(255,255,255,0.08)"}`,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>{l.flag}</button>
+      {/* Language flags top-right — all 7 languages */}
+      <div style={{position:"fixed",top:20,right:24,display:"flex",gap:5,zIndex:10,flexWrap:"wrap",maxWidth:320,justifyContent:"flex-end"}}>
+        {[{code:"en",flag:"🇬🇧"},{code:"de",flag:"🇩🇪"},{code:"tr",flag:"🇹🇷"},{code:"es",flag:"🇪🇸"},{code:"fr",flag:"🇫🇷"},{code:"it",flag:"🇮🇹"},{code:"pt",flag:"🇵🇹"}].map(l=>
+          <button key={l.code} onClick={()=>setLoginLang(l.code)} style={{width:36,height:36,borderRadius:10,background:loginLang===l.code?"rgba(76,201,255,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${loginLang===l.code?"rgba(76,201,255,0.3)":"rgba(255,255,255,0.08)"}`,cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>{l.flag}</button>
         )}
       </div>
       {/* Logo */}
@@ -1297,6 +1298,17 @@ export default function App() {
 
       {/* ═══ 1️⃣ SETUP SCREEN — Done-for-you Activation ═══ */}
       {clinic&&clinic.setupStatus&&clinic.setupStatus!=="live"&&!isOperator&&<div style={{position:"fixed",inset:0,zIndex:2000,background:AUTH_BG,display:"flex",alignItems:"center",justifyContent:"center",overflowY:"auto",padding:"40px 0"}}>
+        {/* Language switcher top-right */}
+        <div style={{position:"fixed",top:20,right:24,display:"flex",gap:5,zIndex:2010,flexWrap:"wrap",maxWidth:320,justifyContent:"flex-end"}}>
+          {[{code:"en",flag:"🇬🇧"},{code:"de",flag:"🇩🇪"},{code:"tr",flag:"🇹🇷"},{code:"es",flag:"🇪🇸"},{code:"fr",flag:"🇫🇷"},{code:"it",flag:"🇮🇹"},{code:"pt",flag:"🇵🇹"}].map(l=>
+            <button key={l.code} onClick={()=>setLang(l.code)} style={{width:36,height:36,borderRadius:10,background:lang===l.code?"rgba(76,201,255,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${lang===l.code?"rgba(76,201,255,0.3)":"rgba(255,255,255,0.08)"}`,cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>{l.flag}</button>
+          )}
+        </div>
+        {/* Live support floating button */}
+        <button onClick={()=>{window.open("https://wa.me/4915901431587?text=Hallo%2C%20ich%20brauche%20Hilfe%20beim%20Onboarding","_blank");}} style={{position:"fixed",bottom:24,right:24,zIndex:2010,padding:"12px 20px",borderRadius:50,background:"linear-gradient(135deg,#25D366,#128C7E)",border:"none",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 16px rgba(37,211,102,0.3)",display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontSize:18}}>💬</span>
+          {{en:"Need help?",de:"Hilfe noetig?",tr:"Yardim mi lazim?",es:"Necesitas ayuda?",fr:"Besoin d'aide?",it:"Hai bisogno di aiuto?",pt:"Precisa de ajuda?"}[lang]||"Need help?"}
+        </button>
         <div style={{maxWidth:560,width:"90vw",textAlign:"center"}}>
           {/* Logo */}
           <div style={{marginBottom:32}}>
@@ -1324,46 +1336,90 @@ export default function App() {
           {/* Status: form_submitted — waiting for connection call */}
           {clinic.setupStatus==="form_submitted"&&<div style={{animation:"slI .3s ease"}}>
             <div style={{width:72,height:72,margin:"0 auto 20px",borderRadius:20,background:"rgba(16,185,129,0.1)",border:"2px solid rgba(16,185,129,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>✅</div>
-            <h1 style={{fontSize:28,fontWeight:800,margin:"0 0 8px"}}>Clinic details received</h1>
-            <p style={{fontSize:16,color:"rgba(167,177,195,0.7)",margin:"0 0 32px",lineHeight:1.6}}>We will contact you shortly to complete the WhatsApp connection.<br/>This usually takes less than 24 hours.</p>
-            <div style={{padding:20,borderRadius:16,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",marginBottom:24,textAlign:"left"}}>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)",textTransform:"uppercase",letterSpacing:"0.5px",marginBottom:12}}>Your Setup Progress</div>
-              {[
-                {label:"Submit clinic details",done:true},
-                {label:"Remote connection",done:false,active:true},
-                {label:"Verification",done:false},
-                {label:"Go live",done:false},
-              ].map((s,i)=><div key={i} style={{display:"flex",gap:10,alignItems:"center",padding:"8px 0",borderBottom:i<3?"1px solid rgba(255,255,255,0.03)":"none"}}>
-                <div style={{width:24,height:24,borderRadius:8,background:s.done?"rgba(16,185,129,0.12)":s.active?"rgba(76,201,255,0.12)":"rgba(255,255,255,0.04)",border:`1.5px solid ${s.done?"rgba(16,185,129,0.4)":s.active?"rgba(76,201,255,0.3)":"rgba(255,255,255,0.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:800,color:s.done?"#10b981":s.active?"#4cc9ff":"rgba(167,177,195,0.3)"}}>{s.done?"✓":s.active?"…":""}</div>
-                <span style={{fontSize:14,fontWeight:s.active?700:500,color:s.done?"#10b981":s.active?"#fff":"rgba(167,177,195,0.4)"}}>{s.label}</span>
-                {s.active&&<span style={{marginLeft:"auto",fontSize:11,color:"#4cc9ff",fontWeight:700,animation:"aiPulse 2s ease infinite"}}>In progress</span>}
-              </div>)}
-            </div>
-            {/* Meta Business Verification Info */}
-            <div style={{padding:18,borderRadius:16,background:"rgba(255,180,0,0.04)",border:"1px solid rgba(255,180,0,0.12)",marginBottom:16,textAlign:"left"}}>
-              <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:10}}>
-                <span style={{fontSize:18}}>📋</span>
-                <span style={{fontWeight:700,fontSize:14,color:"#fbbf24"}}>Meta Business Verification</span>
-              </div>
-              <p style={{fontSize:13,color:"rgba(167,177,195,0.6)",margin:"0 0 8px",lineHeight:1.6}}>If your Meta Business Manager is already verified, please add <strong style={{color:"#fff"}}>Flowmatix</strong> as a Service Partner in your Business Settings → Partners.</p>
-              <p style={{fontSize:13,color:"rgba(167,177,195,0.5)",margin:0,lineHeight:1.6}}>Not verified yet? No worries — we'll help you complete verification during the setup call. Have your business documents ready (registration, website, etc.).</p>
-            </div>
+            <h1 style={{fontSize:28,fontWeight:800,margin:"0 0 8px"}}>{{en:"Connect WhatsApp",de:"WhatsApp verbinden",tr:"WhatsApp Baglantisi",es:"Conectar WhatsApp",fr:"Connecter WhatsApp",it:"Collega WhatsApp",pt:"Conectar WhatsApp"}[lang]||"Connect WhatsApp"}</h1>
+            <p style={{fontSize:16,color:"rgba(167,177,195,0.7)",margin:"0 0 24px",lineHeight:1.6}}>{{en:"Follow these steps to activate your WhatsApp Business channel.",de:"Folgen Sie diesen Schritten um Ihren WhatsApp Business Kanal zu aktivieren.",tr:"WhatsApp Business kanalinizi etkinlestirmek icin bu adimlari izleyin.",es:"Siga estos pasos para activar su canal de WhatsApp Business.",fr:"Suivez ces etapes pour activer votre canal WhatsApp Business.",it:"Segui questi passaggi per attivare il tuo canale WhatsApp Business.",pt:"Siga estes passos para ativar o seu canal WhatsApp Business."}[lang]||"Follow these steps to activate your WhatsApp Business channel."}</p>
 
-            {/* Calendly Booking Widget */}
-            <div style={{padding:18,borderRadius:16,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:24,textAlign:"left"}}>
-              <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:6}}>
-                <span style={{fontSize:18}}>📅</span>
-                <span style={{fontWeight:700,fontSize:15,color:"#4cc9ff"}}>Book your WhatsApp Setup Call</span>
-              </div>
-              <p style={{fontSize:13,color:"rgba(167,177,195,0.55)",margin:"0 0 14px",lineHeight:1.6}}>We'll connect your WhatsApp Business account in a guided 15-minute call. Choose a time that works for you.</p>
-              <div style={{borderRadius:12,overflow:"hidden",background:"#fff"}}>
-                <iframe src="https://calendly.com/flowmatix-io/30min" style={{width:"100%",height:380,border:"none"}} title="Book Setup Call"/>
-              </div>
-            </div>
+            {/* Self-service WhatsApp Setup Steps */}
+            {(()=>{
+              const wp = clinic.waSetupProgress || {};
+              const OB_T = {
+                en: { s1:"Create Meta Business Account", d1:"Create an account on business.facebook.com", s2:"Verify your business", d2:"Upload business registration & proof of address (1-5 days)", s3:"Invite Flowmatix as partner", d3:"Settings → Partners → Enter Business ID", s4:"Register WhatsApp number", d4:"Enter SMS code to activate your clinic number", s5:"Test connection", d5:"Send a test message — AI responds automatically", done:"Done", open:"Open →", sms_title:"Enter SMS verification code", sms_hint:"We send the code via SMS to your clinic number. Best done in the evening.", verify:"Verify", partner_id:"Flowmatix Partner Business ID", copy:"Copy", phone_label:"Your clinic WhatsApp number", phone_hint:"Existing number recommended", help:"Get support", go_live:"Continue → Go Live", preview:"CRM Preview →", connected:"WhatsApp is connected!", steps_done:"completed" },
+                de: { s1:"Meta Business Account erstellen", d1:"Erstellen Sie einen Account auf business.facebook.com", s2:"Unternehmen verifizieren", d2:"Gewerbeschein & Adressnachweis bei Meta hochladen (1-5 Tage)", s3:"Flowmatix als Partner einladen", d3:"Settings → Partners → Business ID eingeben", s4:"WhatsApp-Nummer registrieren", d4:"SMS-Code eingeben um Ihre Praxisnummer zu aktivieren", s5:"Verbindung testen", d5:"Testnachricht senden — AI antwortet automatisch", done:"Erledigt", open:"Oeffnen →", sms_title:"SMS-Verifizierungscode eingeben", sms_hint:"Wir senden den Code per SMS an Ihre Praxisnummer. Am besten abends machen.", verify:"Verifizieren", partner_id:"Flowmatix Partner Business ID", copy:"Kopieren", phone_label:"WhatsApp-Nummer Ihrer Praxis", phone_hint:"Vorhandene Nummer empfohlen", help:"Hilfe vom Support", go_live:"Weiter → Go Live", preview:"CRM Preview →", connected:"WhatsApp ist verbunden!", steps_done:"erledigt" },
+                tr: { s1:"Meta Business Hesabi Olusturun", d1:"business.facebook.com'da hesap olusturun", s2:"Isletmenizi dogrulayin", d2:"Ticaret sicili ve adres belgesi yukleyin (1-5 gun)", s3:"Flowmatix'i partner olarak ekleyin", d3:"Ayarlar → Partnerler → Business ID girin", s4:"WhatsApp numarasini kaydedin", d4:"Klinik numaranizi etkinlestirmek icin SMS kodunu girin", s5:"Baglantiyi test edin", d5:"Test mesaji gonderin — AI otomatik yanit verir", done:"Tamamlandi", open:"Ac →", sms_title:"SMS dogrulama kodunu girin", sms_hint:"Kodu klinik numaraniza SMS ile gonderiyoruz. Aksam yapmak en iyisi.", verify:"Dogrula", partner_id:"Flowmatix Partner Business ID", copy:"Kopyala", phone_label:"Klinik WhatsApp numaraniz", phone_hint:"Mevcut numara onerilir", help:"Destek al", go_live:"Devam → Canli Yayina Gec", preview:"CRM Onizleme →", connected:"WhatsApp baglandi!", steps_done:"tamamlandi" },
+                es: { s1:"Crear cuenta Meta Business", d1:"Cree una cuenta en business.facebook.com", s2:"Verificar empresa", d2:"Suba registro comercial y comprobante de domicilio (1-5 dias)", s3:"Invitar a Flowmatix como socio", d3:"Configuracion → Socios → Ingrese Business ID", s4:"Registrar numero de WhatsApp", d4:"Ingrese el codigo SMS para activar su numero", s5:"Probar conexion", d5:"Envie un mensaje de prueba — la IA responde automaticamente", done:"Listo", open:"Abrir →", sms_title:"Ingrese codigo de verificacion SMS", sms_hint:"Enviamos el codigo por SMS a su numero. Mejor hacerlo por la noche.", verify:"Verificar", partner_id:"Flowmatix Partner Business ID", copy:"Copiar", phone_label:"Numero de WhatsApp de su clinica", phone_hint:"Se recomienda numero existente", help:"Soporte", go_live:"Continuar → Activar", preview:"Vista previa CRM →", connected:"WhatsApp conectado!", steps_done:"completados" },
+                fr: { s1:"Creer un compte Meta Business", d1:"Creez un compte sur business.facebook.com", s2:"Verifier votre entreprise", d2:"Telechargez extrait Kbis et justificatif d'adresse (1-5 jours)", s3:"Inviter Flowmatix comme partenaire", d3:"Parametres → Partenaires → Saisir Business ID", s4:"Enregistrer le numero WhatsApp", d4:"Saisissez le code SMS pour activer votre numero", s5:"Tester la connexion", d5:"Envoyez un message test — l'IA repond automatiquement", done:"Fait", open:"Ouvrir →", sms_title:"Saisir le code de verification SMS", sms_hint:"Nous envoyons le code par SMS a votre numero. Preferez le soir.", verify:"Verifier", partner_id:"Flowmatix Partner Business ID", copy:"Copier", phone_label:"Numero WhatsApp de votre cabinet", phone_hint:"Numero existant recommande", help:"Support", go_live:"Continuer → Mise en ligne", preview:"Apercu CRM →", connected:"WhatsApp est connecte!", steps_done:"termines" },
+                it: { s1:"Creare account Meta Business", d1:"Create un account su business.facebook.com", s2:"Verificare l'azienda", d2:"Caricare visura camerale e prova di indirizzo (1-5 giorni)", s3:"Invitare Flowmatix come partner", d3:"Impostazioni → Partner → Inserire Business ID", s4:"Registrare numero WhatsApp", d4:"Inserire il codice SMS per attivare il numero", s5:"Testare la connessione", d5:"Inviare un messaggio di prova — l'IA risponde automaticamente", done:"Fatto", open:"Apri →", sms_title:"Inserire il codice di verifica SMS", sms_hint:"Inviamo il codice via SMS al vostro numero. Meglio farlo la sera.", verify:"Verifica", partner_id:"Flowmatix Partner Business ID", copy:"Copia", phone_label:"Numero WhatsApp del vostro studio", phone_hint:"Si consiglia il numero esistente", help:"Supporto", go_live:"Continua → Attiva", preview:"Anteprima CRM →", connected:"WhatsApp e connesso!", steps_done:"completati" },
+                pt: { s1:"Criar conta Meta Business", d1:"Crie uma conta em business.facebook.com", s2:"Verificar empresa", d2:"Envie registo comercial e comprovativo de morada (1-5 dias)", s3:"Convidar Flowmatix como parceiro", d3:"Definicoes → Parceiros → Inserir Business ID", s4:"Registar numero WhatsApp", d4:"Insira o codigo SMS para ativar o seu numero", s5:"Testar conexao", d5:"Envie uma mensagem de teste — a IA responde automaticamente", done:"Feito", open:"Abrir →", sms_title:"Inserir codigo de verificacao SMS", sms_hint:"Enviamos o codigo por SMS para o seu numero. Melhor fazer a noite.", verify:"Verificar", partner_id:"Flowmatix Partner Business ID", copy:"Copiar", phone_label:"Numero WhatsApp da sua clinica", phone_hint:"Numero existente recomendado", help:"Suporte", go_live:"Continuar → Ativar", preview:"Pre-visualizacao CRM →", connected:"WhatsApp esta conectado!", steps_done:"concluidos" },
+              };
+              const ob = OB_T[lang] || OB_T.en;
+              const steps = [
+                { id: "meta_account", num: "1", title: ob.s1, desc: ob.d1, link: "https://business.facebook.com", check: wp.meta_account_created },
+                { id: "meta_verify", num: "2", title: ob.s2, desc: ob.d2, check: wp.meta_verified },
+                { id: "partner", num: "3", title: ob.s3, desc: ob.d3, check: wp.partner_invited },
+                { id: "number", num: "4", title: ob.s4, desc: ob.d4, check: wp.number_registered },
+                { id: "test", num: "5", title: ob.s5, desc: ob.d5, check: wp.connection_tested },
+              ];
+              const done = steps.filter(s => s.check).length;
+              const pct = Math.round((done / steps.length) * 100);
+              return <>
+                {/* Progress */}
+                <div style={{height:8,borderRadius:4,background:"rgba(255,255,255,0.06)",marginBottom:20}}>
+                  <div style={{height:8,borderRadius:4,background:pct===100?"#10b981":"linear-gradient(90deg,#4cc9ff,#2da8ff)",width:`${pct}%`,transition:"width .5s ease"}}/>
+                </div>
+                <div style={{fontSize:12,color:"rgba(167,177,195,0.4)",marginBottom:16,textAlign:"right"}}>{done}/{steps.length} {ob.steps_done}</div>
 
+                {/* Steps */}
+                <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20,textAlign:"left"}}>
+                  {steps.map((s,i)=>{
+                    const isNext = !s.check && (i===0 || steps[i-1].check);
+                    return <div key={s.id} style={{display:"flex",gap:12,alignItems:"center",padding:"12px 16px",borderRadius:12,background:s.check?"rgba(16,185,129,0.04)":isNext?"rgba(76,201,255,0.04)":"rgba(255,255,255,0.02)",border:`1px solid ${s.check?"rgba(16,185,129,0.15)":isNext?"rgba(76,201,255,0.15)":"rgba(255,255,255,0.06)"}`,opacity:(!s.check&&!isNext)?0.4:1}}>
+                      <div style={{width:28,height:28,borderRadius:8,background:s.check?"#10b981":isNext?"#4cc9ff":"rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:s.check||isNext?"#fff":"rgba(167,177,195,0.3)",flexShrink:0}}>
+                        {s.check?"✓":s.num}
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:700,fontSize:14,color:s.check?"#10b981":"rgba(232,238,252,0.88)"}}>{s.title}</div>
+                        <div style={{fontSize:12,color:"rgba(167,177,195,0.5)",marginTop:2}}>{s.desc}</div>
+                      </div>
+                      {isNext&&s.link&&<a href={s.link} target="_blank" rel="noopener noreferrer" style={{padding:"6px 14px",borderRadius:8,background:"rgba(76,201,255,0.1)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontSize:11,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap"}}>{ob.open}</a>}
+                      {isNext&&!s.link&&<button onClick={()=>{setClinics(cs=>cs.map(c=>c.id===clinic.id?{...c,waSetupProgress:{...(c.waSetupProgress||{}),[ s.id==="meta_account"?"meta_account_created":s.id==="meta_verify"?"meta_verified":s.id==="partner"?"partner_invited":s.id==="number"?"number_registered":"connection_tested" ]:true}}:c));showT(ob.done+"!");}} style={{padding:"6px 14px",borderRadius:8,background:"rgba(16,185,129,0.1)",border:"1px solid rgba(16,185,129,0.2)",color:"#10b981",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>{ob.done} ✓</button>}
+                    </div>;
+                  })}
+                </div>
+
+                {/* Step 3 detail: Partner ID */}
+                {!wp.partner_invited&&wp.meta_verified&&<div style={{padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,textAlign:"left"}}>
+                  <div style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)",marginBottom:6}}>{ob.partner_id}</div>
+                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                    <code style={{flex:1,padding:"10px 14px",borderRadius:8,background:"rgba(0,0,0,0.3)",border:"1px solid rgba(255,255,255,0.08)",color:"#4cc9ff",fontSize:14,fontFamily:"monospace",letterSpacing:1}}>YOUR_META_BUSINESS_ID</code>
+                    <button onClick={()=>{navigator.clipboard.writeText("YOUR_META_BUSINESS_ID");showT(ob.copy+"!");}} style={{padding:"10px 16px",borderRadius:8,background:"rgba(76,201,255,0.1)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{ob.copy}</button>
+                  </div>
+                </div>}
+
+                {/* Step 4 detail: SMS Code */}
+                {!wp.number_registered&&wp.partner_invited&&<div style={{padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,textAlign:"left"}}>
+                  <div style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)",marginBottom:8}}>{ob.sms_title}</div>
+                  <div style={{display:"flex",gap:10}}>
+                    <input id="ob_sms" placeholder="6-stelliger Code" maxLength={6} style={{width:160,padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"monospace",fontSize:20,letterSpacing:8,textAlign:"center",outline:"none"}} onChange={e=>{e.target.value=e.target.value.replace(/\D/g,"");}}/>
+                    <button onClick={()=>{const code=document.getElementById("ob_sms")?.value;if(code?.length===6){setClinics(cs=>cs.map(c=>c.id===clinic.id?{...c,waSetupProgress:{...(c.waSetupProgress||{}),number_registered:true}}:c));showT(ob.done+"!");}else{showT("6-digit code required");}}} style={{padding:"10px 20px",borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>{ob.verify}</button>
+                  </div>
+                  <div style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginTop:8}}>{ob.sms_hint}</div>
+                </div>}
+
+                {/* All done → Go Live */}
+                {pct===100&&<div style={{padding:16,borderRadius:14,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",textAlign:"center",marginBottom:16}}>
+                  <span style={{fontSize:28}}>🎉</span>
+                  <div style={{fontWeight:800,fontSize:16,color:"#10b981",marginTop:4}}>{ob.connected}</div>
+                </div>}
+              </>;
+            })()}
+
+            {/* Help & Navigation */}
             <div style={{display:"flex",gap:10}}>
-              <button onClick={()=>{window.open("mailto:support@flowmatix.io?subject=Setup%20help","_blank");}} style={{flex:1,padding:14,borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.6)",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>Contact support</button>
-              <button onClick={()=>{completeOnboarding(clinic.id);}} style={{flex:1,padding:14,borderRadius:14,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>Enter CRM Preview →</button>
+              <button onClick={()=>{window.open("https://wa.me/4915901431587?text="+encodeURIComponent("Hallo, ich brauche Hilfe beim WhatsApp Setup"),"_blank");}} style={{flex:1,padding:14,borderRadius:14,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.6)",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><span>💬</span> {ob.help}</button>
+              {(clinic.waSetupProgress?.connection_tested)?
+                <button onClick={()=>{setClinics(cs=>cs.map(c=>c.id===clinic.id?{...c,setupStatus:"connected"}:c));}} style={{flex:1,padding:14,borderRadius:14,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>{ob.go_live}</button>
+                :<button onClick={()=>{completeOnboarding(clinic.id);}} style={{flex:1,padding:14,borderRadius:14,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>{ob.preview}</button>
+              }
             </div>
           </div>}
           {/* Status: connected — verification in progress */}
@@ -1640,6 +1696,9 @@ export default function App() {
 
         {/* AI CONTROL */}
         {view==="ai_control"&&clinic&&<AIControlView/>}
+
+        {/* WHATSAPP SETUP */}
+        {view==="whatsapp_setup"&&clinic&&<WhatsAppSetup/>}
 
         {/* AUTOMATIONS */}
         {view==="automations"&&clinic&&<AutomationsView/>}
