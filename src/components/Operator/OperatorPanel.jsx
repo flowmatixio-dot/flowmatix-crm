@@ -135,7 +135,7 @@ function useOperatorData() {
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════ */
 export default function OperatorPanel() {
-  const { opSubTab } = useApp();
+  const { opSubTab, setOpSubTab } = useApp();
   const tab = opSubTab || "dashboard";
   const { d, loading, apiConnected, loadForTab, reload, load } = useOperatorData();
 
@@ -162,7 +162,7 @@ export default function OperatorPanel() {
       {/* Pending applications alert banner */}
       {d.applicationStats?.pending > 0 && (
         <div
-          onClick={() => { /* navigate to applications tab if possible */ }}
+          onClick={() => { setOpSubTab('applications'); }}
           style={{
             marginBottom: 16,
             padding: '12px 18px',
