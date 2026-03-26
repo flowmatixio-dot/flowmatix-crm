@@ -1,0 +1,1004 @@
+====================================================================================================
+HARDCODED GERMAN STRING AUDIT — CRM Bundle v183
+====================================================================================================
+
+SUMMARY:
+  SECTION A — TRULY HARDCODED (no translation pattern): 112
+  SECTION B — FALLBACKS (t('key')||'DE'): 103
+
+SECTION A items MUST be wrapped in a translation pattern.
+SECTION B items work when the Mt translation key exists, but the
+fallback text is German-only. These are lower priority.
+
+
+====================================================================================================
+SECTION A: TRULY HARDCODED — MUST FIX
+====================================================================================================
+
+
+--- WhatsApp-Nachrichten an Patienten (Kundenbereich!) (3 Strings) ---
+
+  A001 | POS 798741
+  STRING: "
+
+💳 Anzahlung: €${q} — Der Zahlungslink wird Ihnen in Kürze zugesendet."
+  CTX: &V?ee+=`
+
+💳 Um Ihren Termin zu sichern, überweisen Sie bitte die Anzahlung von €${q}:
+${V}`:Q&&(ee+=`
+
+💳 Anzahlung: €${q} — Der Zahlungslink wird Ihnen in Kürze zugesendet.`),Ki(K.id,{text:ee}).catch(
+
+  A002 | POS 1569257
+  STRING: "Hallo Carlos, ich sehe Dr. Yilmaz hat deinen Plan fertig. Möchtest du den Termin am 12. März fest buchen?"
+  CTX: sx("div",{style:{fontSize:12,color:"var(--text-muted)",lineHeight:1.6,fontStyle:"italic"},children:'"Hallo Carlos, ich sehe Dr. Yilmaz hat deinen Plan fertig. Möchtest du den Termin am 12. März fest b
+
+  A003 | POS 1627600
+  STRING: "Bitte teilen Sie uns Ihre Flugdaten mit (Flugnummer, Datum, Ankunftszeit)."
+  CTX: lex:1},children:R}),!G&&C==="flightReceived"&&e.jsx("button",{onClick:le=>{le.stopPropagation(),g(C,"Bitte teilen Sie uns Ihre Flugdaten mit (Flugnummer, Datum, Ankunftszeit).")},style:{padding:"3px 8
+
+
+--- Interne Timeline-Log-Einträge (3 Strings) ---
+
+  A004 | POS 793112
+  STRING: "?`🤖 AI: Analyse abgeschlossen. Anzahlungslink (€${P}) wurde automatisch via WhatsApp gesendet.`:`👤 Mitarbeiter hat Zahlungslink über €${P} generiert und zur Prü"
+  CTX: ndIndex(he=>he.leadId===q);return _e>-1&&(ee[_e]={...ee[_e],msgs:[...ee[_e].msgs||[],{text:E==="auto"?`🤖 AI: Analyse abgeschlossen. Anzahlungslink (€${P}) wurde automatisch via WhatsApp gesendet.`:`👤 
+
+  A005 | POS 793209
+  STRING: "👤 Mitarbeiter hat Zahlungslink über €${P} generiert und zur Prüfung gesendet."
+  CTX: uto"?`🤖 AI: Analyse abgeschlossen. Anzahlungslink (€${P}) wurde automatisch via WhatsApp gesendet.`:`👤 Mitarbeiter hat Zahlungslink über €${P} generiert und zur Prüfung gesendet.`,time:new Date().toLo
+
+  A006 | POS 797329
+  STRING: " + Anzahlungslink €${q}"
+  CTX: e>-1){const me={..._e[he]};me.msgs=[...me.msgs||[],{text:`🤖 KI: Behandlungsplan über ${u} (${w})${Q?` + Anzahlungslink €${q}`:""} wurde an den Patienten gesendet.`,time:new Date().toLocaleTimeString("
+
+
+--- Toast-Benachrichtigungen (4 Strings) ---
+
+  A007 | POS 1002119
+  STRING: "Fahrer hinzugefügt"
+  CTX: "backup",active:!0};const upd={...cli,drivers:[...drvs,nd]};setCli(upd);saveApi(upd).then(()=>toast("Fahrer hinzugefügt")).catch(()=>toast("Fehler beim Speichern"));setNm("");setPh("");setVh("");setPl
+
+  A008 | POS 1002158
+  STRING: "Fehler beim Speichern"
+  CTX: rivers:[...drvs,nd]};setCli(upd);saveApi(upd).then(()=>toast("Fahrer hinzugefügt")).catch(()=>toast("Fehler beim Speichern"));setNm("");setPh("");setVh("");setPl("");setSh(!1)};const delDrv=(id)=>{if(
+
+  A009 | POS 1002586
+  STRING: "Primärfahrer geändert"
+  CTX: rs:drvs.map(d=>({...d,role:d.id===id?"primary":"backup"}))};setCli(upd);saveApi(upd).then(()=>toast("Primärfahrer geändert")).catch(()=>toast("Fehler"))};return e.jsxs("div",{style:{padding:"24px 32px
+
+  A010 | POS 1002628
+  STRING: "Fehler"
+  CTX: ary":"backup"}))};setCli(upd);saveApi(upd).then(()=>toast("Primärfahrer geändert")).catch(()=>toast("Fehler"))};return e.jsxs("div",{style:{padding:"24px 32px"},children:[e.jsxs("div",{style:{display:
+
+
+--- Alert-Dialoge (1 Strings) ---
+
+  A011 | POS 1367851
+  STRING: "📋 E-Mail kopiert: ${y.email}
+
+⚠️ WICHTIG: Füge diese E-Mail als Test-User in der Google Cloud Console hinzu!
+
+1. Google Cloud Console öffnen
+2. APIs & Services "
+  CTX: hildren:"Regen Link"}),e.jsx(et,{small:!0,onClick:()=>{navigator.clipboard.writeText(y.email),alert(`📋 E-Mail kopiert: ${y.email}
+
+⚠️ WICHTIG: Füge diese E-Mail als Test-User in der Google Cloud Conso
+
+
+--- UI-Labels & Buttons (35 Strings) ---
+
+  A012 | POS 754793
+  STRING: "Flug: "
+  CTX: e:{color:"#f1f5f9",fontWeight:600},children:H.airline})]}),H.flight_number&&e.jsxs("div",{children:["Flug: ",e.jsx("span",{style:{color:"#f1f5f9",fontWeight:600},children:H.flight_number})]}),H.depart
+
+  A013 | POS 764341
+  STRING: ":`Bewertung absenden${R.depositRequested&&R.depositAmount?` + Anzahlung (€${R.depositAmount})`:"
+  CTX: =W.id?{...Je.btnPrimary,opacity:d===W.id?.6:1}:Je.btnDisabled,children:d===W.id?"Wird gespeichert...":`Bewertung absenden${R.depositRequested&&R.depositAmount?` + Anzahlung (€${R.depositAmount})`:""}`
+
+  A014 | POS 809106
+  STRING: "Patients"
+  CTX: [n]);const L=b.useMemo(()=>{if(!l)return null;const O=Da[l.plan]||Da.core,re=[{key:"patients",label:"Patients",icon:"👥",color:"#4cc9ff",value:j.length,limit:O.patients}].map(Q=>{const V=Q.limit===null
+
+  A015 | POS 859723
+  STRING: "Nachrichten werden automatisch in der Patientensprache versendet (DE, EN, TR, FR, ES, IT, AR)."
+  CTX: _trigger_note")||"Jeder Schritt wird nur ausgelöst, wenn der Patient eine aktive OP im System hat.","Nachrichten werden automatisch in der Patientensprache versendet (DE, EN, TR, FR, ES, IT, AR)."]})]
+
+  A016 | POS 975956
+  STRING: "Aktiv"
+  CTX: "rgba(167,177,195,0.06)",color:T.lastLogin?"#10b981":"rgba(167,177,195,0.35)"},children:T.lastLogin?"Aktiv":"Eingeladen"})}),e.jsxs("div",{style:{display:"flex",gap:4},children:[!L&&!W&&e.jsxs(e.Fragm
+
+  A017 | POS 1003403
+  STRING: "Abbrechen"
+  CTX: h?"#ef4444":"#3b82f6",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"},children:sh?"Abbrechen":"+ Fahrer hinzufügen"})]}),sh&&e.jsxs("div",{style:{padding:"20px",borderRadius:12,backg
+
+  A018 | POS 1005011
+  STRING: "Speichern"
+  CTX: rder:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"},children:"Speichern"})]}),e.jsx("div",{style:{display:"flex",flexDirection:"column",gap:10},children:drvs.len
+
+  A019 | POS 1075767
+  STRING: "Patient photo"
+  CTX: ex",alignItems:"center",justifyContent:"center",cursor:"zoom-out"},children:[e.jsx("img",{src:l,alt:"Patient photo",style:{maxWidth:"90vw",maxHeight:"90vh",borderRadius:12,boxShadow:"0 8px 40px rgba(0
+
+  A020 | POS 1142675
+  STRING: "Angebot gespeichert"
+  CTX: 0px rgba(0,0,0,0.5)"},children:e.jsx(Zp,{patient:J,doctorReview:J.reviewData,clinic:d,onSave:se=>{M("Angebot gespeichert"),Vn(!1)},onSend:se=>{pe(J.id,0),M("Angebot gesendet"),Vn(!1)},onClose:()=>Vn(!
+
+  A021 | POS 1142731
+  STRING: "Angebot gesendet"
+  CTX: rReview:J.reviewData,clinic:d,onSave:se=>{M("Angebot gespeichert"),Vn(!1)},onSend:se=>{pe(J.id,0),M("Angebot gesendet"),Vn(!1)},onClose:()=>Vn(!1)})})})]})}const nu=[{id:"new",label:_i("fin_new_reques
+
+  A022 | POS 1231404
+  STRING: ",{value:D,onChange:I=>g(I.target.value),rows:2,placeholder:`FUE Hair Transplant 3000 grafts
+Hotel Package`,style:{...re,resize:"
+  CTX: :700,color:"rgba(167,177,195,0.5)",marginBottom:4},children:A("items_description")}),e.jsx("textarea",{value:D,onChange:I=>g(I.target.value),rows:2,placeholder:`FUE Hair Transplant 3000 grafts
+Hotel P
+
+  A023 | POS 1323959
+  STRING: " neue Bewerbung"
+  CTX: ,e.jsxs("span",{style:{fontSize:13,fontWeight:700,color:m.red},children:[r.applicationStats.pending," neue Bewerbung",r.applicationStats.pending!==1?"en":""," warten"]})]}),e.jsx("style",{children:`
+ 
+
+  A024 | POS 1325389
+  STRING: "Neue Zahlung: "
+  CTX: n-out infinite"}}),e.jsxs("span",{style:{fontSize:13,fontWeight:700,color:m.green,flex:1},children:["Neue Zahlung: ",p.clinic," — ",x]}),e.jsx("span",{onClick:k=>{k.stopPropagation(),j(p.id)},style:{c
+
+  A025 | POS 1346245
+  STRING: "/Monat"
+  CTX: }),e.jsxs("div",{style:{fontSize:13,color:"#ccc"},children:["Patienten: ",u.patients_per_month||"-","/Monat"]}),e.jsxs("div",{style:{fontSize:13,color:"#ccc"},children:["Start: ",u.start_timeline||"-"
+
+  A026 | POS 1386045
+  STRING: ",desc:'Klinik informieren dass der Bot aktiv ist. Status auf "
+  CTX: uefen ob der Bot antwortet",priority:"medium"},{id:"go_live",label:"Go Live — Klinik benachrichtigen",desc:'Klinik informieren dass der Bot aktiv ist. Status auf "assigned" setzen.',priority:"medium"}
+
+  A027 | POS 1430632
+  STRING: "Jetzt lösen →"
+  CTX: ht:800,fontSize:13,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap",flexShrink:0},children:"Jetzt lösen →"})]}),e.jsxs("div",{style:{display:"flex",gap:18,marginTop:14,flexWrap:"wrap"},childr
+
+  A028 | POS 1431024
+  STRING: " Termine heute"
+  CTX: pan",{style:{fontSize:13,fontWeight:700,color:z>0?"#3b82f6":"rgba(167,177,195,0.3)"},children:z>0?z+" Termine heute":"Keine Termine"})]}),tr_all.length>0&&e.jsxs("div",{onClick:()=>a("pipeline"),style
+
+  A029 | POS 1434471
+  STRING: "Nächster Termin"
+  CTX: nowrap"},children:nt[0].date===A?"Nächster Termin heute":nt[0].date===tmrw?"Nächster Termin morgen":"Nächster Termin"}),e.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8},children:[e.jsx("
+
+  A030 | POS 1434766
+  STRING: "Termin"
+  CTX: "span",{style:{fontSize:14,fontWeight:700,color:"rgba(232,238,252,0.9)"},children:(nt[0].treatment||"Termin")+" – "+(nt[0].patient||"Patient")})]})]}),nt.length>1&&e.jsxs("div",{children:[e.jsx("div",
+
+  A031 | POS 1435005
+  STRING: "Weitere Termine"
+  CTX: r:"rgba(167,177,195,0.25)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6},children:"Weitere Termine"}),e.jsx("div",{style:{display:"flex",gap:8,flexWrap:"wrap"},children:nt.slice(1).m
+
+  A032 | POS 1436102
+  STRING: "Termin"
+  CTX: rink:0}}),e.jsx("span",{style:{fontWeight:600,color:"rgba(232,238,252,0.6)"},children:(c.treatment||"Termin")+" – "+(c.patient||"Patient")})],key:S})})})]})]}),e.jsx("div",{style:{display:"grid",gridT
+
+  A033 | POS 1491321
+  STRING: "+ Termin"
+  CTX: currentTarget.style.boxShadow="0 2px 8px rgba(76,201,255,0.2)"},children:Vr(l,"new_appointment_btn","+ Termin")}),e.jsx("div",{style:{width:1,height:20,background:"rgba(255,255,255,0.06)",margin:"0 2p
+
+  A034 | POS 1505289
+  STRING: "Arzt (optional)"
+  CTX: s("div",{style:{marginBottom:20},children:[e.jsx("label",{style:lo,children:qn(a,"cal_block_doctor","Arzt (optional)")}),e.jsxs("select",{value:f,onChange:j=>_(j.target.value),style:{...co,cursor:"poi
+
+  A035 | POS 1505895
+  STRING: "Abbrechen"
+  CTX: :"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.7)"},children:qn(a,"cal_block_cancel","Abbrechen")}),e.jsx("button",{onClick:v,style:{padding:"10px 20px",borderRadius:10,fontSize:13,font
+
+  A036 | POS 1506165
+  STRING: "Speichern"
+  CTX: 68,68,0.15)",border:"1px solid rgba(239,68,68,0.3)",color:"#ef4444"},children:qn(a,"cal_block_save","Speichern")})]})]})]})}const lo={display:"block",fontSize:11,fontWeight:600,color:"rgba(167,177,195
+
+  A037 | POS 1526035
+  STRING: "Patient"
+  CTX: div",{style:{fontSize:12,fontWeight:600,color:"rgba(232,238,252,0.8)"},children:k.patient||k.title||"Patient"}),e.jsxs("div",{style:{fontSize:10,color:"rgba(167,177,195,0.35)"},children:[k.time||"—","
+
+  A038 | POS 1526885
+  STRING: "Termin"
+  CTX: ts||"—"," Grafts"]}),e.jsx("button",{onClick:()=>{var c;r==null||r(k.id,d),s==null||s(`${k.patient||"Termin"} → ${(c=_.find(S=>S.id===d))==null?void 0:c.name}`)},style:{padding:"3px 10px",borderRadius
+
+  A039 | POS 1535327
+  STRING: "Termine"
+  CTX: t:800,margin:0,letterSpacing:"-0.03em",color:"rgba(232,238,252,0.95)"},children:uo(_,"appointments","Termine")}),e.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6,marginTop:6},children:[e.
+
+  A040 | POS 1535714
+  STRING: "Mit Kalender synchronisiert"
+  CTX: ,{style:{fontSize:12,color:"rgba(167,177,195,0.45)",fontWeight:500},children:uo(_,"synced_calendar","Mit Kalender synchronisiert")})]})]}),e.jsxs("div",{style:{display:"flex",gap:6,alignItems:"center"
+
+  A041 | POS 1548860
+  STRING: "Patient"
+  CTX: Size:15,fontWeight:800,letterSpacing:"-0.02em",lineHeight:1.2},children:(i==null?void 0:i.patient)||"Patient"}),e.jsx("span",{style:{fontSize:9,fontWeight:700,color:h.c,flexShrink:0,background:`${h.c}
+
+  A042 | POS 1611140
+  STRING: "Weiter →"
+  CTX: ontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"},children:l==="calendar"?"✓ Fertig":"Weiter →"})})]})]})}const m_=Object.freeze(Object.defineProperty({__proto__:null,default:Gl},Symbol
+
+  A043 | POS 1618807
+  STRING: "Manuell"
+  CTX: 7,195,0.25)"},children:["Methode: ",j.method==="whatsapp"?"WhatsApp":j.method==="digital"?"Digital":"Manuell",j.signedAt&&` · ${new Date(j.signedAt).toLocaleString("de-DE")}`]})]})]},v.key)})})]})}fun
+
+  A044 | POS 1618953
+  STRING: "Anzahlung"
+  CTX: t).toLocaleString("de-DE")}`]})]})]},v.key)})})]})}function Kl(n){const o=[{key:"depositPaid",label:"Anzahlung"},{key:"documentsSigned",label:({en:"Documents",de:"Dokumente",tr:"Belgeler"}[localStorag
+
+  A045 | POS 1626890
+  STRING: "Fehler"
+  CTX: ily:"inherit",whiteSpace:"nowrap"},children:R==="sending"?"...":R==="sent"?"✓ Gesendet":R==="error"?"Fehler":"Anfordern"})]}),M&&e.jsx("span",{style:{color:"rgba(16,185,129,0.4)",fontSize:13,fontWeigh
+
+  A046 | POS 1661390
+  STRING: "✓ Bewertung fortsetzen"
+  CTX: ,0.15)":"rgba(76,201,255,0.12)"}`,color:D?"rgba(167,177,195,0.3)":g?"#10b981":"#4cc9ff"},children:g?"✓ Bewertung fortsetzen":D?_i("locked")||"Gesperrt":_i("start_review")||"Bewertung starten"})]},S.id
+
+
+--- Fahrer-Verwaltung (komplett ohne Translation) (3 Strings) ---
+
+  A047 | POS 759285
+  STRING: "Fahrer zuweisen"
+  CTX: .id?{...Je.btnPrimary,opacity:d===W.id?.6:1}:Je.btnDisabled,children:d===W.id?"Wird gespeichert...":"Fahrer zuweisen"})]}),!G&&e.jsxs("div",{style:{borderTop:"1px solid rgba(255,255,255,0.06)",padding
+
+  A048 | POS 1003704
+  STRING: "Neuen Fahrer anlegen"
+  CTX: sx("div",{style:{fontSize:13,fontWeight:700,color:"rgba(232,238,252,0.8)",marginBottom:14},children:"Neuen Fahrer anlegen"}),e.jsxs("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,ma
+
+  A049 | POS 1006620
+  STRING: "⭐ Primär"
+  CTX: rgba(16,185,129,0.15)":"rgba(167,177,195,0.08)"),fontFamily:"inherit"},children:dr.role==="primary"?"⭐ Primär":"Backup"}),e.jsx("button",{onClick:()=>delDrv(dr.id),style:{width:32,height:32,borderRadi
+
+
+--- Action Needed View (11 Strings) ---
+
+  A050 | POS 1208675
+  STRING: " Tagen offen"
+  CTX: ceil(fH/24)+" Tagen"}else{t.urg=days>7?"over":days>3?"today":"later";t.rsn="seit "+Math.round(days)+" Tagen offen"}}else if(t.type==="flight"){t.urg=days>7?"over":days>3?"today":"later";t.rsn="seit "+
+
+  A051 | POS 1208888
+  STRING: " Tagen offen"
+  CTX: ys)+" Tagen gebucht"}else{t.urg=days>7?"over":days>3?"today":"later";t.rsn="seit "+Math.round(days)+" Tagen offen"}t.sk=(t.type==="driver"||t.type==="hotel")&&fH!==null?fH:-hrs});var j=[{urg:"over",la
+
+  A052 | POS 1208992
+  STRING: "🔴 Überfällig"
+  CTX: gen offen"}t.sk=(t.type==="driver"||t.type==="hotel")&&fH!==null?fH:-hrs});var j=[{urg:"over",label:"🔴 Überfällig",color:"#ef4444"},{urg:"today",label:"🟠 Heute",color:"#f59e0b"},{urg:"later",label:"🔵 
+
+  A053 | POS 1209043
+  STRING: "🟠 Heute"
+  CTX: ")&&fH!==null?fH:-hrs});var j=[{urg:"over",label:"🔴 Überfällig",color:"#ef4444"},{urg:"today",label:"🟠 Heute",color:"#f59e0b"},{urg:"later",label:"🔵 Später",color:"#3b82f6"}],A=["#4cc9ff","#a78bfa","#
+
+  A054 | POS 1209089
+  STRING: "🔵 Später"
+  CTX: el:"🔴 Überfällig",color:"#ef4444"},{urg:"today",label:"🟠 Heute",color:"#f59e0b"},{urg:"later",label:"🔵 Später",color:"#3b82f6"}],A=["#4cc9ff","#a78bfa","#ff8a2a","#10b981","#ec4899","#06b6d4"];return 
+
+  A055 | POS 1210382
+  STRING: "Überfällig"
+  CTX: ound:"#ef4444"}}),e.jsxs("span",{style:{fontSize:12,fontWeight:700,color:"#ef4444"},children:[p," ","Überfällig"]})]}),x>0&&e.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6,padding:"4px 1
+
+  A056 | POS 1210711
+  STRING: "Heute"
+  CTX: ound:"#f59e0b"}}),e.jsxs("span",{style:{fontSize:12,fontWeight:700,color:"#f59e0b"},children:[x," ","Heute"]})]}),k>0&&e.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6,padding:"4px 10px",
+
+  A057 | POS 1211049
+  STRING: "Später"
+  CTX: }}),e.jsxs("span",{style:{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)"},children:[k," ","Später"]})]})]})})(),v.length===0&&e.jsxs("div",{style:{padding:"80px 40px",textAlign:"center",bord
+
+  A058 | POS 1425358
+  STRING: "Guten Morgen"
+  CTX: 18?"\u0130yi G\u00fcnler":h>=18&&h<22?"\u0130yi Ak\u015famlar":"\u0130yi Geceler";return h>=5&&h<12?"Guten Morgen":h>=12&&h<18?"Guten Tag":h>=18&&h<22?"Guten Abend":"Gute Nacht"}(n)}function Ag(){cons
+
+  A059 | POS 1430121
+  STRING: " Aufgaben blockieren den Ablauf"
+  CTX: yle:{fontSize:x>0?21:17,fontWeight:900,color:x>0?"#ef4444":"#10b981",lineHeight:1.2},children:x>0?x+" Aufgaben blockieren den Ablauf":"Alles läuft — keine offenen Aufgaben"}),x>0&&hSub.length>0&&e.jsx
+
+  A060 | POS 1435213
+  STRING: "Heute"
+  CTX: =>{const st=c.status==="confirmed"?"#10b981":c.status==="pending"?"#f59e0b":"#3b82f6",dd=c.date===A?"Heute":c.date===tmrw?"Morgen":new Date(c.date+"T12:00").toLocaleDateString("de-DE",{day:"numeric",m
+
+
+--- DATEV-Export (bewusst deutsch?) (4 Strings) ---
+
+  A061 | POS 794792
+  STRING: "Soll/Haben-Kennzeichen"
+  CTX: )==null?void 0:ee.startsWith(`${E}-${Z}`))});if(P==="datev"){const X='"Umsatz (ohne Soll/Haben-Kz)";"Soll/Haben-Kennzeichen";"WKZ Umsatz";"Kurs";"Basis-Umsatz";"WKZ Basis-Umsatz";"Konto";"Gegenkonto (
+
+  A062 | POS 794879
+  STRING: "Gegenkonto (ohne BU-Schlüssel)"
+  CTX: l/Haben-Kz)";"Soll/Haben-Kennzeichen";"WKZ Umsatz";"Kurs";"Basis-Umsatz";"WKZ Basis-Umsatz";"Konto";"Gegenkonto (ohne BU-Schlüssel)";"BU-Schlüssel";"Belegdatum";"Belegfeld 1";"Belegfeld 2";"Skonto";"B
+
+  A063 | POS 794912
+  STRING: "BU-Schlüssel"
+  CTX: hen";"WKZ Umsatz";"Kurs";"Basis-Umsatz";"WKZ Basis-Umsatz";"Konto";"Gegenkonto (ohne BU-Schlüssel)";"BU-Schlüssel";"Belegdatum";"Belegfeld 1";"Belegfeld 2";"Skonto";"Buchungstext"',ee=Q.map((ke,We)=>{
+
+  A064 | POS 794977
+  STRING: "Buchungstext"
+  CTX: ";"Gegenkonto (ohne BU-Schlüssel)";"BU-Schlüssel";"Belegdatum";"Belegfeld 1";"Belegfeld 2";"Skonto";"Buchungstext"',ee=Q.map((ke,We)=>{const Ye=C(ke);z.find(te=>te.id===ke.leadId);const ue=`FM-${E}${Z
+
+
+--- Pricing/Plan Features (9 Strings) ---
+
+  A065 | POS 1019155
+  STRING: "Up to 500 Patients / Month"
+  CTX:  / Month","All Features Included","All Languages","Unlimited Team Members","AI WhatsApp 24/7"],pro:["Up to 500 Patients / Month","All Features Included","All Languages","Unlimited Team Members","AI Wh
+
+  A066 | POS 1019281
+  STRING: "Up to 1,000 Patients / Month"
+  CTX: h","All Features Included","All Languages","Unlimited Team Members","AI WhatsApp 24/7"],operations:["Up to 1,000 Patients / Month","All Features Included","All Languages","Unlimited Team Members","AI 
+
+  A067 | POS 1019409
+  STRING: "Unlimited Patients"
+  CTX: h","All Features Included","All Languages","Unlimited Team Members","AI WhatsApp 24/7"],enterprise:["Unlimited Patients","All Features Included","All Languages","Dedicated Account Manager","SLA & Prio
+
+  A068 | POS 1019567
+  STRING: "Tüm Özellikler Dahil"
+  CTX: s","Dedicated Account Manager","SLA & Priority Support"]};if(l==="tr")return{core:["250 Hasta / Ay","Tüm Özellikler Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],pro:["500 Hast
+
+  A069 | POS 1019603
+  STRING: "Sınırsız Ekip Üyesi"
+  CTX: & Priority Support"]};if(l==="tr")return{core:["250 Hasta / Ay","Tüm Özellikler Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],pro:["500 Hasta / Ay","Tüm Özellikler Dahil","Tüm 
+
+  A070 | POS 1019675
+  STRING: "Tüm Özellikler Dahil"
+  CTX: llikler Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],pro:["500 Hasta / Ay","Tüm Özellikler Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],operations:["1
+
+  A071 | POS 1019792
+  STRING: "Tüm Özellikler Dahil"
+  CTX: ahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],operations:["1.000 Hasta / Ay","Tüm Özellikler Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],enterprise:["S
+
+  A072 | POS 1019815
+  STRING: "Tüm Diller"
+  CTX: ırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],operations:["1.000 Hasta / Ay","Tüm Özellikler Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],enterprise:["Sınırsız Hasta","Tüm Öze
+
+  A073 | POS 1019907
+  STRING: "Tüm Özellikler Dahil"
+  CTX:  Dahil","Tüm Diller","Sınırsız Ekip Üyesi","Yapay Zeka WhatsApp 24/7"],enterprise:["Sınırsız Hasta","Tüm Özellikler Dahil","Tüm Diller","Özel Hesap Yöneticisi","SLA & Öncelikli Destek"]};return{core:(
+
+
+--- Timeline-Übersetzungssystem (1 Strings) ---
+
+  A074 | POS 1079174
+  STRING: ";var patterns=[[/Neue Anfrage.*WhatsApp erhalten/,en?"
+  CTX: Hayır":"Nein"):n}function translateTL(text,lang){if(!text||lang==="de")return text;var en=lang!=="tr";var patterns=[[/Neue Anfrage.*WhatsApp erhalten/,en?"New inquiry received via WhatsApp":"WhatsApp 
+
+
+--- Admin/Intern (1 Strings) ---
+
+  A075 | POS 1029440
+  STRING: "https://mail.google.com/mail/?view=cm&to=info@flowmatix.io&su=${encodeURIComponent("Enterprise Anfrage")}&body=${encodeURIComponent("
+  CTX: ("current_plan_label")||"Aktueller Plan"}):g==="enterprise"?e.jsx("button",{onClick:()=>window.open(`https://mail.google.com/mail/?view=cm&to=info@flowmatix.io&su=${encodeURIComponent("Enterprise Anfr
+
+
+--- Bestätigungs-Dialoge (1 Strings) ---
+
+  A076 | POS 1127095
+  STRING: "Patient cancelled"
+  CTX: _confirm")||"Patient wirklich stornieren?")&&(H(J.id,"cancelled"),le(J.id,"closed"),G(J.id,"system","Patient cancelled"),M(g("patient_cancelled")||"Patient storniert"))},style:{width:"100%",padding:"8
+
+
+--- Demo-Daten (7 Strings) ---
+
+  A077 | POS 1710097
+  STRING: "Fehler"
+  CTX: s")),(Be=n.setDemoLoading)==null||Be.call(n,!1)}catch{(ot=n.setDemoLoading)==null||ot.call(n,!1),$t("Fehler")}},disabled:cn,style:{padding:"3px 8px",borderRadius:5,background:"rgba(168,85,247,0.05)",b
+
+  A078 | POS 1712779
+  STRING: "Patient created via WhatsApp"
+  CTX: jpg"],consent:{granted:!0,timestamp:s+"T10:05:00Z",method:"whatsapp"},timeline:[{type:"system",text:"Patient created via WhatsApp",time:s+" 10:00"},{type:"ai",text:"AI completed intake",time:s+" 10:15
+
+  A079 | POS 1714752
+  STRING: "Patient created via website"
+  CTX: jpg"],consent:{granted:!0,timestamp:s+"T14:05:00Z",method:"whatsapp"},timeline:[{type:"system",text:"Patient created via website",time:s+" 14:00"},{type:"ai",text:"AI completed intake",time:s+" 14:10"
+
+  A080 | POS 1716081
+  STRING: "Patient created via WhatsApp"
+  CTX: jpg"],consent:{granted:!0,timestamp:r+"T16:10:00Z",method:"whatsapp"},timeline:[{type:"system",text:"Patient created via WhatsApp",time:r+" 16:00"},{type:"ai",text:"AI completed intake",time:r+" 16:10
+
+  A081 | POS 1716786
+  STRING: "Patient created via WhatsApp"
+  CTX: jpg"],consent:{granted:!0,timestamp:r+"T11:05:00Z",method:"whatsapp"},timeline:[{type:"system",text:"Patient created via WhatsApp",time:r+" 11:00"},{type:"ai",text:"AI completed intake",time:r+" 11:10
+
+  A082 | POS 1734850
+  STRING: "updatePatient convStatus failed:"
+  CTX: ().setSelChat({...ze,convStatus:ce}),Nt(oe,{conv_status:ce,control_mode:Se}).catch(Me=>console.warn("updatePatient convStatus failed:",Me))},An=oe=>{X&&(wi(X,oe),ee(null))},Ka=(oe,ce)=>{De(ye=>ye.map(
+
+  A083 | POS 1736519
+  STRING: "Fehler beim Speichern"
+  CTX: id 0:fe.response)==null?void 0:Se.status)===403?Ut(lt("requires_plan")||"Plan upgrade required"):Ut("Fehler beim Speichern")}},sa=async()=>{if(!mo)return;const oe=ln?"live":"demo";Zi(!0);try{await ar(
+
+
+--- Sonstige (29 Strings) ---
+
+  A084 | POS 858274
+  STRING: " ${a("task_delivery")||"Erstellt eine Aufgabe für das Klinik-Team."}"
+  CTX: email"&&` ${a("email_delivery")||"Zustellung via E-Mail mit Klinik-Branding."}`,c.channel==="task"&&` ${a("task_delivery")||"Erstellt eine Aufgabe für das Klinik-Team."}`]})]})]},c.id)}),e.jsx("div",{
+
+  A085 | POS 923762
+  STRING: "Fehler beim Senden der Anfrage."
+  CTX: ivation_sent_msg")||"Aktivierungsanfrage gesendet! Wir bestätigen Ihren Termin per E-Mail.")}else{a("Fehler beim Senden der Anfrage.")}}catch(w){a("Fehler: "+w.message)}},style:{padding:"10px 20px",bo
+
+  A086 | POS 923809
+  STRING: "Fehler: "
+  CTX: et! Wir bestätigen Ihren Termin per E-Mail.")}else{a("Fehler beim Senden der Anfrage.")}}catch(w){a("Fehler: "+w.message)}},style:{padding:"10px 20px",borderRadius:10,border:"none",fontWeight:700,font
+
+  A087 | POS 969031
+  STRING: "Einladung an ${s} gesendet"
+  CTX: if(!s.trim()){o("E-Mail eingeben");return}A(!0);try{await Pl({email:s,name:d,role:`clinic_${_}`}),o(`Einladung an ${s} gesendet`),r(!1),l(""),f(""),v("coordinator"),Oc().then(res=>{res&&res.team&&Z(re
+
+  A088 | POS 1019967
+  STRING: "SLA & Öncelikli Destek"
+  CTX: App 24/7"],enterprise:["Sınırsız Hasta","Tüm Özellikler Dahil","Tüm Diller","Özel Hesap Yöneticisi","SLA & Öncelikli Destek"]};return{core:({"en":["Up to 250 patients/month","All features included","A
+
+  A089 | POS 1079264
+  STRING: "WhatsApp üzerinden yeni başvuru alındı"
+  CTX: lang!=="tr";var patterns=[[/Neue Anfrage.*WhatsApp erhalten/,en?"New inquiry received via WhatsApp":"WhatsApp üzerinden yeni başvuru alındı"],[/KI-Bot hat Gespr.+ch gestartet/,en?"AI Bot started conve
+
+  A090 | POS 1079458
+  STRING: "Yaş ve ülke kaydedildi"
+  CTX:  conversation":"AI Bot konuşmayı başlattı"],[/Alter und Land erfasst/,en?"Age and country captured":"Yaş ve ülke kaydedildi"],[/Behandlungsinteresse erfasst/,en?"Treatment interest captured":"Tedavi i
+
+  A091 | POS 1079684
+  STRING: "Bütçe kaydedildi"
+  CTX: e abgeschlossen/,en?"Intake completed":"Başvuru tamamlandı"],[/Budget erfasst/,en?"Budget captured":"Bütçe kaydedildi"],[/DSGVO.Einwilligung erteilt/,en?"GDPR consent given":"KVKK onayı verildi"],[/KV
+
+  A092 | POS 1080141
+  STRING: "Fotoğraflar onaylanı — Teşekkür gönderildi"
+  CTX: oğraflar talep edildi"],[/Fotos? best.+tigt.*Danke gesendet/,en?"Photos confirmed — Thank you sent":"Fotoğraflar onaylanı — Teşekkür gönderildi"],[/Fotos? best.+tigt/,en?"Photos confirmed":"Fotoğrafla
+
+  A093 | POS 1080297
+  STRING: "Fotoğraflar yüklendi"
+  CTX: est.+tigt/,en?"Photos confirmed":"Fotoğraflar onaylanı"],[/Fotos? hochgeladen/,en?"Photos uploaded":"Fotoğraflar yüklendi"],[/Wartet auf .+rztliche Bewertung/,en?"Awaiting medical review":"Tıbbi değle
+
+  A094 | POS 1080669
+  STRING: "Tedavi planı oluşturuldu ve gönderildi"
+  CTX: lendirme tamamlandı"],[/Behandlungsplan erstellt und gesendet/,en?"Treatment plan created and sent":"Tedavi planı oluşturuldu ve gönderildi"],[/Behandlungsplan gesendet/,en?"Treatment plan sent":"Teda
+
+  A095 | POS 1080764
+  STRING: "Tedavi planı gönderildi"
+  CTX: ent":"Tedavi planı oluşturuldu ve gönderildi"],[/Behandlungsplan gesendet/,en?"Treatment plan sent":"Tedavi planı gönderildi"],[/Kostenvoranschlag:(.+)/,en?"Quote:$1":"Teklif:$1"],[/Flug (.+) erkannt/
+
+  A096 | POS 1081809
+  STRING: "Ödeme alındı"
+  CTX: nt EUR $1 received":"EUR $1 \u00f6deme al\u0131nd\u0131"],[/Zahlung erhalten/,en?"Payment received":"Ödeme alındı"],[/Rechnung gesendet/,en?"Invoice sent":"Fatura gönderildi"],[/Erinnerung gesendet/,e
+
+  A097 | POS 1081864
+  STRING: "Fatura gönderildi"
+  CTX: "],[/Zahlung erhalten/,en?"Payment received":"Ödeme alındı"],[/Rechnung gesendet/,en?"Invoice sent":"Fatura gönderildi"],[/Erinnerung gesendet/,en?"Reminder sent":"Hatırlatma gönderildi"],[/Nachsorge.
+
+  A098 | POS 1081927
+  STRING: "Hatırlatma gönderildi"
+  CTX: Rechnung gesendet/,en?"Invoice sent":"Fatura gönderildi"],[/Erinnerung gesendet/,en?"Reminder sent":"Hatırlatma gönderildi"],[/Nachsorge.Tag (\d+) gesendet/,en?"Aftercare day $1 sent":"Ameliyat sonras
+
+  A099 | POS 1082537
+  STRING: "Sürücü atandı"
+  CTX: en|gebucht)/,en?"Hotel assigned":"Otel atandı"],[/Fahrer (zugewiesen|gebucht)/,en?"Driver assigned":"Sürücü atandı"],[/Fahrer benachrichtigt/,en?"Driver notified":"Sürücü bilgilendirildi"],[/Nachricht
+
+  A100 | POS 1082600
+  STRING: "Sürücü bilgilendirildi"
+  CTX: iesen|gebucht)/,en?"Driver assigned":"Sürücü atandı"],[/Fahrer benachrichtigt/,en?"Driver notified":"Sürücü bilgilendirildi"],[/Nachricht gesendet/,en?"Message sent":"Mesaj gönderildi"],[/Notiz hinzug
+
+  A101 | POS 1082666
+  STRING: "Mesaj gönderildi"
+  CTX: achrichtigt/,en?"Driver notified":"Sürücü bilgilendirildi"],[/Nachricht gesendet/,en?"Message sent":"Mesaj gönderildi"],[/Notiz hinzugef.+gt/,en?"Note added":"Not eklendi"],[/Dokument (.+) hochgeladen
+
+  A102 | POS 1106659
+  STRING: ",bt.href=Rt,bt.download=`Patientenkarte-${(J.name||"
+  CTX: ctURL(new Blob([Dt],{type:"application/pdf"})),bt=document.createElement("a");bt.style.display="none",bt.href=Rt,bt.download=`Patientenkarte-${(J.name||"Patient").replace(/\s/g,"-")}.pdf`,document.bod
+
+  A103 | POS 1126291
+  STRING: "Hotel confirmation sent to patient"
+  CTX: te()+2),ln.toISOString().slice(0,10)})():"—")})]})]}),e.jsxs("button",{onClick:()=>{G(J.id,"system","Hotel confirmation sent to patient"),M(g("hotel_confirmation_sent")||"Hotel-Bestätigung gesendet")}
+
+  A104 | POS 1208306
+  STRING: "Patient wartet seit "
+  CTX: h.max(0,(new Date(fD+"T12:00")-_nw)/36e5):null;if(t.type==="chat"){t.urg=hrs>1?"over":"today";t.rsn="Patient wartet seit "+(hrs<1?Math.round(hrs*60)+"m":Math.round(hrs)+"h")}else if(t.type==="driver"|
+
+  A105 | POS 1208559
+  STRING: "Flug in "
+  CTX: H<72?"today":"later";t.rsn=fH<6?"⚡ in "+Math.round(fH)+"h!":fH<24?"Flug heute!":fH<48?"Flug morgen":"Flug in "+Math.ceil(fH/24)+" Tagen"}else{t.urg=days>7?"over":days>3?"today":"later";t.rsn="seit "+M
+
+  A106 | POS 1261515
+  STRING: "Verbindungsfehler. Bitte versuche es erneut."
+  CTX: [q.length-1]={...q[q.length-1],content:$},q}))}catch{}}}}catch(M){M.name!=="AbortError"&&p(i==="de"?"Verbindungsfehler. Bitte versuche es erneut.":"Connection error. Please try again.")}finally{j(!1),
+
+  A107 | POS 1340854
+  STRING: "${u.clinic_name} angenommen${l?" — Zahlungslink gesendet":""}"
+  CTX: 0:i}))},[i]);const p=async u=>{try{s(null),await Us(u.id,{paymentLink:l||void 0}),s({type:"ok",text:`${u.clinic_name} angenommen${l?" — Zahlungslink gesendet":""}`}),d(""),j(null),await h(),o("applica
+
+  A108 | POS 1593426
+  STRING: "Einladung an ${c.email} gesendet"
+  CTX: ame||""} ${c.last_name||""}`.trim(),role:c.role==="doctor"?"clinic_doctor":"clinic_coordinator"}),i(`Einladung an ${c.email} gesendet`)}catch(u){i(u.message||"Fehler beim Senden")}},style:{padding:"6p
+
+  A109 | POS 1593484
+  STRING: "Fehler beim Senden"
+  CTX: ?"clinic_doctor":"clinic_coordinator"}),i(`Einladung an ${c.email} gesendet`)}catch(u){i(u.message||"Fehler beim Senden")}},style:{padding:"6px 12px",borderRadius:8,background:"rgba(16,185,129,0.08)",
+
+  A110 | POS 1623787
+  STRING: "Erinnerung gesendet: "
+  CTX: ,[C]:"sending"}));try{await Ki(r.patientId,{text:M,source:"crm"}),j(G=>({...G,[C]:"sent"}));const R="Erinnerung gesendet: "+C;await vn(r.id,{last_activity_text:R}),s(G=>({...G,lastActivityText:R,lastA
+
+  A111 | POS 1655713
+  STRING: "Arzt"
+  CTX: i(`Fall wird gerade von ${_[S].by} bearbeitet`);return}v(y=>({...y,[S]:{by:(s==null?void 0:s.name)||"Arzt",at:Date.now()}}));const u=p?`${p.first_name} ${p.last_name}`.trim():s==null?void 0:s.name;r(y
+
+  A112 | POS 1662391
+  STRING: "Fehler beim Wiederherstellen"
+  CTX: ion(),v(k.id);try{i==null||i(k.id,"new"),a==null||a(`${k.name} wiederhergestellt`)}catch{a==null||a("Fehler beim Wiederherstellen")}setTimeout(()=>v(null),1e3)},[i,a]),h=x=>x?new Date(x).toLocaleDateS
+
+
+====================================================================================================
+SECTION B: TRANSLATION FALLBACKS — t('key')||'German Text'
+These have a translation key. The German text only shows if the key
+is MISSING from the Mt dictionary. Still, they should ideally show
+English/Turkish fallbacks too.
+====================================================================================================
+
+  B001 | key: deposit_eur
+  FALLBACK: "Anzahlung (EUR)"
+  CTX: en:[e.jsxs("div",{style:{flex:1},children:[e.jsx("label",{style:Je.label,children:i("deposit_eur")||"Anzahlung (EUR)"}),e.jsx("input",{type:"number",placeholder:_i("form_min_ph")||"z.B. 700",value:R.d
+
+  B002 | key: save_error
+  FALLBACK: "Fehler beim Speichern"
+  CTX: ,i==null||i(a("followup_saved")||"Follow-up Sequenz gespeichert")}catch{i==null||i(a("save_error")||"Fehler beim Speichern")}finally{j(!1)}},k=()=>{s(Pr),_(!0),d(null)};return e.jsxs("div",{style:{mar
+
+  B003 | key: saving_btn
+  FALLBACK: "Speichern..."
+  CTX: r":"default",fontFamily:"inherit",opacity:v?.6:1,transition:"all 0.2s"},children:v?a("saving_btn")||"Speichern...":a("save")||"Speichern"})]})]}),e.jsxs("div",{style:{display:"flex",gap:12,marginBotto
+
+  B004 | key: active_steps
+  FALLBACK: "Aktive Schritte"
+  CTX: ,0.6)",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:4},children:a("active_steps")||"Aktive Schritte"}),e.jsxs("div",{style:{fontSize:20,fontWeight:800,color:"#10b981"},children:[h,e.j
+
+  B005 | key: delay_after_op
+  FALLBACK: "Verzögerung nach OP"
+  CTX: .5)",marginBottom:6,textTransform:"uppercase",letterSpacing:"0.04em"},children:a("delay_after_op")||"Verzögerung nach OP"}),e.jsx("select",{value:c.day,onChange:B=>p(c.id,{day:parseInt(B.target.value)
+
+  B006 | key: aftercare_delay_desc
+  FALLBACK: "Aftercare-Nachricht wird X Stunden nach OP-Abschluss gesendet"
+  CTX: ,{style:{fontSize:11,color:"rgba(167,177,195,0.3)",marginTop:2},children:d("aftercare_delay_desc")||"Aftercare-Nachricht wird X Stunden nach OP-Abschluss gesendet"})]}),x((r==null?void 0:r.aftercareDe
+
+  B007 | key: aftercare_lang_info
+  FALLBACK: "Nachricht wird automatisch in der Sprache des Patienten gesendet"
+  CTX: le:{fontSize:11,color:"rgba(76,201,255,0.5)",marginTop:8},children:["ℹ️ ",d("aftercare_lang_info")||"Nachricht wird automatisch in der Sprache des Patienten gesendet"]})]}),c.type==="appt_reminder"&&e
+
+  B008 | key: reminder_timing
+  FALLBACK: "Erinnerungszeitpunkte"
+  CTX: v",{style:{fontSize:12,fontWeight:600,color:"rgba(167,177,195,0.7)"},children:d("reminder_timing")||"Erinnerungszeitpunkte"}),e.jsx("div",{style:{fontSize:11,color:"rgba(167,177,195,0.3)",marginTop:2}
+
+  B009 | key: reminder_timing_desc
+  FALLBACK: "Wann Erinnerungen vor dem Termin gesendet werden"
+  CTX: ,{style:{fontSize:11,color:"rgba(167,177,195,0.3)",marginTop:2},children:d("reminder_timing_desc")||"Wann Erinnerungen vor dem Termin gesendet werden"})]}),x(JSON.stringify((r==null?void 0:r.reminderH
+
+  B010 | key: review_delay_desc
+  FALLBACK: "Bewertungsanfrage wird X Stunden nach der Aftercare-Nachricht gesendet"
+  CTX: iv",{style:{fontSize:11,color:"rgba(167,177,195,0.3)",marginTop:2},children:d("review_delay_desc")||"Bewertungsanfrage wird X Stunden nach der Aftercare-Nachricht gesendet"})]}),x((r==null?void 0:r.re
+
+  B011 | key: save
+  FALLBACK: "Speichern"
+  CTX: ight:600,fontSize:12,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"},children:d("save")||"Speichern"})]}),e.jsx("div",{style:{fontSize:11,color:r!=null&&r.googleMapsLink?"rgba(16,185,129,0.
+
+  B012 | key: file_deleted
+  FALLBACK: "Datei gelöscht"
+  CTX: category===j),M=async $=>{if(F)try{await il($),c(ae=>ae.filter(pe=>pe.id!==$)),a(d("file_deleted")||"Datei gelöscht")}catch{a(d("delete_failed")||"Löschen fehlgeschlagen")}else i(ae=>ae.map(pe=>pe.id=
+
+  B013 | key: delete_failed
+  FALLBACK: "Löschen fehlgeschlagen"
+  CTX: ,c(ae=>ae.filter(pe=>pe.id!==$)),a(d("file_deleted")||"Datei gelöscht")}catch{a(d("delete_failed")||"Löschen fehlgeschlagen")}else i(ae=>ae.map(pe=>pe.id===o?{...pe,files:pe.files.filter(O=>O.id!==$)}
+
+  B014 | key: file_deleted
+  FALLBACK: "Datei gelöscht"
+  CTX: lse i(ae=>ae.map(pe=>pe.id===o?{...pe,files:pe.files.filter(O=>O.id!==$)}:pe)),a(d("file_deleted")||"Datei gelöscht");(_==null?void 0:_.id)===$&&v(null)},R=$=>{var pe;const ae=$.driveLink||`${Gt}/file
+
+  B015 | key: files_added
+  FALLBACK: "hinzugefügt"
+  CTX: ||"Dateien hochgeladen"}`)}r(d("files_uploaded_title")||"Dateien",`${ae.length} ${d("files_added")||"hinzugefügt"}`),setTimeout(()=>{w(!1),g(0)},1500),$.target.value=""}},[F,N]);return e.jsxs("div",{s
+
+  B016 | key: source_manual
+  FALLBACK: "Manuell"
+  CTX: ex",alignItems:"center",gap:4},children:_.source==="whatsapp"?"💬 WhatsApp":`📤 ${d("source_manual")||"Manuell"}`})]}),e.jsxs("div",{children:[e.jsx("div",{style:{fontSize:9,fontWeight:700,color:"rgba(1
+
+  B017 | key: doctor_action_needed
+  FALLBACK: "Arzt-Aktion nötig"
+  CTX: ding,color:l.reviewsPending>0?"#f59e0b":"#10b981",sub:l.reviewsPending>0?r("doctor_action_needed")||"Arzt-Aktion nötig":r("all_reviewed")||"Alle bewertet"})]})}),e.jsx(zi,{title:_i("dash_surgery_perf"
+
+  B018 | key: all_reviewed
+  FALLBACK: "Alle bewertet"
+  CTX: :"#10b981",sub:l.reviewsPending>0?r("doctor_action_needed")||"Arzt-Aktion nötig":r("all_reviewed")||"Alle bewertet"})]})}),e.jsx(zi,{title:_i("dash_surgery_perf")||"Surgery Performance",children:e.jsx
+
+  B019 | key: payments_open
+  FALLBACK: "Zahlungen offen"
+  CTX: outstanding):"€0",color:f.outstanding>0?"#ef4444":"#10b981",sub:f.outstanding>0?r("payments_open")||"Zahlungen offen":r("no_outstanding")||"Keine Außenstände"})]})}),e.jsx(zi,{title:r("marketing_insig
+
+  B020 | key: no_outstanding
+  FALLBACK: "Keine Außenstände"
+  CTX: ?"#ef4444":"#10b981",sub:f.outstanding>0?r("payments_open")||"Zahlungen offen":r("no_outstanding")||"Keine Außenstände"})]})}),e.jsx(zi,{title:r("marketing_insights")||"Marketing Insights",children:e.
+
+  B021 | key: all_reviewed
+  FALLBACK: "Alle bewertet"
+  CTX: v.evalsPending,color:v.evalsPending>0?"#f59e0b":"#10b981",sub:v.evalsPending===0?r("all_reviewed")||"Alle bewertet":r("action_needed_short")||"Aktion nötig"})]})})]})}const jp=Object.freeze(Object.def
+
+  B022 | key: action_needed_short
+  FALLBACK: "Aktion nötig"
+  CTX: 9e0b":"#10b981",sub:v.evalsPending===0?r("all_reviewed")||"Alle bewertet":r("action_needed_short")||"Aktion nötig"})]})})]})}const jp=Object.freeze(Object.defineProperty({__proto__:null,default:Fl},Sy
+
+  B023 | key: documents_uploaded
+  FALLBACK: "Dokument(e) hochgeladen"
+  CTX: ){f(g=>({...g,docs:[...g.docs||[],...D.map(B=>B.name)]})),a(`${D.length} ${r("documents_uploaded")||"Dokument(e) hochgeladen"}`);try{await Xs(D)}catch(g){console.error("Upload failed:",g)}}};return e.
+
+  B024 | key: wa_activation_sent_msg
+  FALLBACK: "Aktivierungsanfrage gesendet! Wir bestätigen Ihren Termin per E-Mail."
+  CTX: B.id===o?Object.assign({},B,{numberRequestStatus:"pending"}):B});});a(_i("wa_activation_sent_msg")||"Aktivierungsanfrage gesendet! Wir bestätigen Ihren Termin per E-Mail.")}else{a("Fehler beim Senden 
+
+  B025 | key: wa_request_activation
+  FALLBACK: "Aktivierung anfragen"
+  CTX: gradient(135deg, #4cc9ff, #2da8ff)",color:"#fff",width:"100%"},children:r("wa_request_activation")||"Aktivierung anfragen"})]})]}),e.jsxs("div",{style:{padding:"10px 14px",borderRadius:10,background:"
+
+  B026 | key: cancel
+  FALLBACK: "Abbrechen"
+  CTX: 03)",border:"1px solid rgba(255,255,255,0.06)",color:"rgba(167,177,195,0.5)"},children:i("cancel")||"Abbrechen"})]})]}),S.length>0&&e.jsxs("div",{style:{borderRadius:10,overflow:"hidden",border:"1px s
+
+  B027 | key: all_treatments_label
+  FALLBACK: "Alle Behandlungen (nicht eingeschränkt)"
+  CTX: {fontSize:10,color:"rgba(167,177,195,0.25)",fontStyle:"italic"},children:i("all_treatments_label")||"Alle Behandlungen (nicht eingeschränkt)"})}),e.jsxs("div",{style:{display:"flex",alignItems:"center
+
+  B028 | key: booking_rules
+  FALLBACK: "Buchungsregeln"
+  CTX: :h("team_access")||"Team & Zugriff",icon:"👥"},"grp:BETRIEB",{id:"booking",label:h("booking_rules")||"Buchungsregeln",icon:"📅"},{id:"doctors",label:h("doctor_assignment")||"Arzt-Zuweisung",icon:"⚕️"},{
+
+  B029 | key: notifications
+  FALLBACK: "Benachrichtigungen"
+  CTX: yo"]})]})]})]}),L==="notifications"&&e.jsx(e.Fragment,{children:e.jsx(Ue,{title:h("notifications")||"Benachrichtigungen",children:e.jsxs("div",{style:{display:"grid",gap:12},children:[e.jsxs("div",{st
+
+  B030 | key: pay_booking_rules
+  FALLBACK: "Buchungsregeln"
+  CTX: ,R)})]})]})})}),L==="booking"&&e.jsx(e.Fragment,{children:e.jsxs(Ue,{title:_i("pay_booking_rules")||"Buchungsregeln",children:[e.jsxs("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 
+
+  B031 | key: settings_max_appts_day
+  FALLBACK: "Max. Termine/Tag"
+  CTX: dTemplateColumns:"1fr 1fr 1fr",gap:"0 16px"},children:[e.jsx(yt,{label:h("settings_max_appts_day")||"Max. Termine/Tag",value:N.maxApptsPerDay||"5",onChange:R=>F("maxApptsPerDay",R),options:["3","5","8
+
+  B032 | key: settings_deposit_amount
+  FALLBACK: "Anzahlungsbetrag (€)"
+  CTX: },children:R.d})]},R.v))}),N.depositPolicy==="fixed"&&e.jsx(yt,{label:h("settings_deposit_amount")||"Anzahlungsbetrag (€)",value:N.depositAmount||"500",onChange:R=>F("depositAmount",R),placeholder:"50
+
+  B033 | key: settings_deposit_percent
+  FALLBACK: "Anzahlung (%)"
+  CTX: ,placeholder:"500"}),N.depositPolicy==="percentage"&&e.jsx(yt,{label:h("settings_deposit_percent")||"Anzahlung (%)",value:N.depositPercent||"30",onChange:R=>F("depositPercent",R),options:["10","20","2
+
+  B034 | key: payment_methods_label
+  FALLBACK: "Zahlungsmethoden"
+  CTX: ze:12,fontWeight:700,color:"var(--text-muted)",marginBottom:8},children:h("payment_methods_label")||"Zahlungsmethoden"}),e.jsx("div",{style:{display:"grid",gap:8},children:[{key:"payStripe",label:"Str
+
+  B035 | key: pay_online_card
+  FALLBACK: "Online-Zahlung per Karte"
+  CTX: {style:{display:"grid",gap:8},children:[{key:"payStripe",label:"Stripe",desc:_i("pay_online_card")||"Online-Zahlung per Karte"},{key:"payCustomLink",label:({en:"Custom Payment Link",de:"Eigener Zahlun
+
+  B036 | key: even_distribution_label
+  FALLBACK: "Gleichmäßige Verteilung"
+  CTX: oked_label")||"Am wenigsten ausgelastet":N.assignAlgorithm==="random"?h("even_distribution_label")||"Gleichmäßige Verteilung":h("earliest_available_doctor")||"Frühester verfügbarer Arzt",'":']})," ",N
+
+  B037 | key: earliest_available_doctor
+  FALLBACK: "Frühester verfügbarer Arzt"
+  CTX: ==="random"?h("even_distribution_label")||"Gleichmäßige Verteilung":h("earliest_available_doctor")||"Frühester verfügbarer Arzt",'":']})," ",N.assignAlgorithm==="least_booked"?h("algo_least_booked_des
+
+  B038 | key: active_badge
+  FALLBACK: "Aktiv"
+  CTX: :"rgba(167,177,195,0.06)",color:B?"#10b981":"rgba(167,177,195,0.35)"},children:B?a("active_badge")||"Aktiv":a("addon_available")||"Verfügbar"})]}),e.jsx("button",{onClick:()=>k(g.id,g.name,B),style:{m
+
+  B039 | key: addon_remove
+  FALLBACK: "Entfernen"
+  CTX: ff",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"},children:B?a("addon_remove")||"Entfernen":a("activate")||"Aktivieren"})]},g.id)})}),e.jsx("div",{style:{fontSize:10,fontWeight:700
+
+  B040 | key: active_badge
+  FALLBACK: "Aktiv"
+  CTX: 0b981":"rgba(167,177,195,0.3)"},children:F?a("already_included")||"Inkludiert":B?a("active_badge")||"Aktiv":a("addon_available")||"Verfügbar"})]}),T?e.jsx("button",{onClick:()=>k(g.id,g.name,B),style:
+
+  B041 | key: addon_remove
+  FALLBACK: "Entfernen"
+  CTX: ff",fontWeight:700,fontSize:10,cursor:"pointer",fontFamily:"inherit"},children:B?a("addon_remove")||"Entfernen":a("activate")||"Aktivieren"}):F?e.jsx("div",{style:{fontSize:10,color:"#10b981",fontWeig
+
+  B042 | key: upgrade_needed
+  FALLBACK: "Upgrade nötig"
+  CTX: 10,color:"#f59e0b",fontWeight:600,textAlign:"center",padding:"6px 0"},children:a("upgrade_needed")||"Upgrade nötig"})]},g.id)})}),e.jsxs("div",{style:{padding:"16px 20px",borderRadius:12,background:"r
+
+  B043 | key: monthly_costs
+  FALLBACK: "Monatliche Kosten"
+  CTX: 35)",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:10},children:a("monthly_costs")||"Monatliche Kosten"}),e.jsxs("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12
+
+  B044 | key: treatment_plan_label
+  FALLBACK: "Behandlungsplan"
+  CTX: st E=window.open("","_blank");E&&(E.document.write(`<html><head><title>${l("treatment_plan_label")||"Behandlungsplan"} — ${(n==null?void 0:n.name)||l("patient")||"Patient"}</title><style>body{font-fam
+
+  B045 | key: patient
+  FALLBACK: "Patient"
+  CTX: d><title>${l("treatment_plan_label")||"Behandlungsplan"} — ${(n==null?void 0:n.name)||l("patient")||"Patient"}</title><style>body{font-family:system-ui;padding:40px;max-width:800px;margin:0 auto}table
+
+  B046 | key: treatment_plan_label
+  FALLBACK: "Behandlungsplan"
+  CTX: weight:800;color:#0f172a}</style></head><body>`),E.document.write(`<h1>${l("treatment_plan_label")||"Behandlungsplan"}</h1>`),E.document.write(`<p><strong>${l("patient")||"Patient"}:</strong> ${(n==nu
+
+  B047 | key: patient
+  FALLBACK: "Patient"
+  CTX: ${l("treatment_plan_label")||"Behandlungsplan"}</h1>`),E.document.write(`<p><strong>${l("patient")||"Patient"}:</strong> ${(n==null?void 0:n.name)||"—"}</p>`),E.document.write(`<p><strong>Technik:</st
+
+  B048 | key: hotel_confirmation_sent
+  FALLBACK: "Hotel-Bestätigung gesendet"
+  CTX: {onClick:()=>{G(J.id,"system","Hotel confirmation sent to patient"),M(g("hotel_confirmation_sent")||"Hotel-Bestätigung gesendet")},style:{padding:"8px 16px",borderRadius:10,background:"rgba(167,107,25
+
+  B049 | key: patient_cancelled
+  FALLBACK: "Patient storniert"
+  CTX: (J.id,"cancelled"),le(J.id,"closed"),G(J.id,"system","Patient cancelled"),M(g("patient_cancelled")||"Patient storniert"))},style:{width:"100%",padding:"8px 0",borderRadius:8,background:"rgba(239,68,68
+
+  B050 | key: fin_new_request
+  FALLBACK: "Neue Anfrage"
+  CTX: bot gesendet"),Vn(!1)},onClose:()=>Vn(!1)})})})]})}const nu=[{id:"new",label:_i("fin_new_request")||"Neue Anfrage",accent:"#4cc9ff"},{id:"contacted",label:_i("fin_doctor_review")||"Arzt-Review",accent
+
+  B051 | key: fin_doctor_review
+  FALLBACK: "Arzt-Review"
+  CTX: "fin_new_request")||"Neue Anfrage",accent:"#4cc9ff"},{id:"contacted",label:_i("fin_doctor_review")||"Arzt-Review",accent:"#ff8a2a"},{id:"booked",label:({en:"Booked",de:"Gebucht",tr:"Rezerve Edildi"}[l
+
+  B052 | key: step_deposit
+  FALLBACK: "Anzahlung"
+  CTX: 36,0.12)",color:"#fbbf24"}),(g=n.metadata)!=null&&g.depositPending?k.push({label:l("step_deposit")||"Anzahlung",background:"rgba(234,179,8,0.12)",color:"#eab308"}):k.length===0&&(n.convStatus==="depos
+
+  B053 | key: cancel
+  FALLBACK: "Abbrechen"
+  CTX: 03)",border:"1px solid rgba(255,255,255,0.06)",color:"rgba(167,177,195,0.5)"},children:a("cancel")||"Abbrechen"}),e.jsx("button",{onClick:w,disabled:u,style:{padding:"8px 20px",borderRadius:8,fontSize
+
+  B054 | key: csv_header
+  FALLBACK: "Name,Telefon,Status,Behandlung,Grafts,Land,Arzt,Quelle,Umsatz,Anzahlung,Letzter Kontakt"
+  CTX: ,$.length>0,pe.length>0,ne,I,q,Z].filter(Boolean).length,Le=Y=>{const be=Y||he,xe=(r("csv_header")||"Name,Telefon,Status,Behandlung,Grafts,Land,Arzt,Quelle,Umsatz,Anzahlung,Letzter Kontakt")+`
+`+be.ma
+
+  B055 | key: no_results
+  FALLBACK: "Keine Ergebnisse"
+  CTX: style:{fontSize:14,fontWeight:600,color:"rgba(167,177,195,0.35)"},children:S||Pe>0?r("no_results")||"Keine Ergebnisse":r("no_patients_yet")||"Noch keine Patienten"}),e.jsx("div",{style:{fontSize:12,co
+
+  B056 | key: no_patients_yet
+  FALLBACK: "Noch keine Patienten"
+  CTX: rgba(167,177,195,0.35)"},children:S||Pe>0?r("no_results")||"Keine Ergebnisse":r("no_patients_yet")||"Noch keine Patienten"}),e.jsx("div",{style:{fontSize:12,color:"rgba(167,177,195,0.2)",marginTop:4},
+
+  B057 | key: patients_auto_created
+  FALLBACK: "Patienten werden automatisch angelegt wenn sie über WhatsApp schreiben"
+  CTX: ldren:S?r("try_different_search")||"Versuche einen anderen Suchbegriff":r("patients_auto_created")||"Patienten werden automatisch angelegt wenn sie über WhatsApp schreiben"})]}):ke.map(Y=>{var Kt;cons
+
+  B058 | key: cal_today
+  FALLBACK: "Heute"
+  CTX: b981":"rgba(232,238,252,0.6)",fontWeight:va(Ae.date)?700:400},children:[va(Ae.date)?r("cal_today")||"Heute":new Date(Ae.date).toLocaleDateString("de-DE",{day:"numeric",month:"short"}),Ae.time?` · ${Ae
+
+  B059 | key: assign_driver
+  FALLBACK: "Fahrer zuweisen"
+  CTX: -bottom:16px"><h3 style="font-size:16px;font-weight:800;color:#fff;margin:0">'+(r("assign_driver")||"Fahrer zuweisen")+`</h3><button onclick="document.getElementById('fm-drv-assign').remove()" style="
+
+  B060 | key: patient
+  FALLBACK: "Patient"
+  CTX: v>`;W+='<div style="font-size:12px;color:rgba(167,177,195,0.5);margin-bottom:16px">'+(r("patient")||"Patient")+': <strong style="color:#fff">'+p.name+"</strong></div>";for(let L=0;L<B.length;L++){cons
+
+  B061 | key: click_assign_driver
+  FALLBACK: "Klicke Zuweisen um den Fahrer manuell zuzuteilen"
+  CTX: ze:11px;color:rgba(167,177,195,0.3);margin-top:12px;text-align:center">'+(r("click_assign_driver")||"Klicke Zuweisen um den Fahrer manuell zuzuteilen")+"</div>",F.innerHTML=W,F.addEventListener("click
+
+  B062 | key: driver_assigned_msg
+  FALLBACK: "Fahrer {name} zugewiesen"
+  CTX: istics:{status:"confirmed",driverName:M,driverPhone:R}})})}).then(()=>{a((r("driver_assigned_msg")||"Fahrer {name} zugewiesen").replace("{name}",M)+" ✅"),F.remove(),window.dispatchEvent(new Event("res
+
+  B063 | key: hotel_name
+  FALLBACK: "Hotelname"
+  CTX: le="color:#fff">'+p.name+'</strong></div><input id="fm-hotel-name" placeholder="'+(r("hotel_name")||"Hotelname")+'" style="'+D+'"><input id="fm-hotel-link" placeholder="'+(r("booking_link")||"Buchungs
+
+  B064 | key: booking_link
+  FALLBACK: "Buchungslink (optional)"
+  CTX: _name")||"Hotelname")+'" style="'+D+'"><input id="fm-hotel-link" placeholder="'+(r("booking_link")||"Buchungslink (optional)")+'" style="'+D+'"><div style="display:grid;grid-template-columns:1fr 1fr;g
+
+  B065 | key: hotel_assigned_msg
+  FALLBACK: "Hotel {name} zugewiesen"
+  CTX: o:{name:g,link:B||null,checkin:T||null,checkout:N||null}}})}).then(()=>{a((r("hotel_assigned_msg")||"Hotel {name} zugewiesen").replace("{name}",g)+" ✅"),w.remove(),window.dispatchEvent(new Event("resi
+
+  B066 | key: flight_number
+  FALLBACK: "Flugnummer (z.B. TK1834)"
+  CTX: . Turkish Airlines)")+'" style="'+D+'"><input id="fm-flight-nr" placeholder="'+(r("flight_number")||"Flugnummer (z.B. TK1834)")+'" style="'+D+'"><div style="display:grid;grid-template-columns:1fr 1fr;
+
+  B067 | key: flight_saved
+  FALLBACK: "Flugdaten gespeichert"
+  CTX: ,date:T,arrivalTime:N||null,detected:new Date().toISOString()}}})}).then(()=>{a((r("flight_saved")||"Flugdaten gespeichert")+" ✅"),w.remove(),window.dispatchEvent(new Event("resize"))}).catch(()=>a(r(
+
+  B068 | key: case_overview
+  FALLBACK: "Fallübersicht"
+  CTX: dren:[e.jsx("span",{style:{fontWeight:800,fontSize:15,color:"#4cc9ff"},children:i("case_overview")||"Fallübersicht"}),null]}),e.jsx("div",{style:{color:"#64748b",fontSize:13},children:i("no_patient_da
+
+  B069 | key: no_patient_data
+  FALLBACK: "Keine Patientendaten verfügbar."
+  CTX: bersicht"}),null]}),e.jsx("div",{style:{color:"#64748b",fontSize:13},children:i("no_patient_data")||"Keine Patientendaten verfügbar."})]});const l=o.photoUrls||[],d=o.reviewData||{},f=o.stage||"new",_
+
+  B070 | key: stage_contacted
+  FALLBACK: "Kontaktiert"
+  CTX: reviewData||{},f=o.stage||"new",_={new:i("stage_new")||"Neuer Lead",contacted:i("stage_contacted")||"Kontaktiert",booked:i("stage_booked")||"Gebucht",done:i("stage_done")||"Erledigt"},v={new:"#4cc9ff"
+
+  B071 | key: action_filter
+  FALLBACK: "⚡ Aktion"
+  CTX: ",flexShrink:0},children:[{id:"open",l:C("open")||"Offen"},{id:"needs_action",l:C("action_filter")||"⚡ Aktion"},{id:"ai_handling",l:C("ai_filter")||"KI"},{id:"resolved",l:C("done_filter")||"✓ Erledigt
+
+  B072 | key: stop_ai_btn
+  FALLBACK: "KI STOPPEN & ÜBERNEHMEN"
+  CTX: r",fontFamily:"inherit",textTransform:"uppercase",letterSpacing:"0.5px"},children:C("stop_ai_btn")||"KI STOPPEN & ÜBERNEHMEN"})]}),X&&e.jsxs("div",{style:{padding:"10px 22px",background:"rgba(255,138,
+
+  B073 | key: take_over
+  FALLBACK: "Übernehmen"
+  CTX: #4cc9ff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"},children:C("take_over")||"Übernehmen"}),e.jsxs("button",{onClick:()=>I(me=>!me),style:{padding:"6px 14px",borderRadius:8,back
+
+  B074 | key: case_overview_hide
+  FALLBACK: "Fallübersicht ausblenden"
+  CTX: r",fontFamily:"inherit",display:"flex",alignItems:"center",gap:6},title:re?C("case_overview_hide")||"Fallübersicht ausblenden":C("case_overview_toggle")||"Fallübersicht einblenden",children:["📋 ",!re&
+
+  B075 | key: case_overview_toggle
+  FALLBACK: "Fallübersicht einblenden"
+  CTX: ter",gap:6},title:re?C("case_overview_hide")||"Fallübersicht ausblenden":C("case_overview_toggle")||"Fallübersicht einblenden",children:["📋 ",!re&&(C("case_overview")||"Fallübersicht")]})]})]}),e.jsxs
+
+  B076 | key: pending
+  FALLBACK: "Ausstehend"
+  CTX: 10b981":"#fbbf24",letterSpacing:"0.5px"},children:Fe?`✅ ${C("paid")||"Bezahlt"}`:`⏳ ${C("pending")||"Ausstehend"}`})]}),e.jsxs("div",{style:{fontSize:11,color:"var(--text-muted)",marginTop:2},children
+
+  B077 | key: stripe_payment_link
+  FALLBACK: "Zahlungslink"
+  CTX: div",{style:{fontSize:11,color:"var(--text-muted)",marginTop:2},children:[C("stripe_payment_link")||"Zahlungslink"," · ",Ze.currency||"EUR"," · ",e.jsxs("span",{style:{fontFamily:"monospace",fontSize:
+
+  B078 | key: stop_ai_btn
+  FALLBACK: "KI STOPPEN & ÜBERNEHMEN"
+  CTX: r",fontFamily:"inherit",textTransform:"uppercase",letterSpacing:"0.5px"},children:C("stop_ai_btn")||"KI STOPPEN & ÜBERNEHMEN"})]})}):X?e.jsx("div",{style:{padding:"14px 22px",borderTop:"1px solid var(
+
+  B079 | key: ai_paused_review_chat
+  FALLBACK: "KI wartet auf medizinische Bewertung"
+  CTX: ontSize:13,color:"rgba(255,138,42,0.7)",fontWeight:600},children:["⚕️ ",C("ai_paused_review_chat")||"KI wartet auf medizinische Bewertung"]}),e.jsx("button",{onClick:()=>{he&&w(he)},style:{padding:"6p
+
+  B080 | key: open_review
+  FALLBACK: "Bewertung öffnen"
+  CTX: f8a2a",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"},children:C("open_review")||"Bewertung öffnen"})]})}):e.jsxs("div",{style:{padding:"14px 22px",borderTop:"1px solid var(--border
+
+  B081 | key: case_overview
+  FALLBACK: "Fallübersicht"
+  CTX: ",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"},title:C("case_overview")||"Fallübersicht",children:"📋"}),e.jsx("input",{id:"chatMsg",name:"chatMsg",value:_,onChange:me=>v(me.
+
+  B082 | key: or_rooms_heading
+  FALLBACK: "OP-Räume"
+  CTX: 195,0.5)",transition:"all 0.15s ease"},children:I},I)})}),e.jsx($n,{children:a("or_rooms_heading")||"OP-Räume"}),e.jsx("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:20},children:Jg.m
+
+  B083 | key: auto_review
+  FALLBACK: "Auto-Bewertung"
+  CTX: )",transition:"all .15s"},children:Yr[P].slice(0,2)},I)})}),e.jsx($n,{children:a&&a("auto_review")||"Auto-Bewertung"}),e.jsx("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12},ch
+
+  B084 | key: no_appointments_room
+  FALLBACK: "Keine Termine in diesem Raum"
+  CTX: le:{fontSize:12,color:"rgba(167,177,195,0.25)",padding:"8px 0"},children:l("no_appointments_room")||"Keine Termine in diesem Raum"}):(((x=A[d])==null?void 0:x.appointments)||[]).map(k=>e.jsx("div",{st
+
+  B085 | key: settings_saved
+  FALLBACK: "Einstellungen gespeichert"
+  CTX: work_days||null,treatment_types_allowed:te.treatment_types_allowed||null}))),f(_("settings_saved")||"Einstellungen gespeichert")}catch(ie){f("Error: "+(ie.message||"Could not save settings"))}w(null)}
+
+  B086 | key: appt_appointments
+  FALLBACK: "Termine"
+  CTX: {style:{display:"flex",gap:6,alignItems:"center"},children:[e.jsx(Ti,{label:_("appt_appointments")||"Termine",value:ke.totalCount,color:"#4cc9ff"}),e.jsx(Ti,{label:"Grafts",value:ke.totalGrafts>0?`${(
+
+  B087 | key: day_overview_label
+  FALLBACK: "Tagesübersicht"
+  CTX: ,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6},children:j("day_overview_label")||"Tagesübersicht"}),k.docLines.map(g=>e.jsxs("div",{style:{display:"flex",alignItems:"center",gap:6,f
+
+  B088 | key: clinic_name
+  FALLBACK: "Klinikname"
+  CTX: ",{style:{opacity:d?.5:1,pointerEvents:d?"none":"auto"},children:[e.jsx(pt,{label:l("clinic_name")||"Klinikname",value:f.name,onChange:v=>_("name",v),placeholder:_i("form_clinic_ph")||"Istanbul Hair C
+
+  B089 | key: tf_desc_ph
+  FALLBACK: "Beschreibung der Behandlung..."
+  CTX: iption"),value:_.description,onChange:h=>v(p=>({...p,description:h})),placeholder:_i("tf_desc_ph")||"Beschreibung der Behandlung...",type:"textarea"}),e.jsxs("div",{style:{display:"grid",gridTemplateC
+
+  B090 | key: active
+  FALLBACK: "Aktiv"
+  CTX: olor:x.inviteStatus==="active"?"#10b981":"#ff8a2a"},children:x.inviteStatus==="active"?s("active")||"Aktiv":s("pending")||"Ausstehend"}),e.jsx("button",{onClick:()=>{const k={...A};delete k[p];try{loc
+
+  B091 | key: member_archived
+  FALLBACK: "Archiviert"
+  CTX: mSlots_"+o,JSON.stringify(k))}catch{}i({teamSlots:k,team:Object.values(k)}),a(s("member_archived")||"Archiviert")},style:{padding:"4px 10px",borderRadius:6,background:"rgba(239,68,68,0.08)",border:"1p
+
+  B092 | key: booking_rules
+  FALLBACK: "Buchungsregeln"
+  CTX: :{fontSize:13,fontWeight:700,color:"var(--text-muted)",marginBottom:8},children:a("booking_rules")||"Buchungsregeln"}),e.jsx(pt,{label:a("min_notice")||"Mindestvorlauf (Stunden)",value:r.minNoticeHour
+
+  B093 | key: op_prep_no_files
+  FALLBACK: "Keine Dateien"
+  CTX: ===0?e.jsx("div",{style:{fontSize:12,color:"rgba(167,177,195,0.3)"},children:a("op_prep_no_files")||"Keine Dateien"}):l.map((C,M)=>e.jsxs("div",{style:{display:"flex",alignItems:"center",gap:8,padding
+
+  B094 | key: cal_today
+  FALLBACK: "Heute"
+  CTX: 158,11,0.6)":"rgba(167,177,195,0.5)",C=F.isUrgent&&F.daysUntil<=5,M=F.daysUntil===0?i("cal_today")||"Heute":F.daysUntil===1?i("tomorrow_label")||"Morgen":F.daysUntil+"d",R=Hl[F.treatment]||"rgba(167,1
+
+  B095 | key: tomorrow_label
+  FALLBACK: "Morgen"
+  CTX: gent&&F.daysUntil<=5,M=F.daysUntil===0?i("cal_today")||"Heute":F.daysUntil===1?i("tomorrow_label")||"Morgen":F.daysUntil+"d",R=Hl[F.treatment]||"rgba(167,177,195,0.3)";return e.jsxs("div",{onClick:()=
+
+  B096 | key: case_claimed_toast
+  FALLBACK: "Fall übernommen — Bewertung starten"
+  CTX: S?{...w,reviewAssignedTo:u}:w)),Nt(S,{reviewAssignedTo:u}).catch(()=>{}),i(l("case_claimed_toast")||"Fall übernommen — Bewertung starten"),o(S)},[_,s,p,r,o,i]),c=b.useMemo(()=>{const S=new Set;return 
+
+  B097 | key: locked
+  FALLBACK: "Gesperrt"
+  CTX: ?"rgba(167,177,195,0.3)":g?"#10b981":"#4cc9ff"},children:g?"✓ Bewertung fortsetzen":D?_i("locked")||"Gesperrt":_i("start_review")||"Bewertung starten"})]},S.id)})})]})}function S_(){const{myLeads:n,op
+
+  B098 | key: start_review
+  FALLBACK: "Bewertung starten"
+  CTX: b981":"#4cc9ff"},children:g?"✓ Bewertung fortsetzen":D?_i("locked")||"Gesperrt":_i("start_review")||"Bewertung starten"})]},S.id)})})]})}function S_(){const{myLeads:n,openPatient:o,moveLead:i,showT:a,
+
+  B099 | key: archive_auto_desc
+  FALLBACK: "Patienten werden automatisch archiviert wenn sie über 6 Monate inaktiv sind. Archivierte Patienten können jederzeit wiederhergestellt werden."
+  CTX: ght:1.5},children:s?`${r("no_results_for")||"Keine Ergebnisse für"} "${s}"`:r("archive_auto_desc")||"Patienten werden automatisch archiviert wenn sie über 6 Monate inaktiv sind. Archivierte Patienten 
+
+  B100 | key: archive_completed
+  FALLBACK: "Abgeschlossen"
+  CTX: ?"rgba(16,185,129,0.6)":"rgba(167,177,195,0.35)"},children:x.stage==="done"?r("archive_completed")||"Abgeschlossen":r("archived")||"Archiviert"})}),e.jsx("div",{onClick:g=>g.stopPropagation(),children
+
+  B101 | key: archived
+  FALLBACK: "Archiviert"
+  CTX: 67,177,195,0.35)"},children:x.stage==="done"?r("archive_completed")||"Abgeschlossen":r("archived")||"Archiviert"})}),e.jsx("div",{onClick:g=>g.stopPropagation(),children:e.jsx("button",{onClick:g=>z(g
+
+  B102 | key: archive_footer_desc
+  FALLBACK: "Patienten werden nach 6 Monaten Inaktivität automatisch archiviert. Wiederhergestellte Patienten erscheinen als neue Anfrage in der Pipeline."
+  CTX: ba(255,255,255,0.01)",fontSize:11,color:"rgba(167,177,195,0.2)"},children:r("archive_footer_desc")||"Patienten werden nach 6 Monaten Inaktivität automatisch archiviert. Wiederhergestellte Patienten er
+
+  B103 | key: action_needed
+  FALLBACK: "Aufgaben"
+  CTX: tyle:{fontSize:12,fontWeight:700,color:qt>0?"#ef4444":"#10b981"},children:qt>0?Ie("action_needed")||"Aufgaben":Ie("all_clear")||"Alles OK"}),qt>0&&e.jsxs("div",{style:{fontSize:10,color:"rgba(167,177,
+
+
+====================================================================================================
+SECTION C: ENGLISH-ONLY HARDCODED STRINGS (should also be translated)
+====================================================================================================
+
+--- Login/Auth Flow (5 Strings) ---
+
+  C001 | POS 817130 | children:"Signing you in…"
+  C002 | POS 817229 | children:"Please wait while we verify your credentials."
+  C003 | POS 817996 | children:"Set new password"
+  C004 | POS 830581 | children:"Sign in with password instead"
+  C005 | POS 830832 | children:"Sign in with magic link instead"
+
+--- Action Needed Suggestions (3 Strings) ---
+
+  C006 | POS 812918 | label:"Request flight details"
+  C007 | POS 813142 | label:"Move to Booked"
+  C008 | POS 809100 | label:"Patients" (usage widget)
+
+--- Action Descriptions (3 Strings) ---
+
+  C009 | POS 811744 | desc:"Patient hasn't sent photos yet"
+  C010 | POS 812949 | desc:"Appointment booked but no flight info yet"
+  C011 | POS 813165 | desc:"Treatment plan sent — ready to book?"
+
+--- Role Descriptions (3 Strings — mixed DE/EN) ---
+
+  C012 | POS 968372 | desc:"Pipeline, Inbox, Kalender, OP-Prep, Dateien"
+  C013 | POS 968549 | desc:"Nur Arzt-Portal (Bewertungen, eigener Kalender)"
+  C014 | POS 968739 | desc:"Umsatz, Rechnungen, Zahlungen"
+
+--- Treatment Extras Descriptions (2 Strings) ---
+
+  C015 | POS 1048945 | desc:"VIP Transfer Flughafen ↔ Hotel ↔ Klinik"
+  C016 | POS 1049050 | desc:"Shampoo, Lotion, Finasterid, Biotin"
+
+--- Onboarding Checklist Descriptions (3 Strings) ---
+
+  C017 | POS 1338201 | desc:"Callback URL + Verify Token"
+  C018 | POS 1338516 | desc:"Testnachricht senden"
+  C019 | POS 1383089 | desc:"Prepaid-SIM im Zielland kaufen..."
+  C020 | POS 1385626 | desc:"Callback URL: https://api.flowmatix.io/..."
+
+--- Placeholders (5 Strings) ---
+
+  C021 | POS 818677 | placeholder:"At least 8 characters"
+  C022 | POS 819254 | placeholder:"Repeat password"
+  C023 | POS 1356389 | placeholder:"Search clinics, contacts, cities, tags..."
+  C024 | POS 1360163 | placeholder:"Add notes..."
+  C025 | POS 1363924 | placeholder:"Search clinics..."
+
+--- Admin Internal (2 Strings) ---
+
+  C026 | POS 1367671 | children:"Impersonate"
+  C027 | POS 1367750 | children:"Regen Link"
+
+--- Demo Data (8+ Strings — low priority) ---
+
+  C028+ | POS 1712774+ | Multiple "Patient created via WhatsApp/website", "AI completed intake" etc.

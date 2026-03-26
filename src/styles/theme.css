@@ -1,0 +1,397 @@
+/* ═══════════════════════════════════════════════════════════════
+   Flowmatix Design Tokens v2 — Dark & Light Theme
+   Premium SaaS quality: Stripe / Linear / Vercel level
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Dark Theme (default) — PRESERVED EXACTLY ── */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --bg-app: #0f1623;
+  --bg-sidebar: #131c2e;
+  --bg-topbar: #0f1623;
+  --bg-card: rgba(255,255,255,0.03);
+  --bg-card-solid: #162032;
+  --bg-card-elevated: rgba(255,255,255,0.05);
+  --bg-input: rgba(255,255,255,0.04);
+  --bg-hover: rgba(255,255,255,0.06);
+  --bg-active: rgba(255,255,255,0.08);
+  --bg-modal: #131c2e;
+  --bg-tooltip: #1e293b;
+  --bg-section: rgba(255,255,255,0.02);
+
+  /* Header special */
+  --bg-header: linear-gradient(135deg,#0b1625 0%,#0e2038 50%,#0b1625 100%);
+  --bg-header-operator: linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(184,143,30,0.03) 50%,rgba(212,175,55,0.06) 100%);
+
+  /* Borders */
+  --border-subtle: rgba(255,255,255,0.04);
+  --border-default: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.10);
+  --border-hover: rgba(255,255,255,0.14);
+  --border-input: rgba(255,255,255,0.08);
+  --border-input-focus: rgba(76,201,255,0.4);
+
+  /* Text */
+  --text-primary: rgba(232,238,252,0.92);
+  --text-secondary: rgba(232,238,252,0.7);
+  --text-muted: rgba(167,177,195,0.5);
+  --text-faint: rgba(167,177,195,0.35);
+  --text-inverse: #0f1623;
+  --text-on-brand: #ffffff;
+
+  /* Brand Orange */
+  --brand: #ff8a2a;
+  --brand-hover: #ff9d4d;
+  --brand-subtle: rgba(255,138,42,0.08);
+  --brand-muted: rgba(255,138,42,0.15);
+  --brand-text: rgba(255,138,42,0.4);
+
+  /* Info / Cyan */
+  --info: #4cc9ff;
+  --info-subtle: rgba(76,201,255,0.06);
+  --info-muted: rgba(76,201,255,0.15);
+  --info-text: rgba(76,201,255,0.5);
+
+  /* Success / Green */
+  --success: #10b981;
+  --success-subtle: rgba(16,185,129,0.06);
+  --success-muted: rgba(16,185,129,0.15);
+  --success-text: rgba(16,185,129,0.5);
+
+  /* Warning / Amber */
+  --warning: #f59e0b;
+  --warning-subtle: rgba(245,158,11,0.06);
+  --warning-muted: rgba(245,158,11,0.15);
+  --warning-text: rgba(245,158,11,0.5);
+
+  /* Error / Red */
+  --error: #ff7a7a;
+  --error-subtle: rgba(255,122,122,0.05);
+  --error-muted: rgba(255,122,122,0.12);
+  --error-text: rgba(255,122,122,0.5);
+
+  /* Operator Gold */
+  --gold: #d4af37;
+  --gold-subtle: rgba(212,175,55,0.08);
+  --gold-muted: rgba(212,175,55,0.15);
+  --gold-text: rgba(212,175,55,0.5);
+
+  /* Neutrals */
+  --neutral: #6b7280;
+  --neutral-subtle: rgba(107,114,128,0.08);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.5);
+  --shadow-card: none;
+  --shadow-card-hover: 0 8px 30px rgba(0,0,0,0.4);
+  --shadow-glow-brand: 0 0 12px rgba(255,138,42,0.15);
+  --shadow-glow-brand-hover: 0 0 12px rgba(255,140,66,0.35);
+  --shadow-glow-success: 0 0 8px rgba(16,185,129,0.3);
+  --shadow-glow-info: 0 0 8px rgba(76,201,255,0.3);
+
+  /* Interactive */
+  --focus-ring: 0 0 0 2px rgba(76,201,255,0.4);
+  --hover-lift: translateY(-2px);
+
+  /* Overlay */
+  --overlay: rgba(0,0,0,0.5);
+  --overlay-heavy: rgba(0,0,0,0.7);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(255,255,255,0.08);
+  --scrollbar-thumb-hover: rgba(255,255,255,0.14);
+
+  /* Misc */
+  --sidebar-btn-border: #131c2e;
+  --dot-border: #0f1729;
+  --progress-track: rgba(255,255,255,0.06);
+  --divider: rgba(255,255,255,0.04);
+  --chart-label: rgba(167,177,195,0.4);
+
+  /* Clock color */
+  --clock-color: #ff8a2a;
+  --clock-sep: rgba(255,138,42,0.4);
+}
+
+/* ── Light Theme — Premium SaaS Design ── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces — layered, not flat white */
+  --bg-app: #F8FAFC;
+  --bg-sidebar: #131c2e;
+  --bg-topbar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-solid: #FFFFFF;
+  --bg-card-elevated: #FFFFFF;
+  --bg-input: #F1F3F6;
+  --bg-hover: #F0F2F5;
+  --bg-active: #E8ECF1;
+  --bg-modal: #FFFFFF;
+  --bg-tooltip: #1B2430;
+  --bg-section: #F0F3F7;
+
+  /* Header — warm tinted, not flat */
+  --bg-header: #F8FAFC;
+  --bg-header-operator: linear-gradient(135deg, #FFFBF0 0%, #FFF9E8 50%, #FFFBF0 100%);
+
+  /* Borders — visible structure */
+  --border-subtle: #EFF1F5;
+  --border-default: #E6EAF0;
+  --border-strong: #D4DAE3;
+  --border-hover: #C0C8D4;
+  --border-input: #D4DAE3;
+  --border-input-focus: #FF8C42;
+
+  /* Text — dark navy, NOT pure black */
+  --text-primary: #1B2430;
+  --text-secondary: #475569;
+  --text-muted: #6B7280;
+  --text-faint: #9CA3AF;
+  --text-inverse: #FFFFFF;
+  --text-on-brand: #FFFFFF;
+
+  /* Brand Orange — slightly deepened for white bg contrast */
+  --brand: #E8792A;
+  --brand-hover: #FF8C42;
+  --brand-subtle: #FFF4EB;
+  --brand-muted: #FFE4CC;
+  --brand-text: #C2610E;
+
+  /* Info / Cyan — rich blue for light bg */
+  --info: #2563EB;
+  --info-subtle: #EFF6FF;
+  --info-muted: #DBEAFE;
+  --info-text: #1D4ED8;
+
+  /* Success / Green — rich, not neon */
+  --success: #059669;
+  --success-subtle: #ECFDF5;
+  --success-muted: #D1FAE5;
+  --success-text: #047857;
+
+  /* Warning / Amber — clear separation from brand */
+  --warning: #D97706;
+  --warning-subtle: #FFFBEB;
+  --warning-muted: #FEF3C7;
+  --warning-text: #B45309;
+
+  /* Error / Red */
+  --error: #DC2626;
+  --error-subtle: #FEF2F2;
+  --error-muted: #FECACA;
+  --error-text: #B91C1C;
+
+  /* Operator Gold */
+  --gold: #A97C0E;
+  --gold-subtle: #FFFBEB;
+  --gold-muted: #FEF3C7;
+  --gold-text: #854D0E;
+
+  /* Neutrals */
+  --neutral: #6B7280;
+  --neutral-subtle: #F3F4F6;
+
+  /* Shadows — soft, layered, NO dark mode glow */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 1px 3px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.04);
+  --shadow-lg: 0 2px 4px rgba(0,0,0,0.03), 0 8px 20px rgba(0,0,0,0.06);
+  --shadow-xl: 0 4px 8px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.08);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.06);
+  --shadow-glow-brand: 0 2px 8px rgba(232,121,42,0.08);
+  --shadow-glow-brand-hover: 0 4px 14px rgba(232,121,42,0.14);
+  --shadow-glow-success: 0 2px 8px rgba(5,150,105,0.08);
+  --shadow-glow-info: 0 2px 8px rgba(37,99,235,0.08);
+
+  /* Interactive */
+  --focus-ring: 0 0 0 2px rgba(232,121,42,0.25);
+  --hover-lift: translateY(-1px);
+
+  /* Overlay */
+  --overlay: rgba(0,0,0,0.25);
+  --overlay-heavy: rgba(0,0,0,0.45);
+
+  /* Scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(0,0,0,0.10);
+  --scrollbar-thumb-hover: rgba(0,0,0,0.18);
+
+  /* Misc */
+  --sidebar-btn-border: #131c2e;
+  --dot-border: #FFFFFF;
+  --progress-track: #E5E7EB;
+  --divider: #EFF1F5;
+  --chart-label: #9CA3AF;
+
+  /* Clock color — darker for readability */
+  --clock-color: #E8792A;
+  --clock-sep: rgba(232,121,42,0.35);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Global Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+html {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+::selection {
+  background: rgba(255,138,42,0.15);
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-faint) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Animations (shared)
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes clockBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes statusPulse{0%{transform:scale(1);opacity:0.4}50%{transform:scale(1.8);opacity:0}100%{transform:scale(1);opacity:0}}
+@keyframes statusGlow{0%,100%{box-shadow:0 0 4px currentColor}50%{box-shadow:0 0 12px currentColor}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pipeProgress{from{width:0}to{width:var(--pipe-w)}}
+@keyframes fmPulse{0%,100%{opacity:1;box-shadow:0 0 4px #a78bfa}50%{opacity:0.4;box-shadow:0 0 16px #a78bfa}}
+@keyframes fmPulseOrange{0%,100%{opacity:1;box-shadow:0 0 4px #ff8a2a}50%{opacity:0.4;box-shadow:0 0 16px #ff8a2a}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes aiPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Dashboard Components
+   ═══════════════════════════════════════════════════════════════ */
+
+.dash-card{
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  box-shadow: var(--shadow-card);
+}
+.dash-card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-card-hover);
+}
+.dash-kpi{
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  box-shadow: var(--shadow-card);
+}
+.dash-kpi:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-card-hover);
+}
+
+.dash-fade-in{animation:fadeInUp .4s ease both}
+.dash-fade-in:nth-child(1){animation-delay:.05s}
+.dash-fade-in:nth-child(2){animation-delay:.1s}
+.dash-fade-in:nth-child(3){animation-delay:.15s}
+.dash-fade-in:nth-child(4){animation-delay:.2s}
+.dash-fade-in:nth-child(5){animation-delay:.25s}
+.dash-fade-in:nth-child(6){animation-delay:.3s}
+.dash-fade-in:nth-child(7){animation-delay:.35s}
+.dash-fade-in:nth-child(8){animation-delay:.4s}
+
+/* Nav hover */
+.crm-nav-item:hover{background:var(--brand-subtle)!important}
+.op-nav-item:hover{background:var(--gold-subtle)!important}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Theme Toggle
+   ═══════════════════════════════════════════════════════════════ */
+
+.theme-toggle{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:10px;
+  background:var(--bg-hover);border:1px solid var(--border-default);
+  cursor:pointer;transition:all .2s;color:var(--text-muted);
+  font-size:15px;padding:0;
+}
+.theme-toggle:hover{
+  background:var(--bg-active);
+  border-color:var(--border-strong);
+  color:var(--text-secondary);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Light Mode Structural Overrides
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Sidebar — stays dark in both themes (identical to dark mode) */
+[data-theme="light"] .fm-sidebar {
+  background: #131c2e !important;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  box-shadow: none;
+}
+
+/* Topbar — subtle bottom edge */
+[data-theme="light"] .fm-topbar {
+  border-bottom: 1px solid var(--border-default);
+  box-shadow: 0 1px 0 var(--border-subtle);
+}
+
+/* Inputs — proper light styling */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Light mode glow is subdued */
+[data-theme="light"] .dash-card:hover,
+[data-theme="light"] .dash-kpi:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Status glow — softer in light mode */
+[data-theme="light"] [style*="statusGlow"] {
+  animation: none !important;
+}
+
+/* Auth screen */
+[data-theme="light"] #root {
+  background: var(--bg-app);
+}
+
+/* Status chips — subtler in light mode */
+[data-theme="light"] .fm-status-chip {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.08);
+}
+
+/* Sidebar — no light overrides for logo/toggle (stays dark) */

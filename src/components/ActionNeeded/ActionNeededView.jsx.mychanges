@@ -1,0 +1,123 @@
+import { useMemo } from "react";
+import { useApp } from "../../context/AppContext";
+import { timeAgo } from "../../utils/helpers";
+
+const PRIORITY_COLORS = { critical: { color: "#ef4444", bg: "rgba(239,68,68,0.06)", border: "rgba(239,68,68,0.15)" }, high: { color: "#ff8a2a", bg: "rgba(255,138,42,0.06)", border: "rgba(255,138,42,0.15)" }, medium: { color: "#fbbf24", bg: "rgba(251,191,36,0.06)", border: "rgba(251,191,36,0.15)" }, low: { color: "#4cc9ff", bg: "rgba(76,201,255,0.06)", border: "rgba(76,201,255,0.15)" } };
+
+export default function ActionNeededView() {
+  const { myLeads, invoices, clinic, flightAlerts, openPatient, setView, showT, moveLead, sendPaymentLink, setConvStatus, addTL, logAction, setMsgs, activeClinicId, setLeads, t } = useApp();
+
+  const tasks = useMemo(() => {
+    const items = [];
+    myLeads.forEach(l => {
+      // Medical review needed
+      if (l.convStatus === "needs_medical_review") {
+        items.push({ id: "review_" + l.id, priority: "critical", icon: "🩺", title: t("medical_review_required"), patient: l.name, desc: (l.photoUrls?.length || 0) + " " + t("photos_waiting"), time: l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("review_now"), category: "medical" });
+      }
+      // Human takeover requested
+      if (l.convStatus === "human_takeover") {
+        items.push({ id: "takeover_" + l.id, priority: "critical", icon: "👤", title: t("human_takeover_requested"), patient: l.name, desc: t("patient_requested_staff"), time: l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("open_chat"), category: "communication" });
+      }
+      // Waiting for clinic reply
+      if (l.convStatus === "waiting_for_clinic_reply") {
+        items.push({ id: "reply_" + l.id, priority: "high", icon: "💬", title: t("waiting_for_reply"), patient: l.name, desc: t("patient_waiting_response"), time: l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("reply"), category: "communication" });
+      }
+      // Booked but no flight info
+      if ((l.stage === "booked") && !l.flightConfirmed?.date) {
+        items.push({ id: "flight_" + l.id, priority: "medium", icon: "✈️", title: t("flight_details_missing"), patient: l.name, desc: t("booked_no_flight"), time: l.createdAt, action: () => openPatient(l.id), actionLabel: t("add_flight"), category: "logistics" });
+      }
+      // Flight confirmed but no driver assigned
+      if (l.flightConfirmed?.date && !l.logistics?.driverName) {
+        items.push({ id: "driver_" + l.id, priority: "high", icon: "🚗", title: t("assign_driver"), patient: l.name, desc: l.flightConfirmed.airline + " — " + t("no_driver_assigned"), time: l.flightConfirmed.detected, action: () => openPatient(l.id), actionLabel: t("assign"), category: "logistics" });
+      }
+      // Flight mismatch
+      if (flightAlerts?.find(a => a.id === l.id)) {
+        items.push({ id: "mismatch_" + l.id, priority: "critical", icon: "⚠️", title: t("flight_appt_mismatch"), patient: l.name, desc: t("flight_date_mismatch"), time: l.flightConfirmed?.detected, action: () => openPatient(l.id), actionLabel: t("review"), category: "logistics" });
+      }
+      // Done but no aftercare sent
+      if (l.stage === "done" && !l.aftercareSent) {
+        items.push({ id: "aftercare_" + l.id, priority: "high", icon: "💊", title: t("send_aftercare"), patient: l.name, desc: t("procedure_no_aftercare"), time: l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("send_aftercare_btn"), category: "aftercare" });
+      }
+      // Aftercare sent but no review request
+      if (l.aftercareSent && !l.reviewRequestSent) {
+        items.push({ id: "reviewreq_" + l.id, priority: "low", icon: "⭐", title: t("send_review_request"), patient: l.name, desc: t("aftercare_review_pending"), time: l.aftercareSentAt, action: () => openPatient(l.id), actionLabel: t("send_review_btn"), category: "aftercare" });
+      }
+      // Deposit not paid (treatment plan sent but no payment)
+      if (l.reviewData && l.convStatus !== "deposit_paid" && l.stage !== "done" && !invoices.some(i => i.leadId === l.id && i.status === "paid")) {
+        items.push({ id: "deposit_" + l.id, priority: "medium", icon: "💳", title: t("deposit_outstanding"), patient: l.name, desc: t("plan_no_deposit"), time: l.treatmentPlanSentAt || l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("send_reminder"), category: "billing" });
+      }
+      // Booking pending
+      if (l.convStatus === "booking_pending" && l.stage === "contacted") {
+        items.push({ id: "book_" + l.id, priority: "medium", icon: "📅", title: t("ready_to_book"), patient: l.name, desc: t("plan_accepted_booking"), time: l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("book_now"), category: "booking" });
+      }
+      // Bot paused (human control mode but not resolved/closed)
+      if (l.controlMode === "human" && l.convStatus !== "resolved" && l.convStatus !== "closed" && l.convStatus !== "human_takeover") {
+        items.push({ id: "botpause_" + l.id, priority: "medium", icon: "🤖", title: t("bot_paused"), patient: l.name, desc: t("bot_paused_desc"), time: l.lastAiInteraction, action: () => openPatient(l.id), actionLabel: t("activate_bot"), category: "communication" });
+      }
+    });
+    // Unpaid invoices
+    invoices.filter(i => i.status !== "paid" && i.gross > 0 && (i.clinicId === clinic?.id || !i.clinicId)).forEach(inv => {
+      const daysSince = Math.round((Date.now() - new Date(inv.date).getTime()) / (1000 * 60 * 60 * 24));
+      if (daysSince >= 3) {
+        items.push({ id: "inv_" + inv.id, priority: daysSince > 7 ? "critical" : "high", icon: "🧾", title: t("invoice_overdue"), patient: inv.patient || "Unknown", desc: inv.nr + " — EUR " + (inv.gross||0).toLocaleString() + " " + t("unpaid_for") + " " + daysSince + " " + t("days"), time: inv.date, action: () => setView("revenue"), actionLabel: t("view_invoice"), category: "billing" });
+      }
+    });
+    // Sort by priority
+    const order = { critical: 0, high: 1, medium: 2, low: 3 };
+    items.sort((a, b) => order[a.priority] - order[b.priority]);
+    return items;
+  }, [myLeads, invoices, clinic, flightAlerts]);
+
+  const categories = [...new Set(tasks.map(t => t.category))];
+  const catMeta = { medical: { label: t("cat_medical"), icon: "🩺" }, communication: { label: t("cat_communication"), icon: "💬" }, logistics: { label: t("cat_logistics"), icon: "✈️" }, aftercare: { label: t("cat_aftercare"), icon: "💊" }, billing: { label: t("cat_billing"), icon: "💳" }, booking: { label: t("cat_bookings"), icon: "📅" } };
+
+  return <div style={{ padding: 28, maxWidth: 800 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div>
+        <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>{t("action_needed")}</h1>
+        <p style={{ fontSize: 14, color: "rgba(167,177,195,0.6)", margin: 0 }}>{tasks.length} {t("tasks_attention")}</p>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        {Object.entries(PRIORITY_COLORS).map(([k, v]) => {
+          const count = tasks.filter(t => t.priority === k).length;
+          const pLabel = {critical:t("priority_urgent"),high:t("priority_high"),medium:t("priority_medium"),low:t("priority_info")}[k];
+          return count > 0 ? <div key={k} style={{ padding: "4px 12px", borderRadius: 8, background: v.bg, border: "1px solid " + v.border, fontSize: 11, fontWeight: 700, color: v.color }}>{count} {pLabel}</div> : null;
+        })}
+      </div>
+    </div>
+
+    {tasks.length === 0 && <div style={{ padding: 40, textAlign: "center", borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)" }}>
+      <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
+      <div style={{ fontWeight: 800, fontSize: 18, color: "#10b981" }}>{t("all_clear")}</div>
+      <div style={{ fontSize: 14, color: "rgba(167,177,195,0.5)", marginTop: 6 }}>{t("no_pending")}</div>
+    </div>}
+
+    {categories.map(cat => {
+      const meta = catMeta[cat] || { label: cat, icon: "📋" };
+      const catTasks = tasks.filter(t => t.category === cat);
+      return <div key={cat} style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+          <span>{meta.icon}</span> {meta.label} <span style={{ color: "rgba(167,177,195,0.25)" }}>({catTasks.length})</span>
+        </div>
+        {catTasks.map(task => {
+          const p = PRIORITY_COLORS[task.priority]; const pLabel = {critical:t("priority_urgent"),high:t("priority_high"),medium:t("priority_medium"),low:t("priority_info")}[task.priority];
+          return <div key={task.id} style={{ padding: "14px 18px", borderRadius: 14, background: p.bg, border: "1px solid " + p.border, marginBottom: 8, display: "flex", alignItems: "flex-start", gap: 14 }}>
+            <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{task.icon}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>{task.title}</span>
+                <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, background: p.color + "18", color: p.color }}>{pLabel}</span>
+              </div>
+              <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 3 }}>
+                <strong>{task.patient}</strong>
+                {" — "}{task.desc}
+              </div>
+              {task.time && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 4 }}>{timeAgo(task.time)}</div>}
+            </div>
+            <button onClick={task.action} style={{ padding: "8px 16px", borderRadius: 10, background: p.color + "12", border: "1px solid " + p.color + "30", color: p.color, fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap", marginTop: 2 }}>{task.actionLabel}</button>
+          </div>;
+        })}
+      </div>;
+    })}
+  </div>;
+}

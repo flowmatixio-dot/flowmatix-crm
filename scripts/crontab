@@ -1,0 +1,5 @@
+# Flowmatix Cron Jobs
+# Install: crontab /opt/flowmatix/scripts/crontab
+
+# Database backup — daily at 03:00 UTC
+0 3 * * * /opt/flowmatix/scripts/backup.sh >> /var/log/flowmatix-backup.log 2>&1
