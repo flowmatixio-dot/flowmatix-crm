@@ -108,7 +108,7 @@ export default function ProductTour() {
       </div>
 
       <div style={{ fontSize: 10, fontWeight: 700, color: "#4cc9ff", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>
-        Step {tourStep + 1} of {TOUR_STEPS.length}
+        {t("step_x_of_y").replace("{x}",tourStep + 1).replace("{y}",TOUR_STEPS.length)}
       </div>
       <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>{step?.title}</div>
       <div style={{ fontSize: 14, color: "rgba(167,177,195,0.7)", lineHeight: 1.5, marginBottom: 20 }}>{step?.desc}</div>
@@ -166,7 +166,7 @@ export function TourWelcomeModal() {
       <div style={{ fontSize: 48, marginBottom: 16 }}>🚀</div>
       <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>{t("tour_welcome")}</div>
       <div style={{ fontSize: 15, color: "rgba(167,177,195,0.7)", lineHeight: 1.5, marginBottom: 24 }}>
-        Discover how to manage patients, automate WhatsApp conversations, and track revenue — all in under 2 minutes.
+        {t("tour_welcome_desc")}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <button onClick={() => { setShow(false); setTourStep(0); setTourActive(true); }} style={{

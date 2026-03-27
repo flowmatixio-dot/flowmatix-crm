@@ -106,6 +106,25 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     }
   }, []);
 
+  /* ═══ IMPERSONATION — handle #impersonate=... from operator console ═══ */
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#impersonate=')) {
+      try {
+        const encoded = hash.replace('#impersonate=', '');
+        const decoded = atob(encoded);
+        const params = new URLSearchParams(decoded);
+        const access = params.get('access');
+        if (access) {
+          fmApi.setTokens(access, access); // impersonation token as both access + refresh
+          sessionStorage.setItem('fm_impersonation', 'true');
+          sessionStorage.setItem('fm_login_at', String(Date.now()));
+          // Don't clean hash — banner needs it
+        }
+      } catch (e) { console.warn('[impersonate] Failed to parse:', e); }
+    }
+  }, []);
+
   /* ═══ SESSION RESTORE — API-only ═══ */
   useEffect(() => {
     const onSessionExpired = () => { fmApi.clearTokens(); setUser(null); setAuthLoading(false); };

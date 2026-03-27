@@ -1,38 +1,211 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { Stat, Toggle } from "../shared/index";
-import { timeAgo } from "../../utils/helpers";
+import { updateClinicSettings, submitWhatsAppTemplates } from "../../api/client";
 
 export default function AutomationsView() {
-  const { myAutomations, toggleAutomation, usageMetrics, setView } = useApp();
-  const [limitDismissed, setLimitDismissed] = useState(()=>localStorage.getItem("fm_auto_limit_dismissed")==="true");
+  const { myAutomations, toggleAutomation, clinic, setClinics, showT, t } = useApp();
+  const [openGroup, setOpenGroup] = useState(null);
+  const [reviewLink, setReviewLink] = useState(clinic?.googleMapsLink || "");
 
-  const autoMetric = usageMetrics?.metrics?.find(m=>m.key==="automations");
-  const showLimitNotice = autoMetric?.isWarning && !limitDismissed;
+  const saveSetting = (key, value) => {
+    setClinics(cs => cs.map(cl => cl.id === clinic?.id ? { ...cl, [key]: value } : cl));
+    updateClinicSettings({ [key]: value, orgId: clinic?.id }).then(() => showT(t("auto_saved") || "Saved")).catch(() => showT(t("auto_error") || "Error"));
+  };
 
-  return <div style={{padding:28,maxWidth:800}}>
-    <h1 style={{fontSize:22,fontWeight:800,margin:"0 0 6px"}}>Automations</h1>
-    <p style={{fontSize:14,color:"rgba(167,177,195,0.6)",margin:"0 0 28px"}}>Manage automated workflows for patient engagement.</p>
-    {showLimitNotice&&<div style={{padding:"10px 16px",borderRadius:10,background:autoMetric.isUrgent?"rgba(239,68,68,0.06)":"rgba(251,191,36,0.06)",border:`1px solid ${autoMetric.isUrgent?"rgba(239,68,68,0.15)":"rgba(251,191,36,0.15)"}`,marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-      <span style={{fontSize:13,color:autoMetric.isUrgent?"#ef4444":"#fbbf24",fontWeight:600}}>{autoMetric.icon} {autoMetric.value}/{autoMetric.limit} automations active — <span style={{cursor:"pointer",textDecoration:"underline"}} onClick={()=>setView("billing")}>upgrade for more</span></span>
-      <button onClick={()=>{setLimitDismissed(true);localStorage.setItem("fm_auto_limit_dismissed","true");}} style={{padding:"3px 10px",borderRadius:6,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>✕</button>
-    </div>}
-    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:14,marginBottom:28}}>
-      <Stat label="Active Automations" value={myAutomations.filter(a=>a.active).length} color="#10b981"/>
-      <Stat label="Total Runs" value={myAutomations.reduce((s,a)=>s+a.runs,0)} color="#4cc9ff"/>
-    </div>
-    {myAutomations.map(aut=><div key={aut.id} style={{padding:20,borderRadius:16,background:aut.active?"rgba(16,185,129,0.04)":"rgba(255,255,255,0.02)",border:`1px solid ${aut.active?"rgba(16,185,129,0.15)":"rgba(255,255,255,0.06)"}`,marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-      <div style={{flex:1}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-          <span style={{fontSize:18}}>⚡</span>
-          <div style={{fontWeight:700,fontSize:16}}>{aut.name}</div>
-          {aut.active&&<span style={{padding:"2px 8px",borderRadius:6,fontSize:10,fontWeight:700,background:"rgba(16,185,129,0.12)",color:"#10b981"}}>Active</span>}
-        </div>
-        <div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginBottom:4}}>Trigger: <span style={{color:"rgba(232,238,252,0.7)"}}>{aut.trigger}</span></div>
-        <div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginBottom:4}}>Action: <span style={{color:"rgba(232,238,252,0.7)"}}>{aut.action}</span></div>
-        <div style={{fontSize:12,color:"rgba(167,177,195,0.4)"}}>{aut.runs} runs · Last: {aut.lastRun?timeAgo(aut.lastRun):"Never"}</div>
+  const sel = (value, onChange, options) => (
+    <select value={value} onChange={e => onChange(e.target.value)} style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 12, outline: "none", cursor: "pointer", minWidth: 120 }}>
+      {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+    </select>
+  );
+
+  const GROUPS = [
+    {
+      id: "bookings", icon: "📅", label: t("auto_group_bookings") || "Terminerinnerungen & Buchungen",
+      desc: t("auto_group_bookings_desc") || "Buchungsbestätigungen und Erinnerungen",
+      types: ["booking_confirm", "appt_reminder"],
+      locked: true,
+    },
+    {
+      id: "aftercare", icon: "💊", label: t("auto_group_aftercare") || "Nachsorge",
+      desc: t("auto_group_aftercare_desc") || "Nachsorge-Nachrichten nach der Behandlung",
+      types: ["aftercare"],
+    },
+    {
+      id: "reviews", icon: "⭐", label: t("auto_group_reviews") || "Bewertungen",
+      desc: t("auto_group_reviews_desc") || "Google Maps Bewertungsanfrage",
+      types: ["review_request"],
+      alwaysOpen: true,
+    },
+    {
+      id: "logistics", icon: "✈️", label: t("auto_group_logistics") || "Logistik",
+      desc: t("auto_group_logistics_desc") || "Flug-Tracking, Fahrer-Benachrichtigung",
+      types: ["driver_notify"],
+    },
+  ];
+
+  const visibleTypes = GROUPS.flatMap(g => g.types);
+  const activeCount = myAutomations.filter(a => a.active && !a.locked && visibleTypes.includes(a.type)).length;
+  const totalRuns = myAutomations.filter(a => visibleTypes.includes(a.type)).reduce((s, a) => s + (a.runs || 0), 0);
+
+  return (
+    <div style={{ padding: 28, maxWidth: 800 }}>
+      <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 6px" }}>{t("automations") || "Automatisierungen"}</h1>
+      <p style={{ fontSize: 14, color: "rgba(167,177,195,0.6)", margin: "0 0 20px" }}>{t("auto_subtitle") || "Wiederkehrende Aufgaben automatisieren"}</p>
+
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 28 }}>
+        <Stat label={t("stat_active_automations") || "Aktive Automatisierungen"} value={activeCount} color="#10b981" />
+        <Stat label={t("stat_total_runs") || "Gesamtausführungen"} value={totalRuns} color="#4cc9ff" />
       </div>
-      <Toggle value={aut.active} onChange={()=>toggleAutomation(aut.id)}/>
-    </div>)}
-  </div>;
+
+      {/* Automation Groups */}
+      {GROUPS.map(group => {
+        const items = myAutomations.filter(a => group.types.includes(a.type));
+        if (items.length === 0) return null;
+        const anyActive = items.some(a => a.active && !a.locked);
+        const isOpen = openGroup === group.id || group.alwaysOpen;
+
+        return (
+          <div key={group.id} style={{ marginBottom: 12, borderRadius: 14, background: "rgba(255,255,255,0.015)", border: `1px solid ${anyActive ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.06)"}`, overflow: "hidden" }}>
+            {/* Group Header */}
+            <div
+              onClick={() => setOpenGroup(isOpen ? null : group.id)}
+              style={{ padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 16 }}>{group.icon}</span>
+                <span style={{ fontWeight: 700, fontSize: 15 }}>{group.label}</span>
+                {anyActive && <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, background: "rgba(16,185,129,0.12)", color: "#10b981" }}>{t("auto_aktiv") || "aktiv"}</span>}
+                {!group.alwaysOpen && <span style={{ fontSize: 12, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {group.locked ? <span style={{padding:"3px 10px",borderRadius:6,fontSize:10,fontWeight:700,background:"rgba(16,185,129,0.12)",color:"#10b981"}}>{t("always_active")}</span> : <Toggle value={anyActive} onChange={(e) => { e?.stopPropagation?.(); items.forEach(a => { if (a.active === anyActive && !a.locked) toggleAutomation(a.id); }); }} />}
+              </div>
+            </div>
+
+            {/* Expanded Content */}
+            {isOpen && (
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                {items.map(aut => (
+                  <div key={aut.id} style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: "rgba(232,238,252,0.85)", marginBottom: 4 }}>{aut.name}</div>
+                    <div style={{ fontSize: 12, color: "rgba(167,177,195,0.45)" }}>{aut.trigger}</div>
+
+                    {/* Inline settings per type */}
+                    {aut.type === "booking_confirm" && (
+                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 6 }}>
+                        ℹ️ {t("auto_booking_confirm_desc") || "Patient automatically receives booking confirmation with appointment, address and preparation instructions."}
+                      </div>
+                    )}
+
+                    {aut.type === "appt_reminder" && (<>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("auto_reminder_times") || "Reminder times"}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.7)", padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>{t("auto_reminder_3days") || "3 days before"}</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 6 }}>
+                        ℹ️ {t("auto_reminder_combined") || "Combined message: appointment reminder + hotel info + flight ticket request — all in one message."}
+                      </div>
+                    </>)}
+
+                    {aut.type === "aftercare" && (
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("auto_aftercare_label") || "Aftercare"}</span>
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.35)" }}>
+                          ℹ️ {t("auto_aftercare_lang_note") || "Message is automatically sent in the patient's language"}
+                        </span>
+                        {sel(clinic?.aftercareDelayHours || 4, v => saveSetting("aftercareDelayHours", parseInt(v)), [
+                          ["2", t("auto_aftercare_2h") || "2h after surgery"], ["4", t("auto_aftercare_4h") || "4h after surgery"], ["6", t("auto_aftercare_6h") || "6h after surgery"], ["12", t("auto_aftercare_12h") || "12h after surgery"], ["24", t("auto_aftercare_24h") || "24h after surgery"]
+                        ])}
+                      </div>
+                    )}
+
+                    {aut.type === "review_request" && (
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{padding:"8px 12px",borderRadius:8,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,lineHeight:1.6,marginBottom:10,display:"flex",alignItems:"flex-start",gap:6}}>{"ℹ️"} {t("hint_review_timing") || "Wird automatisch einige Stunden nach der Nachsorge-Nachricht an den Patienten gesendet. Der Patient erhaelt einen direkten Link zu deinem Google Maps Profil."}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Google Maps Link</div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <input value={reviewLink} onChange={e => setReviewLink(e.target.value)} placeholder="https://g.page/r/..." style={{ flex: 1, padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 12, outline: "none" }} />
+                          <button onClick={() => saveSetting("googleMapsLink", reviewLink)} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(76,201,255,0.1)", border: "1px solid rgba(76,201,255,0.2)", color: "#4cc9ff", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>{t("save") || "Speichern"}</button>
+                        </div>
+                        {!reviewLink && <div style={{fontSize:10,color:"rgba(251,191,36,0.6)",marginTop:6}}>{"⚠️"} {t("hint_review_no_link") || "Kein Link hinterlegt — Bewertungsanfrage wird ohne Link gesendet."}</div>}
+                      </div>
+                    )}
+
+                    {aut.type === "driver_notify" && (
+                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 6 }}>
+                        ℹ️ {t("auto_driver_desc") || "1 day before arrival, the patient receives a message with driver name, vehicle and pickup details. Driver is notified via Telegram."}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* WhatsApp Templates */}
+      <div style={{ marginTop: 20, borderRadius: 14, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(76,201,255,0.12)", overflow: "hidden" }}>
+        <div style={{ padding: "16px 20px 0" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 16 }}>📋</span>
+              <span style={{ fontWeight: 700, fontSize: 15 }}>WhatsApp Templates</span>
+            </div>
+            <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("auto_lang_auto_detect") || "Language is automatically detected"}</span>
+          </div>
+          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,lineHeight:1.6,marginBottom:14,display:"flex",alignItems:"flex-start",gap:8}}>{"ℹ️"} {t("hint_templates")}</div>
+        </div>
+        <div style={{ padding: "0 12px" }}>
+          {[
+            { name: t("tpl_reminder") || "Terminerinnerung", desc: t("tpl_reminder_desc") || "3 Tage vor Termin + Flugdaten-Anfrage", icon: "📅", cat: "booking" },
+            { name: t("tpl_booking") || "Buchungsbestätigung", desc: t("tpl_booking_desc") || "Nach Terminbuchung", icon: "✅", cat: "booking" },
+            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung", icon: "💊", cat: "aftercare" },
+            { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge-Nachricht", icon: "⭐", cat: "aftercare" },
+            { name: t("tpl_deposit_confirmed") || "Zahlungsbestaetigung", desc: t("tpl_deposit_confirmed_desc") || "Nach Zahlungseingang", icon: "💰", cat: "payment" },
+            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen", icon: "📨", cat: "reactivation" },
+          ].map(tpl => (
+            <div key={tpl.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
+                <span style={{ fontSize: 14 }}>{tpl.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{tpl.name}</div>
+                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{tpl.desc}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                {["DE", "EN", "TR"].map(l => (
+                  <span key={l} style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: "rgba(76,201,255,0.08)", border: "1px solid rgba(76,201,255,0.15)", color: "#4cc9ff" }}>{l}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: "14px 20px" }}>
+          <button
+            onClick={async () => {
+              showT(t("auto_templates_submitting") || "Templates are being submitted…");
+              try {
+                const res = await submitWhatsAppTemplates();
+                if (res.success) {
+                  showT(`✓ ${res.submitted} ${t("auto_templates_submitted") || "submitted"}, ${res.already_exists} ${t("auto_templates_already") || "already existing"}`);
+                } else {
+                  showT(`${res.submitted} ${t("auto_templates_submitted") || "submitted"}, ${res.errors} ${t("auto_templates_errors") || "errors — details in console"}`);
+                  console.log("[template-submit]", res.details);
+                }
+              } catch (e) {
+                showT((t("auto_save_error_prefix") || "Error: ") + (e.message || (t("auto_submission_failed") || "Submission failed")));
+              }
+            }}
+            style={{ width: "100%", padding: "11px", borderRadius: 10, background: "linear-gradient(135deg, #4cc9ff, #2b7cff)", border: "none", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
+          >
+            {t("auto_submit_all_templates") || "Submit all templates to 360dialog"}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  );
 }

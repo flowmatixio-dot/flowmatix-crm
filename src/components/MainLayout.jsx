@@ -87,6 +87,10 @@ export default function MainLayout() {
   const effectiveRole = userRole || "admin";
   const canAccess = (mod) => hasModuleAccess(effectiveRole, mod, clinicPlan);
 
+  // Live clock for operator top bar
+  const [clockNow, setClockNow] = React.useState(new Date());
+  React.useEffect(() => { const iv = setInterval(() => setClockNow(new Date()), 30000); return () => clearInterval(iv); }, []);
+
   // ── Mobile detection: show desktop-only notice ──
   const [isMobile] = useState(() => window.innerWidth < 768);
   if (isMobile) {
@@ -133,7 +137,7 @@ export default function MainLayout() {
     return () => { mounted = false; clearInterval(iv); };
   }, [effectiveRole]);
   // Reset scroll on view change
-  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [view]);
+  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [view, opSubTab]);
   // Listen for internal tab scroll reset
   useEffect(() => {
     const handler = () => { if (scrollRef.current) scrollRef.current.scrollTop = 0; };
@@ -582,6 +586,25 @@ export default function MainLayout() {
 
       {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+        {/* ═══ IMPERSONATION BANNER ═══ */}
+        {(() => {
+          const hash = window.location.hash;
+          if (!hash.startsWith('#impersonate=')) return null;
+          let info = {};
+          try { const decoded = atob(hash.replace('#impersonate=', '')); const p = new URLSearchParams(decoded); info = { user: p.get('user'), org: p.get('org'), operator: p.get('operator') === 'true', reason: decodeURIComponent(p.get('reason') || '') }; } catch { return null; }
+          if (!info.operator) return null;
+          return (
+            <div style={{ background: "linear-gradient(90deg, #ff8a2a, #ef4444)", padding: "8px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 200 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 14 }}>{"⚠\uFE0F"}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>IMPERSONATION AKTIV</span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>Du bist als <strong>{info.user || "Klinik"}</strong> eingeloggt</span>
+                {info.reason && <span style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", padding: "1px 8px", borderRadius: 4, background: "rgba(0,0,0,0.2)" }}>Grund: {info.reason}</span>}
+              </div>
+              <button onClick={() => { window.close(); }} style={{ padding: "5px 16px", borderRadius: 6, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Impersonation beenden</button>
+            </div>
+          );
+        })()}
         {/* ═══ TOP BAR — Redesigned ═══ */}
         <div style={{ height: 52, minHeight: 52, borderBottom: "1px solid rgba(255,255,255,0.04)", background: "#0f1623", display: "flex", alignItems: "center", padding: "0 24px", gap: 0, flexShrink: 0, minWidth: 0, position: "relative", zIndex: 100 }}>
 
@@ -615,9 +638,9 @@ export default function MainLayout() {
             </div>)}
             {/* Operator badges */}
             {!IS_CLIENT_MODE && isOperator && <>
-              <div onClick={() => { setView("operator"); setOpSubTab("applications"); }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 6, cursor: "pointer", background: pendingApps > 0 ? "rgba(239,68,68,0.06)" : "transparent" }}>
-                <span style={{ width: 6, height: 6, borderRadius: 99, background: pendingApps > 0 ? "#ef4444" : "#10b981", boxShadow: `0 0 6px ${pendingApps > 0 ? "#ef4444" : "#10b981"}` }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: pendingApps > 0 ? "#ef4444" : "#10b981" }}>{pendingApps > 0 ? pendingApps + " Pending" : "All Good"}</span>
+              <div onClick={() => { setView("operator"); setOpSubTab("trials"); }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 6, cursor: "pointer", background: pendingApps > 0 ? "rgba(255,183,77,0.06)" : "transparent" }}>
+                <span style={{ width: 6, height: 6, borderRadius: 99, background: pendingApps > 0 ? "#fbbf24" : "#10b981", boxShadow: `0 0 6px ${pendingApps > 0 ? "#fbbf24" : "#10b981"}` }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: pendingApps > 0 ? "#fbbf24" : "#10b981" }}>{pendingApps > 0 ? pendingApps + " Trials" : "All Good"}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px" }}>
                 <span style={{ fontSize: 13, fontWeight: 800, color: "#d4af37" }}>{clinics.length}</span>
@@ -664,6 +687,8 @@ export default function MainLayout() {
               </div>}
             </div>}
 
+            {/* Clock (operator only) */}
+            {isOperator && <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(212,175,55,0.5)", fontFamily: "monospace", fontVariantNumeric: "tabular-nums" }}>{clockNow.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}</span>}
             {/* User menu (gear icon trigger) */}
             {(() => {
               const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
@@ -692,7 +717,7 @@ export default function MainLayout() {
         </div>
 
         {/* ── Trial Countdown Banner ── */}
-        {trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (
+        {IS_CLIENT_MODE && trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (
           <div style={{ padding: "8px 20px", background: "rgba(76,201,255,0.04)", borderBottom: "1px solid rgba(76,201,255,0.08)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13 }}>⏱</span>
@@ -725,8 +750,9 @@ export default function MainLayout() {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
           const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
-          const copyNum = () => { navigator.clipboard.writeText(phoneDisplay).then(() => { setPhoneCopied(true); setTimeout(() => setPhoneCopied(false), 2000); }).catch(() => {}); };
+          const clinicCode = clinic?.id ? 'START-' + clinic.id.substring(0, 8).toUpperCase() : '';
+          const waLink = `https://wa.me/${phoneClean.replace('+', '')}${clinicCode ? '?text=' + encodeURIComponent(clinicCode) : ''}`;
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
             <div style={{ padding: "24px", background: "linear-gradient(135deg, rgba(76,201,255,0.05), rgba(16,185,129,0.03))", borderBottom: "1px solid rgba(76,201,255,0.12)", flexShrink: 0 }}>
               <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
@@ -737,23 +763,22 @@ export default function MainLayout() {
                 <p style={{ fontSize: 13, color: "rgba(200,215,240,0.5)", margin: "0 0 16px", lineHeight: 1.5 }}>
                   {t("lt_sub")}
                 </p>
-                <a href={waLink} target="_blank" rel="noopener" style={{ display: "block", padding: "14px 20px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 14, marginBottom: 12, textDecoration: "none", cursor: "pointer", transition: "border-color 0.2s" }}>
-                  <div style={{ fontSize: 11, color: "rgba(200,215,240,0.4)", marginBottom: 4, fontWeight: 500 }}>{t("lt_number_label")}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#10b981", letterSpacing: "1px", fontFamily: "'Plus Jakarta Sans', monospace" }}>{phoneDisplay}</div>
-                </a>
+                <div style={{ marginBottom: 16 }}>
+                  <img src={qrUrl} alt="WhatsApp QR Code" style={{ width: 180, height: 180, borderRadius: 14, border: "2px solid rgba(16,185,129,0.2)" }} />
+                </div>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 12 }}>
-                  <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 20px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 600, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer" }}>
+                  <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 24px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 600, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer" }}>
                     <span style={{ fontSize: 16 }}>💬</span> {t("lt_open_wa")}
                   </a>
-                  <button onClick={copyNum} style={{ padding: "9px 16px", background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", borderRadius: 10, color: phoneCopied ? "#10b981" : "rgba(200,215,240,0.5)", fontWeight: 500, fontSize: 12, cursor: "pointer", transition: "color 0.2s" }}>
-                    {phoneCopied ? t("lt_copied") : t("lt_copy")}
-                  </button>
                 </div>
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.35)", marginBottom: 4 }}>
                     Messages: {ti.session.messagesCount} / 10{ti.session.photoUploaded ? ' · Photos: ✓' : ''}
                   </div>
                 )}
+                <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", borderRadius: 8, padding: "8px 14px", marginBottom: 8 }}>
+                  Scanne den QR-Code oder klicke den Button — nur so erscheinen deine Nachrichten in deinem CRM.
+                </div>
                 <div style={{ fontSize: 11, color: "rgba(200,215,240,0.2)" }}>
                   {t("lt_no_setup")}
                 </div>

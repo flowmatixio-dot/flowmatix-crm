@@ -191,6 +191,9 @@ const categories = [
     { id: "whatsapp", icon: "💬", label: "WhatsApp System" },
     { id: "storage", icon: "💾", label: "Storage" },
   ]},
+  { group: "Alerts & Rules", items: [
+    { id: "alerts", icon: "🚨", label: "Alert Settings" },
+  ]},
   { group: "Security & API", items: [
     { id: "security", icon: "🛡️", label: "Security" },
     { id: "api", icon: "🔑", label: "API Settings" },
@@ -298,13 +301,13 @@ function AIPanel({ state, set }) {
 
       <SettingsSection title="Model">
         <SettingsDropdown label="Default AI Model" desc="Primary model for conversation handling" value={state.aiModel} onChange={(v) => set("aiModel", v)} options={[
-          { value: "gpt-4o", label: "GPT-4o (Recommended)" },
-          { value: "gpt-4o-mini", label: "GPT-4o Mini (Faster)" },
+          { value: "claude-sonnet-4", label: "Claude Sonnet 4 (Active)" },
+          { value: "claude-haiku", label: "Claude Haiku (Faster)" },
           { value: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
           { value: "claude-haiku-4-5", label: "Claude Haiku 4.5 (Fast)" },
         ]} />
         <SettingsDropdown label="Fallback Model" desc="Used when primary model is unavailable" value={state.aiFallback} onChange={(v) => set("aiFallback", v)} options={[
-          { value: "gpt-4o-mini", label: "GPT-4o Mini" },
+          { value: "claude-haiku", label: "Claude Haiku" },
           { value: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
         ]} />
       </SettingsSection>
@@ -353,10 +356,9 @@ function WhatsAppPanel({ state, set }) {
       <div style={S.sectionDesc}>Global WhatsApp configuration for the platform.</div>
 
       <SettingsSection title="Provider">
-        <SettingsDropdown label="WhatsApp Provider" value={state.waProvider} onChange={(v) => set("waProvider", v)} options={[
-          { value: "meta_cloud", label: "Meta Cloud API (Official)" },
-          { value: "360dialog", label: "360dialog" },
-          { value: "twilio", label: "Twilio" },
+        <SettingsDropdown label="WhatsApp Provider" value={state.waProvider || "360dialog"} onChange={(v) => set("waProvider", v)} options={[
+          { value: "360dialog", label: "360dialog Partner (Active)" },
+          { value: "meta_cloud", label: "Meta Cloud API (Direct)" },
         ]} />
         <SettingsInput label="Webhook Endpoint" desc="URL where Meta sends webhook events" value={state.waWebhookUrl} onChange={(v) => set("waWebhookUrl", v)} placeholder="https://api.flowmatix.io/webhooks/whatsapp" />
       </SettingsSection>
@@ -377,10 +379,10 @@ function StoragePanel({ state, set }) {
       <div style={S.sectionDesc}>Configure file storage and retention policies.</div>
 
       <SettingsSection title="Provider">
-        <SettingsDropdown label="Storage Provider" value={state.storageProvider} onChange={(v) => set("storageProvider", v)} options={[
-          { value: "supabase", label: "Supabase Storage (Default)" },
+        <SettingsDropdown label="Storage Provider" value={state.storageProvider || "r2"} onChange={(v) => set("storageProvider", v)} options={[
+          { value: "r2", label: "Cloudflare R2 (Active)" },
           { value: "s3", label: "Amazon S3" },
-          { value: "r2", label: "Cloudflare R2" },
+          { value: "local", label: "Local Filesystem" },
         ]} />
         <SettingsInput label="Backup Location" desc="Path or bucket for backup storage" value={state.backupLocation} onChange={(v) => set("backupLocation", v)} placeholder="/opt/flowmatix/backups" />
       </SettingsSection>
@@ -452,6 +454,35 @@ function APIPanel({ state, set }) {
   );
 }
 
+function AlertsPanel({ state, set }) {
+  return (
+    <>
+      <div style={S.sectionTitle}>Alert Settings</div>
+      <div style={S.sectionDesc}>Configure alert thresholds and working hours for incident management.</div>
+
+      <SettingsSection title="Working Hours">
+        <SettingsInput label="Work Start" desc="Alerts are paused outside these hours" value={state.workStart || "09:00"} onChange={(v) => set("workStart", v)} placeholder="09:00" />
+        <SettingsInput label="Work End" value={state.workEnd || "18:00"} onChange={(v) => set("workEnd", v)} placeholder="18:00" />
+        <SettingsDropdown label="Working Days" value={state.workDays || "mon-fri"} onChange={(v) => set("workDays", v)} options={[
+          { value: "mon-fri", label: "Monday - Friday" },
+          { value: "mon-sat", label: "Monday - Saturday" },
+          { value: "all", label: "Every Day" },
+        ]} />
+      </SettingsSection>
+
+      <SettingsSection title="Review Queue">
+        <SettingsInput label="First Email After (hours)" desc="Business hours before first reminder email to clinic" value={state.reviewAlertHours || "24"} onChange={(v) => set("reviewAlertHours", v)} type="number" placeholder="24" />
+        <SettingsInput label="Escalation After (hours)" desc="Business hours before escalation email" value={state.reviewEscalationHours || "48"} onChange={(v) => set("reviewEscalationHours", v)} type="number" placeholder="48" />
+      </SettingsSection>
+
+      <SettingsSection title="Notifications">
+        <SettingsToggle label="Telegram Alerts" desc="Send critical alerts to Telegram" value={state.telegramAlerts !== false} onChange={(v) => set("telegramAlerts", v)} />
+        <SettingsToggle label="Email to Clinics" desc="Auto-send review reminders to clinic email" value={state.clinicEmailAlerts !== false} onChange={(v) => set("clinicEmailAlerts", v)} />
+      </SettingsSection>
+    </>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════════════════════ */
@@ -463,6 +494,7 @@ const PANELS = {
   automation: AutomationPanel,
   whatsapp: WhatsAppPanel,
   storage: StoragePanel,
+  alerts: AlertsPanel,
   security: SecurityPanel,
   api: APIPanel,
 };
@@ -478,16 +510,16 @@ const DEFAULT_STATE = {
   platformName: "Flowmatix", supportEmail: "info@flowmatix.io",
   defaultTimezone: "Europe/Berlin", defaultLanguage: "en",
   // AI
-  aiModel: "gpt-4o", aiFallback: "gpt-4o-mini", aiResponseLength: "balanced",
+  aiModel: "claude-sonnet-4", aiFallback: "claude-haiku", aiResponseLength: "balanced",
   aiTemperature: "0.7", aiMaxConversation: "50",
   // Automation
   leadTimeout: "48", autoReplyDelay: "3", conversationCloseTimer: "72",
   reminderTiming: "24", photoReminderDelay: "12", maxPhotoReminders: "3",
   // WhatsApp
-  waProvider: "meta_cloud", waWebhookUrl: "", waMediaLimit: "16",
+  waProvider: "360dialog", waWebhookUrl: "https://api.flowmatix.io/webhooks/whatsapp", waMediaLimit: "16",
   waMaxImages: "10", waRateLimit: "60",
   // Storage
-  storageProvider: "supabase", backupLocation: "/opt/flowmatix/backups",
+  storageProvider: "r2", backupLocation: "/opt/flowmatix/backups",
   retentionPolicy: "forever", autoDeleteDays: "0", autoDeleteTemp: true,
   // Security
   twoFactor: false, sessionTimeout: "60", passwordPolicy: "strong",
@@ -509,8 +541,8 @@ export default function OperatorSettings() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await api.getClinicSettings?.();
-        if (!cancelled && res) {
+        const res = await api.getOperatorSettings();
+        if (!cancelled && res && Object.keys(res).length > 0) {
           const merged = { ...DEFAULT_STATE, ...res };
           setState(merged);
           setSavedState(merged);
@@ -532,7 +564,7 @@ export default function OperatorSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.updateClinicSettings?.(state);
+      await api.saveOperatorSettings(state);
       setSavedState({ ...state });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
