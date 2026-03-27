@@ -756,9 +756,7 @@ export default function MainLayout() {
             <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 28, justifyContent: "center" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, #25D366, #128C7E)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 24px rgba(37,211,102,0.3)" }}>
-                    <span style={{ fontSize: 24 }}>💬</span>
-                  </div>
+                  <div style={{ width: 14, height: 14, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>{t("lt_title")}</div>
                     <div style={{ fontSize: 13, color: "rgba(200,215,240,0.5)", marginTop: 3 }}>{t("lt_sub")}</div>
