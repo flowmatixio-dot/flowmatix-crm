@@ -767,6 +767,9 @@ export default function MainLayout() {
                 <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 22px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer", boxShadow: "0 4px 16px rgba(37,211,102,0.2)", transition: "transform 0.15s, box-shadow 0.15s" }}>
                   WhatsApp öffnen →
                 </a>
+                <div style={{ fontSize: 11, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", borderRadius: 6, padding: "5px 10px", maxWidth: 200, lineHeight: 1.4 }}>
+                  {t("lt_use_registered_phone") || "Nutze die Nummer, mit der du dich registriert hast."}
+                </div>
                 <img src={qrUrl} alt="QR" style={{ width: 42, height: 42, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }} />
                 {ti?.session && (
                   <div style={{ fontSize: 11, color: "rgba(200,215,240,0.4)", background: "rgba(255,255,255,0.04)", padding: "4px 10px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.06)" }}>
