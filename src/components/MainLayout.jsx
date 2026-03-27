@@ -750,38 +750,25 @@ export default function MainLayout() {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
           const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const clinicCode = clinic?.id ? 'START-' + clinic.id.substring(0, 8).toUpperCase() : '';
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}${clinicCode ? '?text=' + encodeURIComponent(clinicCode) : ''}`;
-          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
+          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
-            <div style={{ padding: "24px", background: "linear-gradient(135deg, rgba(76,201,255,0.05), rgba(16,185,129,0.03))", borderBottom: "1px solid rgba(76,201,255,0.12)", flexShrink: 0 }}>
-              <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: 99, background: "#10b981", animation: "fmHighlight 2s infinite" }} />
-                  <span style={{ fontSize: 14, fontWeight: 700, color: "#4CC9FF" }}>{t("lt_title")}</span>
+            <div style={{ padding: "10px 20px", background: "linear-gradient(135deg, rgba(76,201,255,0.05), rgba(16,185,129,0.03))", borderBottom: "1px solid rgba(76,201,255,0.12)", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981", animation: "fmHighlight 2s infinite" }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#4CC9FF" }}>{t("lt_title")}</span>
                 </div>
-                <p style={{ fontSize: 13, color: "rgba(200,215,240,0.5)", margin: "0 0 16px", lineHeight: 1.5 }}>
-                  {t("lt_sub")}
-                </p>
-                <div style={{ marginBottom: 16 }}>
-                  <img src={qrUrl} alt="WhatsApp QR Code" style={{ width: 180, height: 180, borderRadius: 14, border: "2px solid rgba(16,185,129,0.2)" }} />
-                </div>
-                <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 12 }}>
-                  <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 24px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 600, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer" }}>
-                    <span style={{ fontSize: 16 }}>💬</span> {t("lt_open_wa")}
-                  </a>
-                </div>
+                <span style={{ fontSize: 12, color: "rgba(200,215,240,0.4)" }}>{t("lt_sub")}</span>
+                <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 18px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 600, fontSize: 12, border: "none", borderRadius: 8, textDecoration: "none", cursor: "pointer" }}>
+                  <span style={{ fontSize: 14 }}>💬</span> {t("lt_open_wa")}
+                </a>
+                <img src={qrUrl} alt="QR" style={{ width: 36, height: 36, borderRadius: 6, border: "1px solid rgba(16,185,129,0.15)" }} />
                 {ti?.session && (
-                  <div style={{ fontSize: 12, color: "rgba(200,215,240,0.35)", marginBottom: 4 }}>
-                    Messages: {ti.session.messagesCount} / 10{ti.session.photoUploaded ? ' · Photos: ✓' : ''}
-                  </div>
+                  <span style={{ fontSize: 11, color: "rgba(200,215,240,0.35)" }}>
+                    {ti.session.messagesCount}/10{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
+                  </span>
                 )}
-                <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", borderRadius: 8, padding: "8px 14px", marginBottom: 8 }}>
-                  Scanne den QR-Code oder klicke den Button — nur so erscheinen deine Nachrichten in deinem CRM.
-                </div>
-                <div style={{ fontSize: 11, color: "rgba(200,215,240,0.2)" }}>
-                  {t("lt_no_setup")}
-                </div>
               </div>
             </div>
           );
