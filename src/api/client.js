@@ -1420,10 +1420,10 @@ export async function getTestInfo() {
 
 // ── Trial Subscription (reuses existing billing/subscribe) ──
 
-export async function startTrialActivation(plan = 'pro') {
+export async function startTrialActivation(plan = 'pro', billingCycle = 'monthly') {
   return apiFetch('/api/v1/billing/subscribe', {
     method: 'POST',
-    body: JSON.stringify({ plan }),
+    body: JSON.stringify({ plan, billingCycle }),
   });
 }
 

@@ -245,6 +245,8 @@ export default function MainLayout() {
     {/* ── Plan Picker Modal (trial_expired forced OR manual trigger) ── */}
     {(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker) && (() => {
       const isForced = ctx.workspaceState === 'trial_expired';
+      const [billingCycle, setBillingCycle] = React.useState('monthly');
+      const isYearly = billingCycle === 'yearly';
       const PLAN_ORDER = ["core", "pro", "operations", "enterprise"];
       const PLAN_LABELS = { core: "Core", pro: "Pro", operations: "Operations", enterprise: "Enterprise" };
       const sharedFeatures = [t("pf_shared_ai")||"AI WhatsApp assistant", t("pf_shared_crm")||"Full CRM & pipeline", t("pf_shared_calendar")||"Calendar & booking", t("pf_shared_automations")||"All automations", t("pf_shared_languages")||"All languages", t("pf_shared_team")||"Unlimited team members"];
@@ -263,7 +265,7 @@ export default function MainLayout() {
         try {
           await fmApi.setWorkspaceState('checkout_pending');
           ctx.setWorkspaceState('checkout_pending');
-          const res = await fmApi.startTrialActivation(plan);
+          const res = await fmApi.startTrialActivation(plan, billingCycle);
           if (res?.url) window.location.href = res.url;
           else ctx.showT?.(t("plan_checkout_error")||'Checkout failed');
         } catch (e) { ctx.showT?.((t("plan_checkout_error")||'Checkout failed') + ': ' + (e.message || '')); }
@@ -306,6 +308,16 @@ export default function MainLayout() {
               ))}
             </div>
 
+            {/* Billing Cycle Toggle */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+              <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, border: "1px solid rgba(255,255,255,0.06)" }}>
+                <button onClick={() => setBillingCycle('monthly')} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "none", background: !isYearly ? "rgba(76,201,255,0.12)" : "transparent", color: !isYearly ? "#4cc9ff" : "rgba(167,177,195,0.4)" }}>{t("pp_monthly")||"Monatlich"}</button>
+                <button onClick={() => setBillingCycle('yearly')} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "none", background: isYearly ? "rgba(16,185,129,0.12)" : "transparent", color: isYearly ? "#10b981" : "rgba(167,177,195,0.4)" }}>
+                  {t("pp_yearly")||"Jährlich"} <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "rgba(16,185,129,0.1)", color: "#10b981", marginLeft: 4 }}>{t("pp_no_setup")||"Keine Setup-Gebühr"}</span>
+                </button>
+              </div>
+            </div>
+
             {/* Plan Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
               {PLAN_ORDER.map((pk) => {
@@ -332,7 +344,9 @@ export default function MainLayout() {
                     <div style={{ fontSize: 28, fontWeight: 800, color: "rgba(232,238,252,0.95)", marginBottom: 2 }}>
                       {PLAN_PRICE[pk]}<span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.3)" }}>/mo</span>
                     </div>
-                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.25)", marginBottom: 16 }}>+ {t("pp_setup")||"€1,990 setup fee (one-time)"}</div>
+                    <div style={{ fontSize: 10, color: isYearly ? "rgba(16,185,129,0.5)" : "rgba(167,177,195,0.25)", marginBottom: 16 }}>
+                      {isYearly ? (t("pp_no_setup_fee")||"Keine Setup-Gebühr") : `+ ${t("pp_setup")||"€1.990 Setup-Gebühr (einmalig)"}`}
+                    </div>
 
                     <div style={{ flex: 1, marginBottom: 18 }}>
                       {features.map((f, i) => (
