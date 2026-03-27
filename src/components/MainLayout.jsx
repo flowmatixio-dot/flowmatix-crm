@@ -753,26 +753,26 @@ export default function MainLayout() {
           const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
-            <div style={{ padding: "14px 24px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.04))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 20, justifyContent: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg, #25D366, #128C7E)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(37,211,102,0.25)" }}>
-                    <span style={{ fontSize: 17, filter: "brightness(2)" }}>💬</span>
+            <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 28, justifyContent: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, #25D366, #128C7E)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 24px rgba(37,211,102,0.3)" }}>
+                    <span style={{ fontSize: 24 }}>💬</span>
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>{t("lt_title")}</div>
-                    <div style={{ fontSize: 11, color: "rgba(200,215,240,0.45)", marginTop: 1 }}>{t("lt_sub")}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>{t("lt_title")}</div>
+                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.5)", marginTop: 3 }}>{t("lt_sub")}</div>
                   </div>
                 </div>
-                <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 22px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer", boxShadow: "0 4px 16px rgba(37,211,102,0.2)", transition: "transform 0.15s, box-shadow 0.15s" }}>
+                <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, textDecoration: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.25)", transition: "transform 0.15s, box-shadow 0.15s" }}>
                   WhatsApp öffnen →
                 </a>
-                <div style={{ fontSize: 11, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", borderRadius: 6, padding: "5px 10px", maxWidth: 200, lineHeight: 1.4 }}>
+                <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
                   {t("lt_use_registered_phone") || "Nutze die Nummer, mit der du dich registriert hast."}
                 </div>
-                <img src={qrUrl} alt="QR" style={{ width: 42, height: 42, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }} />
+                <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
-                  <div style={{ fontSize: 11, color: "rgba(200,215,240,0.4)", background: "rgba(255,255,255,0.04)", padding: "4px 10px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
                     {ti.session.messagesCount}/10 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
                   </div>
                 )}
