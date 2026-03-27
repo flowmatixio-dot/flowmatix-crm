@@ -725,8 +725,9 @@ export default function MainLayout() {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
           const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
-          const copyNum = () => { navigator.clipboard.writeText(phoneDisplay).then(() => { setPhoneCopied(true); setTimeout(() => setPhoneCopied(false), 2000); }).catch(() => {}); };
+          const clinicCode = clinic?.id ? 'START-' + clinic.id.substring(0, 8).toUpperCase() : '';
+          const waLink = `https://wa.me/${phoneClean.replace('+', '')}${clinicCode ? '?text=' + encodeURIComponent(clinicCode) : ''}`;
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
             <div style={{ padding: "24px", background: "linear-gradient(135deg, rgba(76,201,255,0.05), rgba(16,185,129,0.03))", borderBottom: "1px solid rgba(76,201,255,0.12)", flexShrink: 0 }}>
               <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
@@ -737,21 +738,21 @@ export default function MainLayout() {
                 <p style={{ fontSize: 13, color: "rgba(200,215,240,0.5)", margin: "0 0 16px", lineHeight: 1.5 }}>
                   {t("lt_sub")}
                 </p>
-                <a href={waLink} target="_blank" rel="noopener" style={{ display: "block", padding: "14px 20px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 14, marginBottom: 12, textDecoration: "none", cursor: "pointer", transition: "border-color 0.2s" }}>
-                  <div style={{ fontSize: 11, color: "rgba(200,215,240,0.4)", marginBottom: 4, fontWeight: 500 }}>{t("lt_number_label")}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#10b981", letterSpacing: "1px", fontFamily: "'Plus Jakarta Sans', monospace" }}>{phoneDisplay}</div>
-                </a>
+                {/* QR Code */}
+                <div style={{ marginBottom: 16 }}>
+                  <img src={qrUrl} alt="WhatsApp QR Code" style={{ width: 180, height: 180, borderRadius: 14, border: "2px solid rgba(16,185,129,0.2)" }} />
+                </div>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 12 }}>
-                  <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 20px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 600, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer" }}>
-                    <span style={{ fontSize: 16 }}>💬</span> {t("lt_open_wa")}
+                  <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 24px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 600, fontSize: 13, border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer" }}>
+                    <span style={{ fontSize: 16 }}>{"\uD83D\uDCAC"}</span> {t("lt_open_wa")}
                   </a>
-                  <button onClick={copyNum} style={{ padding: "9px 16px", background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", borderRadius: 10, color: phoneCopied ? "#10b981" : "rgba(200,215,240,0.5)", fontWeight: 500, fontSize: 12, cursor: "pointer", transition: "color 0.2s" }}>
-                    {phoneCopied ? t("lt_copied") : t("lt_copy")}
-                  </button>
+                </div>
+                <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", borderRadius: 8, padding: "8px 14px", marginBottom: 8 }}>
+                  {"\u26A0\uFE0F"} Nutze den QR-Code oder den Button oben — nur so erscheinen deine Nachrichten in deinem CRM.
                 </div>
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.35)", marginBottom: 4 }}>
-                    Messages: {ti.session.messagesCount} / 10{ti.session.photoUploaded ? ' · Photos: ✓' : ''}
+                    Messages: {ti.session.messagesCount} / 10{ti.session.photoUploaded ? ' · Photos: \u2713' : ''}
                   </div>
                 )}
                 <div style={{ fontSize: 11, color: "rgba(200,215,240,0.2)" }}>
