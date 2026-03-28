@@ -59,7 +59,7 @@ function getAssignedInfo(lead) {
 }
 
 /* ── Right Panel: Fallübersicht (Case Overview) ── */
-function CaseOverviewPanel({ chat, lead, t, onClose }) {
+function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
   if (!lead) return (
     <div style={{width:320,minWidth:320,maxWidth:320,borderLeft:"1px solid #2a2a3a",background:"#131c2e",padding:16,overflowY:"auto",overflowX:"hidden"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
@@ -82,9 +82,10 @@ function CaseOverviewPanel({ chat, lead, t, onClose }) {
   const intake = lead.intake || lead.extractedFields || {};
   const cs = lead.convStatus;
 
-  // Consent status
-  const consentStatus = lead.consentGiven ? (t("consent_granted") || "Granted") : (t("consent_pending") || "Pending");
-  const consentColor = lead.consentGiven ? "#10b981" : "#fbbf24";
+  // Consent status — 3 states: granted (green), pending (yellow), refused (red)
+  const consentRefused = lead.metadata?.gdpr_consent === 'refused' || lead.consent?.refused;
+  const consentStatus = lead.consentGiven ? (t("consent_granted") || "Erteilt") : consentRefused ? (t("consent_refused") || "Verweigert") : (t("consent_pending") || "Ausstehend");
+  const consentColor = lead.consentGiven ? "#10b981" : consentRefused ? "#ef4444" : "#fbbf24";
 
   // Assessment status
   const assessmentStatus = cs === "needs_medical_review" ? (t("assessment_pending") || "Pending") : reviewData.grafts ? (t("assessment_complete") || "Complete") : (t("assessment_not_started") || "Not started");
@@ -152,7 +153,7 @@ function CaseOverviewPanel({ chat, lead, t, onClose }) {
         <SectionHeader label={t("section_patient") || "PATIENT"} />
         <FieldRow label="Name" value={lead.name || "—"} bold />
         <FieldRow label={t("lbl_age") || "Age"} value={intake.age || lead.age || "—"} />
-        <FieldRow label={t("lbl_country") || "Country"} value={TV(lead.country) || "—"} />
+        <FieldRow label={t("lbl_country") || "Country"} value={<span>{TV(lead.country) || "—"}{lead.country && clinic?.country && lead.country.toLowerCase() === clinic.country.toLowerCase() && <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}>{t("local_patient") || "LOKAL"}</span>}</span>} />
         <FieldRow label={t("lbl_language") || "Language"} value={(lead.language || "—").toUpperCase()} />
 
         <SectionHeader label={t("section_medical") || "MEDICAL"} />
@@ -268,14 +269,14 @@ export default function InboxView() {
   /* ── 24h WhatsApp window timer ── */
   const lastPatientMsgTime = useMemo(() => {
     if (!selChat) return null;
+    // Primary: use last_user_message_at from conversation (most reliable, set by backend)
+    if (selChat.lastUserMessageAt || selChat.last_user_message_at) {
+      return selChat.lastUserMessageAt || selChat.last_user_message_at;
+    }
+    // Fallback: scan loaded messages
     const allMsgs = (msgs[activeClinicId] || []).find(c => c.id === selChat.id)?.msgs || selChat.msgs || [];
     const lastPat = [...allMsgs].filter(m => m.sender === "patient").pop();
-    if (!lastPat) return selChat.lastContactAt || selChat.lastMessageAt || null;
-    if (lastPat.createdAt) return lastPat.createdAt;
-    if (lastPat.time && lastPat.time.includes(":")) {
-      const today = getNow().toISOString().split("T")[0];
-      return today + "T" + lastPat.time + ":00";
-    }
+    if (lastPat?.createdAt) return lastPat.createdAt;
     return selChat.lastContactAt || selChat.lastMessageAt || null;
   }, [selChat, msgs, activeClinicId]);
   const demoTimerIndex = useMemo(() => {
@@ -923,7 +924,7 @@ export default function InboxView() {
       {/* ═══════════════════════════════════════════════════════════
           RIGHT PANEL - Fallübersicht (Case Overview)
          ═══════════════════════════════════════════════════════════ */}
-      {selChat && showOverview && <CaseOverviewPanel chat={selChat} lead={overviewLead} t={t} onClose={() => setShowOverview(false)} />}
+      {selChat && showOverview && <CaseOverviewPanel chat={selChat} lead={overviewLead} t={t} clinic={clinic} onClose={() => setShowOverview(false)} />}
 
       {/* ══ Reactivation Template Modal ══ */}
       {reactivationPicker && selChat && (() => {

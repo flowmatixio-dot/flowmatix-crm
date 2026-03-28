@@ -86,6 +86,25 @@ export default function MainLayout() {
   const clinicPlan = clinic?.plan || "core";
   const effectiveRole = userRole || "admin";
   const canAccess = (mod) => hasModuleAccess(effectiveRole, mod, clinicPlan);
+  const [billingCycle, setBillingCycle] = React.useState('monthly');
+  const [showTrialReviewPopup, setShowTrialReviewPopup] = React.useState(false);
+  const [trialReviewPatient, setTrialReviewPatient] = React.useState(null);
+  const trialReviewShownRef = React.useRef(false);
+
+  // Trial popup: show when real patient is in needs_medical_review
+  React.useEffect(() => {
+    if (trialReviewShownRef.current) return;
+    if (ctx.workspaceState !== 'live_test') return;
+    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photoUrls || []).length >= 3);
+    if (realReview && !trialReviewShownRef.current) {
+      setTimeout(() => {
+        if (trialReviewShownRef.current) return;
+        setTrialReviewPatient(realReview);
+        setShowTrialReviewPopup(true);
+        trialReviewShownRef.current = true;
+      }, 10000);
+    }
+  }, [myLeads, ctx.workspaceState]);
 
   // Live clock for operator top bar
   const [clockNow, setClockNow] = React.useState(new Date());
@@ -236,6 +255,35 @@ export default function MainLayout() {
 
   return (
     <ErrorBoundary>
+
+    {/* ── Trial Review Popup — real DoctorTasksView after 3 photos ── */}
+    {showTrialReviewPopup && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 999998, background: "rgba(8,12,22,0.92)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, overflowY: "auto" }}>
+        <div style={{ maxWidth: 900, width: "100%", maxHeight: "90vh", background: "#0f1623", borderRadius: 18, border: "1px solid rgba(255,138,42,0.2)", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", display: "flex", flexDirection: "column" }}>
+          {/* Header with info */}
+          <div style={{ padding: "16px 24px", background: "linear-gradient(135deg, rgba(255,138,42,0.08), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(255,138,42,0.15)", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 20 }}>{"⚕️"}</span>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{t("trial_review_title") || "Arzt-Bewertung — Live Preview"}</div>
+                  <div style={{ fontSize: 11, color: "rgba(200,215,240,0.4)", marginTop: 2 }}>{t("trial_review_sub") || "Bewerten Sie den Patienten — die Nachricht geht direkt raus"}</div>
+                </div>
+              </div>
+              <button onClick={() => setShowTrialReviewPopup(false)} style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "none", color: "rgba(200,215,240,0.4)", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{"✕"}</button>
+            </div>
+            <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", fontSize: 11, color: "rgba(200,215,240,0.5)", lineHeight: 1.6 }}>
+              {"💡"} {t("trial_review_hint") || "Im Live-Betrieb sehen Ihre Ärzte diese Ansicht in ihrem eigenen Portal. Jeder Arzt bekommt die Bewertung. Der erste der bewertet, schließt den Fall ab — der Patient wird automatisch kontaktiert."}
+            </div>
+          </div>
+          {/* Actual DoctorTasksView */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
+            <DoctorTasksView />
+          </div>
+        </div>
+      </div>
+    )}
+
     {showOnboarding && <OnboardingWizard onComplete={() => {
       setShowOnboarding(false);
       completeOnboarding(ctx.activeClinicId, t("onboarding_complete") || "Setup abgeschlossen!");
@@ -245,7 +293,6 @@ export default function MainLayout() {
     {/* ── Plan Picker Modal (trial_expired forced OR manual trigger) ── */}
     {(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker) && (() => {
       const isForced = ctx.workspaceState === 'trial_expired';
-      const [billingCycle, setBillingCycle] = React.useState('monthly');
       const isYearly = billingCycle === 'yearly';
       const PLAN_ORDER = ["core", "pro", "operations", "enterprise"];
       const PLAN_LABELS = { core: "Core", pro: "Pro", operations: "Operations", enterprise: "Enterprise" };
@@ -342,7 +389,7 @@ export default function MainLayout() {
 
                     <div style={{ fontWeight: 800, fontSize: 13, color, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>{PLAN_LABELS[pk]}</div>
                     <div style={{ fontSize: 28, fontWeight: 800, color: "rgba(232,238,252,0.95)", marginBottom: 2 }}>
-                      {PLAN_PRICE[pk]}<span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.3)" }}>/mo</span>
+                      {(() => { const prices = { core: 690, pro: 990, operations: 1490, enterprise: 2500 }; const m = prices[pk] || 0; return isYearly ? `€${(m * 12).toLocaleString('de-DE')}` : PLAN_PRICE[pk]; })()}<span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.3)" }}>{isYearly ? "/Jahr" : "/mo"}</span>
                     </div>
                     <div style={{ fontSize: 10, color: isYearly ? "rgba(16,185,129,0.5)" : "rgba(167,177,195,0.25)", marginBottom: 16 }}>
                       {isYearly ? (t("pp_no_setup_fee")||"Keine Setup-Gebühr") : `+ ${t("pp_setup")||"€1.990 Setup-Gebühr (einmalig)"}`}

@@ -152,6 +152,7 @@ export default function AppointmentsPage() {
           depositPaid: lead.depositPaid || lead.convStatus === "deposit_paid",
           patientStage: lead.stage,
           patientCountry: lead.country,
+          clinicCountry: clinic?.country || "",
         };
       });
     // Doctor: filter to own appointments + unassigned (e.g. Google imports)
@@ -798,6 +799,9 @@ function renderEventContent(eventInfo) {
             <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.55)" }}>
               {(Number(props.grafts) / 1000).toFixed(1)}k Grafts
             </span>
+          )}
+          {props.patientCountry && props.clinicCountry && props.patientCountry.toLowerCase() === props.clinicCountry.toLowerCase() && (
+            <span style={{ fontSize: 8, fontWeight: 700, color: "#10b981", background: "rgba(16,185,129,0.12)", borderRadius: 3, padding: "1px 5px", border: "1px solid rgba(16,185,129,0.2)" }}>LOKAL</span>
           )}
           {props.room && (
             <span style={{

@@ -518,7 +518,7 @@ export default function OpPrepView() {
   const [missingHover, setMissingHover] = useState(null);
 
   const loadApiData = useCallback(() => {
-    const today = new Date();
+    const today = getNow();
     const fromStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
     const toDate = new Date(today.getTime() + 60 * 86400000);
     const toStr = toDate.getFullYear() + "-" + String(toDate.getMonth() + 1).padStart(2, "0") + "-" + String(toDate.getDate()).padStart(2, "0");

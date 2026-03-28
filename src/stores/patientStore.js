@@ -49,8 +49,13 @@ export const usePatientStore = create((set, get) => ({
         const isCollecting = cs === 'collecting_photos';
         // new → contacted (Arzt-Review): patient has photos, review, or needs attention
         if (s === 'new' && (hasPhotos || hasReview || needsReview || isHandover || isCollecting)) return 'contacted';
-        // contacted → booked: deposit paid or booking confirmed
+        // contacted → booked: deposit paid, booking confirmed, or termin stage
         if ((cs === 'deposit_paid' || cs === 'booking_pending') && (s === 'new' || s === 'contacted')) return 'booked';
+        if (['termin_bestaetigt', 'termin_reserviert', 'termin_gebucht', 'angebot_gesendet'].includes(s)) return 'booked';
+        if (s === 'abgeschlossen') return 'done';
+        if (s === 'storniert') return 'cancelled';
+        if (['neue_anfrage', 'anfrage_neu', 'new_inquiry'].includes(s)) return 'new';
+        if (['contacted', 'arzt_zugewiesen', 'review_broadcast', 'fotos_erhalten', 'bewertung_ausstehend'].includes(s)) return 'contacted';
         return s;
       })(),
       convStatus: p.convStatus || p.conversation_state || 'ai_active',

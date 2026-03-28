@@ -193,7 +193,7 @@ export default function App() {
       if (res?.workspaceState) {
         setWorkspaceState(res.workspaceState);
         if (res.workspaceState === 'activation_pending') setShowActivation(true);
-        if (res.workspaceState === 'active') { setDemoMode(false); }
+        if (['active', 'live_test', 'activation_pending'].includes(res.workspaceState)) { setDemoMode(false); }
       }
     }).catch(() => {});
   }, [user?.orgId]);
@@ -204,7 +204,7 @@ export default function App() {
     const loadTest = () => fmApi.getTestInfo().then(res => {
       if (res) {
         setTestInfo(res);
-        if (res.session?.photoUploaded) { setWorkspaceState('activation_pending'); setShowActivation(true); }
+        if (res.session?.messagesCount >= 20) { setWorkspaceState('activation_pending'); setShowActivation(true); }
       }
     }).catch(() => {});
     loadTest();
@@ -520,6 +520,10 @@ export default function App() {
         try {
           const d = JSON.parse(e.data);
           if (d.type === 'conv:updated' && d.patientId) {
+            // Check if this is a trial photos-ready signal
+            if (d.convStatus === 'needs_medical_review' || d.flowState === 'REVIEW_PENDING') {
+              window.dispatchEvent(new CustomEvent('fm:trial-photos-ready', { detail: JSON.stringify({ patientId: d.patientId }) }));
+            }
             fmApi.getPatient(d.patientId).then(res => {
               const p = res?.patient || res;
               if (p) setLeads(prev => {
@@ -599,8 +603,10 @@ export default function App() {
               const cs=updates.convStatus||l.convStatus;
               const st=updates.stage||l.stage;
               if(cs==="deposit_paid"&&st==="contacted"){updates.stage="booked";diff=true;}
-              // booking_pending = treatment plan sent, NOT booked yet — don't auto-advance
-              // NOTE: resolved/closed does NOT auto-move to done — only backend sets done after actual OP
+            }
+            // Trigger trial review popup when patient reaches needs_medical_review
+            if(diff && p.convStatus==='needs_medical_review' && l.convStatus!=='needs_medical_review' && !p.is_demo){
+              window.dispatchEvent(new CustomEvent('fm:trial-photos-ready',{detail:JSON.stringify({patientId:p.id})}));
             }
             if(diff){changed=true;return updates;}
             return l;
@@ -608,7 +614,7 @@ export default function App() {
           return changed?next:prev;
         });
       }).catch(()=>{});
-    },10000);
+    },5000);
     return()=>{clearInterval(iv);clearInterval(iv2);};
   },[user,activeClinicId]);
 
