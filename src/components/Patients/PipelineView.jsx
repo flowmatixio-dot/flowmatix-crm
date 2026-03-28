@@ -455,8 +455,10 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
           return steps.map((s, i) => {
             let color;
             const isReviewStep = s.t.includes("Bewertung") || s.t.includes("Review") || s.t.includes("İnceleme");
+            const isDepositStep = s.t.includes("Anzahlung") || s.t.includes("Deposit") || s.t.includes("Depozito");
+            const depositPending = isDepositStep && !s.done && lead.reviewData;
             // Blink red↔orange when handover active on the current step the patient is stuck at
-            const shouldBlink = isHandover && !s.done && i === firstNotDone;
+            const shouldBlink = (isHandover && !s.done && i === firstNotDone) || depositPending;
             if (allDone) {
               color = "#10b981";
             } else if (s.done) {
@@ -465,6 +467,8 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
               color = isHandover ? "#ef4444" : "#ff8a2a";
             } else if (i === firstNotDone) {
               color = isHandover ? "#ef4444" : "#ff8a2a";
+            } else if (depositPending) {
+              color = "#fbbf24";
             } else {
               color = "rgba(167,177,195,0.2)";
             }

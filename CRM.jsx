@@ -343,7 +343,8 @@ export default function App() {
       if (!isLocal(l) && l.stage === "booked" && !l.flightConfirmed?.date && l.metadata?.flightReminderSent && hoursToAppt < 48) count++;
       // 6. Follow-up needed
       if (l.metadata?.followup_needed && !l.metadata?.followup_completed) count++;
-      // 7. (DSGVO merged into #4 above)
+      // 7. Deposit pending (booking_pending or awaiting state with review done = waiting for deposit)
+      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active') count++;
     });
     return count;
   },[myLeads]);
@@ -594,16 +595,12 @@ export default function App() {
             if(l.is_demo)return l;
             const p=pats.find(pt=>pt.id===l.id);
             if(!p)return l;
-            const updates={...l,...p};
+            const {stage: _ignoreStage, ...pWithoutStage}=p;
+            const updates={...l,...pWithoutStage};
             // Check if anything changed
             let diff=false;
             for(const k of Object.keys(p)){if(JSON.stringify(p[k])!==JSON.stringify(l[k])){diff=true;break;}}
-            // Auto-progress stage based on convStatus (if backend didn't update stage)
-            if(!diff||!p.stage){
-              const cs=updates.convStatus||l.convStatus;
-              const st=updates.stage||l.stage;
-              if(cs==="deposit_paid"&&st==="contacted"){updates.stage="booked";diff=true;}
-            }
+            // Stage is computed by patientStore normalize() — no manual override here
             // Trigger trial review popup when patient reaches needs_medical_review
             if(diff && p.convStatus==='needs_medical_review' && l.convStatus!=='needs_medical_review' && !p.is_demo){
               window.dispatchEvent(new CustomEvent('fm:trial-photos-ready',{detail:JSON.stringify({patientId:p.id})}));

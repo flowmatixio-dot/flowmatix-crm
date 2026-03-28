@@ -837,7 +837,7 @@ export default function SettingsView() {
         <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:8}}>{t("settings_deposit") || "Anzahlung"}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12}}>
           {[{v:"none",l:t("settings_no_deposit_short")||"None",d:t("settings_no_deposit")||"No deposit"},{v:"fixed",l:t("settings_fixed_amount")||"Fixed amount",d:t("pay_fixed_example")||"e.g. €500"},{v:"percentage",l:t("settings_percentage")||"Percentage",d:t("pay_percent_example")||"e.g. 30%"}].map(opt=>(
-            <div key={opt.v} onClick={()=>up("depositPolicy",opt.v)} style={{padding:"12px 14px",borderRadius:10,cursor:"pointer",textAlign:"center",
+            <div key={opt.v} onClick={()=>{up("depositPolicy",opt.v);if(opt.v==="fixed"&&!c.depositAmount)up("depositAmount","500");if(opt.v==="percentage"&&!c.depositPercent)up("depositPercent","25");}} style={{padding:"12px 14px",borderRadius:10,cursor:"pointer",textAlign:"center",
               background:(c.depositPolicy||"none")===opt.v?"rgba(76,201,255,0.06)":"rgba(255,255,255,0.02)",
               border:`1px solid ${(c.depositPolicy||"none")===opt.v?"rgba(76,201,255,0.2)":"rgba(255,255,255,0.06)"}`,
             }}>
@@ -846,7 +846,7 @@ export default function SettingsView() {
             </div>
           ))}
         </div>
-        {c.depositPolicy === "fixed" && <Field label={t("deposit_amount_label")} value={c.depositAmount || "500"} onChange={v=>up("depositAmount",v)} placeholder="500"/>}
+        {c.depositPolicy === "fixed" && <Field label={t("deposit_amount_label")} value={c.depositAmount ?? ""} onChange={v=>up("depositAmount",v)} placeholder="500"/>}
         {c.depositPolicy === "percentage" && <Field label={t("settings_deposit_percent") || "Anzahlung (%)"} value={c.depositPercent || "30"} onChange={v=>up("depositPercent",v)} options={["10","20","25","30","40","50"]}/>}
       </div>
 

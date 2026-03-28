@@ -266,6 +266,10 @@ export default function DoctorTasksView({ onLogout } = {}) {
 
               <div style={{ padding: '14px 16px' }}>
 
+                {/* ── Scroll hint ── */}
+                {!isPickup && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(255,138,42,0.06)', border: '1px solid rgba(255,138,42,0.15)', marginBottom: 8, textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#ff8a2a' }}>👇 Bitte nach unten scrollen und die Fotos bewerten</div>
+                </div>}
                 {/* ── MIDDLE: Photos ── */}
                 {!isPickup && photos.length > 0 && (
                   <div style={{ marginBottom: 12 }}>

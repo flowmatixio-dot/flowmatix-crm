@@ -290,10 +290,11 @@ export default function PatientPanel() {
           <div><div style={{fontWeight:800,fontSize:20}}>{lead.name}</div><div style={{fontSize:13,color:"rgba(167,177,195,0.7)",marginTop:2}}>{lead.treatment}{lead.reviewData?.grafts?" · "+lead.reviewData.grafts:""}</div>
             <div style={{display:"flex",gap:6,marginTop:8,flexWrap:"wrap"}}>
               <span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:`${stage.color}18`,color:stage.color}}>{t("stage_"+stage.id)||stage.label}</span>
-              {(lead.convStatus==="deposit_paid"||invoices.filter(i=>i.leadId===lead.id&&i.status==="paid").length>0)&&<span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:"rgba(16,185,129,0.12)",color:"#10b981"}}>{t("deposit_paid_badge") || "Anzahlung bezahlt"}</span>}
+              {(lead.convStatus==="deposit_paid"||invoices.filter(i=>i.leadId===lead.id&&i.status==="paid").length>0)?<span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:"rgba(16,185,129,0.12)",color:"#10b981"}}>✅ {t("deposit_received")||"Anzahlung erhalten"}</span>:(clinic?.depositPolicy&&clinic.depositPolicy!=="none"&&lead.reviewData&&lead.convStatus!=="resolved")?<button onClick={()=>{setConvStatus(lead.id,"deposit_paid");showT("Anzahlung als bezahlt markiert ✅");}} style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:"rgba(251,191,36,0.12)",color:"#fbbf24",cursor:"pointer",animation:"fmDepPulse 2s infinite",border:"1px solid rgba(251,191,36,0.3)",fontFamily:"inherit"}}>💳 {t("deposit_received")||"Anzahlung"} bestätigen</button>:null}
+              <style>{`@keyframes fmDepPulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
               {lead.contacted&&<span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:"rgba(76,201,255,0.12)",color:"#4cc9ff"}}>{t("contacted_badge") || "Kontaktiert"}</span>}
               {lead.convStatus==="human_takeover"&&<span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:"rgba(239,68,68,0.12)",color:"#ef4444"}}>{t("human_takeover_badge_pp") || "Menschliche \u00DCbernahme"}</span>}
-              {cs && cs.label !== "conv_medical_review" && <span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:`${cs.color}18`,color:cs.color}}>{cs.icon} {t(cs.label) || cs.label}</span>}
+              {cs && cs.label !== "conv_medical_review" && lead.convStatus !== "deposit_paid" && <span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:`${cs.color}18`,color:cs.color}}>{cs.icon} {t(cs.label) || cs.label}</span>}
               {lead.locale&&lead.locale!=="en"&&<span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:"rgba(167,107,255,0.12)",color:"#a78bfa"}}>{lead.locale.toUpperCase()} {"\u2192"} {t("auto_translate") || "Auto-\u00DCbersetzung"}</span>}
               <span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:600,background:"rgba(255,255,255,0.05)",color:"rgba(167,177,195,0.7)"}}>{getClinicById(lead.clinic)?.name}</span></div></div></div>
         <button onClick={()=>{setSelLead(null);setPatientTab("timeline");}} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"rgba(167,177,195,0.7)",width:32,height:32,borderRadius:8,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>&#10005;</button></div>
@@ -327,11 +328,11 @@ export default function PatientPanel() {
             <div style={{height:3,borderRadius:2,background:pct===100?"#10b981":"linear-gradient(90deg,#4cc9ff,#00b4d8)",width:`${pct}%`,transition:"width .5s ease"}}/>
           </div>
           <div style={{display:"flex",justifyContent:"space-between"}}>
-            {steps.map((s,i)=><div key={s.id} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,position:"relative"}}>
-              <div style={{width:28,height:28,borderRadius:8,background:s.done?"rgba(16,185,129,0.12)":"rgba(255,255,255,0.04)",border:`1.5px solid ${s.done?"rgba(16,185,129,0.4)":"rgba(255,255,255,0.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,transition:"all .3s"}}>{s.done?<span style={{color:"#10b981"}}>✓</span>:<span style={{opacity:0.4}}>{s.icon}</span>}</div>
-              <span style={{fontSize:9,fontWeight:700,color:s.done?"#10b981":"rgba(167,177,195,0.35)",textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</span>
+            {steps.map((s,i)=>{const pending=s.id==="deposit"&&!s.done&&lead.reviewData&&lead.convStatus!=="resolved";return<div key={s.id} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,position:"relative"}}>
+              <div style={{width:28,height:28,borderRadius:8,background:s.done?"rgba(16,185,129,0.12)":pending?"rgba(251,191,36,0.12)":"rgba(255,255,255,0.04)",border:`1.5px solid ${s.done?"rgba(16,185,129,0.4)":pending?"rgba(251,191,36,0.5)":"rgba(255,255,255,0.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,transition:"all .3s",animation:pending?"fmDepPulse 2s infinite":"none"}}>{s.done?<span style={{color:"#10b981"}}>✓</span>:pending?<span style={{color:"#fbbf24"}}>💳</span>:<span style={{opacity:0.4}}>{s.icon}</span>}</div>
+              <span style={{fontSize:9,fontWeight:700,color:s.done?"#10b981":pending?"#fbbf24":"rgba(167,177,195,0.35)",textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</span>
               {i<steps.length-1&&<div style={{position:"absolute",top:14,left:"calc(100% + 2px)",width:20,height:1.5,background:steps[i+1]?.done?"rgba(16,185,129,0.3)":"rgba(255,255,255,0.06)"}}/>}
-            </div>)}
+            </div>})}
           </div>
         </div>;
       })()}

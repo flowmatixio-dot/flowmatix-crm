@@ -91,20 +91,21 @@ export default function MainLayout() {
   const [trialReviewPatient, setTrialReviewPatient] = React.useState(null);
   const trialReviewShownRef = React.useRef(false);
 
-  // Trial popup: show when real patient is in needs_medical_review
+  // Trial popup: show when real patient is in needs_medical_review (opens for each NEW patient)
   React.useEffect(() => {
-    if (trialReviewShownRef.current) return;
-    if (ctx.workspaceState !== 'live_test') return;
-    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photoUrls || []).length >= 3);
-    if (realReview && !trialReviewShownRef.current) {
+    if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
+    if (showTrialReviewPopup) return; // Already showing
+    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
+    if (realReview && realReview.id !== trialReviewShownRef.current) {
+      const patId = realReview.id;
       setTimeout(() => {
-        if (trialReviewShownRef.current) return;
+        if (trialReviewShownRef.current === patId) return; // Already shown for this patient
+        trialReviewShownRef.current = patId;
         setTrialReviewPatient(realReview);
         setShowTrialReviewPopup(true);
-        trialReviewShownRef.current = true;
       }, 10000);
     }
-  }, [myLeads, ctx.workspaceState]);
+  }, [myLeads, ctx.workspaceState, showTrialReviewPopup]);
 
   // Live clock for operator top bar
   const [clockNow, setClockNow] = React.useState(new Date());

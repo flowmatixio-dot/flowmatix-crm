@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useApp } from "../../context/AppContext";
-import { useInboxStore } from "../../stores";
+import { useInboxStore, usePatientStore } from "../../stores";
 import { apiFetch } from "../../api/client";
 import { getNowMs } from "../../utils/demoTime";
 import { TASK_COLORS, TASK_GROUPS, getTimeBadgeColor } from "../../data/badgeColors";
@@ -43,7 +43,7 @@ export default function ActionNeededView() {
     document.head.appendChild(ss);
   }
 
-  const { myLeads, openPatient, setView, showT, t, activeClinicId } = useApp();
+  const { myLeads, openPatient, setView, showT, t, activeClinicId, clinic } = useApp();
   const { msgs, setSelChat } = useInboxStore();
 
   const clinicId = activeClinicId || myLeads[0]?.clinic || null;
@@ -375,8 +375,27 @@ export default function ActionNeededView() {
         });
       }
 
-      /* 7. (merged into task #2 above) */
-      if (false) {
+      /* 7. Deposit pending — waiting for payment confirmation */
+      if (p.reviewData && p.convStatus !== 'deposit_paid' && p.convStatus !== 'resolved' && p.convStatus !== 'closed') {
+        const cli = clinic || {};
+        if (cli.depositPolicy && cli.depositPolicy !== 'none') {
+          const depAmt = cli.depositAmount || '';
+          items.push({
+            id: "deposit_" + p.id,
+            type: "deposit",
+            icon: "💳",
+            color: "#fbbf24",
+            title: tFb(t, "action_deposit_pending", "Anzahlung ausstehend"),
+            desc: (depAmt ? `€${depAmt} — ` : '') + tFb(t, "action_deposit_pending_desc", "Anzahlung noch nicht eingegangen — als bezahlt markieren wenn Geld eingegangen"),
+            patient: p.name, patientId: p.id,
+            time: p.reviewedAt || p.lastAiInteraction || p.updatedAt || p.createdAt,
+            action: () => {
+              usePatientStore.getState().setConvStatus(p.id, 'deposit_paid');
+              showT("Anzahlung als bezahlt markiert ✅");
+            },
+            actionLabel: tFb(t, "mark_paid", "Bezahlt ✓"),
+          });
+        }
       }
     });
 
