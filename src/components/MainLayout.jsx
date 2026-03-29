@@ -87,6 +87,24 @@ export default function MainLayout() {
   const effectiveRole = userRole || "admin";
   const canAccess = (mod) => hasModuleAccess(effectiveRole, mod, clinicPlan);
   const [billingCycle, setBillingCycle] = React.useState('monthly');
+  const [showPwModal, setShowPwModal] = React.useState(false);
+  const [pwForm, setPwForm] = React.useState({ current: '', newPw: '', confirm: '' });
+  const [pwLoading, setPwLoading] = React.useState(false);
+  const [pwToast, setPwToast] = React.useState(null);
+  const handlePwChange = async () => {
+    if (pwForm.newPw.length < 8) { setPwToast({ msg: t('pw_min_8') || 'Mindestens 8 Zeichen', type: 'error' }); setTimeout(() => setPwToast(null), 3000); return; }
+    if (pwForm.newPw !== pwForm.confirm) { setPwToast({ msg: t('pw_mismatch') || 'Passwörter stimmen nicht überein', type: 'error' }); setTimeout(() => setPwToast(null), 3000); return; }
+    setPwLoading(true);
+    try {
+      await fmApi.updatePassword(pwForm.newPw, pwForm.current);
+      setPwToast({ msg: t('pw_changed') || 'Passwort geändert — Sie werden abgemeldet' }); setTimeout(() => setPwToast(null), 3000);
+      setShowPwModal(false);
+      setTimeout(() => handleLogout(), 2000);
+    } catch (e) {
+      setPwToast({ msg: e.message || t('pw_error') || 'Fehler beim Ändern', type: 'error' }); setTimeout(() => setPwToast(null), 3000);
+    }
+    setPwLoading(false);
+  };
   const [showTrialReviewPopup, setShowTrialReviewPopup] = React.useState(false);
   const [trialReviewPatient, setTrialReviewPatient] = React.useState(null);
   const trialReviewShownRef = React.useRef(false);
@@ -96,15 +114,10 @@ export default function MainLayout() {
   React.useEffect(() => {
     if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
     if (showTrialReviewPopup) return;
-    const shownIds = JSON.parse(localStorage.getItem('fm_review_popup_shown') || '[]');
-    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3) && !shownIds.includes(l.id));
+    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
     if (realReview) {
-      const patId = realReview.id;
       setTimeout(() => {
-        const current = JSON.parse(localStorage.getItem('fm_review_popup_shown') || '[]');
-        if (current.includes(patId)) return;
-        localStorage.setItem('fm_review_popup_shown', JSON.stringify([...current, patId].slice(-50)));
-        trialReviewShownRef.current = patId;
+        trialReviewShownRef.current = realReview.id;
         setTrialReviewPatient(realReview);
         setShowTrialReviewPopup(true);
       }, 10000);
@@ -767,7 +780,8 @@ export default function MainLayout() {
                     <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(232,238,252,0.85)" }}>{user.name}</div>
                     <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
                   </div>
-                  <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>
+                  {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
+                  <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
                   {/* Language picker inside menu */}
                   <div style={{ padding: "4px 12px", display: "flex", gap: 4 }}>
                     {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "rgba(76,201,255,0.1)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
@@ -781,6 +795,34 @@ export default function MainLayout() {
             {/* Demo reset (small) */}
           </div>
         </div>
+
+        {/* Password Change Modal */}
+        {showPwModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPwModal(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: '#1a2236', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 380, maxWidth: '90vw' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
+                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
+                </div>
+                <div>
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
+                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', color: pwToast.type === 'error' ? '#ef4444' : '#10b981', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
+              <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
+                <button onClick={() => setShowPwModal(false)} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.5)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
+                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'rgba(255,138,42,0.3)' : 'rgba(255,138,42,0.9)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Trial Countdown Banner ── */}
         {IS_CLIENT_MODE && trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (

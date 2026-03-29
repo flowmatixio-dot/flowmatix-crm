@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import { fmLocale } from "../../utils/helpers";
+import { uploadToDrive } from "../../api/client";
 
 const getConsentItems = (t) => [
   { key: "treatment_contract", label: t("treatment_contract") || "Behandlungsvertrag", icon: "📋", desc: t("treatment_contract_desc") || "Vertrag über die geplante Behandlung", required: true },
@@ -121,13 +122,35 @@ export default function ConsentTracker({ patient, onUpdate, onRequestSignature, 
                           padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                           background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.12)", color: "#10b981",
                         }}>{t("mark_as_signed") || "Als unterschrieben markieren"}</button>
-                        <button onClick={() => {
-                          onRequestSignature?.(item.key, item.label);
-                          showT?.(`${t("consent_requested") || "Einwilligung angefordert"}: ${item.label}`);
-                        }} style={{
-                          padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                          background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", color: "#4cc9ff",
-                        }}>{t("request_via_whatsapp") || "Per WhatsApp anfordern"}</button>
+                        {item.key === "data_privacy" ? (
+                          <button onClick={() => {
+                            onRequestSignature?.(item.key, item.label);
+                            showT?.(`${t("consent_requested") || "Einwilligung angefordert"}: ${item.label}`);
+                          }} style={{
+                            padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", color: "#4cc9ff",
+                          }}>{t("request_via_whatsapp") || "Per WhatsApp anfordern"}</button>
+                        ) : (
+                          <label style={{
+                            padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", color: "#4cc9ff",
+                            display: "inline-flex", alignItems: "center", gap: 4,
+                          }}>
+                            {"📄"} {t("upload") || "Upload"}
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display: "none" }} onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                await uploadToDrive(file, patient?.patientId || patient?.id, "consent");
+                                onUpdate?.(item.key, { signed: true, signedAt: new Date().toISOString(), method: "digital", fileName: file.name });
+                                showT?.(`${item.label}: ${file.name} ${t("uploaded") || "hochgeladen"}`);
+                              } catch (err) {
+                                console.error("Upload failed:", err);
+                                showT?.(t("upload_failed") || "Upload fehlgeschlagen");
+                              }
+                            }} />
+                          </label>
+                        )}
                       </>
                     )}
                     {isSigned && (

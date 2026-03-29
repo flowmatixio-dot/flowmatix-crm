@@ -754,6 +754,14 @@ export default function SettingsView() {
     showT(t("driver_added"));
   };
   const removeDriver=(id)=>{up("drivers",drivers.filter(d=>d.id!==id));showT(t("driver_removed"));};
+  const [editDriverId, setEditDriverId] = useState(null);
+  const startEditDriver=(d)=>{setEditDriverId(d.id);setDrvName(d.name);setDrvPhone(d.phone);setDrvRole(d.role||"primary");setDrvVehicle(d.vehicle||"");setDrvPlate(d.plateNo||"");setDrvTelegram(d.telegramChatId||"");setDrvForm(true);};
+  const saveEditDriver=()=>{
+    if(!drvName.trim()||!drvPhone.trim()){showT(t("name_phone_required"));return;}
+    up("drivers",drivers.map(d=>d.id===editDriverId?{...d,name:drvName,phone:drvPhone,role:drvRole,vehicle:drvVehicle,plateNo:drvPlate,telegramChatId:drvTelegram.trim()||d.telegramChatId||""}:d));
+    setEditDriverId(null);setDrvForm(false);setDrvName("");setDrvPhone("");setDrvRole("primary");setDrvVehicle("");setDrvPlate("");setDrvTelegram("");
+    showT(t("driver_updated")||"Fahrer aktualisiert");
+  };
 
   const inp={width:"100%",padding:"8px 12px",borderRadius:8,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box"};
   const [settingsTab, setSettingsTab] = useState("general");
@@ -1055,7 +1063,10 @@ export default function SettingsView() {
             <div style={{fontWeight:700,fontSize:13}}>{d.name} <span style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginLeft:4}}>{d.role==="primary"?t("primary_role"):"Backup"}</span></div>
             <div style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginTop:3}}>{d.phone}{d.telegramChatId?` · Telegram: ${d.telegramChatId}`:""}{d.vehicle?` · ${d.vehicle}`:""}{d.plateNo?` · ${d.plateNo}`:""}</div>
           </div>
-          <button onClick={()=>removeDriver(d.id)} style={{padding:"5px 12px",borderRadius:8,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.12)",color:"#ef4444",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("remove")}</button>
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={()=>startEditDriver(d)} style={{padding:"5px 12px",borderRadius:8,background:"rgba(76,201,255,0.06)",border:"1px solid rgba(76,201,255,0.12)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("edit")||"Bearbeiten"}</button>
+            <button onClick={()=>removeDriver(d.id)} style={{padding:"5px 12px",borderRadius:8,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.12)",color:"#ef4444",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("remove")}</button>
+          </div>
         </div>
       ))}
     </div>}
@@ -1065,7 +1076,7 @@ export default function SettingsView() {
       <div style={{borderRadius:14,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",overflow:"hidden"}}>
         <div style={{padding:"14px 20px",borderBottom:"1px solid rgba(255,255,255,0.04)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div style={{fontWeight:700,fontSize:14,color:"rgba(232,238,252,0.9)"}}>{t("add_new_driver")}</div>
-          <button onClick={()=>{setDrvForm(false);setDrvName("");setDrvPhone("");setDrvVehicle("");setDrvPlate("");setDrvTelegram("");setDrvRole("primary");}} style={{padding:"4px 12px",borderRadius:6,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
+          <button onClick={()=>{setDrvForm(false);setEditDriverId(null);setDrvName("");setDrvPhone("");setDrvVehicle("");setDrvPlate("");setDrvTelegram("");setDrvRole("primary");}} style={{padding:"4px 12px",borderRadius:6,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
         </div>
         <div style={{padding:20}}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px 16px"}}>
@@ -1080,7 +1091,7 @@ export default function SettingsView() {
             💡 {t("driver_telegram_hint")}
           </div>
           <div style={{marginTop:16,display:"flex",justifyContent:"flex-end"}}>
-            <button onClick={addDriver} style={{padding:"8px 24px",borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(16,185,129,0.3)"}}>{t("save")}</button>
+            <button onClick={editDriverId?saveEditDriver:addDriver} style={{padding:"8px 24px",borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(16,185,129,0.3)"}}>{editDriverId?(t("save_changes")||"Änderungen speichern"):t("save")}</button>
           </div>
         </div>
       </div>

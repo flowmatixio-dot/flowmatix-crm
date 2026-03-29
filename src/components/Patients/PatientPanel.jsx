@@ -5,6 +5,7 @@ import { timeAgo, translateValue, fmLocale } from "../../utils/helpers";
 import { CONV_STATUS, APPT_C, TL, MSG_TEMPLATES, DRIVER_STATUS } from "../../data/constants";
 import TreatmentPlanBuilder from "./TreatmentPlanBuilder";
 import { useInboxStore } from "../../stores";
+import { authPhotoUrl } from "../../api/client";
 
 function PhotoLightbox({ photos, startIdx, onClose }) {
   const [idx, setIdx] = useState(startIdx || 0);
@@ -13,7 +14,7 @@ function PhotoLightbox({ photos, startIdx, onClose }) {
   const url = typeof photo === 'string' ? photo : photo.url;
   if (!url) return null;
   return <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.92)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"zoom-out"}}>
-    <img src={url} alt="Patient photo" style={{maxWidth:"90vw",maxHeight:"90vh",borderRadius:12,boxShadow:"0 8px 40px rgba(0,0,0,0.5)"}} onClick={e=>e.stopPropagation()}/>
+    <img src={authPhotoUrl(url)} alt="Patient photo" style={{maxWidth:"90vw",maxHeight:"90vh",borderRadius:12,boxShadow:"0 8px 40px rgba(0,0,0,0.5)"}} onClick={e=>e.stopPropagation()}/>
     {photos.length>1&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",bottom:30,display:"flex",gap:12,alignItems:"center"}}>
       <button onClick={()=>setIdx(p=>(p-1+photos.length)%photos.length)} style={{width:40,height:40,borderRadius:20,background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",color:"#fff",fontSize:18,cursor:"pointer",fontFamily:"inherit"}}>&#8592;</button>
       <span style={{color:"#fff",fontSize:14,fontWeight:600}}>{idx+1} / {photos.length}</span>
@@ -94,7 +95,6 @@ function formatBool(v) {
 function translateTimeline(text) {
   if (!text) return text;
   const l = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
-  if (l === "de") return text; // Timeline is already in German from backend
   const map = {
     "Neue Anfrage ueber WhatsApp erhalten": { en: "New inquiry received via WhatsApp", tr: "WhatsApp üzerinden yeni talep alındı" },
     "Neue Anfrage über WhatsApp erhalten": { en: "New inquiry received via WhatsApp", tr: "WhatsApp üzerinden yeni talep alındı" },
@@ -130,6 +130,27 @@ function translateTimeline(text) {
     "Manuell übernommen": { en: "Manually taken over", tr: "Manuel olarak devralındı" },
     "KI fortgesetzt": { en: "AI resumed", tr: "AI devam etti" },
     "Konversation geschlossen": { en: "Conversation closed", tr: "Görüşme kapatıldı" },
+    "booking_pending": { de: "Buchung ausstehend", en: "Booking pending", tr: "Rezervasyon bekliyor" },
+    "AWAITING_DEPOSIT": { de: "Warten auf Anzahlung", en: "Awaiting deposit", tr: "Depozito bekleniyor" },
+    "ai_active": { de: "KI aktiv", en: "AI active", tr: "AI aktif" },
+    "WELCOME_SENT": { de: "Begrüßung gesendet", en: "Welcome sent", tr: "Hoş geldin gönderildi" },
+    "WELCOME": { de: "Willkommen", en: "Welcome", tr: "Hoş geldin" },
+    "GDPR_REQUESTED": { de: "DSGVO-Einwilligung angefragt", en: "GDPR consent requested", tr: "KVKK onayı istendi" },
+    "INTAKE_STARTED": { de: "Aufnahme gestartet", en: "Intake started", tr: "Kayıt başladı" },
+    "INTAKE_COMPLETE": { de: "Aufnahme abgeschlossen", en: "Intake complete", tr: "Kayıt tamamlandı" },
+    "PHOTOS_REQUESTED": { de: "Fotos angefordert", en: "Photos requested", tr: "Fotoğraflar istendi" },
+    "PHOTOS_RECEIVED": { de: "Fotos erhalten", en: "Photos received", tr: "Fotoğraflar alındı" },
+    "REVIEW_PENDING": { de: "Wartet auf ärztliche Bewertung", en: "Waiting for medical review", tr: "Tıbbi değerlendirme bekleniyor" },
+    "QUOTE_READY": { de: "Angebot bereit", en: "Quote ready", tr: "Teklif hazır" },
+    "OFFER_SENT": { de: "Angebot gesendet", en: "Offer sent", tr: "Teklif gönderildi" },
+    "BOOKING_REQUESTED": { de: "Terminbuchung angefragt", en: "Booking requested", tr: "Rezervasyon talep edildi" },
+    "BOOKING_CONFIRMED": { de: "Termin bestätigt", en: "Booking confirmed", tr: "Randevu onaylandı" },
+    "BOOKING_COLLECT_DATE": { de: "Terminwunsch wird erfasst", en: "Collecting preferred date", tr: "Tercih edilen tarih alınıyor" },
+    "needs_medical_review": { de: "Wartet auf ärztliche Bewertung", en: "Waiting for medical review", tr: "Tıbbi değerlendirme bekleniyor" },
+    "deposit_paid": { de: "Anzahlung bezahlt", en: "Deposit paid", tr: "Depozito ödendi" },
+    "human_takeover": { de: "Manuell übernommen", en: "Manual takeover", tr: "Manuel devralma" },
+    "resolved": { de: "Abgeschlossen", en: "Resolved", tr: "Çözüldü" },
+    "Flugdaten empfangen": { en: "Flight data received", tr: "Uçuş bilgileri alındı" },
     "Konversation wieder geöffnet": { en: "Conversation reopened", tr: "Görüşme yeniden açıldı" },
     "Uebergabe an Mitarbeiter": { en: "Handover to staff", tr: "Personele devredildi" },
     "Übergabe an Mitarbeiter": { en: "Handover to staff", tr: "Personele devredildi" },
@@ -165,6 +186,9 @@ function translateTimeline(text) {
     "Template gesendet": { en: "Template sent", tr: "Şablon gönderildi" },
     "Reactivation template sent": { en: "Reactivation template sent", tr: "Yeniden etkinleştirme şablonu gönderildi" },
   };
+  // Internal state names → translate even for DE
+  if (map[text]?.de) { if (l === "de") return map[text].de; return map[text][l] || map[text].de || text; }
+  if (l === "de") return text;
   // Exact match
   if (map[text]) return map[text][l] || text;
   // Partial match for patterns with dynamic suffixes
@@ -268,7 +292,7 @@ export default function PatientPanel() {
       else setAftercareText(t("aftercare_general"));
     }
   }
-  const photoCount = (lead.photoUrls||[]).filter(u => typeof u === 'string' && (u.startsWith('https://') || u.startsWith('http://'))).length;
+  const photoCount = (lead.photoUrls||[]).filter(u => { const url = typeof u === 'string' ? u : u?.url; return url && (url.startsWith('https://') || url.startsWith('http://')); }).length;
   const tabs=[{id:"timeline",label:t("tab_timeline")},{id:"invoices",label:t("tab_invoices")},{id:"appointments",label:t("tab_appointments")},{id:"photos",label:photoCount > 0 ? `${t("tab_photos")} (${photoCount})` : t("tab_photos")},{id:"notes",label:t("tab_notes")}];
   const leadAppts=appts.filter(a=>(a.leadId||a.patientId||a.patient_id)===lead.id);
 
@@ -410,8 +434,10 @@ export default function PatientPanel() {
               <div style={{marginTop:14,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
                 <div style={{fontSize:10,fontWeight:700,color:"rgba(167,177,195,0.4)",textTransform:"uppercase",marginBottom:8}}>{t("patient_photos") || "Patientenfotos"}</div>
                 <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                  {(lead.photoUrls||[]).slice(0,6).map((url,pi) => {
-                    const isReal = typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'));
+                  {(lead.photoUrls||[]).slice(0,6).map((p,pi) => {
+                    const photoUrl = typeof p === 'string' ? p : p?.url;
+                    const authUrl = photoUrl ? authPhotoUrl(photoUrl) : null;
+                    const isReal = !!authUrl && (authUrl.startsWith('https://') || authUrl.startsWith('http://'));
                     const labels = [t("photo_front")||"Vorne",t("photo_top")||"Oben",t("photo_left")||"Links",t("photo_right")||"Rechts",t("photo_back")||"Hinten","Extra"];
                     return (
                       <div key={pi} style={{
@@ -421,10 +447,10 @@ export default function PatientPanel() {
                         display:"flex",alignItems:"center",justifyContent:"center",
                         flexDirection:"column",gap:1,cursor:"pointer",
                       }} onClick={() => {
-                        if(isReal) { setLightbox({photos:lead.photoUrls.filter(u=>u.startsWith('https://')||u.startsWith('http://')),idx:pi}); }
+                        if(isReal) { setLightbox({photos:lead.photoUrls.map(u=>typeof u==='string'?u:u?.url).filter(u=>u&&(u.startsWith('https://')||u.startsWith('http://'))),idx:pi}); }
                         else { const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;cursor:pointer';ov.onclick=()=>ov.remove();ov.innerHTML='<div style="font-size:80px">\uD83D\uDCF7</div><div style="color:rgba(255,255,255,0.5);font-size:16px;font-weight:600">'+labels[pi]+' — Foto '+(pi+1)+'/'+Math.min(lead.photoUrls.length,6)+'</div>';document.body.appendChild(ov); }
                       }}>
-                        {isReal ? <img src={url} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <><span style={{fontSize:16}}>{"\uD83D\uDCF7"}</span><span style={{fontSize:7,color:"rgba(76,201,255,0.5)",fontWeight:600}}>{labels[pi]||""}</span></>}
+                        {isReal ? <img src={authUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <><span style={{fontSize:16}}>{"\uD83D\uDCF7"}</span><span style={{fontSize:7,color:"rgba(76,201,255,0.5)",fontWeight:600}}>{labels[pi]||""}</span></>}
                       </div>
                     );
                   })}
@@ -733,7 +759,7 @@ export default function PatientPanel() {
           </div>}
           {(lead.photoUrls||[]).length>0&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
             {(lead.photoUrls||[]).map((p,i)=>{const url=typeof p==='string'?p:p?.url;const mime=typeof p==='object'?p?.mimeType:'';const created=typeof p==='object'&&p?.createdAt?new Date(p.createdAt).toLocaleString(fmLocale(),{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';return<div key={i} onClick={()=>url&&setLightbox({photos:lead.photoUrls,idx:i})} style={{aspectRatio:"1",borderRadius:14,background:"rgba(167,177,195,0.06)",border:"2px solid rgba(76,201,255,0.25)",overflow:"hidden",cursor:url?"pointer":"default",position:"relative"}}>
-              {url?<img src={url} alt={`Photo ${i+1}`} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{"\uD83D\uDCF7"}</div>}
+              {url?<img src={authPhotoUrl(url)} alt={`Photo ${i+1}`} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{"\uD83D\uDCF7"}</div>}
               <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"4px 8px",background:"rgba(0,0,0,0.6)",fontSize:10,color:"#fff",fontWeight:600}}>{created||`Photo ${i+1}`}</div>
             </div>;})}
           </div>}

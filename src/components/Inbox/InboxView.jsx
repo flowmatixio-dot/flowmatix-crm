@@ -121,22 +121,24 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
         {/* Photo thumbnails — unified blue style */}
         {photos.length > 0 && (
           <div style={{display:"flex",gap:6,marginBottom:14,flexWrap:"wrap"}}>
-            {photos.slice(0, 6).map((url, i) => {
-              const isReal = typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'));
+            {photos.slice(0, 6).map((p, i) => {
+              const photoUrl = typeof p === 'string' ? p : p?.url;
+              const authUrl = photoUrl ? fmApi.authPhotoUrl(photoUrl) : null;
+              const isReal = !!authUrl && (authUrl.startsWith('https://') || authUrl.startsWith('http://'));
               const labels = [t("photo_front")||"Front",t("photo_top")||"Top",t("photo_left")||"Left",t("photo_right")||"Right",t("photo_back")||"Back",t("photo_extra")||"Extra"];
               return (
               <div key={i} style={{width:48,height:48,borderRadius:8,overflow:"hidden",background:isReal?"rgba(0,0,0,0.2)":"rgba(76,201,255,0.06)",border:isReal?"1px solid rgba(255,255,255,0.1)":"1px solid rgba(76,201,255,0.12)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:1}} onClick={() => {
                 const overlay = document.createElement('div');
                 overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;cursor:pointer;';
                 overlay.onclick = () => overlay.remove();
-                if(isReal){const img = document.createElement('img');img.src = url;img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);';overlay.appendChild(img);}
+                if(isReal){const img = document.createElement('img');img.src = authUrl;img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);';overlay.appendChild(img);}
                 const counter = document.createElement('div');
                 counter.style.cssText = 'color:rgba(255,255,255,0.5);font-size:13px;';
                 counter.textContent = (isReal?'':'📷 ')+labels[i] + ' — Foto ' + (i+1) + ' / ' + Math.min(photos.length, 6);
                 overlay.appendChild(counter);
                 document.body.appendChild(overlay);
               }}>
-                {isReal ? <img src={url} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <><span style={{fontSize:14}}>📷</span><span style={{fontSize:7,color:"rgba(76,201,255,0.5)",fontWeight:600}}>{labels[i]}</span></>}
+                {isReal ? <img src={authUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} /> : <><span style={{fontSize:14}}>📷</span><span style={{fontSize:7,color:"rgba(76,201,255,0.5)",fontWeight:600}}>{labels[i]}</span></>}
               </div>);
             })}
           </div>
@@ -726,7 +728,7 @@ export default function InboxView() {
                           /* Media message with URL */
                           : msg.msgType === "media" && msg.media?.url ? (
                             <div style={{maxWidth:"70%",borderRadius:14,overflow:"hidden",background:msg.sender === "patient" ? "rgba(255,255,255,0.06)" : "rgba(76,201,255,0.06)",border:`1px solid ${msg.sender === "patient" ? "var(--border-strong)" : "rgba(76,201,255,0.1)"}`,borderBottomLeftRadius:msg.sender === "patient" ? 4 : 14,borderBottomRightRadius:msg.sender !== "patient" ? 4 : 14}}>
-                              <img src={msg.media.url} alt="Foto" style={{width:"100%",maxWidth:300,display:"block",borderRadius:"12px 12px 0 0",cursor:"pointer"}} onClick={() => window.open(msg.media.url, '_blank')} />
+                              <img src={fmApi.authPhotoUrl(msg.media.url)} alt="Foto" style={{width:"100%",maxWidth:300,display:"block",borderRadius:"12px 12px 0 0",cursor:"pointer"}} onClick={() => window.open(fmApi.authPhotoUrl(msg.media.url), '_blank')} />
                               <div style={{padding:"6px 12px",fontSize:11,color:"var(--text-faint)",textAlign:msg.sender === "patient" ? "left" : "right"}}>{msg.time} 📷</div>
                             </div>
                           )

@@ -165,7 +165,6 @@ export default function DoctorTasksView({ onLogout } = {}) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>{tl('doctor_portal_title') || 'Arzt-Portal'}</h1>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button onClick={() => { const btn = document.getElementById('fm-support-launcher'); if (btn) btn.click(); }} style={{ background: 'rgba(76,201,255,0.06)', border: '1px solid rgba(76,201,255,0.12)', color: 'rgba(76,201,255,0.7)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>{'💬'} {tl('help') || 'Hilfe'}</button>
             {onLogout && <button onClick={onLogout} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.4)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 600, fontFamily: 'inherit' }}>{tl('logout')}</button>}
           </div>
         </div>

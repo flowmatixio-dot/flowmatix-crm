@@ -37,6 +37,12 @@ export function getAccessToken() {
   return accessToken;
 }
 
+export function authPhotoUrl(url) {
+  if (!url || !accessToken) return url;
+  if (!url.includes('/crm/photos/') && !url.includes('api.flowmatix.io')) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'token=' + accessToken;
+}
+
 export function isAuthenticated() {
   return !!accessToken;
 }

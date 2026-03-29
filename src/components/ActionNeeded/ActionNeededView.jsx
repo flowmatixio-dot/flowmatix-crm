@@ -277,7 +277,7 @@ export default function ActionNeededView() {
               apiFetch("/api/v1/crm/patients/" + p.id, {
                 method: "PATCH",
                 body: JSON.stringify({
-                  metadata: { hotelInfo: { name, link: link || null, checkin: checkin || null, checkout: checkout || null } }
+                  hotelInfo: { name, link: link || null, checkIn: checkin || null, checkOut: checkout || null }
                 })
               }).then(() => {
                 showT((t("hotel_assigned_msg") || "Hotel {name} zugewiesen").replace("{name}", name) + " \u2705");

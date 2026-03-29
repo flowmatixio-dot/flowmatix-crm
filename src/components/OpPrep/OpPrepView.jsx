@@ -127,6 +127,8 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
   const [medicalOpen, setMedicalOpen] = useState(true);
   const [logisticsOpen, setLogisticsOpen] = useState(false);
   const [consentsOpen, setConsentsOpen] = useState(false);
+  const [photosOpen, setPhotosOpen] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
   const syncTimer = useRef(null);
   const queueDriveSync = useCallback(() => {
     if (!localAppt.patientId) return;
@@ -148,6 +150,30 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
 
   useEffect(() => {
     if (!localAppt.patientId) { setFilesLoading(false); return; }
+    // Load patient metadata for logistics sync
+    fmApi.getPatient(localAppt.patientId).then(res => {
+      const p = res?.patient || res;
+      if (!p) return;
+      const fc = p.flightConfirmed || p.metadata?.flightConfirmed || {};
+      const lg = p.logistics || p.metadata?.logistics || {};
+      const hi = p.hotelInfo || p.metadata?.hotelInfo || p.metadata?.hotel || {};
+      const photoUrls = p.photoUrls || p.metadata?.photoUrls || [];
+      setLocalAppt(prev => ({
+        ...prev,
+        flightNumber: prev.flightNumber || fc.flightNo || fc.flight_number || '',
+        flightDate: prev.flightDate || fc.date || fc.arrival_date || '',
+        flightAirline: prev.flightAirline || fc.airline || '',
+        flightArrival: prev.flightArrival || fc.arrivalTime || fc.arrival_time || fc.time || '',
+        driverName: prev.driverName || lg.driverName || '',
+        driverPhone: prev.driverPhone || lg.driverPhone || '',
+        hotelName: prev.hotelName || hi.name || '',
+        hotelCheckin: prev.hotelCheckin || hi.checkIn || hi.checkin || '',
+        hotelCheckout: prev.hotelCheckout || hi.checkOut || hi.checkout || '',
+        consents: prev.consents || p.consents || p.metadata?.consents || {},
+        _photoUrls: photoUrls,
+        _intake: prev._intake || p.intake || p.extractedFields || p.intake_data || p.metadata?.intake || {},
+      }));
+    }).catch(() => {});
     fmApi.getDriveFiles({ patientId: localAppt.patientId }).then(d => {
       setFiles(d.files || []);
       setFilesLoading(false);
@@ -312,6 +338,9 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
       }}>
         <style>{`@keyframes fm-slide-in{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
 
+        {/* Lightbox */}
+        {lightbox && <div onClick={() => setLightbox(null)} style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out" }}><img src={lightbox} style={{ maxWidth: "90vw", maxHeight: "90vh", borderRadius: 12, objectFit: "contain" }} alt="" /></div>}
+
         {/* ── Colored header bar ── */}
         <div style={{
           padding: "20px 24px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)",
@@ -366,6 +395,35 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
             ))}
           </div>
 
+          {/* ── Medical Details (from patient intake) ── */}
+          {localAppt._intake && Object.keys(localAppt._intake).length > 0 && (
+            <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{"🩺"} {t("medical_details") || "Medizinische Details"}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px" }}>
+                {[
+                  { k: "treatment", l: t("treatment") || "Behandlung" },
+                  { k: "concern", l: t("concern") || "Anliegen" },
+                  { k: "age", l: t("age") || "Alter" },
+                  { k: "country", l: t("country") || "Land" },
+                  { k: "hair_loss_type", l: t("hair_loss") || "Haarausfall" },
+                  { k: "medications", l: t("medications") || "Medikamente" },
+                  { k: "allergies", l: t("allergies") || "Allergien" },
+                  { k: "previous_treatments", l: t("prev_treatments") || "Vorbehandlungen" },
+                  { k: "medical_conditions", l: t("medical_conditions") || "Vorerkrankungen" },
+                  { k: "smoker", l: t("smoker") || "Raucher" },
+                  { k: "blood_thinners", l: t("blood_thinners") || "Blutverdünner" },
+                ].map(f => {
+                  const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
+                  if (!v || v === '—') return null;
+                  return <div key={f.k} style={{ fontSize: 11 }}>
+                    <span style={{ color: "rgba(167,177,195,0.4)" }}>{f.l}: </span>
+                    <span style={{ color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>{v}</span>
+                  </div>;
+                })}
+              </div>
+            </div>
+          )}
+
           {/* ── Readiness progress ── */}
           <div style={{
             padding: "12px 14px", borderRadius: 8, marginBottom: 20,
@@ -408,8 +466,8 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {localAppt.flightReceived && (localAppt.flightNumber || localAppt.flightAirline) ? (
             <div style={{ margin: "0 0 6px 46px", padding: "6px 10px", borderRadius: 6, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(203,213,225,0.8)" }}>
               {localAppt.flightAirline && <span style={{ color: "#10b981", fontWeight: 700 }}>{localAppt.flightAirline}</span>}
-              {localAppt.flightAirline && " \u00B7 "}
-              {localAppt.flightNumber && <>{localAppt.flightNumber} \u00B7 </>}
+              {localAppt.flightAirline && " · "}
+              {localAppt.flightNumber && <>{localAppt.flightNumber} · </>}
               {localAppt.flightArrival && <>{t("arrival_label") || "Ankunft:"} {localAppt.flightArrival}</>}
             </div>
           ) : (
@@ -425,7 +483,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {localAppt.driverAssigned && localAppt.driverName ? (
             <div style={{ margin: "0 0 6px 46px", padding: "6px 10px", borderRadius: 6, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(203,213,225,0.8)" }}>
               <span style={{ color: "#10b981", fontWeight: 700 }}>{localAppt.driverName}</span>
-              {localAppt.driverPhone && <> \u00B7 <a href={`tel:${localAppt.driverPhone}`} style={{ color: "#4cc9ff", textDecoration: "none" }}>{localAppt.driverPhone}</a></>}
+              {localAppt.driverPhone && <> · <a href={`tel:${localAppt.driverPhone}`} style={{ color: "#4cc9ff", textDecoration: "none" }}>{localAppt.driverPhone}</a></>}
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, margin: "0 0 6px 46px" }}>
@@ -440,8 +498,8 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {localAppt.hotelBooked && localAppt.hotelName ? (
             <div style={{ margin: "0 0 6px 46px", padding: "6px 10px", borderRadius: 6, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(203,213,225,0.8)" }}>
               <span style={{ color: "#10b981", fontWeight: 700 }}>{localAppt.hotelName}</span>
-              {localAppt.hotelCheckin && <> \u00B7 {localAppt.hotelCheckin}</>}
-              {localAppt.hotelCheckout && <> \u2192 {localAppt.hotelCheckout}</>}
+              {localAppt.hotelCheckin && <> · {localAppt.hotelCheckin}</>}
+              {localAppt.hotelCheckout && <> → {localAppt.hotelCheckout}</>}
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, margin: "0 0 6px 46px" }}>
@@ -457,13 +515,42 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {renderLogisticsToggle("transferConfirmed", "transfer_confirmed", t("transfer_confirmed_label") || "Transfer bestätigt", !!localAppt.transferConfirmed)}
           </>}
 
+          {/* ── Patient Photos ── */}
+          {(localAppt._photoUrls || []).length > 0 && <>
+            <div onClick={() => setPhotosOpen?.(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
+              <span style={{ fontSize: 9, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: photosOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
+              <span>{"📸"} {t("patient_photos") || "Patientenfotos"}</span>
+              <span style={{ color: "#10b981" }}>{localAppt._photoUrls.length}</span>
+            </div>
+            {photosOpen && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 12 }}>
+                {localAppt._photoUrls.map((p, i) => {
+                  const url = typeof p === 'string' ? p : p?.url;
+                  if (!url) return null;
+                  const authUrl = fmApi.authPhotoUrl(url);
+                  return <div key={i} onClick={() => setLightbox(authUrl)} style={{ aspectRatio: "1", borderRadius: 10, overflow: "hidden", cursor: "pointer", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <img src={authUrl} alt={`Foto ${i+1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>;
+                })}
+              </div>
+            )}
+          </>}
+
           {/* ── Consent Tracker (collapsible) ── */}
           <div onClick={() => setConsentsOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
             <span style={{ fontSize: 9, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: consentsOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
             <span>{t("consents_label") || "Einwilligungen"}</span>
           </div>
           {consentsOpen && <div style={{ marginTop: 4 }}>
-            <ConsentTracker patient={localAppt} onUpdate={(key, data) => {}} onRequestSignature={(key, label) => { if (typeof requestItem === "function") requestItem(key, `Bitte sende uns die unterschriebene ${label}.`); }} showT={() => {}} hideHeader />
+            <ConsentTracker patient={{ ...localAppt, consents: localAppt.consents || localAppt.metadata?.consents || {} }} onUpdate={async (key, data) => {
+              try {
+                const prev = localAppt.consents || localAppt.metadata?.consents || {};
+                const consents = { ...prev, [key]: data };
+                await fmApi.apiFetch(`/api/v1/crm/patients/${localAppt.patientId}`, { method: "PATCH", body: JSON.stringify({ consents }) });
+                setLocalAppt(p => ({ ...p, consents, metadata: { ...(p.metadata || {}), consents } }));
+                if (onUpdate) onUpdate();
+              } catch (e) { console.error("Consent update failed:", e); }
+            }} onRequestSignature={(key, label) => { if (typeof requestItem === "function") requestItem(key, `Bitte sende uns die unterschriebene ${label}.`); }} showT={(msg) => { const el = document.getElementById("fm-toast-global"); if (el) { el.textContent = msg; el.style.display = "block"; setTimeout(() => el.style.display = "none", 3000); } }} hideHeader />
           </div>}
 
           {/* ── Last activity ── */}
