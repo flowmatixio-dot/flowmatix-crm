@@ -10,12 +10,14 @@ export function useCalendarFilters(events) {
   const filteredEvents = useMemo(() => {
     if (!selectedDoctorIds) return events;
     return events.filter((ev) => {
-      const docId = ev.extendedProps?.doctorId;
+      const props = ev.extendedProps || {};
+      const appt = props.appt || {};
       // Blocked days always visible
-      if (ev.extendedProps?.type === "blocked") return true;
-      // If event has no doctor, hide when filtering (Google imports etc.)
-      if (!docId || docId === "undefined" || docId === "null") return false;
-      return selectedDoctorIds.includes(docId);
+      if (props.type === "blocked") return true;
+      // Check all possible doctor ID fields (staff_members.id OR doctors.id)
+      const ids = [props.doctorId, appt.staffMemberId, appt.doctorsTableId, appt.doctorId, appt.doctor_id, appt.staffId, appt.staff_id].filter(Boolean);
+      if (ids.length === 0) return false;
+      return ids.some(id => selectedDoctorIds.includes(id));
     });
   }, [events, selectedDoctorIds]);
 

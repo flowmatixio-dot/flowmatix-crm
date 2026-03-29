@@ -172,7 +172,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
     }
     setReqStates(s => ({ ...s, [key]: "sending" }));
     try {
-      await fmApi.sendCrmMessage(localAppt.patientId, { text: msg, source: "crm" });
+      await fmApi.sendCrmMessage(localAppt.patientId, { text: msg, source: "crm", templateHint: key });
       setReqStates(s => ({ ...s, [key]: "sent" }));
       const actText = "Erinnerung gesendet: " + key;
       await fmApi.updateAppointment(localAppt.id, { last_activity_text: actText });

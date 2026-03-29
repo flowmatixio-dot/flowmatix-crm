@@ -47,8 +47,10 @@ export const usePatientStore = create((set, get) => ({
         const needsReview = cs === 'needs_medical_review';
         const isHandover = cs === 'human_takeover';
         const isCollecting = cs === 'collecting_photos';
+        // Handover: patient stays in current stage — do NOT move
+        if (isHandover) return s === 'new' ? 'new' : s;
         // new → contacted (Arzt-Review): patient has photos, review, or needs attention
-        if (s === 'new' && (hasPhotos || hasReview || needsReview || isHandover || isCollecting)) return 'contacted';
+        if (s === 'new' && (hasPhotos || hasReview || needsReview || isCollecting)) return 'contacted';
         // termin stages always = booked (even with deposit_paid)
         if (['termin_bestaetigt', 'termin_reserviert', 'termin_gebucht'].includes(s)) return 'booked';
         // deposit_paid WITHOUT termin = still waiting, not booked yet

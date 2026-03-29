@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { Stat, Toggle } from "../shared/index";
-import { updateClinicSettings, submitWhatsAppTemplates } from "../../api/client";
+import { updateClinicSettings, submitWhatsAppTemplates, apiFetch } from "../../api/client";
 
 export default function AutomationsView() {
   const { myAutomations, toggleAutomation, clinic, setClinics, showT, t } = useApp();
   const [openGroup, setOpenGroup] = useState(null);
   const [reviewLink, setReviewLink] = useState(clinic?.googleMapsLink || "");
+  const [tplStatuses, setTplStatuses] = useState({});
+
+  // Load template statuses
+  useEffect(() => {
+    apiFetch('/api/v1/clinic/whatsapp/templates/status').then(res => {
+      const map = {};
+      (res?.templates || []).forEach(t => { map[`${t.template_name}_${t.language}`] = t.status; });
+      setTplStatuses(map);
+    }).catch(() => {});
+  }, []);
 
   const saveSetting = (key, value) => {
     setClinics(cs => cs.map(cl => cl.id === clinic?.id ? { ...cl, [key]: value } : cl));
@@ -53,14 +63,8 @@ export default function AutomationsView() {
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 6px" }}>{t("automations") || "Automatisierungen"}</h1>
       <p style={{ fontSize: 14, color: "rgba(167,177,195,0.6)", margin: "0 0 20px" }}>{t("auto_subtitle") || "Wiederkehrende Aufgaben automatisieren"}</p>
 
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 28 }}>
-        <Stat label={t("stat_active_automations") || "Aktive Automatisierungen"} value={activeCount} color="#10b981" />
-        <Stat label={t("stat_total_runs") || "Gesamtausführungen"} value={totalRuns} color="#4cc9ff" />
-      </div>
-
-      {/* Automation Groups */}
-      {GROUPS.map(group => {
+      {/* Automation Groups — hidden, managed via WhatsApp Templates below */}
+      {false && GROUPS.map(group => {
         const items = myAutomations.filter(a => group.types.includes(a.type));
         if (items.length === 0) return null;
         const anyActive = items.some(a => a.active && !a.locked);
@@ -160,12 +164,14 @@ export default function AutomationsView() {
         </div>
         <div style={{ padding: "0 12px" }}>
           {[
-            { name: t("tpl_reminder") || "Terminerinnerung", desc: t("tpl_reminder_desc") || "3 Tage vor Termin + Flugdaten-Anfrage", icon: "📅", cat: "booking" },
-            { name: t("tpl_booking") || "Buchungsbestätigung", desc: t("tpl_booking_desc") || "Nach Terminbuchung", icon: "✅", cat: "booking" },
-            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung", icon: "💊", cat: "aftercare" },
-            { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge-Nachricht", icon: "⭐", cat: "aftercare" },
-            { name: t("tpl_deposit_confirmed") || "Zahlungsbestaetigung", desc: t("tpl_deposit_confirmed_desc") || "Nach Zahlungseingang", icon: "💰", cat: "payment" },
-            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen", icon: "📨", cat: "reactivation" },
+            { name: t("tpl_treatment_plan") || "Behandlungsplan", desc: t("tpl_treatment_plan_desc") || "Nach Arzt-Bewertung — Methode, Grafts, Preis", icon: "🩺", cat: "medical", tplKey: "treatment_plan" },
+            { name: t("tpl_deposit_confirmed") || "Anzahlung bestätigt", desc: t("tpl_deposit_confirmed_desc") || "Nach Zahlungseingang — Terminbuchung anbieten", icon: "💰", cat: "payment", tplKey: "deposit_confirmed" },
+            { name: t("tpl_booking") || "Terminbestätigung", desc: t("tpl_booking_desc") || "Nach OP-Terminbuchung", icon: "✅", cat: "booking", tplKey: "booking_confirmation" },
+            { name: t("tpl_reminder") || "Erinnerung + Flugdaten", desc: t("tpl_reminder_desc") || "3 Tage vor OP — Erinnerung + Flugticket anfordern", icon: "📅", cat: "booking", tplKey: "appointment_reminder_flight" },
+            { name: t("tpl_driver_pickup") || "Fahrer-Info", desc: t("tpl_driver_pickup_desc") || "1 Tag vor Flug — Fahrer, Auto, Kennzeichen", icon: "🚗", cat: "logistics", tplKey: "driver_pickup_info" },
+            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung — Pflegeanweisungen", icon: "💊", cat: "aftercare", tplKey: "aftercare_instructions" },
+            { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge — Google Maps Bewertung", icon: "⭐", cat: "aftercare", tplKey: "review_request" },
+            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen — Gespräch fortsetzen", icon: "📨", cat: "reactivation", tplKey: "reactivation" },
           ].map(tpl => (
             <div key={tpl.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
@@ -176,9 +182,12 @@ export default function AutomationsView() {
                 </div>
               </div>
               <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-                {["DE", "EN", "TR"].map(l => (
-                  <span key={l} style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: "rgba(76,201,255,0.08)", border: "1px solid rgba(76,201,255,0.15)", color: "#4cc9ff" }}>{l}</span>
-                ))}
+                {["de", "en", "tr"].map(l => {
+                  const st = tplStatuses[`${tpl.tplKey}_${l}`] || 'draft';
+                  const colors = { approved: { bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)", color: "#10b981" }, pending: { bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)", color: "#fbbf24" }, rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", color: "#ef4444" }, error: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)", color: "#ef4444" }, draft: { bg: "rgba(167,177,195,0.06)", border: "rgba(167,177,195,0.15)", color: "rgba(167,177,195,0.5)" } };
+                  const c = colors[st] || colors.draft;
+                  return <span key={l} title={st} style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: c.bg, border: `1px solid ${c.border}`, color: c.color }}>{l.toUpperCase()}</span>;
+                })}
               </div>
             </div>
           ))}
@@ -201,7 +210,25 @@ export default function AutomationsView() {
             }}
             style={{ width: "100%", padding: "11px", borderRadius: 10, background: "linear-gradient(135deg, #4cc9ff, #2b7cff)", border: "none", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
           >
-            {t("auto_submit_all_templates") || "Submit all templates to 360dialog"}
+            {t("auto_submit_all_templates") || "Alle Templates bei 360dialog einreichen"}
+          </button>
+          <button
+            onClick={async () => {
+              showT("Status wird aktualisiert...");
+              try {
+                const res = await apiFetch('/api/v1/clinic/whatsapp/templates/refresh', { method: 'POST' });
+                if (res.success) {
+                  showT(`✅ ${res.updated} Templates aktualisiert`);
+                  const statusRes = await apiFetch('/api/v1/clinic/whatsapp/templates/status');
+                  const map = {};
+                  (statusRes?.templates || []).forEach(t => { map[`${t.template_name}_${t.language}`] = t.status; });
+                  setTplStatuses(map);
+                } else showT("Fehler beim Aktualisieren");
+              } catch (e) { showT("Fehler: " + e.message); }
+            }}
+            style={{ width: "100%", padding: "11px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(167,177,195,0.7)", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", marginTop: 8 }}
+          >
+            🔄 {t("auto_refresh_status") || "Status aktualisieren"}
           </button>
         </div>
       </div>

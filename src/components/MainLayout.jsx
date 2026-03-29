@@ -92,14 +92,18 @@ export default function MainLayout() {
   const trialReviewShownRef = React.useRef(false);
 
   // Trial popup: show when real patient is in needs_medical_review (opens for each NEW patient)
+  // Uses localStorage to persist across login/logout/mode-switch
   React.useEffect(() => {
     if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
-    if (showTrialReviewPopup) return; // Already showing
-    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
-    if (realReview && realReview.id !== trialReviewShownRef.current) {
+    if (showTrialReviewPopup) return;
+    const shownIds = JSON.parse(localStorage.getItem('fm_review_popup_shown') || '[]');
+    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3) && !shownIds.includes(l.id));
+    if (realReview) {
       const patId = realReview.id;
       setTimeout(() => {
-        if (trialReviewShownRef.current === patId) return; // Already shown for this patient
+        const current = JSON.parse(localStorage.getItem('fm_review_popup_shown') || '[]');
+        if (current.includes(patId)) return;
+        localStorage.setItem('fm_review_popup_shown', JSON.stringify([...current, patId].slice(-50)));
         trialReviewShownRef.current = patId;
         setTrialReviewPatient(realReview);
         setShowTrialReviewPopup(true);

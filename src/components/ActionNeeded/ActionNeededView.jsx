@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useApp } from "../../context/AppContext";
 import { useInboxStore, usePatientStore } from "../../stores";
 import { apiFetch } from "../../api/client";
@@ -43,6 +43,7 @@ export default function ActionNeededView() {
     document.head.appendChild(ss);
   }
 
+  const [collapsed, setCollapsed] = useState({});
   const { myLeads, openPatient, setView, showT, t, activeClinicId, clinic } = useApp();
   const { msgs, setSelChat } = useInboxStore();
 
@@ -231,7 +232,8 @@ export default function ActionNeededView() {
       const hoursSinceBooking = hotelBookedAt ? (getNowMs() - new Date(hotelBookedAt).getTime()) / 3600000 : 999;
       const hoursUntilAppt = hotelApptDate ? (new Date(hotelApptDate).getTime() - getNowMs()) / 3600000 : 999;
       const hotelEscalated = hoursSinceBooking > 24 || hoursUntilAppt < 48;
-      if (!isLocal && (p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && hotelEscalated) {
+      const hasFlightConfirmed = !!(p.flightConfirmed && p.flightConfirmed.date);
+      if (!isLocal && hasFlightConfirmed && (p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && hotelEscalated) {
         items.push({
           id: "hotel_" + p.id,
           type: "hotel",
@@ -376,7 +378,7 @@ export default function ActionNeededView() {
       }
 
       /* 7. Deposit pending — waiting for payment confirmation */
-      if (p.reviewData && p.convStatus !== 'deposit_paid' && p.convStatus !== 'resolved' && p.convStatus !== 'closed') {
+      if (p.reviewData && p.convStatus !== 'deposit_paid' && p.convStatus !== 'appointment_booked' && p.convStatus !== 'resolved' && p.convStatus !== 'closed' && !p.depositPaid && !p.metadata?.deposit_paid) {
         const cli = clinic || {};
         if (cli.depositPolicy && cli.depositPolicy !== 'none') {
           const depAmt = cli.depositAmount || '';
@@ -396,6 +398,22 @@ export default function ActionNeededView() {
             actionLabel: tFb(t, "mark_paid", "Bezahlt ✓"),
           });
         }
+      }
+
+      /* 8. Waiting for flight data — info task for booked patients without flight */
+      if ((p.stage === 'booked' || p.stage === 'done') && !isLocal && !(p.flightConfirmed && p.flightConfirmed.date) && p.convStatus !== 'resolved' && p.convStatus !== 'closed') {
+        items.push({
+          id: "flight_wait_" + p.id,
+          type: "flight_wait",
+          icon: "⏳",
+          color: "rgba(167,177,195,0.5)",
+          title: tFb(t, "action_waiting_flight", "Warte auf Flugdaten"),
+          desc: tFb(t, "action_waiting_flight_desc", "3 Tage vor dem OP-Termin wird automatisch eine Erinnerung gesendet"),
+          patient: p.name, patientId: p.id,
+          time: p.appointmentDate || p.booking?.date || p.updatedAt || p.createdAt,
+          action: () => openPatient(p.id),
+          actionLabel: tFb(t, "action_open_patient", "Patient öffnen"),
+        });
       }
     });
 
@@ -469,15 +487,17 @@ export default function ActionNeededView() {
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         {categories.map(cat => {
           if (cat.items.length === 0) return null;
+          const isOpen = !collapsed[cat.key];
           return (
             <div key={cat.key}>
-              {/* Section header */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              {/* Section header — clickable to collapse */}
+              <div onClick={() => setCollapsed(prev => ({ ...prev, [cat.key]: !prev[cat.key] }))} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: isOpen ? 10 : 0, cursor: "pointer", userSelect: "none" }}>
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: cat.dotColor }} />
                 <span style={{ fontSize: 14, fontWeight: 800, color: cat.color }}>{cat.label}</span>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: `${cat.color}15`, color: cat.color }}>{cat.items.length}</span>
+                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.3)", marginLeft: 4, transition: "transform 0.2s", transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>▼</span>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {isOpen && <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {cat.items.map((task, fi) => {
           const waitStr = formatWaiting(task.time);
           const waitDays = task.time ? (getNowMs() - new Date(task.time).getTime()) / 86400000 : 0;
@@ -534,8 +554,8 @@ export default function ActionNeededView() {
                 style={{
                   padding: "7px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700,
                   cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
-                  background: `${cat.color}10`, border: `1px solid ${cat.color}20`,
-                  color: cat.color, transition: "all 0.15s",
+                  background: "rgba(76,201,255,0.08)", border: "1px solid rgba(76,201,255,0.2)",
+                  color: "#4cc9ff", transition: "all 0.15s",
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = `${cat.color}20`}
                 onMouseLeave={e => e.currentTarget.style.background = `${cat.color}10`}
@@ -560,7 +580,7 @@ export default function ActionNeededView() {
             </div>
           );
         })}
-              </div>
+              </div>}
             </div>
           );
         })}

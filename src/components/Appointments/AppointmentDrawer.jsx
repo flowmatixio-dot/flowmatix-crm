@@ -100,8 +100,8 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
   });
 
   const patientStatuses = appt.patientStatus ? [
-    statusBadge(appt.patientStatus.deposit, tFb(t, "cal_deposit_paid", "Anzahlung"), tFb(t, "cal_deposit_missing", "Keine Anzahlung")),
-    statusBadge(appt.patientStatus.documents, tFb(t, "cal_docs_ok", "Dokumente"), tFb(t, "cal_docs_missing", "Keine Dokumente")),
+    statusBadge(appt.patientStatus.depositPaid || appt.patientStatus.deposit || appt.depositPaid, tFb(t, "cal_deposit_paid", "Anzahlung"), tFb(t, "cal_deposit_missing", "Keine Anzahlung")),
+    statusBadge(appt.patientStatus.docsSigned || appt.patientStatus.documents, tFb(t, "cal_docs_ok", "Dokumente"), tFb(t, "cal_docs_missing", "Keine Dokumente")),
     statusBadge(appt.patientStatus.bloodTest, tFb(t, "cal_blood_ok", "Bluttest"), tFb(t, "cal_blood_missing", "Kein Bluttest")),
   ].map(s => ({
     ...s,

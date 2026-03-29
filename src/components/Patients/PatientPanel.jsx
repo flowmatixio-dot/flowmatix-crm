@@ -670,7 +670,7 @@ export default function PatientPanel() {
             <div><div style={{fontWeight:700,fontSize:15}}>{a.treatment||a.title||t("appointment")||"Appointment"}</div><div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginTop:4}}>{a.date} · {a.time}{a.endTime?`–${a.endTime}`:""}{(a.assigned||a.doctorName)?` · ${a.assigned||a.doctorName}`:""}</div></div>
             <span style={{padding:"4px 12px",borderRadius:8,fontSize:12,fontWeight:700,background:`${ac.c}18`,color:ac.c}}>{ac.l}</span>
           </div>;})}
-          {lead.booking&&!leadAppts.length&&<div style={{padding:16,borderRadius:14,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",fontSize:14}}>{t("booking")}: <strong style={{color:"#10b981"}}>{lead.booking.date}</strong> at {lead.booking.time} — {lead.booking.type}</div>}
+          {lead.booking&&!leadAppts.length&&<div style={{padding:16,borderRadius:14,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",fontSize:14}}>{t("booking")}: <strong style={{color:"#10b981"}}>{lead.booking.date}</strong>{lead.booking.time?` · OP-Start: ${lead.booking.time}`:""} — {lead.booking.type}</div>}
         </div>}
 
         {/* ═══ INVOICES TAB ═══ */}

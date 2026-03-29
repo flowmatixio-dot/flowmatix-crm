@@ -149,7 +149,7 @@ export default function AppointmentsPage() {
           grafts: a.grafts || lead.reviewData?.grafts || lead.grafts || null,
           photosComplete: a.photos_complete || a.photosComplete || (lead.photoUrls || []).length >= 3 || lead.photos || false,
           reviewDone: !!lead.reviewData,
-          depositPaid: lead.depositPaid || lead.convStatus === "deposit_paid",
+          depositPaid: a.depositPaid || a.deposit_paid || lead.depositPaid || lead.convStatus === "deposit_paid",
           patientStage: lead.stage,
           patientCountry: lead.country,
           clinicCountry: clinic?.country || "",

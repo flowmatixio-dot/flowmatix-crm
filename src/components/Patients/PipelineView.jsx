@@ -297,12 +297,18 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
     opBadges.push({ label: t("review_label"), ...bs.orange });
   if (isLocal)
     opBadges.push({ label: t("local_patient"), ...bs.green });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !(lead.flightConfirmed && lead.flightConfirmed.date))
-    opBadges.push({ label: t("flight_missing_badge") || "Flug fehlt", background: LOGISTICS_COLORS.flight_missing.bg, color: LOGISTICS_COLORS.flight_missing.color });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !(lead.logistics && lead.logistics.driverName))
-    opBadges.push({ label: t("driver_missing") || "Fahrer fehlt", background: LOGISTICS_COLORS.driver_missing.bg, color: LOGISTICS_COLORS.driver_missing.color });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !(lead.hotelInfo?.name || lead.hotel?.name))
-    opBadges.push({ label: t("hotel_missing") || "Hotel fehlt", background: LOGISTICS_COLORS.hotel_missing.bg, color: LOGISTICS_COLORS.hotel_missing.color });
+  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal) {
+    const hasFlightData = !!(lead.flightConfirmed && lead.flightConfirmed.date);
+    if (!hasFlightData) {
+      // No flight yet → just waiting, grey info badge
+      opBadges.push({ label: "✈️ " + (t("wait_flight") || "Waiting for flight"), background: "rgba(167,177,195,0.08)", color: "rgba(167,177,195,0.5)" });
+    } else {
+      if (!(lead.logistics && lead.logistics.driverName))
+        opBadges.push({ label: "🚗 " + (t("wait_driver") || "Waiting for driver"), background: LOGISTICS_COLORS.driver_missing.bg, color: LOGISTICS_COLORS.driver_missing.color });
+      if (!(lead.hotelInfo?.name || lead.hotel?.name))
+        opBadges.push({ label: "🏨 " + (t("wait_hotel") || "Waiting for hotel"), background: LOGISTICS_COLORS.hotel_missing.bg, color: LOGISTICS_COLORS.hotel_missing.color });
+    }
+  }
   if (lead.metadata?.depositPending)
     opBadges.push({ label: t("step_deposit") || "Anzahlung", background: "rgba(234,179,8,0.12)", color: "#eab308" });
   else if (opBadges.length === 0 && (lead.convStatus === "deposit_paid" || (lead.financials && lead.financials.depositStatus === "paid")))
@@ -426,23 +432,23 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
       <div style={{ display: "flex", gap: 3, paddingLeft: 30, marginTop: 4 }}>
         {(() => {
           const baseSteps = [
-            { done: true, t: t("step_inquiry") || "Anfrage" },
-            { done: (lead.photoUrls || []).length >= 3 || lead.photos, t: t("step_photos") || "Fotos" },
-            { done: !!lead.reviewData, t: t("step_review") || "Bewertung" },
+            { key: "inquiry", done: true, t: t("step_inquiry") || "Anfrage" },
+            { key: "photos", done: (lead.photoUrls || []).length >= 3 || lead.photos, t: t("step_photos") || "Fotos" },
+            { key: "review", done: !!lead.reviewData, t: t("step_review") || "Bewertung" },
           ];
           if (depositRequired && depositBeforeAppt) {
-            baseSteps.push({ done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "booked" || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
+            baseSteps.push({ key: "deposit", done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "booked" || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
           }
-          baseSteps.push({ done: lead.stage === "booked" || lead.stage === "done", t: t("step_booked") || "Gebucht" });
+          baseSteps.push({ key: "booked", done: lead.stage === "booked" || lead.stage === "done", t: t("step_booked") || "Gebucht" });
           if (depositRequired && !depositBeforeAppt) {
-            baseSteps.push({ done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
+            baseSteps.push({ key: "deposit", done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
           }
           // Transfer steps — skip for local patients
           if (!isLocal) {
             baseSteps.push(
-              { done: !!(lead.flightConfirmed && lead.flightConfirmed.date) || !!(lead.metadata && lead.metadata.noFlightNeeded), t: t("step_flight") || "Flug" },
-              { done: !!(lead.logistics?.driverName), t: t("driver") || "Fahrer" },
-              { done: !!(lead.hotelInfo?.name || lead.hotel?.name), t: t("hotel") || "Hotel" },
+              { key: "flight", done: !!(lead.flightConfirmed && lead.flightConfirmed.date) || !!(lead.metadata && lead.metadata.noFlightNeeded), t: t("step_flight") || "Flug" },
+              { key: "driver", done: !!(lead.logistics?.driverName), t: t("driver") || "Fahrer" },
+              { key: "hotel", done: !!(lead.hotelInfo?.name || lead.hotel?.name), t: t("hotel") || "Hotel" },
             );
           }
           const steps = baseSteps;
@@ -454,8 +460,8 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
           const isHandover = lead.convStatus === "human_takeover";
           return steps.map((s, i) => {
             let color;
-            const isReviewStep = s.t.includes("Bewertung") || s.t.includes("Review") || s.t.includes("İnceleme");
-            const isDepositStep = s.t.includes("Anzahlung") || s.t.includes("Deposit") || s.t.includes("Depozito");
+            const isReviewStep = s.key === "review";
+            const isDepositStep = s.key === "deposit";
             const depositPending = isDepositStep && !s.done && lead.reviewData;
             // Blink red↔orange when handover active on the current step the patient is stuck at
             const shouldBlink = (isHandover && !s.done && i === firstNotDone) || depositPending;

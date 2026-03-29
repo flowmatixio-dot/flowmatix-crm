@@ -328,7 +328,7 @@ export default function App() {
       // 2. Driver — ONLY after automation failed
       if (!isLocal(l) && (l.stage === "booked" || l.stage === "done") && !lg.driverName && (lg.status === "all_declined" || lg.status === "failed_auto_assignment" || (lg.retryCount || 0) >= 2)) count++;
       // 3. Hotel — delayed (>24h since booking OR <48h before appointment)
-      if (!isLocal(l) && (l.stage === "booked" || l.stage === "done") && !(l.hotelInfo?.name || l.hotel?.name)) {
+      if (!isLocal(l) && !!(l.flightConfirmed?.date) && (l.stage === "booked" || l.stage === "done") && !(l.hotelInfo?.name || l.hotel?.name)) {
         const hba = l.bookedAt || l.metadata?.bookedAt || l.updatedAt;
         const had = l.appointmentDate || l.booking?.date;
         const hsb = hba ? (_now() - new Date(hba).getTime()) / 3600000 : 999;
@@ -344,7 +344,7 @@ export default function App() {
       // 6. Follow-up needed
       if (l.metadata?.followup_needed && !l.metadata?.followup_completed) count++;
       // 7. Deposit pending (booking_pending or awaiting state with review done = waiting for deposit)
-      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active') count++;
+      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'appointment_booked' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active' && !l.depositPaid && !l.metadata?.deposit_paid) count++;
     });
     return count;
   },[myLeads]);
@@ -534,6 +534,10 @@ export default function App() {
               });
             }).catch(() => {});
           }
+          if (d.type === 'appointment:created' || d.type === 'appointment:updated') {
+            // Auto-refresh appointments for live calendar
+            useAppointmentStore.getState().fetchAppointments();
+          }
           if (d.type === 'task:completed' && d.task?.id) {
             const result = d.task.result || {};
             if (result.patientId || d.task.patientId) {
@@ -600,7 +604,21 @@ export default function App() {
             // Check if anything changed
             let diff=false;
             for(const k of Object.keys(p)){if(JSON.stringify(p[k])!==JSON.stringify(l[k])){diff=true;break;}}
-            // Stage is computed by patientStore normalize() — no manual override here
+            // Recalculate stage from convStatus when it changes
+            if(diff){
+              const cs=updates.convStatus||'ai_active';
+              const s=p.metadata?.stage||p.case_status||p.caseStatus||'new';
+              const hasP=updates.photos||(updates.photoUrls||[]).length>0||updates.photosReceived>0;
+              const hasR=!!updates.reviewData;
+              if(['termin_bestaetigt','termin_reserviert','termin_gebucht'].includes(s))updates.stage='booked';
+              else if(cs==='deposit_paid'&&!['termin_bestaetigt','termin_reserviert','termin_gebucht'].includes(s))updates.stage='contacted';
+              else if(cs==='booking_pending')updates.stage='contacted';
+              else if(cs==='human_takeover'){/* handover: keep current stage */}
+              else if(cs==='needs_medical_review'||cs==='collecting_photos'||hasP||hasR)updates.stage='contacted';
+              else if(cs==='resolved'||cs==='closed')updates.stage='done';
+              else if(['bewertung_ausstehend','arzt_zugewiesen','fotos_erhalten','contacted'].includes(s))updates.stage='contacted';
+              else if(s==='new'&&(hasP||hasR||cs==='needs_medical_review'))updates.stage='contacted';
+            }
             // Trigger trial review popup when patient reaches needs_medical_review
             if(diff && p.convStatus==='needs_medical_review' && l.convStatus!=='needs_medical_review' && !p.is_demo){
               window.dispatchEvent(new CustomEvent('fm:trial-photos-ready',{detail:JSON.stringify({patientId:p.id})}));

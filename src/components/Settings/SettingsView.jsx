@@ -850,21 +850,10 @@ export default function SettingsView() {
         {c.depositPolicy === "percentage" && <Field label={t("settings_deposit_percent") || "Anzahlung (%)"} value={c.depositPercent || "30"} onChange={v=>up("depositPercent",v)} options={["10","20","25","30","40","50"]}/>}
       </div>
 
-      {/* Payment Timing */}
-      <div style={{marginBottom:16,opacity:(c.depositPolicy||"none")==="none"?0.4:1,pointerEvents:(c.depositPolicy||"none")==="none"?"none":"auto"}}>
-        <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:8}}>{t("payment_timing_label") || "Zahlungszeitpunkt"}</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-          {[{v:"on_booking",l:t("on_booking_label")||"Bei Buchung",d:t("on_booking_desc")||"Sofort bei Terminbuchung"},{v:"after_confirmation",l:t("after_confirmation_label")||"Nach Bestätigung",d:t("after_confirmation_desc")||"Nach ärztlicher Freigabe"},{v:"before_treatment",l:t("before_treatment_label")||"Vor Behandlung",d:t("before_treatment_desc")||"X Tage vor dem Termin"}].map(opt=>(
-            <div key={opt.v} onClick={()=>up("paymentTiming",opt.v)} style={{padding:"12px 14px",borderRadius:10,cursor:"pointer",textAlign:"center",
-              background:(c.paymentTiming||"on_booking")===opt.v?"rgba(16,185,129,0.05)":"rgba(255,255,255,0.02)",
-              border:`1px solid ${(c.paymentTiming||"on_booking")===opt.v?"rgba(16,185,129,0.15)":"rgba(255,255,255,0.06)"}`,
-            }}>
-              <div style={{fontWeight:700,fontSize:12,color:(c.paymentTiming||"on_booking")===opt.v?"#10b981":"rgba(232,238,252,0.5)"}}>{opt.l}</div>
-              <div style={{fontSize:10,color:"rgba(167,177,195,0.3)",marginTop:2}}>{opt.d}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Deposit hint */}
+      {(c.depositPolicy||"none")!=="none" && <div style={{padding:"10px 14px",borderRadius:8,background:"rgba(76,201,255,0.06)",border:"1px solid rgba(76,201,255,0.12)",marginBottom:16}}>
+        <span style={{fontSize:11,color:"rgba(76,201,255,0.7)"}}>ℹ {t("deposit_before_booking_hint") || "The deposit is required before the appointment can be booked. The patient will be asked to pay before a date is confirmed."}</span>
+      </div>}
 
       {/* Payment Methods */}
       <div style={{marginTop:8,opacity:(c.depositPolicy||"none")==="none"?0.4:1,pointerEvents:(c.depositPolicy||"none")==="none"?"none":"auto"}}>
@@ -921,7 +910,6 @@ export default function SettingsView() {
 
     {/* ═══ BOOKING RULES ═══ */}
     {settingsTab === "booking_rules" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_booking_rules")}</div>
     <Section title={t("booking_rules") || "Buchungsregeln"}>
       <div style={{display:"grid",gap:16}}>
         <div>
@@ -932,6 +920,19 @@ export default function SettingsView() {
           </div>
           <div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginTop:6,lineHeight:1.5}}>
             {t("settings_min_lead_desc") || "Determines how many days must be between today and the earliest bookable appointment. Default: 5 days."}
+          </div>
+        </div>
+        <div>
+          <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("settings_checkin_offset_label") || "Patienten-Ankunft vor OP (Minuten)"}</div>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <input type="number" min={0} max={180} value={c.checkinOffsetMinutes ?? 60} onChange={e => up("checkinOffsetMinutes", Math.max(0, Math.min(180, parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
+            <span style={{fontSize:13,color:"rgba(167,177,195,0.5)"}}>min</span>
+          </div>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginTop:6,lineHeight:1.5}}>
+            {t("settings_checkin_offset_desc") || "Wie viele Minuten vor der OP soll der Patient in der Klinik sein? Diese Zeit wird für Vorgespräch, Haarlinie und Vorbereitung benötigt. Der Patient erhält automatisch die berechnete Ankunftszeit per WhatsApp."}
+          </div>
+          <div style={{marginTop:8,padding:"10px 14px",borderRadius:8,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",fontSize:11,color:"rgba(76,201,255,0.7)",lineHeight:1.5}}>
+            {"💡"} {t("settings_checkin_offset_hint") || "Beispiel: Ihr Arzt beginnt um 09:00 Uhr und Sie stellen 60 Minuten ein → Der Patient wird automatisch für 08:00 Uhr einbestellt. Die OP-Startzeit wird intern aus den Arbeitszeiten Ihrer Ärzte berechnet."}
           </div>
         </div>
       </div>

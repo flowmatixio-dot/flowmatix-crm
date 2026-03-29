@@ -37,6 +37,7 @@ export const TASK_COLORS = {
   flight: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
   cancel: { bg: "rgba(239,68,68,0.08)", color: "#ef4444", border: "rgba(239,68,68,0.15)", dot: "#ef4444" },
   deposit: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
+  flight_wait: { bg: "rgba(167,177,195,0.06)", color: "rgba(167,177,195,0.5)", border: "rgba(167,177,195,0.1)", dot: "rgba(167,177,195,0.4)" },
 };
 
 // Logistics badge colors (NOT red)
@@ -63,4 +64,5 @@ export const TASK_GROUPS = [
   { key: "flight", label: "Flugdaten", icon: "✈️" },
   { key: "cancel", label: "Stornierung", icon: "❌" },
   { key: "deposit", label: "Anzahlung", icon: "💳" },
+  { key: "flight_wait", label: "Warte auf Flugdaten", icon: "⏳" },
 ];
