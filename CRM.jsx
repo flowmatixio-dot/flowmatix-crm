@@ -610,10 +610,11 @@ export default function App() {
               const s=p.metadata?.stage||p.case_status||p.caseStatus||'new';
               const hasP=updates.photos||(updates.photoUrls||[]).length>0||updates.photosReceived>0;
               const hasR=!!updates.reviewData;
-              if(['termin_bestaetigt','termin_reserviert','termin_gebucht'].includes(s))updates.stage='booked';
-              else if(cs==='deposit_paid'&&!['termin_bestaetigt','termin_reserviert','termin_gebucht'].includes(s))updates.stage='contacted';
+              if(['termin_bestaetigt','termin_reserviert','termin_gebucht','booked'].includes(s))updates.stage='booked';
+              else if(cs==='deposit_paid'&&!['termin_bestaetigt','termin_reserviert','termin_gebucht','booked','done'].includes(s))updates.stage='contacted';
               else if(cs==='booking_pending')updates.stage='contacted';
               else if(cs==='human_takeover'){/* handover: keep current stage */}
+              else if(cs==='appointment_booked'){/* already booked — keep stage */}
               else if(cs==='needs_medical_review'||cs==='collecting_photos'||hasP||hasR)updates.stage='contacted';
               else if(cs==='resolved'||cs==='closed')updates.stage='done';
               else if(['bewertung_ausstehend','arzt_zugewiesen','fotos_erhalten','contacted'].includes(s))updates.stage='contacted';
