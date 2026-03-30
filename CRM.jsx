@@ -528,6 +528,9 @@ export default function App() {
   const myMsgs=useMemo(()=>allClinicMsgs.filter(m=>{const cs=getCS(m);if(inboxFilter==="all")return true;if(inboxFilter==="resolved")return cs==="resolved"||cs==="closed";if(inboxFilter==="needs_action")return["needs_medical_review","waiting_for_clinic_reply","booking_pending","human_takeover"].includes(cs);if(inboxFilter==="ai_handling")return cs==="ai_active"||cs==="collecting_photos";return cs!=="resolved"&&cs!=="closed";}),[allClinicMsgs,inboxFilter,leads]);
   const unread=useMemo(()=>allClinicMsgs.filter(m=>m.unread).length,[allClinicMsgs]);
 
+  /* Redirect operator to operator panel instead of dashboard */
+  useEffect(()=>{if(isOperator&&view==="dashboard")setView("operator");},[isOperator]);
+
   /* Fetch pending applications count for operator badge */
   useEffect(()=>{
     if(!isOperator||!user)return;
@@ -1670,8 +1673,8 @@ export default function App() {
 
         <div style={{flex:1,overflow:"auto"}}>
 
-        {/* DASHBOARD */}
-        {view==="dashboard"&&clinic&&<DashboardView/>}
+        {/* DASHBOARD — hidden for operator */}
+        {view==="dashboard"&&clinic&&!isOperator&&<DashboardView/>}
 
         {/* INBOX */}
         {view==="inbox"&&<InboxView/>}
