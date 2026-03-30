@@ -46,7 +46,7 @@ export default function PipelineView() {
     getLeadScore, t, invoices, clinic, setView, activeClinicId,
   } = useApp();
   const { msgs, setSelChat } = useInboxStore();
-  const depositRequired = clinic?.deposit_required !== false && clinic?.deposit_required !== "false";
+  const depositRequired = clinic?.deposit_required === true || clinic?.deposit_required === "true";
   const depositBeforeAppt = clinic?.deposit_before_appointment !== false;
   const [showCancelled, setShowCancelled] = useState(false);
   const [pipeTab, setPipeTab] = useState("active");
@@ -313,6 +313,8 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
     opBadges.push({ label: t("step_deposit") || "Anzahlung", background: "rgba(234,179,8,0.12)", color: "#eab308" });
   else if (opBadges.length === 0 && (lead.convStatus === "deposit_paid" || (lead.financials && lead.financials.depositStatus === "paid")))
     opBadges.push({ label: t("paid_label"), ...bs.green });
+  if (opBadges.length === 0 && lead.convStatus === "booking_pending")
+    opBadges.push({ label: t("booking_pending") || "Buchung offen", ...bs.purple });
   if (opBadges.length === 0 && lead.convStatus === "collecting_photos")
     opBadges.push({ label: t("collecting_photos") || "Collecting photos", background: "rgba(76,201,255,0.12)", color: "#4cc9ff" });
   if (opBadges.length === 0 && lead._hasFutureAppt && lead.stage === "contacted")

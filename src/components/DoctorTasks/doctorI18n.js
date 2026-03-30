@@ -77,6 +77,9 @@ const doctorI18n = {
     notes_hint: "Anmerkungen für das Team (werden NICHT an den Patienten gesendet).",
     notes_privacy: "Notizen bleiben intern — nur Grafts, Methode und Preis werden per WhatsApp an den Patienten gesendet.",
     submit_review: "Bewertung absenden",
+    scroll_hint: "Bitte nach unten scrollen und die Fotos bewerten",
+    patient_auto_contacted: "Patient wird automatisch kontaktiert",
+    broadcast_all_doctors: "Broadcast an alle Ärzte",
     saving: "Wird gespeichert...",
     review_btn: "Bewerten",
 
@@ -316,6 +319,9 @@ const doctorI18n = {
     notes_hint: "Notes for the team (will NOT be sent to the patient).",
     notes_privacy: "Notes remain internal \u2014 only grafts, method, and price are sent to the patient via WhatsApp.",
     submit_review: "Submit Review",
+    scroll_hint: "Please scroll down and review the photos",
+    patient_auto_contacted: "Patient will be contacted automatically",
+    broadcast_all_doctors: "Broadcast to all doctors",
     saving: "Saving...",
     review_btn: "Review",
 
@@ -555,6 +561,9 @@ const doctorI18n = {
     notes_hint: "Ekip i\u00E7in notlar (hastaya G\u00D6NDER\u0130LMEZ).",
     notes_privacy: "Notlar dahili kal\u0131r \u2014 yaln\u0131zca greft say\u0131s\u0131, y\u00F6ntem ve fiyat WhatsApp ile hastaya g\u00F6nderilir.",
     submit_review: "De\u011Ferlendirmeyi G\u00F6nder",
+    scroll_hint: "L\u00FCtfen a\u015Fa\u011F\u0131 kay\u0131n ve foto\u011Fraflar\u0131 de\u011Ferlendirin",
+    patient_auto_contacted: "Hasta otomatik olarak bilgilendirilecektir",
+    broadcast_all_doctors: "T\u00FCm doktorlara yay\u0131n",
     saving: "Kaydediliyor...",
     review_btn: "De\u011Ferlendir",
 

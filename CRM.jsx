@@ -335,16 +335,15 @@ export default function App() {
         const hua = had ? (new Date(had).getTime() - _now()) / 3600000 : 999;
         if (hsb > 24 || hua < 48) count++;
       }
-      // 4. DSGVO — immediate if photos without consent
-      if (!l.consentGiven && ((l.photoUrls || []).length >= 3 || l.photos)) count++;
+      // 4. DSGVO — shown inside tasks only, NOT counted in sidebar
       // 5. Flight — only escalation (<48h + reminder sent)
       const apptDate = l.appointmentDate || l.booking?.date;
       const hoursToAppt = apptDate ? (new Date(apptDate).getTime() - _now()) / 3600000 : 999;
       if (!isLocal(l) && l.stage === "booked" && !l.flightConfirmed?.date && l.metadata?.flightReminderSent && hoursToAppt < 48) count++;
       // 6. Follow-up needed
       if (l.metadata?.followup_needed && !l.metadata?.followup_completed) count++;
-      // 7. Deposit pending (booking_pending or awaiting state with review done = waiting for deposit)
-      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'appointment_booked' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active' && !l.depositPaid && !l.metadata?.deposit_paid) count++;
+      // 7. Deposit pending — only if clinic has deposit policy configured
+      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'appointment_booked' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active' && !l.depositPaid && !l.metadata?.deposit_paid && clinic?.depositPolicy && clinic.depositPolicy !== 'none') count++;
     });
     return count;
   },[myLeads]);

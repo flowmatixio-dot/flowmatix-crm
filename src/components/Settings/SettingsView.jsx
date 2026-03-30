@@ -1061,7 +1061,7 @@ export default function SettingsView() {
         <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",marginBottom:8,borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)"}}>
           <div>
             <div style={{fontWeight:700,fontSize:13}}>{d.name} <span style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginLeft:4}}>{d.role==="primary"?t("primary_role"):"Backup"}</span></div>
-            <div style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginTop:3}}>{d.phone}{d.telegramChatId?` · Telegram: ${d.telegramChatId}`:""}{d.vehicle?` · ${d.vehicle}`:""}{d.plateNo?` · ${d.plateNo}`:""}</div>
+            <div style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginTop:3}}>{d.phone}{d.telegramChatId?" · ✅ Telegram":"" }{d.vehicle?` · ${d.vehicle}`:""}{d.plateNo?` · ${d.plateNo}`:""}</div>
           </div>
           <div style={{display:"flex",gap:6}}>
             <button onClick={()=>startEditDriver(d)} style={{padding:"5px 12px",borderRadius:8,background:"rgba(76,201,255,0.06)",border:"1px solid rgba(76,201,255,0.12)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("edit")||"Bearbeiten"}</button>
@@ -1084,7 +1084,6 @@ export default function SettingsView() {
             <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("phone")} *</div><input value={drvPhone} onChange={e=>setDrvPhone(e.target.value)} placeholder="+49 170 1234567" style={inp}/></div>
             <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("vehicle")}</div><input value={drvVehicle} onChange={e=>setDrvVehicle(e.target.value)} placeholder="Mercedes V-Klasse" style={inp}/></div>
             <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("license_plate")}</div><input value={drvPlate} onChange={e=>setDrvPlate(e.target.value)} placeholder="B-FM 1234" style={inp}/></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>Telegram Chat-ID</div><input value={drvTelegram} onChange={e=>setDrvTelegram(e.target.value)} placeholder="123456789" style={inp}/></div>
             <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("role")}</div><select value={drvRole} onChange={e=>setDrvRole(e.target.value)} style={inp}><option value="primary">{t("primary_role")}</option><option value="backup">Backup</option></select></div>
           </div>
           <div style={{marginTop:16,padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",fontSize:11,color:"rgba(167,177,195,0.35)",lineHeight:1.6}}>

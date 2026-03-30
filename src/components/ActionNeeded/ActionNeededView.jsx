@@ -3,7 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { useInboxStore, usePatientStore } from "../../stores";
 import { apiFetch } from "../../api/client";
 import { getNowMs } from "../../utils/demoTime";
-import { TASK_COLORS, TASK_GROUPS, getTimeBadgeColor } from "../../data/badgeColors";
+import { TASK_COLORS, getTaskGroups, getTimeBadgeColor } from "../../data/badgeColors";
 import { getAvatarGradient, getInitials } from "../shared/index";
 
 function tFb(t, key, fallback) { const val = t(key); return (val && val !== key) ? val : fallback; }
@@ -101,14 +101,16 @@ export default function ActionNeededView() {
       }
 
       /* 2. DSGVO consent — immediate task if photos exist without consent */
-      if (!p.consentGiven && ((p.photoUrls || []).length >= 3 || p.photos)) {
+      const consentRefused = p.metadata?.gdpr_consent === 'refused' || p.consent?.refused;
+      if (consentRefused && !p.consentGiven) {
         items.push({
           id: "dsgvo_" + p.id,
           type: "dsgvo",
           icon: "\u{1F4CB}",
-          color: "#fbbf24",
+          color: "rgba(167,177,195,0.35)",
           title: t("action_dsgvo_missing") || "DSGVO Zustimmung fehlt",
           desc: t("action_dsgvo_desc") || "Patient hat Fotos gesendet — Einwilligung muss eingeholt werden",
+          subtle: true,
           patient: p.name, patientId: p.id,
           time: p.lastAiInteraction || p.createdAt,
           action: () => goToChat(p.id),
@@ -445,7 +447,7 @@ export default function ActionNeededView() {
     return `${t("patient_waiting_since") || "Patient wartet seit"} ${Math.floor(days / 7)} ${t("action_weeks") || "Wochen"}`;
   }
   // Group by task type (category-based)
-  const categories = TASK_GROUPS.map(g => {
+  const categories = getTaskGroups(t).map(g => {
     const tc = TASK_COLORS[g.key] || TASK_COLORS.followup;
     return { ...g, items: tasks.filter(t => t.type === g.key), color: tc.color, dotColor: tc.dot, bg: tc.bg, border: tc.border };
   }).filter(c => c.items.length > 0);
@@ -518,6 +520,7 @@ export default function ActionNeededView() {
                 alignItems: "center",
                 gap: 16,
                 transition: "background 0.15s",
+                opacity: task.subtle ? 0.5 : 1,
               }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.035)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}

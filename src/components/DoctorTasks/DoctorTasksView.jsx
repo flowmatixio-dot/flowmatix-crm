@@ -22,7 +22,7 @@ function timeLabel(createdAt) {
   if (!createdAt) return '';
   const h = (Date.now() - new Date(createdAt).getTime()) / 3600000;
   const l = (localStorage.getItem('fm_doctor_lang') || localStorage.getItem('fm_lang') || 'de');
-  const since = { de: 'Seit', en: 'Since', tr: '' }[l] || 'Seit';
+  const since = { de: 'Seit', en: 'Since', tr: 'Beri' }[l] || 'Seit';
   if (h >= 1) return `${since} ${Math.floor(h)}h`.trim();
   return `${since} ${Math.floor(h * 60)}m`.trim();
 }
@@ -267,7 +267,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
 
                 {/* ── Scroll hint ── */}
                 {!isPickup && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(255,138,42,0.06)', border: '1px solid rgba(255,138,42,0.15)', marginBottom: 8, textAlign: 'center' }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#ff8a2a' }}>👇 Bitte nach unten scrollen und die Fotos bewerten</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#ff8a2a' }}>👇 {tl('scroll_hint') || 'Bitte nach unten scrollen und die Fotos bewerten'}</div>
                 </div>}
                 {/* ── MIDDLE: Photos ── */}
                 {!isPickup && photos.length > 0 && (
@@ -296,13 +296,13 @@ export default function DoctorTasksView({ onLogout } = {}) {
                 {!isPickup && (intake.hair_loss_duration || intake.previous_treatments || intake.medications) && (
                   <div style={{ background: 'rgba(255,255,255,0.015)', borderRadius: 7, padding: '8px 10px', marginBottom: 12, fontSize: 11, color: 'rgba(167,177,195,0.4)', lineHeight: 1.5 }}>
                     {intake.hair_loss_duration && <span>{tl('hair_loss_since')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.hair_loss_duration}</strong> · </span>}
-                    {intake.previous_treatments && <span>{tl('previous_treatments')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.previous_treatments}</strong> · </span>}
-                    {intake.medications && <span>{tl('medications')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.medications}</strong></span>}
+                    {intake.previous_treatments && intake.previous_treatments !== 'none' && intake.previous_treatments !== 'keine' && <span>{tl('previous_treatments')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.previous_treatments}</strong> · </span>}
+                    {intake.medications && intake.medications !== 'none' && intake.medications !== 'keine' && <span>{tl('medications')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.medications}</strong></span>}
                   </div>
                 )}
 
                 {/* Assigner note */}
-                {task.notes && <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.4)', background: 'rgba(167,107,255,0.03)', borderRadius: 7, padding: '7px 10px', marginBottom: 12, borderLeft: '2px solid rgba(167,139,250,0.3)' }}>{task.notes}</div>}
+                {task.notes && <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.4)', background: 'rgba(167,107,255,0.03)', borderRadius: 7, padding: '7px 10px', marginBottom: 12, borderLeft: '2px solid rgba(167,139,250,0.3)' }}>{task.notes === 'Broadcast an alle Aerzte' ? tl('broadcast_all_doctors') || task.notes : task.notes}</div>}
 
                 {/* ── BOTTOM: Decision Form ── */}
                 {isPickup ? (
@@ -314,19 +314,19 @@ export default function DoctorTasksView({ onLogout } = {}) {
                     <div style={{ marginBottom: 8 }}><label style={S.label}>Fahrzeug</label><input type="text" placeholder="Mercedes Vito" value={form.vehicle || ''} onChange={e => setForm(task.id, { vehicle: e.target.value })} style={S.input} /></div>
                     <div style={{ marginBottom: 12 }}><label style={S.label}>Notiz</label><textarea placeholder="Terminal, Treffpunkt..." value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} /></div>
                     <button onClick={() => handlePickupSubmit(task)} disabled={!canSubmit || submitting === task.id} style={{ width: '100%', padding: '11px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'default', fontFamily: 'inherit', background: canSubmit ? 'linear-gradient(135deg,#ff8a2a,#ff6b00)' : 'rgba(255,255,255,0.04)', color: canSubmit ? '#fff' : 'rgba(167,177,195,0.25)', opacity: submitting === task.id ? 0.6 : 1 }}>
-                      {submitting === task.id ? '...' : 'Fahrer zuweisen'}
+                      {submitting === task.id ? '...' : tl('assign_driver') || 'Fahrer zuweisen'}
                     </button>
                   </div>
                 ) : (
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
-                      <div><label style={S.label}>Grafts *</label><input type="number" placeholder="3000" value={form.grafts || ''} onChange={e => setForm(task.id, { grafts: e.target.value })} style={S.input} min="1" /></div>
-                      <div><label style={S.label}>Preis (€) *</label><input type="number" placeholder="3500" value={form.price || ''} onChange={e => setForm(task.id, { price: e.target.value })} style={S.input} min="1" /></div>
-                      <div><label style={S.label}>Technik</label><div style={{ position: 'relative' }}><select value={form.technique || 'fue'} onChange={e => setForm(task.id, { technique: e.target.value })} style={S.select}>{techniques.map(tc => <option key={tc.value} value={tc.value}>{tc.label}</option>)}</select><div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(167,177,195,0.25)', fontSize: 9 }}>▼</div></div></div>
+                      <div><label style={S.label}>{tl('grafts') || 'Grafts'} *</label><input type="number" placeholder="3000" value={form.grafts || ''} onChange={e => setForm(task.id, { grafts: e.target.value })} style={S.input} min="1" /></div>
+                      <div><label style={S.label}>{tl('price_eur') || 'Preis (€)'} *</label><input type="number" placeholder="3500" value={form.price || ''} onChange={e => setForm(task.id, { price: e.target.value })} style={S.input} min="1" /></div>
+                      <div><label style={S.label}>{tl('technique') || 'Technik'}</label><div style={{ position: 'relative' }}><select value={form.technique || 'fue'} onChange={e => setForm(task.id, { technique: e.target.value })} style={S.select}>{techniques.map(tc => <option key={tc.value} value={tc.value}>{tc.label}</option>)}</select><div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(167,177,195,0.25)', fontSize: 9 }}>▼</div></div></div>
                     </div>
                     <div style={{ marginBottom: 10 }}>
-                      <label style={S.label}>Notiz (intern)</label>
-                      <textarea placeholder="Anmerkung für das Team..." value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} />
+                      <label style={S.label}>{tl('internal_notes') || 'Notiz (intern)'}</label>
+                      <textarea placeholder={tl('notes_hint') || "Anmerkung für das Team..."} value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} />
                     </div>
 
                     {/* Deposit toggle */}
@@ -334,7 +334,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
                       <div style={{ marginBottom: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(167,107,255,0.03)', border: '1px solid rgba(167,107,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <span style={{ fontSize: 13 }}>💳</span>
-                          <span style={{ fontWeight: 600, fontSize: 11, color: '#a78bfa' }}>Anzahlung anfordern</span>
+                          <span style={{ fontWeight: 600, fontSize: 11, color: '#a78bfa' }}>{tl('request_deposit') || 'Anzahlung anfordern'}</span>
                         </div>
                         <button onClick={() => { const nv = !form.depositRequested; const p = { depositRequested: nv }; if (nv && form.price) p.depositAmount = String(Math.max(Math.round(parseInt(form.price) * 0.25), 500)); setForm(task.id, p); }} style={{ width: 36, height: 20, borderRadius: 10, background: form.depositRequested ? '#a78bfa' : 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer', position: 'relative' }}>
                           <div style={{ width: 14, height: 14, borderRadius: 7, background: '#fff', position: 'absolute', top: 3, left: form.depositRequested ? 19 : 3, transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,0.3)' }} />
@@ -350,14 +350,14 @@ export default function DoctorTasksView({ onLogout } = {}) {
                         color: canSubmit ? '#fff' : 'rgba(167,177,195,0.25)', opacity: submitting === task.id ? 0.6 : 1,
                         boxShadow: canSubmit ? '0 4px 14px rgba(255,138,42,0.25)' : 'none',
                       }}>
-                        {submitting === task.id ? '...' : 'Bewertung abschließen'}
+                        {submitting === task.id ? '...' : tl('submit_review') || 'Bewertung abschließen'}
                       </button>
                       <button onClick={() => skipTask(task.id)} style={{
                         padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)',
                         color: 'rgba(167,177,195,0.35)', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
                       }}>{t("skip") || "Überspringen"}</button>
                     </div>
-                    <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.2)', marginTop: 6, textAlign: 'center' }}>Patient wird automatisch kontaktiert</div>
+                    <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.2)', marginTop: 6, textAlign: 'center' }}>{tl('patient_auto_contacted') || 'Patient wird automatisch kontaktiert'}</div>
                   </div>
                 )}
               </div>

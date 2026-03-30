@@ -114,7 +114,7 @@ export default function MainLayout() {
   React.useEffect(() => {
     if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
     if (showTrialReviewPopup) return;
-    const realReview = myLeads.find(l => !l.is_demo && !l.isDemo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
+    const realReview = myLeads.find(l => l.is_demo !== true && l.isDemo !== true && !l.demo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
     if (realReview) {
       setTimeout(() => {
         trialReviewShownRef.current = realReview.id;

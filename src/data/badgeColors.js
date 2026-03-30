@@ -54,15 +54,17 @@ export function getTimeBadgeColor(days) {
   return { bg: "rgba(239,68,68,0.08)", color: "#ef4444" };
 }
 
-// Task group definitions
-export const TASK_GROUPS = [
-  { key: "chat", label: "Chat übernehmen", icon: "💬" },
-  { key: "hotel", label: "Hotel zuweisen", icon: "🏨" },
-  { key: "driver", label: "Fahrer zuweisen", icon: "🚗" },
-  { key: "dsgvo", label: "DSGVO Zustimmung", icon: "📋" },
-  { key: "followup", label: "Follow-up", icon: "📞" },
-  { key: "flight", label: "Flugdaten", icon: "✈️" },
-  { key: "cancel", label: "Stornierung", icon: "❌" },
-  { key: "deposit", label: "Anzahlung", icon: "💳" },
-  { key: "flight_wait", label: "Warte auf Flugdaten", icon: "⏳" },
+// Task group definitions — pass t() for translations
+export const getTaskGroups = (t) => [
+  { key: "chat", label: t("task_chat") || "Chat übernehmen", icon: "💬" },
+  { key: "hotel", label: t("task_hotel") || "Hotel zuweisen", icon: "🏨" },
+  { key: "driver", label: t("task_driver") || "Fahrer zuweisen", icon: "🚗" },
+  { key: "dsgvo", label: t("task_dsgvo") || "DSGVO Zustimmung", icon: "📋" },
+  { key: "followup", label: t("task_followup") || "Follow-up", icon: "📞" },
+  { key: "flight", label: t("task_flight") || "Flugdaten", icon: "✈️" },
+  { key: "cancel", label: t("task_cancel") || "Stornierung", icon: "❌" },
+  { key: "deposit", label: t("task_deposit") || "Anzahlung", icon: "💳" },
+  { key: "flight_wait", label: t("task_flight_wait") || "Warte auf Flugdaten", icon: "⏳" },
 ];
+// Backward compat
+export const TASK_GROUPS = getTaskGroups(k => null);
