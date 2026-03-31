@@ -114,7 +114,7 @@ export default function BlockDayModal({ doctors, onSave, onClose, t }) {
 
 const labelStyle = {
   display: "block", fontSize: 11, fontWeight: 600,
-  color: "rgba(167,177,195,0.5)", marginBottom: 5,
+  color: "rgba(167,177,195,0.7)", marginBottom: 5,
 };
 
 const inputStyle = {

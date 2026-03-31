@@ -138,7 +138,7 @@ export default function PaymentsView() {
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#fff", margin: 0 }}>
           {T("Payments & Deposits", "Zahlungen & Anzahlungen", "Ödemeler & Depozitolar")}
         </h1>
-        <p style={{ fontSize: 13, color: "rgba(167,177,195,0.45)", marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: "rgba(167,177,195,0.65)", marginTop: 4 }}>
           {T("Track deposits and payment status", "Anzahlungen und Zahlungsstatus verfolgen", "Depozito ve ödeme durumunu takip edin")}
         </p>
       </div>
@@ -154,7 +154,7 @@ export default function PaymentsView() {
         ].map((k, i) => (
           <div key={i} style={{ ...card, textAlign: "center" }}>
             <div style={{ fontSize: k.large ? 20 : 28, fontWeight: 800, color: k.color }}>{k.value}</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 4 }}>{k.label}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 4 }}>{k.label}</div>
           </div>
         ))}
       </div>
@@ -166,7 +166,7 @@ export default function PaymentsView() {
             padding: "6px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
             background: filter === f.id ? "rgba(76,201,255,0.1)" : "rgba(255,255,255,0.03)",
             border: `1px solid ${filter === f.id ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.06)"}`,
-            color: filter === f.id ? "#4cc9ff" : "rgba(167,177,195,0.5)",
+            color: filter === f.id ? "#4cc9ff" : "rgba(167,177,195,0.7)",
           }}>{f.label}</button>
         ))}
         <div style={{ flex: 1 }} />
@@ -180,7 +180,7 @@ export default function PaymentsView() {
       {/* Payment List */}
       <div style={{ ...card, padding: 0, overflow: "hidden" }}>
         {/* Header */}
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1.2fr 1fr 1fr 1.2fr 0.8fr 1.5fr", gap: 8, padding: "12px 18px", background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1.2fr 1fr 1fr 1.2fr 0.8fr 1.5fr", gap: 8, padding: "12px 18px", background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
           <div>{T("Patient", "Patient", "Hasta")}</div>
           <div>{T("Treatment", "Behandlung", "Tedavi")}</div>
           <div>{T("Deposit", "Anzahlung", "Depozito")}</div>
@@ -192,7 +192,7 @@ export default function PaymentsView() {
 
         {/* Rows */}
         {filtered.length === 0 && (
-          <div style={{ padding: 40, textAlign: "center", color: "rgba(167,177,195,0.3)", fontSize: 13 }}>
+          <div style={{ padding: 40, textAlign: "center", color: "rgba(167,177,195,0.7)", fontSize: 13 }}>
             {T("No payments found", "Keine Zahlungen gefunden", "Ödeme bulunamadı")}
           </div>
         )}
@@ -203,16 +203,16 @@ export default function PaymentsView() {
               {/* Patient */}
               <div>
                 <div style={{ fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{p.name}</div>
-                {p.email && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 1 }}>{p.email}</div>}
+                {p.email && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 1 }}>{p.email}</div>}
               </div>
               {/* Treatment */}
               <div style={{ color: "rgba(167,177,195,0.6)" }}>{p.treatment}</div>
               {/* Deposit */}
-              <div style={{ fontWeight: 700, color: p.depositAmount > 0 ? "#fff" : "rgba(167,177,195,0.3)" }}>
+              <div style={{ fontWeight: 700, color: p.depositAmount > 0 ? "#fff" : "rgba(167,177,195,0.7)" }}>
                 {p.depositAmount > 0 ? fmt(p.depositAmount, p.currency) : "—"}
               </div>
               {/* Date */}
-              <div style={{ color: "rgba(167,177,195,0.5)", fontSize: 12 }}>
+              <div style={{ color: "rgba(167,177,195,0.7)", fontSize: 12 }}>
                 {p.appointmentDate ? new Date(p.appointmentDate).toLocaleDateString(fmLocale(), { day: "2-digit", month: "2-digit" }) : "—"}
               </div>
               {/* Status */}
@@ -228,14 +228,14 @@ export default function PaymentsView() {
                     📎 {T("View", "Ansehen", "Görüntüle")}
                   </button>
                 ) : (
-                  <span style={{ fontSize: 11, color: "rgba(167,177,195,0.25)" }}>—</span>
+                  <span style={{ fontSize: 11, color: "rgba(167,177,195,0.65)" }}>—</span>
                 )}
               </div>
               {/* Actions */}
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                 {/* Upload proof */}
                 {!p.proofUrl && (p.depositStatus === "pending" || p.depositStatus === "proof_uploaded") && (
-                  <label style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(232,238,252,0.7)", fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}>
+                  <label style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(232,238,252,0.9)", fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit" }}>
                     {uploading === p.id ? "..." : T("Upload", "Hochladen", "Yükle")}
                     <input type="file" accept="image/*,.pdf" hidden onChange={e => { if (e.target.files[0]) handleProofUpload(p.id, e.target.files[0]); }} />
                   </label>
@@ -259,7 +259,7 @@ export default function PaymentsView() {
       </div>
 
       {/* Count */}
-      <div style={{ marginTop: 12, fontSize: 11, color: "rgba(167,177,195,0.3)" }}>
+      <div style={{ marginTop: 12, fontSize: 11, color: "rgba(167,177,195,0.7)" }}>
         {filtered.length} {T("of", "von", "/")} {payments.length} {T("payments", "Zahlungen", "ödeme")}
       </div>
 
@@ -271,7 +271,7 @@ export default function PaymentsView() {
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#fff" }}>
                 {T("Deposit proof", "Zahlungsbeleg", "Ödeme belgesi")} — {proofModal.name}
               </h3>
-              <button onClick={() => setProofModal(null)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", fontSize: 18, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setProofModal(null)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", fontSize: 18, cursor: "pointer" }}>✕</button>
             </div>
             {proofModal.proofUrl?.endsWith(".pdf") ? (
               <iframe src={proofModal.proofUrl} style={{ width: "100%", height: 400, border: "none", borderRadius: 8 }} />
@@ -279,7 +279,7 @@ export default function PaymentsView() {
               <img src={proofModal.proofUrl} alt="Proof" style={{ width: "100%", borderRadius: 8, objectFit: "contain" }} />
             )}
             {proofModal.proofUploadedAt && (
-              <div style={{ marginTop: 12, fontSize: 11, color: "rgba(167,177,195,0.4)" }}>
+              <div style={{ marginTop: 12, fontSize: 11, color: "rgba(167,177,195,0.6)" }}>
                 {T("Uploaded", "Hochgeladen", "Yüklendi")}: {new Date(proofModal.proofUploadedAt).toLocaleString(fmLocale())}
               </div>
             )}

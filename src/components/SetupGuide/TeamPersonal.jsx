@@ -80,7 +80,7 @@ function StaffPanel() {
             <div style={{fontSize:12,fontWeight:700,color:"#25D366",display:"flex",alignItems:"center",gap:6}}>
               <span>💬</span> {t("whatsapp_notifications") || "WhatsApp-Benachrichtigungen"}
             </div>
-            <div style={{fontSize:10,color:"rgba(167,177,195,0.35)",marginTop:2}}>
+            <div style={{fontSize:10,color:"rgba(167,177,195,0.75)",marginTop:2}}>
               {t("doctor_wa_notif_desc") || "Arzt wird per WhatsApp benachrichtigt bei: neuen Bewertungen, Terminen, Änderungen und Stornierungen"}
             </div>
           </div>

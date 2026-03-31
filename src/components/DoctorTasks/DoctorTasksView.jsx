@@ -22,7 +22,7 @@ function timeLabel(createdAt) {
   if (!createdAt) return '';
   const h = (Date.now() - new Date(createdAt).getTime()) / 3600000;
   const l = (localStorage.getItem('fm_doctor_lang') || localStorage.getItem('fm_lang') || 'de');
-  const since = { de: 'Seit', en: 'Since', tr: '' }[l] || 'Seit';
+  const since = { de: 'Seit', en: 'Since', tr: 'Beri' }[l] || 'Seit';
   if (h >= 1) return `${since} ${Math.floor(h)}h`.trim();
   return `${since} ${Math.floor(h * 60)}m`.trim();
 }
@@ -31,7 +31,7 @@ const S = {
   input: { width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#f1f5f9', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' },
   select: { width: '100%', background: '#0f1623', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#f1f5f9', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', appearance: 'none', cursor: 'pointer' },
   textarea: { width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px', color: '#f1f5f9', fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', resize: 'vertical', minHeight: 60 },
-  label: { fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' },
+  label: { fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' },
 };
 
 export default function DoctorTasksView({ onLogout } = {}) {
@@ -146,7 +146,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 20px' }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ width: 32, height: 32, border: '3px solid rgba(255,255,255,0.08)', borderTopColor: '#ff8a2a', borderRadius: '50%', animation: 'fmSpin .8s linear infinite', margin: '0 auto 12px' }} />
-        <div style={{ color: 'rgba(167,177,195,0.35)', fontSize: 13 }}>{tl('loading_tasks')}</div>
+        <div style={{ color: 'rgba(167,177,195,0.75)', fontSize: 13 }}>{tl('loading_tasks')}</div>
         <style>{`@keyframes fmSpin{to{transform:rotate(360deg)}}`}</style>
       </div>
     </div>
@@ -165,8 +165,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>{tl('doctor_portal_title') || 'Arzt-Portal'}</h1>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button onClick={() => { const btn = document.getElementById('fm-support-launcher'); if (btn) btn.click(); }} style={{ background: 'rgba(76,201,255,0.06)', border: '1px solid rgba(76,201,255,0.12)', color: 'rgba(76,201,255,0.7)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>{'💬'} {tl('help') || 'Hilfe'}</button>
-            {onLogout && <button onClick={onLogout} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.4)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 600, fontFamily: 'inherit' }}>{tl('logout')}</button>}
+            {onLogout && <button onClick={onLogout} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.6)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 600, fontFamily: 'inherit' }}>{tl('logout')}</button>}
           </div>
         </div>
       </div>
@@ -175,13 +174,13 @@ export default function DoctorTasksView({ onLogout } = {}) {
       {showOnboarding && (
         <div style={{ margin: '12px 28px 0', padding: '12px 16px', borderRadius: 10, background: 'rgba(76,201,255,0.03)', border: '1px solid rgba(76,201,255,0.08)', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 15, flexShrink: 0 }}>💡</span>
-          <div style={{ flex: 1, fontSize: 12, color: 'rgba(167,177,195,0.5)', lineHeight: 1.6 }}>
-            <div style={{ fontWeight: 700, fontSize: 12, color: 'rgba(232,238,252,0.7)', marginBottom: 6 }}>{tl('onboarding_title')}</div>
+          <div style={{ flex: 1, fontSize: 12, color: 'rgba(167,177,195,0.7)', lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 700, fontSize: 12, color: 'rgba(232,238,252,0.9)', marginBottom: 6 }}>{tl('onboarding_title')}</div>
             <div><strong style={{ color: 'rgba(255,138,42,0.7)' }}>1.</strong> {tl('onboarding_line1')}</div>
             <div><strong style={{ color: 'rgba(255,138,42,0.7)' }}>2.</strong> {tl('onboarding_line2')}</div>
             <div><strong style={{ color: 'rgba(255,138,42,0.7)' }}>3.</strong> {tl('onboarding_line4')}</div>
           </div>
-          <button onClick={() => { setShowOnboarding(false); localStorage.setItem('fm_doctor_onboarded', '1'); }} style={{ background: 'none', border: 'none', color: 'rgba(167,177,195,0.25)', fontSize: 14, cursor: 'pointer', padding: '0 2px', flexShrink: 0, lineHeight: 1 }}>✕</button>
+          <button onClick={() => { setShowOnboarding(false); localStorage.setItem('fm_doctor_onboarded', '1'); }} style={{ background: 'none', border: 'none', color: 'rgba(167,177,195,0.65)', fontSize: 14, cursor: 'pointer', padding: '0 2px', flexShrink: 0, lineHeight: 1 }}>✕</button>
         </div>
       )}
 
@@ -193,7 +192,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
         ].map(tb => (
           <button key={tb.key} onClick={() => setTab(tb.key)} style={{
             background: 'none', border: 'none', borderBottom: tab === tb.key ? '2px solid #ff8a2a' : '2px solid transparent',
-            color: tab === tb.key ? '#fff' : 'rgba(167,177,195,0.35)', padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            color: tab === tb.key ? '#fff' : 'rgba(167,177,195,0.75)', padding: '10px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
           }}>
             {tb.dot && tab !== tb.key && <span style={{ display: 'inline-block', width: 5, height: 5, borderRadius: 99, background: '#ff8a2a', marginRight: 5, verticalAlign: 'middle' }} />}
             {tb.label}
@@ -217,8 +216,8 @@ export default function DoctorTasksView({ onLogout } = {}) {
         {tab === 'pending' && pendingTasks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '48px 20px' }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 18 }}>✓</div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'rgba(232,238,252,0.6)' }}>{tl("empty_open_title")}</div>
-            <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.3)', marginTop: 6, maxWidth: 320, margin: '6px auto 0', lineHeight: 1.5 }}>{tl("empty_open_desc")}</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: 'rgba(232,238,252,0.95)' }}>{tl("empty_open_title")}</div>
+            <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.7)', marginTop: 6, maxWidth: 320, margin: '6px auto 0', lineHeight: 1.5 }}>{tl("empty_open_desc")}</div>
           </div>
         )}
 
@@ -226,7 +225,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
         {tab === 'completed' && completedTasks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '48px 20px' }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: 'rgba(232,238,252,0.45)' }}>{tl("no_reviewed_cases")}</div>
-            <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.25)', marginTop: 4 }}>{tl("reviewed_cases_hint")}</div>
+            <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.65)', marginTop: 4 }}>{tl("reviewed_cases_hint")}</div>
           </div>
         )}
 
@@ -252,7 +251,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
                   </div>
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.4)', marginTop: 1, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.6)', marginTop: 1, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                       {intake.treatment && <span style={{ padding: '1px 6px', borderRadius: 4, background: 'rgba(76,201,255,0.06)', border: '1px solid rgba(76,201,255,0.1)', color: 'rgba(76,201,255,0.7)', fontWeight: 600, fontSize: 10 }}>{intake.treatment}</span>}
                       {intake.concern && <span>{intake.concern}</span>}
                       {photos.length > 0 && <span>📷 {photos.length}</span>}
@@ -266,6 +265,10 @@ export default function DoctorTasksView({ onLogout } = {}) {
 
               <div style={{ padding: '14px 16px' }}>
 
+                {/* ── Scroll hint ── */}
+                {!isPickup && <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(255,138,42,0.06)', border: '1px solid rgba(255,138,42,0.15)', marginBottom: 8, textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#ff8a2a' }}>👇 {tl('scroll_hint') || 'Bitte nach unten scrollen und die Fotos bewerten'}</div>
+                </div>}
                 {/* ── MIDDLE: Photos ── */}
                 {!isPickup && photos.length > 0 && (
                   <div style={{ marginBottom: 12 }}>
@@ -281,7 +284,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
 
                 {/* Flight data (pickup) */}
                 {isPickup && (
-                  <div style={{ background: 'rgba(59,130,246,0.04)', borderRadius: 8, padding: '10px 12px', marginBottom: 12, border: '1px solid rgba(59,130,246,0.1)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px', fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>
+                  <div style={{ background: 'rgba(59,130,246,0.04)', borderRadius: 8, padding: '10px 12px', marginBottom: 12, border: '1px solid rgba(59,130,246,0.1)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px', fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>
                     {flight.airline && <div>{t("airline_label") || "Airline:"} <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{flight.airline}</span></div>}
                     {flight.flight_number && <div>{t("flight_label") || "Flug:"} <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{flight.flight_number}</span></div>}
                     {flight.arrival_date && <div>{t("arrival_label") || "Ankunft:"} <span style={{ color: '#22c55e', fontWeight: 700 }}>{flight.arrival_date}</span></div>}
@@ -291,15 +294,15 @@ export default function DoctorTasksView({ onLogout } = {}) {
 
                 {/* Context note */}
                 {!isPickup && (intake.hair_loss_duration || intake.previous_treatments || intake.medications) && (
-                  <div style={{ background: 'rgba(255,255,255,0.015)', borderRadius: 7, padding: '8px 10px', marginBottom: 12, fontSize: 11, color: 'rgba(167,177,195,0.4)', lineHeight: 1.5 }}>
-                    {intake.hair_loss_duration && <span>{tl('hair_loss_since')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.hair_loss_duration}</strong> · </span>}
-                    {intake.previous_treatments && <span>{tl('previous_treatments')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.previous_treatments}</strong> · </span>}
-                    {intake.medications && <span>{tl('medications')}: <strong style={{ color: 'rgba(232,238,252,0.6)' }}>{intake.medications}</strong></span>}
+                  <div style={{ background: 'rgba(255,255,255,0.015)', borderRadius: 7, padding: '8px 10px', marginBottom: 12, fontSize: 11, color: 'rgba(167,177,195,0.6)', lineHeight: 1.5 }}>
+                    {intake.hair_loss_duration && <span>{tl('hair_loss_since')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{intake.hair_loss_duration}</strong> · </span>}
+                    {intake.previous_treatments && intake.previous_treatments !== 'none' && intake.previous_treatments !== 'keine' && <span>{tl('previous_treatments')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{intake.previous_treatments}</strong> · </span>}
+                    {intake.medications && intake.medications !== 'none' && intake.medications !== 'keine' && <span>{tl('medications')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{intake.medications}</strong></span>}
                   </div>
                 )}
 
                 {/* Assigner note */}
-                {task.notes && <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.4)', background: 'rgba(167,107,255,0.03)', borderRadius: 7, padding: '7px 10px', marginBottom: 12, borderLeft: '2px solid rgba(167,139,250,0.3)' }}>{task.notes}</div>}
+                {task.notes && <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.6)', background: 'rgba(167,107,255,0.03)', borderRadius: 7, padding: '7px 10px', marginBottom: 12, borderLeft: '2px solid rgba(167,139,250,0.3)' }}>{task.notes === 'Broadcast an alle Aerzte' ? tl('broadcast_all_doctors') || task.notes : task.notes}</div>}
 
                 {/* ── BOTTOM: Decision Form ── */}
                 {isPickup ? (
@@ -310,20 +313,20 @@ export default function DoctorTasksView({ onLogout } = {}) {
                     </div>
                     <div style={{ marginBottom: 8 }}><label style={S.label}>Fahrzeug</label><input type="text" placeholder="Mercedes Vito" value={form.vehicle || ''} onChange={e => setForm(task.id, { vehicle: e.target.value })} style={S.input} /></div>
                     <div style={{ marginBottom: 12 }}><label style={S.label}>Notiz</label><textarea placeholder="Terminal, Treffpunkt..." value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} /></div>
-                    <button onClick={() => handlePickupSubmit(task)} disabled={!canSubmit || submitting === task.id} style={{ width: '100%', padding: '11px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'default', fontFamily: 'inherit', background: canSubmit ? 'linear-gradient(135deg,#ff8a2a,#ff6b00)' : 'rgba(255,255,255,0.04)', color: canSubmit ? '#fff' : 'rgba(167,177,195,0.25)', opacity: submitting === task.id ? 0.6 : 1 }}>
-                      {submitting === task.id ? '...' : 'Fahrer zuweisen'}
+                    <button onClick={() => handlePickupSubmit(task)} disabled={!canSubmit || submitting === task.id} style={{ width: '100%', padding: '11px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'default', fontFamily: 'inherit', background: canSubmit ? 'linear-gradient(135deg,#ff8a2a,#ff6b00)' : 'rgba(255,255,255,0.04)', color: canSubmit ? '#fff' : 'rgba(167,177,195,0.65)', opacity: submitting === task.id ? 0.6 : 1 }}>
+                      {submitting === task.id ? '...' : tl('assign_driver') || 'Fahrer zuweisen'}
                     </button>
                   </div>
                 ) : (
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
-                      <div><label style={S.label}>Grafts *</label><input type="number" placeholder="3000" value={form.grafts || ''} onChange={e => setForm(task.id, { grafts: e.target.value })} style={S.input} min="1" /></div>
-                      <div><label style={S.label}>Preis (€) *</label><input type="number" placeholder="3500" value={form.price || ''} onChange={e => setForm(task.id, { price: e.target.value })} style={S.input} min="1" /></div>
-                      <div><label style={S.label}>Technik</label><div style={{ position: 'relative' }}><select value={form.technique || 'fue'} onChange={e => setForm(task.id, { technique: e.target.value })} style={S.select}>{techniques.map(tc => <option key={tc.value} value={tc.value}>{tc.label}</option>)}</select><div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(167,177,195,0.25)', fontSize: 9 }}>▼</div></div></div>
+                      <div><label style={S.label}>{tl('grafts') || 'Grafts'} *</label><input type="number" placeholder="3000" value={form.grafts || ''} onChange={e => setForm(task.id, { grafts: e.target.value })} style={S.input} min="1" /></div>
+                      <div><label style={S.label}>{tl('price_eur') || 'Preis (€)'} *</label><input type="number" placeholder="3500" value={form.price || ''} onChange={e => setForm(task.id, { price: e.target.value })} style={S.input} min="1" /></div>
+                      <div><label style={S.label}>{tl('technique') || 'Technik'}</label><div style={{ position: 'relative' }}><select value={form.technique || 'fue'} onChange={e => setForm(task.id, { technique: e.target.value })} style={S.select}>{techniques.map(tc => <option key={tc.value} value={tc.value}>{tc.label}</option>)}</select><div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(167,177,195,0.65)', fontSize: 9 }}>▼</div></div></div>
                     </div>
                     <div style={{ marginBottom: 10 }}>
-                      <label style={S.label}>Notiz (intern)</label>
-                      <textarea placeholder="Anmerkung für das Team..." value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} />
+                      <label style={S.label}>{tl('internal_notes') || 'Notiz (intern)'}</label>
+                      <textarea placeholder={tl('notes_hint') || "Anmerkung für das Team..."} value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} />
                     </div>
 
                     {/* Deposit toggle */}
@@ -331,7 +334,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
                       <div style={{ marginBottom: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(167,107,255,0.03)', border: '1px solid rgba(167,107,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <span style={{ fontSize: 13 }}>💳</span>
-                          <span style={{ fontWeight: 600, fontSize: 11, color: '#a78bfa' }}>Anzahlung anfordern</span>
+                          <span style={{ fontWeight: 600, fontSize: 11, color: '#a78bfa' }}>{tl('request_deposit') || 'Anzahlung anfordern'}</span>
                         </div>
                         <button onClick={() => { const nv = !form.depositRequested; const p = { depositRequested: nv }; if (nv && form.price) p.depositAmount = String(Math.max(Math.round(parseInt(form.price) * 0.25), 500)); setForm(task.id, p); }} style={{ width: 36, height: 20, borderRadius: 10, background: form.depositRequested ? '#a78bfa' : 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer', position: 'relative' }}>
                           <div style={{ width: 14, height: 14, borderRadius: 7, background: '#fff', position: 'absolute', top: 3, left: form.depositRequested ? 19 : 3, transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,0.3)' }} />
@@ -344,17 +347,17 @@ export default function DoctorTasksView({ onLogout } = {}) {
                       <button onClick={() => handleSubmit(task)} disabled={!canSubmit || submitting === task.id} style={{
                         flex: 1, padding: '12px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'default', fontFamily: 'inherit',
                         background: canSubmit ? 'linear-gradient(135deg,#ff8a2a,#ff6b00)' : 'rgba(255,255,255,0.04)',
-                        color: canSubmit ? '#fff' : 'rgba(167,177,195,0.25)', opacity: submitting === task.id ? 0.6 : 1,
+                        color: canSubmit ? '#fff' : 'rgba(167,177,195,0.65)', opacity: submitting === task.id ? 0.6 : 1,
                         boxShadow: canSubmit ? '0 4px 14px rgba(255,138,42,0.25)' : 'none',
                       }}>
-                        {submitting === task.id ? '...' : 'Bewertung abschließen'}
+                        {submitting === task.id ? '...' : tl('submit_review') || 'Bewertung abschließen'}
                       </button>
                       <button onClick={() => skipTask(task.id)} style={{
                         padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)',
-                        color: 'rgba(167,177,195,0.35)', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+                        color: 'rgba(167,177,195,0.75)', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
                       }}>{t("skip") || "Überspringen"}</button>
                     </div>
-                    <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.2)', marginTop: 6, textAlign: 'center' }}>Patient wird automatisch kontaktiert</div>
+                    <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.6)', marginTop: 6, textAlign: 'center' }}>{tl('patient_auto_contacted') || 'Patient wird automatisch kontaktiert'}</div>
                   </div>
                 )}
               </div>
@@ -371,15 +374,15 @@ export default function DoctorTasksView({ onLogout } = {}) {
             <div key={task.id} style={{ borderRadius: 10, background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)', marginBottom: 8, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(232,238,252,0.65)' }}>{name}</div>
-                <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.35)', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.75)', marginTop: 2 }}>
                   {task.type === 'airport_pickup' ? (
                     <>{r.driverName && <span>{r.driverName}</span>}{task.payload?.flight_number && <span> · {task.payload.flight_number}</span>}</>
                   ) : (
-                    <>{r.graftCount && <span style={{ fontWeight: 600, color: 'rgba(232,238,252,0.5)' }}>{r.graftCount.toLocaleString()} Grafts</span>}{r.price && <span> · €{r.price.toLocaleString()}</span>}{tech && <span> · {tech.label}</span>}</>
+                    <>{r.graftCount && <span style={{ fontWeight: 600, color: 'rgba(232,238,252,0.9)' }}>{r.graftCount.toLocaleString()} Grafts</span>}{r.price && <span> · €{r.price.toLocaleString()}</span>}{tech && <span> · {tech.label}</span>}</>
                   )}
                 </div>
-                {(task.assignedTo?.name || task.completedByName || task.result?.doctorName) && <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.3)', marginTop: 2 }}>{"👨‍⚕️"} Bewertet von {task.assignedTo?.name || task.completedByName || task.result?.doctorName}</div>}
-                {task.completedAt && <div style={{ fontSize: 9, color: 'rgba(167,177,195,0.2)', marginTop: 2 }}>{new Date(task.completedAt).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>}
+                {(task.assignedTo?.name || task.completedByName || task.result?.doctorName) && <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.7)', marginTop: 2 }}>{"👨‍⚕️"} Bewertet von {task.assignedTo?.name || task.completedByName || task.result?.doctorName}</div>}
+                {task.completedAt && <div style={{ fontSize: 9, color: 'rgba(167,177,195,0.6)', marginTop: 2 }}>{new Date(task.completedAt).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</div>}
               </div>
               <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(16,185,129,0.08)', color: '#10b981', border: '1px solid rgba(16,185,129,0.12)', flexShrink: 0 }}>✓</span>
             </div>

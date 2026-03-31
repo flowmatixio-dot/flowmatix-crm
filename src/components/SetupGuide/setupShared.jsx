@@ -41,7 +41,7 @@ export const LockedBanner = ({ t }) => (
     <span style={{ fontSize: 14, color: "#10b981" }}>✓</span>
     <div>
       <div style={{ fontWeight: 700, fontSize: 13, color: "#10b981" }}>{t("setup_completed_label") || "Einrichtung abgeschlossen"}</div>
-      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("setup_change_in_settings") || "Sie können diese Daten jederzeit in den Einstellungen ändern."}</div>
+      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{t("setup_change_in_settings") || "Sie können diese Daten jederzeit in den Einstellungen ändern."}</div>
     </div>
   </div>
 );

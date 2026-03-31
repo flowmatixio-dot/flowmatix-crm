@@ -53,7 +53,7 @@ export default function RoomScheduler({ appointments, doctors, date, rooms, onAs
           <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(232,238,252,0.85)" }}>
             {t("room_occupancy") || "OP-Raum Belegung"}
           </div>
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 2 }}>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 2 }}>
             {dateStr ? new Date(dateStr + "T12:00:00").toLocaleDateString(fmLocale(), { weekday: "long", day: "numeric", month: "long" }) : "—"}
           </div>
         </div>
@@ -107,8 +107,8 @@ export default function RoomScheduler({ appointments, doctors, date, rooms, onAs
 
               {/* Stats */}
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10 }}>
-                <span style={{ color: "rgba(167,177,195,0.4)" }}>{util.appointments.length} {t("surgeries_short") || "OPs"}</span>
-                <span style={{ color: "rgba(167,177,195,0.4)" }}>{util.totalGrafts.toLocaleString(fmLocale())} / {room.capacity.toLocaleString(fmLocale())} {t("grafts_label_ui")}</span>
+                <span style={{ color: "rgba(167,177,195,0.6)" }}>{util.appointments.length} {t("surgeries_short") || "OPs"}</span>
+                <span style={{ color: "rgba(167,177,195,0.6)" }}>{util.totalGrafts.toLocaleString(fmLocale())} / {room.capacity.toLocaleString(fmLocale())} {t("grafts_label_ui")}</span>
               </div>
 
               {/* Equipment tags */}
@@ -116,7 +116,7 @@ export default function RoomScheduler({ appointments, doctors, date, rooms, onAs
                 {room.equipment.map(eq => (
                   <span key={eq} style={{
                     fontSize: 8, fontWeight: 700, padding: "1px 5px", borderRadius: 3,
-                    background: "rgba(255,255,255,0.03)", color: "rgba(167,177,195,0.3)",
+                    background: "rgba(255,255,255,0.03)", color: "rgba(167,177,195,0.7)",
                     border: "1px solid rgba(255,255,255,0.04)",
                   }}>{eq}</span>
                 ))}
@@ -133,11 +133,11 @@ export default function RoomScheduler({ appointments, doctors, date, rooms, onAs
           background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)",
           marginBottom: 12,
         }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
             {opRooms.find(r => r.id === selectedRoom)?.name || selectedRoom}
           </div>
           {(roomUtil[selectedRoom]?.appointments || []).length === 0 ? (
-            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.25)", padding: "8px 0" }}>{t("no_appointments_room") || "Keine Termine in diesem Raum"}</div>
+            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", padding: "8px 0" }}>{t("no_appointments_room") || "Keine Termine in diesem Raum"}</div>
           ) : (
             (roomUtil[selectedRoom]?.appointments || []).map(a => (
               <div key={a.id} style={{
@@ -146,8 +146,8 @@ export default function RoomScheduler({ appointments, doctors, date, rooms, onAs
                 background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.03)",
               }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.8)" }}>{a.patient || a.title || "Patient"}</div>
-                  <div style={{ fontSize: 10, color: "rgba(167,177,195,0.35)" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.95)" }}>{a.patient || a.title || "Patient"}</div>
+                  <div style={{ fontSize: 10, color: "rgba(167,177,195,0.75)" }}>
                     {a.time || "—"} · {a.treatment || "—"} · {a.grafts || a.estimatedGrafts || "—"} {t("grafts_label_ui")}
                   </div>
                 </div>
@@ -165,7 +165,7 @@ export default function RoomScheduler({ appointments, doctors, date, rooms, onAs
                   padding: "6px 10px", borderRadius: 6, marginBottom: 3,
                   background: "rgba(255,138,42,0.03)", border: "1px solid rgba(255,138,42,0.08)",
                 }}>
-                  <span style={{ fontSize: 11, color: "rgba(232,238,252,0.7)" }}>{a.patient || a.title} · {a.grafts || "—"} {t("grafts_label_ui")}</span>
+                  <span style={{ fontSize: 11, color: "rgba(232,238,252,0.9)" }}>{a.patient || a.title} · {a.grafts || "—"} {t("grafts_label_ui")}</span>
                   <button onClick={() => {
                     onAssignRoom?.(a.id, selectedRoom);
                     showT?.(`${a.patient || "Termin"} → ${opRooms.find(r => r.id === selectedRoom)?.name}`);

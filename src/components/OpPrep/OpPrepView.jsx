@@ -101,7 +101,7 @@ function MissingHover({ missing, x, y }) {
       zIndex: 10000, boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
       pointerEvents: "none", minWidth: 160,
     }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
         {{ de: "Noch offen", en: "Still open", tr: "Hala açık" }[localStorage.getItem("fm_lang") || "de"] || "Noch offen"}
       </div>
       {missing.map(m => (
@@ -127,6 +127,8 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
   const [medicalOpen, setMedicalOpen] = useState(true);
   const [logisticsOpen, setLogisticsOpen] = useState(false);
   const [consentsOpen, setConsentsOpen] = useState(false);
+  const [photosOpen, setPhotosOpen] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
   const syncTimer = useRef(null);
   const queueDriveSync = useCallback(() => {
     if (!localAppt.patientId) return;
@@ -148,6 +150,30 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
 
   useEffect(() => {
     if (!localAppt.patientId) { setFilesLoading(false); return; }
+    // Load patient metadata for logistics sync
+    fmApi.getPatient(localAppt.patientId).then(res => {
+      const p = res?.patient || res;
+      if (!p) return;
+      const fc = p.flightConfirmed || p.metadata?.flightConfirmed || {};
+      const lg = p.logistics || p.metadata?.logistics || {};
+      const hi = p.hotelInfo || p.metadata?.hotelInfo || p.metadata?.hotel || {};
+      const photoUrls = p.photoUrls || p.metadata?.photoUrls || [];
+      setLocalAppt(prev => ({
+        ...prev,
+        flightNumber: prev.flightNumber || fc.flightNo || fc.flight_number || '',
+        flightDate: prev.flightDate || fc.date || fc.arrival_date || '',
+        flightAirline: prev.flightAirline || fc.airline || '',
+        flightArrival: prev.flightArrival || fc.arrivalTime || fc.arrival_time || fc.time || '',
+        driverName: prev.driverName || lg.driverName || '',
+        driverPhone: prev.driverPhone || lg.driverPhone || '',
+        hotelName: prev.hotelName || hi.name || '',
+        hotelCheckin: prev.hotelCheckin || hi.checkIn || hi.checkin || '',
+        hotelCheckout: prev.hotelCheckout || hi.checkOut || hi.checkout || '',
+        consents: prev.consents || p.consents || p.metadata?.consents || {},
+        _photoUrls: photoUrls,
+        _intake: prev._intake || p.intake || p.extractedFields || p.intake_data || p.metadata?.intake || {},
+      }));
+    }).catch(() => {});
     fmApi.getDriveFiles({ patientId: localAppt.patientId }).then(d => {
       setFiles(d.files || []);
       setFilesLoading(false);
@@ -172,7 +198,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
     }
     setReqStates(s => ({ ...s, [key]: "sending" }));
     try {
-      await fmApi.sendCrmMessage(localAppt.patientId, { text: msg, source: "crm" });
+      await fmApi.sendCrmMessage(localAppt.patientId, { text: msg, source: "crm", templateHint: key });
       setReqStates(s => ({ ...s, [key]: "sent" }));
       const actText = "Erinnerung gesendet: " + key;
       await fmApi.updateAppointment(localAppt.id, { last_activity_text: actText });
@@ -312,6 +338,9 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
       }}>
         <style>{`@keyframes fm-slide-in{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
 
+        {/* Lightbox */}
+        {lightbox && <div onClick={() => setLightbox(null)} style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out" }}><img src={lightbox} style={{ maxWidth: "90vw", maxHeight: "90vh", borderRadius: 12, objectFit: "contain" }} alt="" /></div>}
+
         {/* ── Colored header bar ── */}
         <div style={{
           padding: "20px 24px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)",
@@ -338,7 +367,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
             </div>
             <button onClick={onClose} style={{
               background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
-              color: "rgba(167,177,195,0.5)", fontSize: 16, cursor: "pointer", padding: "4px 8px",
+              color: "rgba(167,177,195,0.7)", fontSize: 16, cursor: "pointer", padding: "4px 8px",
               borderRadius: 6, lineHeight: 1, transition: "all 0.15s",
             }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
@@ -359,12 +388,41 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
                 padding: "10px 12px", borderRadius: 8,
                 background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
               }}>
-                <div style={{ fontSize: 9, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700 }}>{c.label}</div>
+                <div style={{ fontSize: 9, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700 }}>{c.label}</div>
                 <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", fontWeight: 700, marginTop: 3 }}>{c.value}</div>
-                {c.sub && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.4)", marginTop: 1 }}>{c.sub}</div>}
+                {c.sub && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", marginTop: 1 }}>{c.sub}</div>}
               </div>
             ))}
           </div>
+
+          {/* ── Medical Details (from patient intake) ── */}
+          {localAppt._intake && Object.keys(localAppt._intake).length > 0 && (
+            <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{"🩺"} {t("medical_details") || "Medizinische Details"}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px" }}>
+                {[
+                  { k: "treatment", l: t("treatment") || "Behandlung" },
+                  { k: "concern", l: t("concern") || "Anliegen" },
+                  { k: "age", l: t("age") || "Alter" },
+                  { k: "country", l: t("country") || "Land" },
+                  { k: "hair_loss_type", l: t("hair_loss") || "Haarausfall" },
+                  { k: "medications", l: t("medications") || "Medikamente" },
+                  { k: "allergies", l: t("allergies") || "Allergien" },
+                  { k: "previous_treatments", l: t("prev_treatments") || "Vorbehandlungen" },
+                  { k: "medical_conditions", l: t("medical_conditions") || "Vorerkrankungen" },
+                  { k: "smoker", l: t("smoker") || "Raucher" },
+                  { k: "blood_thinners", l: t("blood_thinners") || "Blutverdünner" },
+                ].map(f => {
+                  const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
+                  if (!v || v === '—') return null;
+                  return <div key={f.k} style={{ fontSize: 11 }}>
+                    <span style={{ color: "rgba(167,177,195,0.6)" }}>{f.l}: </span>
+                    <span style={{ color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>{v}</span>
+                  </div>;
+                })}
+              </div>
+            </div>
+          )}
 
           {/* ── Readiness progress ── */}
           <div style={{
@@ -372,35 +430,35 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
             background: `${pctColor}06`, border: `1px solid ${pctColor}15`,
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("op_readiness")}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("op_readiness")}</span>
               <span style={{ fontSize: 16, fontWeight: 800, color: pctColor }}>{r.done} / {r.total}</span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${r.pct}%`, borderRadius: 3, background: pctColor, transition: "width 0.3s" }} />
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.4)" }}>
-                {t("medical_tab")} <span style={{ color: r.medDone === r.medTotal ? "#10b981" : "rgba(232,238,252,0.7)", fontWeight: 800 }}>{r.medDone}/{r.medTotal}</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.6)" }}>
+                {t("medical_tab")} <span style={{ color: r.medDone === r.medTotal ? "#10b981" : "rgba(232,238,252,0.9)", fontWeight: 800 }}>{r.medDone}/{r.medTotal}</span>
               </span>
-              <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.4)" }}>
-                {t("logistics_tab")} <span style={{ color: r.logDone === r.logTotal ? "#10b981" : "rgba(232,238,252,0.7)", fontWeight: 800 }}>{r.logDone}/{r.logTotal}</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.6)" }}>
+                {t("logistics_tab")} <span style={{ color: r.logDone === r.logTotal ? "#10b981" : "rgba(232,238,252,0.9)", fontWeight: 800 }}>{r.logDone}/{r.logTotal}</span>
               </span>
             </div>
           </div>
 
           {/* ── Medical section (collapsible) ── */}
-          <div onClick={() => setMedicalOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
-            <span style={{ fontSize: 9, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: medicalOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
+          <div onClick={() => setMedicalOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
+            <span style={{ fontSize: 9, color: "rgba(167,177,195,0.7)", transition: "transform 0.2s", transform: medicalOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
             <span>{t("medical_tab")}</span>
-            <span style={{ color: r.medDone === r.medTotal ? "#10b981" : "rgba(167,177,195,0.3)" }}>{r.medDone}/{r.medTotal}</span>
+            <span style={{ color: r.medDone === r.medTotal ? "#10b981" : "rgba(167,177,195,0.7)" }}>{r.medDone}/{r.medTotal}</span>
           </div>
           {medicalOpen && medItems.map(it => renderToggleRow(it))}
 
           {/* ── Logistics section (collapsible) ── */}
-          <div onClick={() => setLogisticsOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
-            <span style={{ fontSize: 9, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: logisticsOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
+          <div onClick={() => setLogisticsOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
+            <span style={{ fontSize: 9, color: "rgba(167,177,195,0.7)", transition: "transform 0.2s", transform: logisticsOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
             <span>{t("logistics_tab")}</span>
-            <span style={{ color: r.logDone === r.logTotal ? "#10b981" : "rgba(167,177,195,0.3)" }}>{r.logDone}/{r.logTotal}</span>
+            <span style={{ color: r.logDone === r.logTotal ? "#10b981" : "rgba(167,177,195,0.7)" }}>{r.logDone}/{r.logTotal}</span>
           </div>
 
           {logisticsOpen && <>
@@ -408,8 +466,8 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {localAppt.flightReceived && (localAppt.flightNumber || localAppt.flightAirline) ? (
             <div style={{ margin: "0 0 6px 46px", padding: "6px 10px", borderRadius: 6, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(203,213,225,0.8)" }}>
               {localAppt.flightAirline && <span style={{ color: "#10b981", fontWeight: 700 }}>{localAppt.flightAirline}</span>}
-              {localAppt.flightAirline && " \u00B7 "}
-              {localAppt.flightNumber && <>{localAppt.flightNumber} \u00B7 </>}
+              {localAppt.flightAirline && " · "}
+              {localAppt.flightNumber && <>{localAppt.flightNumber} · </>}
               {localAppt.flightArrival && <>{t("arrival_label") || "Ankunft:"} {localAppt.flightArrival}</>}
             </div>
           ) : (
@@ -425,7 +483,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {localAppt.driverAssigned && localAppt.driverName ? (
             <div style={{ margin: "0 0 6px 46px", padding: "6px 10px", borderRadius: 6, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(203,213,225,0.8)" }}>
               <span style={{ color: "#10b981", fontWeight: 700 }}>{localAppt.driverName}</span>
-              {localAppt.driverPhone && <> \u00B7 <a href={`tel:${localAppt.driverPhone}`} style={{ color: "#4cc9ff", textDecoration: "none" }}>{localAppt.driverPhone}</a></>}
+              {localAppt.driverPhone && <> · <a href={`tel:${localAppt.driverPhone}`} style={{ color: "#4cc9ff", textDecoration: "none" }}>{localAppt.driverPhone}</a></>}
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, margin: "0 0 6px 46px" }}>
@@ -440,8 +498,8 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {localAppt.hotelBooked && localAppt.hotelName ? (
             <div style={{ margin: "0 0 6px 46px", padding: "6px 10px", borderRadius: 6, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(203,213,225,0.8)" }}>
               <span style={{ color: "#10b981", fontWeight: 700 }}>{localAppt.hotelName}</span>
-              {localAppt.hotelCheckin && <> \u00B7 {localAppt.hotelCheckin}</>}
-              {localAppt.hotelCheckout && <> \u2192 {localAppt.hotelCheckout}</>}
+              {localAppt.hotelCheckin && <> · {localAppt.hotelCheckin}</>}
+              {localAppt.hotelCheckout && <> → {localAppt.hotelCheckout}</>}
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, margin: "0 0 6px 46px" }}>
@@ -457,40 +515,69 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           {renderLogisticsToggle("transferConfirmed", "transfer_confirmed", t("transfer_confirmed_label") || "Transfer bestätigt", !!localAppt.transferConfirmed)}
           </>}
 
+          {/* ── Patient Photos ── */}
+          {(localAppt._photoUrls || []).length > 0 && <>
+            <div onClick={() => setPhotosOpen?.(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
+              <span style={{ fontSize: 9, color: "rgba(167,177,195,0.7)", transition: "transform 0.2s", transform: photosOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
+              <span>{"📸"} {t("patient_photos") || "Patientenfotos"}</span>
+              <span style={{ color: "#10b981" }}>{localAppt._photoUrls.length}</span>
+            </div>
+            {photosOpen && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 12 }}>
+                {localAppt._photoUrls.map((p, i) => {
+                  const url = typeof p === 'string' ? p : p?.url;
+                  if (!url) return null;
+                  const authUrl = fmApi.authPhotoUrl(url);
+                  return <div key={i} onClick={() => setLightbox(authUrl)} style={{ aspectRatio: "1", borderRadius: 10, overflow: "hidden", cursor: "pointer", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <img src={authUrl} alt={`Foto ${i+1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>;
+                })}
+              </div>
+            )}
+          </>}
+
           {/* ── Consent Tracker (collapsible) ── */}
-          <div onClick={() => setConsentsOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
-            <span style={{ fontSize: 9, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: consentsOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
+          <div onClick={() => setConsentsOpen(o => !o)} style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", margin: "16px 0 6px", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", userSelect: "none" }}>
+            <span style={{ fontSize: 9, color: "rgba(167,177,195,0.7)", transition: "transform 0.2s", transform: consentsOpen ? "rotate(90deg)" : "rotate(0)", display: "inline-block" }}>▶</span>
             <span>{t("consents_label") || "Einwilligungen"}</span>
           </div>
           {consentsOpen && <div style={{ marginTop: 4 }}>
-            <ConsentTracker patient={localAppt} onUpdate={(key, data) => {}} onRequestSignature={(key, label) => { if (typeof requestItem === "function") requestItem(key, `Bitte sende uns die unterschriebene ${label}.`); }} showT={() => {}} hideHeader />
+            <ConsentTracker patient={{ ...localAppt, consents: localAppt.consents || localAppt.metadata?.consents || {} }} onUpdate={async (key, data) => {
+              try {
+                const prev = localAppt.consents || localAppt.metadata?.consents || {};
+                const consents = { ...prev, [key]: data };
+                await fmApi.apiFetch(`/api/v1/crm/patients/${localAppt.patientId}`, { method: "PATCH", body: JSON.stringify({ consents }) });
+                setLocalAppt(p => ({ ...p, consents, metadata: { ...(p.metadata || {}), consents } }));
+                if (onUpdate) onUpdate();
+              } catch (e) { console.error("Consent update failed:", e); }
+            }} onRequestSignature={(key, label) => { if (typeof requestItem === "function") requestItem(key, `Bitte sende uns die unterschriebene ${label}.`); }} showT={(msg) => { const el = document.getElementById("fm-toast-global"); if (el) { el.textContent = msg; el.style.display = "block"; setTimeout(() => el.style.display = "none", 3000); } }} hideHeader />
           </div>}
 
           {/* ── Last activity ── */}
           <div style={{ marginTop: 20, padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
-            <div style={{ fontSize: 9, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 5, fontWeight: 700 }}>{t("last_activity_label") || "Letzte Aktivität"}</div>
+            <div style={{ fontSize: 9, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 5, fontWeight: 700 }}>{t("last_activity_label") || "Letzte Aktivität"}</div>
             {localAppt.lastActivityText ? (
               <>
-                <div style={{ fontSize: 12, color: "rgba(232,238,252,0.7)", fontWeight: 600 }}>{localAppt.lastActivityText}</div>
-                <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)", marginTop: 2 }}>{fmTimeAgo(localAppt.lastActivityAt || localAppt.updatedAt)}</div>
+                <div style={{ fontSize: 12, color: "rgba(232,238,252,0.9)", fontWeight: 600 }}>{localAppt.lastActivityText}</div>
+                <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{fmTimeAgo(localAppt.lastActivityAt || localAppt.updatedAt)}</div>
               </>
             ) : (
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.3)" }}>{t("no_activity_label") || "Keine Aktivität"}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }}>{t("no_activity_label") || "Keine Aktivität"}</div>
             )}
           </div>
 
           {/* ── Files ── */}
           <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
-            <div style={{ fontSize: 9, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, fontWeight: 700 }}>{t("op_prep_files") || "Dateien"}</div>
+            <div style={{ fontSize: 9, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, fontWeight: 700 }}>{t("op_prep_files") || "Dateien"}</div>
             {filesLoading ? (
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.3)" }}>{t("loading")}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }}>{t("loading")}</div>
             ) : !files || files.length === 0 ? (
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.3)" }}>{t("op_prep_no_files") || "Keine Dateien"}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }}>{t("op_prep_no_files") || "Keine Dateien"}</div>
             ) : (
               files.map((f, i) => (
                 <div key={f.id || i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < files.length - 1 ? "1px solid rgba(255,255,255,0.03)" : "none" }}>
-                  <span style={{ flex: 1, color: "rgba(232,238,252,0.7)", fontSize: 11, fontWeight: 500 }}>{f.file_name}</span>
-                  <span style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>{f.file_size ? (Math.round(f.file_size / 1024) + "KB") : ""}</span>
+                  <span style={{ flex: 1, color: "rgba(232,238,252,0.9)", fontSize: 11, fontWeight: 500 }}>{f.file_name}</span>
+                  <span style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{f.file_size ? (Math.round(f.file_size / 1024) + "KB") : ""}</span>
                   {f.google_drive_link && (
                     <a href={f.google_drive_link} target="_blank" rel="noopener noreferrer" style={{
                       color: "#4cc9ff", textDecoration: "none", fontSize: 10, fontWeight: 600,
@@ -518,7 +605,7 @@ export default function OpPrepView() {
   const [missingHover, setMissingHover] = useState(null);
 
   const loadApiData = useCallback(() => {
-    const today = new Date();
+    const today = getNow();
     const fromStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
     const toDate = new Date(today.getTime() + 60 * 86400000);
     const toStr = toDate.getFullYear() + "-" + String(toDate.getMonth() + 1).padStart(2, "0") + "-" + String(toDate.getDate()).padStart(2, "0");
@@ -664,7 +751,7 @@ export default function OpPrepView() {
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "rgba(232,238,252,0.95)", margin: 0, letterSpacing: "-0.03em" }}>
             {t("op_preparation") || "OP-Vorbereitung"}
           </h1>
-          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.35)", margin: "5px 0 0", fontWeight: 500 }}>
+          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", margin: "5px 0 0", fontWeight: 500 }}>
             {t("op_prep_subtitle") || "Statusübersicht für anstehende Termine — wird automatisch vom System verfolgt"}
           </p>
         </div>
@@ -679,13 +766,13 @@ export default function OpPrepView() {
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
         {filterTabs.map(tab => {
           const isActive = filter === tab.id;
-          const accentColor = tab.color || (isActive ? "#4cc9ff" : "rgba(167,177,195,0.5)");
+          const accentColor = tab.color || (isActive ? "#4cc9ff" : "rgba(167,177,195,0.7)");
           return (
             <button key={tab.id} onClick={() => setFilter(tab.id)} style={{
               padding: "6px 14px", borderRadius: 6, fontFamily: "inherit", fontSize: 12, fontWeight: 600, cursor: "pointer",
               background: isActive ? `${accentColor}12` : "rgba(255,255,255,0.02)",
               border: `1px solid ${isActive ? `${accentColor}30` : "rgba(255,255,255,0.05)"}`,
-              color: isActive ? accentColor : "rgba(167,177,195,0.5)",
+              color: isActive ? accentColor : "rgba(167,177,195,0.7)",
               transition: "all 0.15s",
               display: "inline-flex", alignItems: "center", gap: 6,
             }}>
@@ -693,7 +780,7 @@ export default function OpPrepView() {
               <span style={{
                 fontSize: 10, fontWeight: 800,
                 background: isActive ? `${accentColor}18` : "rgba(255,255,255,0.04)",
-                color: isActive ? accentColor : "rgba(167,177,195,0.35)",
+                color: isActive ? accentColor : "rgba(167,177,195,0.75)",
                 padding: "1px 6px", borderRadius: 4, minWidth: 18, textAlign: "center",
               }}>
                 {tab.count}
@@ -733,22 +820,22 @@ export default function OpPrepView() {
       {apiError && (
         <div style={{ textAlign: "center", padding: "48px 20px" }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px", fontSize: 18 }}>📋</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(232,238,252,0.6)" }}>{t("op_load_error")||"Could not load surgery data"}</div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.3)", marginTop: 6 }}>{t("try_again_later")||"Please try again later"}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(232,238,252,0.95)" }}>{t("op_load_error")||"Could not load surgery data"}</div>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 6 }}>{t("try_again_later")||"Please try again later"}</div>
           <button onClick={() => { setApiError(null); setApiAppts(null); loadApiData(); }} style={{ marginTop: 14, padding: "8px 18px", borderRadius: 8, background: "rgba(76,201,255,0.08)", border: "1px solid rgba(76,201,255,0.15)", color: "#4cc9ff", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>{t("try_again")||"Try again"}</button>
         </div>
       )}
       {apiAppts === null && !apiError && (
-        <div style={{ textAlign: "center", padding: 60, color: "rgba(167,177,195,0.4)", fontSize: 13 }}>{t("loading_op") || "Wird geladen..."}</div>
+        <div style={{ textAlign: "center", padding: 60, color: "rgba(167,177,195,0.6)", fontSize: 13 }}>{t("loading_op") || "Wird geladen..."}</div>
       )}
 
       {/* ── Table ── */}
       {apiAppts !== null && filtered.length === 0 ? (
         <div>
-          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:16}}>{"ℹ️"} {t("hint_opprep_empty")}</div>
+          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:16}}>{"ℹ️"} {t("hint_opprep_empty")}</div>
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.7)", marginBottom: 6 }}>{t("no_upcoming_ops")}</div>
-            <div style={{ fontSize: 13, color: "rgba(167,177,195,0.4)" }}>{t("all_patients_prepared") || "Alle Patienten sind vorbereitet oder es stehen keine Termine an."}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.9)", marginBottom: 6 }}>{t("no_upcoming_ops")}</div>
+            <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)" }}>{t("all_patients_prepared") || "Alle Patienten sind vorbereitet oder es stehen keine Termine an."}</div>
           </div>
         </div>
       ) : apiAppts !== null && (
@@ -758,7 +845,7 @@ export default function OpPrepView() {
             display: "grid", gridTemplateColumns: COLS, gap: 0,
             padding: "10px 16px",
             background: "rgba(255,255,255,0.02)",
-            fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "rgba(167,177,195,0.4)",
+            fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "rgba(167,177,195,0.6)",
             borderBottom: "1px solid rgba(255,255,255,0.04)",
           }}>
             <div>{t("op_prep_patient") || "Patient"}</div>
@@ -773,10 +860,10 @@ export default function OpPrepView() {
 
           {/* Rows */}
           {filtered.map((item, idx) => {
-            const daysColor = (item.daysUntil <= 1 && !item.isReady) ? "#ef4444" : item.daysUntil <= 3 ? "#f59e0b" : item.daysUntil <= 14 ? "rgba(167,177,195,0.6)" : "rgba(167,177,195,0.4)";
+            const daysColor = (item.daysUntil <= 1 && !item.isReady) ? "#ef4444" : item.daysUntil <= 3 ? "#f59e0b" : item.daysUntil <= 14 ? "rgba(167,177,195,0.6)" : "rgba(167,177,195,0.6)";
             const isUrgentRow = item.isUrgent && item.daysUntil <= 5;
             const daysStr = item.daysUntil === 0 ? (t("op_today") || "Heute") : item.daysUntil === 1 ? (t("op_tomorrow") || "Morgen") : item.daysUntil + "d";
-            const treatColor = TREAT_COLORS[item.treatment] || "rgba(167,177,195,0.3)";
+            const treatColor = TREAT_COLORS[item.treatment] || "rgba(167,177,195,0.7)";
 
             return (
               <div key={item.id} onClick={() => handleRowClick(item)} style={{
@@ -829,7 +916,7 @@ export default function OpPrepView() {
                     }}>{t("op_ready") || "Bereit"}</span>
                   ) : (
                     <span style={{
-                      color: (item.daysUntil <= 1 && item.missing >= 3) ? "#ef4444" : item.missing >= 5 ? "#f59e0b" : "rgba(167,177,195,0.5)",
+                      color: (item.daysUntil <= 1 && item.missing >= 3) ? "#ef4444" : item.missing >= 5 ? "#f59e0b" : "rgba(167,177,195,0.7)",
                       fontSize: 11, fontWeight: 600,
                       background: (item.daysUntil <= 1 && item.missing >= 3) ? "rgba(239,68,68,0.06)" : "transparent",
                       padding: "2px 8px", borderRadius: 4,
@@ -872,7 +959,7 @@ function SummaryCard({ label, value, color, accent }) {
       border: `1px solid ${accent ? `${color}18` : "rgba(255,255,255,0.05)"}`,
     }}>
       <div style={{ fontSize: 18, fontWeight: 800, color, letterSpacing: "-0.02em" }}>{value}</div>
-      <div style={{ fontSize: 10, color: "rgba(167,177,195,0.45)", fontWeight: 600, marginTop: 2 }}>{label}</div>
+      <div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", fontWeight: 600, marginTop: 2 }}>{label}</div>
     </div>
   );
 }

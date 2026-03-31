@@ -103,11 +103,11 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
         }}>
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "rgba(232,238,252,0.95)" }}>{t("new_lead_title") || "Neuer Lead"}</div>
-            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 2 }}>{t("create_patient_manual") || "Patient manuell anlegen"}</div>
+            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 }}>{t("create_patient_manual") || "Patient manuell anlegen"}</div>
           </div>
           <button onClick={onClose} style={{
             background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
-            color: "rgba(167,177,195,0.5)", fontSize: 14, cursor: "pointer", padding: "4px 8px",
+            color: "rgba(167,177,195,0.7)", fontSize: 14, cursor: "pointer", padding: "4px 8px",
             borderRadius: 6, lineHeight: 1,
           }}>✕</button>
         </div>
@@ -115,7 +115,7 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
         <div style={{ padding: "16px 22px 20px" }}>
           {/* Source Selection */}
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{t("source_label") || "Quelle"}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{t("source_label") || "Quelle"}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {SOURCES.map(s => (
                 <button key={s.id} onClick={() => setSource(s.id)} style={{
@@ -123,7 +123,7 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
                   cursor: "pointer", fontFamily: "inherit",
                   background: source === s.id ? `${s.color}12` : "rgba(255,255,255,0.02)",
                   border: `1px solid ${source === s.id ? `${s.color}30` : "rgba(255,255,255,0.05)"}`,
-                  color: source === s.id ? s.color : "rgba(167,177,195,0.45)",
+                  color: source === s.id ? s.color : "rgba(167,177,195,0.65)",
                   display: "flex", alignItems: "center", gap: 4,
                 }}>
                   <span style={{ fontSize: 10 }}>{s.icon}</span> {s.label}
@@ -135,11 +135,11 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
           {/* Name + Phone */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{t("name") || "Name"} *</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{t("name") || "Name"} *</div>
               <input value={name} onChange={e => setName(e.target.value)} placeholder={t("name_placeholder") || "Max Mustermann"} style={inp} autoFocus />
             </div>
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{t("phone") || "Telefon"}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{t("phone") || "Telefon"}</div>
               <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 171 1234567" style={inp} />
             </div>
           </div>
@@ -147,18 +147,18 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
           {/* Email + Country */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{t("channel_email") || "E-Mail"}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{t("channel_email") || "E-Mail"}</div>
               <input value={email} onChange={e => setEmail(e.target.value)} placeholder="max@example.com" type="email" style={inp} />
             </div>
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{t("country") || "Land"}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{t("country") || "Land"}</div>
               <input value={country} onChange={e => setCountry(e.target.value)} placeholder={t("country_placeholder") || "Deutschland"} style={inp} />
             </div>
           </div>
 
           {/* Treatment */}
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{t("treatment") || "Behandlung"}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{t("treatment") || "Behandlung"}</div>
             <select value={treatment} onChange={e => setTreatment(e.target.value)} style={{ ...inp, cursor: "pointer" }}>
               <option value="">{t("select_placeholder") || "— Wählen —"}</option>
               {getTreatments().map(tr => <option key={tr} value={tr}>{tr}</option>)}
@@ -167,7 +167,7 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
 
           {/* Notes */}
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{t("notes_label") || "Notizen"}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{t("notes_label") || "Notizen"}</div>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder={t("additional_info_placeholder") || "Zusätzliche Informationen..."} rows={2} style={{ ...inp, resize: "vertical" }} />
           </div>
 
@@ -180,10 +180,10 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
               display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer",
             }} onClick={() => setStartWhatsApp(!startWhatsApp)}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: startWhatsApp ? "#25D366" : "rgba(167,177,195,0.5)" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: startWhatsApp ? "#25D366" : "rgba(167,177,195,0.7)" }}>
                   💬 {t("start_wa_conversation") || "WhatsApp-Gespräch starten"}
                 </div>
-                <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)", marginTop: 1 }}>
+                <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)", marginTop: 1 }}>
                   {t("ai_bot_starts_conversation") || "KI-Bot beginnt automatisch die Konversation"}
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <button onClick={onClose} style={{
               padding: "8px 18px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)",
+              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
             }}>{t("cancel") || "Abbrechen"}</button>
             <button onClick={handleCreate} disabled={sending} style={{
               padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",

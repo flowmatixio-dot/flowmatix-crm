@@ -26,7 +26,7 @@ export default function UsageCard({ onUpgrade, compact }) {
   }, []);
 
   const _l = localStorage.getItem("fm_lang") || "de";
-  if (err) return <div style={{padding:14,borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",fontSize:13,color:"rgba(167,177,195,0.5)"}}>
+  if (err) return <div style={{padding:14,borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",fontSize:13,color:"rgba(167,177,195,0.7)"}}>
     {{ de: "Nutzung nicht verfügbar", en: "Usage unavailable", tr: "Kullanım bilgisi mevcut değil" }[_l] || "Usage unavailable"} <button onClick={()=>{setErr(false);api.getUsage().then(setData).catch(()=>setErr(true));}} style={{marginLeft:8,padding:"3px 10px",borderRadius:6,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{{ de: "Wiederholen", en: "Retry", tr: "Yeniden dene" }[_l] || "Retry"}</button>
   </div>;
 
@@ -45,7 +45,7 @@ export default function UsageCard({ onUpgrade, compact }) {
       <div style={{fontSize:compact?12:13,fontWeight:700,color:"rgba(167,177,195,0.6)",textTransform:"uppercase",letterSpacing:"0.05em"}}>{{ de: "Patienten diesen Monat", en: "Patients this month", tr: "Bu ay hastalar" }[_l] || "Patients this month"}</div>
       <div style={{fontSize:compact?14:16,fontWeight:800,color:s.color}}>
         {isUnlimited ? <span>{data.used} <span style={{fontSize:12,fontWeight:500}}>/ ∞</span></span>
-          : <span>{data.used} <span style={{fontSize:12,fontWeight:500,color:"rgba(167,177,195,0.5)"}}>/ {data.limit}</span></span>}
+          : <span>{data.used} <span style={{fontSize:12,fontWeight:500,color:"rgba(167,177,195,0.7)"}}>/ {data.limit}</span></span>}
       </div>
     </div>
     {!isUnlimited && <div style={{height:compact?6:8,borderRadius:4,background:"rgba(255,255,255,0.06)",marginBottom:compact?8:12,overflow:"hidden"}}>

@@ -103,7 +103,7 @@ function useOperatorData() {
       case 'onboarding': await load('onboarding', api.getOnboarding); break;
       case 'automations': await Promise.allSettled([load('queueStats', api.getQueueStats), load('queueJobs', () => api.getQueueJobs({ limit: 20 }))]); break;
       case 'incidents': await load('incidents', () => api.getIncidents({ limit: 50 })); break;
-      case 'dashboard': await load('platformStats', api.getPlatformStats); break;
+      case 'dashboard': await Promise.allSettled([load('platformStats', api.getPlatformStats), load('clinics', api.getPlatformClinics)]); break;
       case 'logs': await load('unifiedLogs', () => api.getUnifiedLogs({ limit: 50 })); break;
       case 'api': await load('apiKeys', api.getApiKeys); break;
       case 'billing':
@@ -231,6 +231,8 @@ function TabDashboard({ d }) {
   const ov = d.overview;
   const h = d.health;
   const st = d.platformStats;
+  const [profileModal, setProfileModal] = useState(null);
+  const profileReqs = ((d.clinics?.clinics) || []).filter(c => c.wa_profile_request);
   return (
     <><style>{`[id*="fm-analytics"] div, [id*="fm-analytics"] span, .fm-analytics-wrap div, .fm-analytics-wrap span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .fm-analytics-wrap { max-width: 100%; overflow: hidden; }`}</style>
       <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Plattformübersicht</h2>
@@ -297,41 +299,54 @@ function TabDashboard({ d }) {
         </div>
       </div>
 
-      {/* WA Profile Requests from Clinics */}
-      {st?.profileRequests?.length > 0 && (
+      {/* WA Profile Requests */}
+      {profileReqs.length > 0 && (
         <div style={{ marginTop: 20 }}>
-          <h3 style={{ color: '#fff', fontSize: 16, marginBottom: 12 }}>📱 WhatsApp-Profil Anfragen</h3>
-          {st.profileRequests.map(pr => {
-            const p = pr.wa_profile_request || {};
+          <h3 style={{ color: '#fff', fontSize: 16, marginBottom: 12 }}>📱 WhatsApp-Profil Anfragen ({profileReqs.length})</h3>
+          {profileReqs.map(c => {
+            const p = c.wa_profile_request || {};
             return (
-              <div key={pr.id} style={{ ...S.card, marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{pr.name}</div>
-                    <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>Eingereicht: {new Date(pr.wa_profile_request_at).toLocaleString('de-DE')}</div>
-                  </div>
-                  <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: 'rgba(255,138,42,0.12)', color: '#ff8a2a' }}>Einrichten</span>
-                </div>
-                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                  {p.logoUrl && (
-                    <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', border: '2px solid #333', flexShrink: 0 }}>
-                      <img src={p.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div key={c.id} style={{ ...S.card, marginBottom: 12, cursor: 'pointer' }} onClick={() => setProfileModal(c)}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {p.logoUrl ? <img src={p.logoUrl} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #333' }} /> : <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#1a2530', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📷</div>}
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>{c.name}</div>
+                      <div style={{ fontSize: 11, color: '#666' }}>{p.botName || '—'} · {new Date(c.wa_profile_request_at).toLocaleString('de-DE')}</div>
                     </div>
-                  )}
-                  <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', fontSize: 12 }}>
-                    <div><span style={{ color: '#666' }}>Display Name:</span> <b style={{ color: '#fff' }}>{p.botName || '—'}</b></div>
-                    <div><span style={{ color: '#666' }}>About:</span> <b style={{ color: '#fff' }}>{p.about || '—'}</b></div>
-                    <div><span style={{ color: '#666' }}>Adresse:</span> <b style={{ color: '#fff' }}>{p.address || '—'}</b></div>
-                    <div><span style={{ color: '#666' }}>E-Mail:</span> <b style={{ color: '#fff' }}>{p.email || '—'}</b></div>
-                    <div><span style={{ color: '#666' }}>Website:</span> <b style={{ color: '#fff' }}>{p.websites?.join(', ') || '—'}</b></div>
-                    <div><span style={{ color: '#666' }}>Kategorie:</span> <b style={{ color: '#fff' }}>{p.vertical || '—'}</b></div>
                   </div>
+                  <span style={{ padding: '4px 12px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: 'rgba(255,138,42,0.12)', color: '#ff8a2a' }}>Details →</span>
                 </div>
               </div>
             );
           })}
         </div>
       )}
+
+      {/* Profile Detail Modal */}
+      {profileModal && (() => {
+        const p = profileModal.wa_profile_request || {};
+        return <div style={{ position: 'fixed', inset: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setProfileModal(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#141820', border: '1px solid #1e1e3e', borderRadius: 16, padding: 24, maxWidth: 520, width: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ color: '#fff', fontSize: 16, margin: 0 }}>📱 {profileModal.name} — WhatsApp Profil</h3>
+              <button onClick={() => setProfileModal(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: 18, cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 16 }}>
+              {p.logoUrl ? <img src={p.logoUrl} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid #333' }} /> : <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#1a2530', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>📷</div>}
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px', fontSize: 13 }}>
+                <div><span style={{ color: '#666', fontSize: 11 }}>Display Name</span><div style={{ fontWeight: 700, color: '#fff' }}>{p.botName || '—'}</div></div>
+                <div><span style={{ color: '#666', fontSize: 11 }}>About</span><div style={{ fontWeight: 700, color: '#fff' }}>{p.about || '—'}</div></div>
+                <div><span style={{ color: '#666', fontSize: 11 }}>Adresse</span><div style={{ fontWeight: 700, color: '#fff' }}>{p.address || '—'}</div></div>
+                <div><span style={{ color: '#666', fontSize: 11 }}>E-Mail</span><div style={{ fontWeight: 700, color: '#fff' }}>{p.email || '—'}</div></div>
+                <div><span style={{ color: '#666', fontSize: 11 }}>Website</span><div style={{ fontWeight: 700, color: '#fff' }}>{p.websites?.join(', ') || '—'}</div></div>
+                <div><span style={{ color: '#666', fontSize: 11 }}>Kategorie</span><div style={{ fontWeight: 700, color: '#fff' }}>{p.vertical || '—'}</div></div>
+              </div>
+            </div>
+            {p.logoUrl && <a href={p.logoUrl} download target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '8px 16px', borderRadius: 8, background: 'rgba(76,201,255,0.1)', border: '1px solid rgba(76,201,255,0.2)', color: '#4cc9ff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>📥 Profilbild herunterladen</a>}
+          </div>
+        </div>;
+      })()}
     </>
   );
 }
@@ -944,8 +959,8 @@ function TabClinics({ d, load }) {
                   <td style={S.td}>{statusBadge(c.is_active ? 'active' : 'inactive')}</td>
                   <td style={S.td}>{c.plan_name || '-'}</td>
                   <td style={S.td}>
-                    {waStateBadge(wa?.onboarding_state || wa?.status)}
-                    {wa?.phone_number && <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>{wa.phone_number}</div>}
+                    {waStateBadge(wa?.onboarding_state || wa?.status || (c.whatsapp_connected === true || c.whatsapp_connected === 't' ? 'connected' : null))}
+                    {(wa?.phone_number || c.whatsapp_phone_id) && <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>{wa?.phone_number || c.whatsapp_phone_id}</div>}
                     {wa?.onboarding_state === 'requested' && (
                       <Btn small onClick={() => handleProvision(c.id, c.name)} disabled={provLoading === c.id} style={{ marginTop: 4 }}>
                         {provLoading === c.id ? '...' : 'Provisionieren'}

@@ -55,10 +55,10 @@ export default function PatientCard({ lead, t }) {
     },
     header: { display: "flex", alignItems: "center", gap: 8, marginBottom: 14 },
     title: { fontWeight: 800, fontSize: 14, color: "#a78bfa" },
-    subtitle: { fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 2 },
+    subtitle: { fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 2 },
     grid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px" },
     fieldLabel: {
-      fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)",
+      fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)",
       textTransform: "uppercase", marginBottom: 2, display: "flex", alignItems: "center", gap: 4,
     },
     fieldValue: { fontSize: 13, color: "#e2e8f0", fontWeight: 500 },
@@ -133,7 +133,7 @@ export default function PatientCard({ lead, t }) {
           return (
             <div key={key}>
               <div style={s.fieldLabel}><span style={{ fontSize: 10 }}>{icon}</span> {label}</div>
-              <div style={flagged ? s.flagRed : muted ? { ...s.fieldValue, color: "rgba(167,177,195,0.25)" } : s.fieldValue}>{String(display)}</div>
+              <div style={flagged ? s.flagRed : muted ? { ...s.fieldValue, color: "rgba(167,177,195,0.65)" } : s.fieldValue}>{String(display)}</div>
             </div>
           );
         })}
@@ -186,7 +186,7 @@ export default function PatientCard({ lead, t }) {
             </div>
             {rd.notes && <div style={{ gridColumn: "1 / -1" }}>
               <div style={s.fieldLabel}>📝 {t("notes_label") || "Notizen"}</div>
-              <div style={{ ...s.fieldValue, color: "rgba(232,238,252,0.7)" }}>{rd.notes}</div>
+              <div style={{ ...s.fieldValue, color: "rgba(232,238,252,0.9)" }}>{rd.notes}</div>
             </div>}
           </div>
         </div>;

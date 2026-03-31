@@ -3,7 +3,7 @@ import { SETUP_CATS, CHECKS } from "./setupShared";
 const TIER_META = {
   required:    { label: { de: "Erforderlich", en: "Required", tr: "Gerekli" },         color: "#4cc9ff", bg: "rgba(76,201,255,0.04)", border: "rgba(76,201,255,0.1)",  icon: "🔵", desc: { de: "Diese Schritte müssen abgeschlossen sein", en: "These steps must be completed", tr: "Bu adımlar tamamlanmalıdır" } },
   recommended: { label: { de: "Empfohlen", en: "Recommended", tr: "Önerilen" },         color: "#ff8a2a", bg: "rgba(255,138,42,0.03)", border: "rgba(255,138,42,0.08)", icon: "🟠", desc: { de: "Für den vollen Funktionsumfang", en: "For full functionality", tr: "Tam işlevsellik için" } },
-  optional:    { label: { de: "Optional", en: "Optional", tr: "İsteğe bağlı" },         color: "rgba(167,177,195,0.5)", bg: "rgba(255,255,255,0.015)", border: "rgba(255,255,255,0.05)", icon: "⚪", desc: { de: "Zusätzliche Funktionen", en: "Additional features", tr: "Ek özellikler" } },
+  optional:    { label: { de: "Optional", en: "Optional", tr: "İsteğe bağlı" },         color: "rgba(167,177,195,0.7)", bg: "rgba(255,255,255,0.015)", border: "rgba(255,255,255,0.05)", icon: "⚪", desc: { de: "Zusätzliche Funktionen", en: "Additional features", tr: "Ek özellikler" } },
 };
 
 export default function SetupOverview({ clinic, progress, isDone, setTab, t, lang }) {

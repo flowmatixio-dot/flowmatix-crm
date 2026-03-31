@@ -99,15 +99,36 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
           fmApi.setTokens(access, refresh);
           if (userData) sessionStorage.setItem('fm_api_user', userData);
           sessionStorage.setItem('fm_login_at', String(Date.now()));
-          // Set CRM language from signup
+          // Set CRM language from signup — localStorage AND Zustand state
           const lang = params.get('lang');
           if (lang && ['de', 'en', 'tr'].includes(lang)) {
             localStorage.setItem('fm_lang', lang);
+            setLang(lang);
+            setLoginLang(lang);
           }
         }
       } catch (e) { console.warn('[trial-auth] Failed to parse:', e); }
       // Clean URL hash
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
+
+  /* ═══ IMPERSONATION — handle #impersonate=... from operator console ═══ */
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#impersonate=')) {
+      try {
+        const encoded = hash.replace('#impersonate=', '');
+        const decoded = atob(encoded);
+        const params = new URLSearchParams(decoded);
+        const access = params.get('access');
+        if (access) {
+          fmApi.setTokens(access, access); // impersonation token as both access + refresh
+          sessionStorage.setItem('fm_impersonation', 'true');
+          sessionStorage.setItem('fm_login_at', String(Date.now()));
+          // Don't clean hash — banner needs it
+        }
+      } catch (e) { console.warn('[impersonate] Failed to parse:', e); }
     }
   }, []);
 

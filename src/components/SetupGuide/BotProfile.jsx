@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWaProfile, updateWaProfile, uploadWaProfilePhoto } from "../../api/client";
+import { getWaProfile, updateWaProfile, uploadWaProfilePhoto, saveWaProfileRequest } from "../../api/client";
 import { Field } from "./setupShared";
 
 // WhatsApp Bot Profile — AI engine, logo, banner, opening hours, preview
@@ -65,12 +65,6 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
     setWaProfileSaving(true);
     setWaProfileError(null);
     try {
-      // 1. Upload profile photo if changed (base64 data URL = new upload)
-      if (waLogoPreview && waLogoPreview.startsWith("data:")) {
-        await uploadWaProfilePhoto(waLogoPreview);
-      }
-
-      // 2. Sync profile fields to Meta API
       const hours = profile.hours || {};
       const businessHours = [];
       const dayMap = { weekdays: ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"], saturday: ["SATURDAY"], sunday: ["SUNDAY"] };
@@ -86,7 +80,8 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         }
       }
 
-      await updateWaProfile({
+      await saveWaProfileRequest({
+        botName: profile.botName || clinic.name || "",
         about: profile.infoText || "",
         address: profile.address || "",
         email: profile.email || "",
@@ -94,10 +89,12 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         vertical: profile.category || "HEALTH",
         websites: profile.website ? [profile.website] : [],
         businessHours: businessHours.length ? { business_hours: businessHours, timezone: "Europe/Berlin" } : undefined,
+        logoUrl: profile.logoUrl || null,
+        bannerUrl: profile.bannerUrl || null,
       });
 
-      showT(t("wa_profile_synced"));
-      setWaLogoPreview(null); // clear dirty flag
+      showT(t("wa_profile_saved") || "Profil gespeichert — wird von Flowmatix eingerichtet");
+      setWaLogoPreview(null);
     } catch (err) {
       const msg = err?.body?.error || err?.message || t("error_saving");
       setWaProfileError(msg);
@@ -110,36 +107,20 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
   return <div>
     <p style={{ fontSize: 13, color: "var(--text-muted)", margin: "0 0 16px" }}>{t("setup_wa_profile")}</p>
 
-    {/* Logo + Banner side by side */}
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-      {/* Profile Photo */}
-      <div style={{ padding: 16, borderRadius: 12, background: "var(--bg-section)", border: "1px solid var(--border-default)" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>{t("wa_profile_photo")}</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--bg-card-elevated)", border: "2px dashed var(--border-hover)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-            {logoPreview ? <img src={logoPreview} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 28, opacity: 0.3 }}>{"\u{1F4F7}"}</span>}
-          </div>
-          <div>
-            <label style={{ display: "inline-block", padding: "6px 14px", borderRadius: 8, background: "rgba(76,201,255,0.1)", border: "1px solid rgba(76,201,255,0.2)", color: "#4cc9ff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-              {t("wa_upload_logo")}
-              <input type="file" accept="image/*" onChange={handleImage("logo")} style={{ display: "none" }} />
-            </label>
-            <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 4 }}>{t("wa_profile_photo_hint")}</div>
-          </div>
+    {/* Profile Photo */}
+    <div style={{ padding: 16, borderRadius: 12, background: "var(--bg-section)", border: "1px solid var(--border-default)", marginBottom: 20 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>{t("wa_profile_photo")}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--bg-card-elevated)", border: "2px dashed var(--border-hover)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+          {logoPreview ? <img src={logoPreview} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 28, opacity: 0.3 }}>{"\u{1F4F7}"}</span>}
         </div>
-      </div>
-
-      {/* Banner Image */}
-      <div style={{ padding: 16, borderRadius: 12, background: "var(--bg-section)", border: "1px solid var(--border-default)" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>{t("wa_banner_image")}</div>
-        <div style={{ width: "100%", height: 72, borderRadius: 10, background: "var(--bg-card-elevated)", border: "2px dashed var(--border-hover)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", marginBottom: 8 }}>
-          {bannerPreview ? <img src={bannerPreview} alt="Banner" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 28, opacity: 0.3 }}>{"\u{1F5BC}️"}</span>}
+        <div>
+          <label style={{ display: "inline-block", padding: "6px 14px", borderRadius: 8, background: "rgba(76,201,255,0.1)", border: "1px solid rgba(76,201,255,0.2)", color: "#4cc9ff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+            {t("wa_upload_logo")}
+            <input type="file" accept="image/*" onChange={handleImage("logo")} style={{ display: "none" }} />
+          </label>
+          <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 4 }}>{t("wa_profile_photo_hint")}</div>
         </div>
-        <label style={{ display: "inline-block", padding: "6px 14px", borderRadius: 8, background: "rgba(76,201,255,0.1)", border: "1px solid rgba(76,201,255,0.2)", color: "#4cc9ff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-          {t("wa_upload_banner")}
-          <input type="file" accept="image/*" onChange={handleImage("banner")} style={{ display: "none" }} />
-        </label>
-        <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 4 }}>{t("wa_banner_hint")}</div>
       </div>
     </div>
 
@@ -147,9 +128,25 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
     <Field label={t("wa_bot_name")} value={profile.botName} onChange={v => update("botName", v)} placeholder={clinic.name || "Klinik Name"} />
     <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: -8, marginBottom: 12 }}>{t("wa_bot_name_hint")}</div>
 
-    {/* Info / About */}
-    <Field label={t("wa_bot_info")} value={profile.infoText} onChange={v => update("infoText", v.slice(0, 256))} placeholder={t("wa_bot_info_placeholder")} type="textarea" />
-    <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: -8, marginBottom: 12 }}>{t("wa_bot_info_hint")} ({(profile.infoText || "").length}/256)</div>
+    {/* Info / About — Status text */}
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>{t("wa_bot_info") || "Info / Über-Text"}</div>
+      {(() => {
+        const aboutOptions = [
+          { de: "Hey! Ich benutze WhatsApp.", en: "Hey there! I am using WhatsApp.", tr: "Merhaba! WhatsApp kullanıyorum." },
+          { de: "Verfügbar", en: "Available", tr: "Müsait" },
+          { de: "Beschäftigt", en: "Busy", tr: "Meşgul" },
+          { de: "Bei der Arbeit", en: "At work", tr: "İş yerinde" },
+          { de: "Kann nicht sprechen, nur WhatsApp", en: "Can't talk, WhatsApp only", tr: "Konuşamam, sadece WhatsApp" },
+          { de: "Nur dringende Anrufe", en: "Urgent calls only", tr: "Sadece acil aramalar" },
+        ];
+        return <select value={profile.infoText || ""} onChange={e => update("infoText", e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated)", border: "1px solid var(--border-strong)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 13, outline: "none", marginBottom: 6 }}>
+          <option value="" style={{ background: "#1a1d2e" }}>{"— Status auswählen —"}</option>
+          {aboutOptions.map((opt, i) => <option key={i} value={opt.de + " | " + opt.en + " | " + opt.tr} style={{ background: "#1a1d2e" }}>{opt.de} / {opt.en} / {opt.tr}</option>)}
+        </select>;
+      })()}
+      <div style={{ fontSize: 10, color: "var(--text-faint)" }}>{t("wa_bot_info_hint") || "WhatsApp Status-Text unter dem Profilnamen"}</div>
+    </div>
 
     {/* Business Category */}
     <div style={{ marginBottom: 12 }}>
@@ -190,7 +187,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
           </label>
         </div>;
       })}
-      <div style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.08)", fontSize: 11, color: "rgba(16,185,129,0.7)" }}>
+      <div style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", fontSize: 11, color: "rgba(232,238,252,0.7)" }}>
         {"\u{1F4A1}"} {t("hours_open_24")}
       </div>
     </div>
@@ -199,8 +196,8 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
     <div style={{ marginBottom: 16 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>{t("wa_preview")}</div>
       <div style={{ maxWidth: 320, borderRadius: 16, overflow: "hidden", background: "#0b141a", border: "1px solid var(--border-strong)" }}>
-        {/* Banner */}
-        <div style={{ height: 100, background: bannerPreview ? `url(${bannerPreview}) center/cover` : "linear-gradient(135deg, #075e54, #128c7e)", position: "relative" }}>
+        {/* Header */}
+        <div style={{ height: 100, background: "linear-gradient(135deg, #075e54, #128c7e)", position: "relative" }}>
           {/* Profile pic overlay */}
           <div style={{ position: "absolute", bottom: -28, left: 16, width: 56, height: 56, borderRadius: "50%", background: "#1a2530", border: "3px solid #0b141a", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {logoPreview ? <img src={logoPreview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 22, opacity: 0.5 }}>{"\u{1F916}"}</span>}
@@ -209,7 +206,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         {/* Info area */}
         <div style={{ padding: "36px 16px 16px" }}>
           <div style={{ fontWeight: 700, fontSize: 16, color: "#e9edef" }}>{profile.botName || clinic.name || t("wa_bot_name_fallback")}</div>
-          <div style={{ fontSize: 12, color: "#8696a0", marginTop: 2 }}>{profile.infoText || t("wa_bot_info_placeholder")}</div>
+          <div style={{ fontSize: 12, color: "#8696a0", marginTop: 2 }}>{(profile.infoText || "").split(" | ")[0] || t("wa_bot_info_placeholder")}</div>
           <div style={{ marginTop: 10, borderTop: "1px solid var(--border-default)", paddingTop: 10 }}>
             {profile.address && <div style={{ fontSize: 11, color: "#8696a0", marginBottom: 4 }}>{"\u{1F4CD}"} {profile.address}</div>}
             {(profile.email || clinic.clinicEmail) && <div style={{ fontSize: 11, color: "#8696a0", marginBottom: 4 }}>{"✉️"} {profile.email || clinic.clinicEmail}</div>}
@@ -227,6 +224,10 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
       {waProfileError}
     </div>}
 
+    <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", fontSize: 11, color: "rgba(167,177,195,0.7)", marginBottom: 12, lineHeight: 1.6 }}>
+      {"ℹ️"} {"Ihr WhatsApp-Profil wird von unserem Team eingerichtet. Nach dem Speichern kann die Aktivierung bis zu 24 Stunden dauern."}
+    </div>
+
     <button
       onClick={saveProfile}
       disabled={waProfileSaving || !isConnected}
@@ -237,7 +238,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         opacity: waProfileSaving ? 0.7 : 1,
       }}
     >
-      {waProfileSaving ? (t("saving")) : (t("wa_sync_to_meta"))}
+      {waProfileSaving ? (t("saving")) : "Profil speichern"}
     </button>
   </div>;
 }

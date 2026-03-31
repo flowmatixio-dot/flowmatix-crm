@@ -132,7 +132,14 @@ export function useCrmData({
   const resolveTemplate = (tpl, lead) => {
     if (!tpl || !lead) return tpl?.text || "";
     let text = tpl.text;
-    const vars = { "{first_name}": lead.name?.split(" ")[0] || lead.name, "{name}": lead.name, "{treatment}": lead.treatment || "", "{doctor}": lead.assigned || "Dr. Yilmaz", "{date}": lead.booking?.date || "TBD", "{time}": lead.booking?.time || "TBD", "{price}": lead.reviewData?.price || "", "{payment_link}": "checkout.stripe.com/pay/...", "{clinic}": clinic?.name || "Flowmatix" };
+    // {time} = patient check-in time (OP start minus offset), not raw OP time
+    const _rawTime = lead.booking?.time || "TBD";
+    let _patientTime = _rawTime;
+    if (_rawTime !== "TBD" && clinic?.checkinOffsetMinutes) {
+      const [_h, _m] = _rawTime.split(":").map(Number);
+      if (!isNaN(_h)) { const _tot = Math.max(0, _h * 60 + (_m||0) - (clinic.checkinOffsetMinutes || 60)); _patientTime = `${String(Math.floor(_tot/60)).padStart(2,"0")}:${String(_tot%60).padStart(2,"0")}`; }
+    }
+    const vars = { "{first_name}": lead.name?.split(" ")[0] || lead.name, "{name}": lead.name, "{treatment}": lead.treatment || "", "{doctor}": lead.assigned || "Dr. Yilmaz", "{date}": lead.booking?.date || "TBD", "{time}": _patientTime, "{price}": lead.reviewData?.price || "", "{payment_link}": "checkout.stripe.com/pay/...", "{clinic}": clinic?.name || "Flowmatix" };
     Object.entries(vars).forEach(([k, v]) => { text = text.replaceAll(k, v); });
     return text;
   };

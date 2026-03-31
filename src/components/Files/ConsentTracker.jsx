@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import { fmLocale } from "../../utils/helpers";
+import { uploadToDrive } from "../../api/client";
 
 const getConsentItems = (t) => [
   { key: "treatment_contract", label: t("treatment_contract") || "Behandlungsvertrag", icon: "📋", desc: t("treatment_contract_desc") || "Vertrag über die geplante Behandlung", required: true },
@@ -43,7 +44,7 @@ export default function ConsentTracker({ patient, onUpdate, onRequestSignature, 
         background: `${pctColor}06`, border: `1px solid ${pctColor}15`,
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
             {t("consents_label") || "Einwilligungen"}
           </span>
           <span style={{ fontSize: 14, fontWeight: 800, color: pctColor }}>
@@ -83,14 +84,14 @@ export default function ConsentTracker({ patient, onUpdate, onRequestSignature, 
                   background: isSigned ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
                   border: `1px solid ${isSigned ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.06)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, color: isSigned ? "#10b981" : "rgba(167,177,195,0.3)",
+                  fontSize: 13, color: isSigned ? "#10b981" : "rgba(167,177,195,0.7)",
                 }}>
                   {isSigned ? "✓" : item.icon}
                 </div>
 
                 {/* Label — single line with required dot */}
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: isSigned ? "rgba(232,238,252,0.8)" : "rgba(167,177,195,0.5)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: isSigned ? "rgba(232,238,252,0.95)" : "rgba(167,177,195,0.7)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {item.label}
                     {item.required && !isSigned && <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: "#ef4444", marginLeft: 6, verticalAlign: "middle" }} />}
                   </div>
@@ -105,7 +106,7 @@ export default function ConsentTracker({ patient, onUpdate, onRequestSignature, 
                   {isSigned ? `${t("signed") || "Unterschrieben"} ${consent.signedAt ? new Date(consent.signedAt).toLocaleDateString(fmLocale()) : ""}` : (t("pending") || "Ausstehend")}
                 </span>
 
-                <span style={{ fontSize: 10, color: "rgba(167,177,195,0.2)", transition: "transform 0.2s", transform: isExpanded ? "rotate(90deg)" : "rotate(0)" }}>▶</span>
+                <span style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", transition: "transform 0.2s", transform: isExpanded ? "rotate(90deg)" : "rotate(0)" }}>▶</span>
               </div>
 
               {/* Expanded details */}
@@ -121,13 +122,35 @@ export default function ConsentTracker({ patient, onUpdate, onRequestSignature, 
                           padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                           background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.12)", color: "#10b981",
                         }}>{t("mark_as_signed") || "Als unterschrieben markieren"}</button>
-                        <button onClick={() => {
-                          onRequestSignature?.(item.key, item.label);
-                          showT?.(`${t("consent_requested") || "Einwilligung angefordert"}: ${item.label}`);
-                        }} style={{
-                          padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                          background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", color: "#4cc9ff",
-                        }}>{t("request_via_whatsapp") || "Per WhatsApp anfordern"}</button>
+                        {item.key === "data_privacy" ? (
+                          <button onClick={() => {
+                            onRequestSignature?.(item.key, item.label);
+                            showT?.(`${t("consent_requested") || "Einwilligung angefordert"}: ${item.label}`);
+                          }} style={{
+                            padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", color: "#4cc9ff",
+                          }}>{t("request_via_whatsapp") || "Per WhatsApp anfordern"}</button>
+                        ) : (
+                          <label style={{
+                            padding: "6px 14px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.12)", color: "#4cc9ff",
+                            display: "inline-flex", alignItems: "center", gap: 4,
+                          }}>
+                            {"📄"} {t("upload") || "Upload"}
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display: "none" }} onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                await uploadToDrive(file, patient?.patientId || patient?.id, "consent");
+                                onUpdate?.(item.key, { signed: true, signedAt: new Date().toISOString(), method: "digital", fileName: file.name });
+                                showT?.(`${item.label}: ${file.name} ${t("uploaded") || "hochgeladen"}`);
+                              } catch (err) {
+                                console.error("Upload failed:", err);
+                                showT?.(t("upload_failed") || "Upload fehlgeschlagen");
+                              }
+                            }} />
+                          </label>
+                        )}
                       </>
                     )}
                     {isSigned && (
@@ -140,7 +163,7 @@ export default function ConsentTracker({ patient, onUpdate, onRequestSignature, 
                     )}
                   </div>
                   {consent.signedAt && (
-                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.25)" }}>
+                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)" }}>
                       {t("method") || "Methode"}: {consent.method === "whatsapp" ? "WhatsApp" : consent.method === "digital" ? "Digital" : (t("manual") || "Manuell")}
                       {consent.signedAt && ` · ${new Date(consent.signedAt).toLocaleString(fmLocale())}`}
                     </div>

@@ -46,7 +46,7 @@ export default function PipelineView() {
     getLeadScore, t, invoices, clinic, setView, activeClinicId,
   } = useApp();
   const { msgs, setSelChat } = useInboxStore();
-  const depositRequired = clinic?.deposit_required !== false && clinic?.deposit_required !== "false";
+  const depositRequired = clinic?.deposit_required === true || clinic?.deposit_required === "true";
   const depositBeforeAppt = clinic?.deposit_before_appointment !== false;
   const [showCancelled, setShowCancelled] = useState(false);
   const [pipeTab, setPipeTab] = useState("active");
@@ -77,7 +77,7 @@ export default function PipelineView() {
           <button key={tab.id} onClick={() => { setPipeTab(tab.id); window.dispatchEvent(new Event("fm:scroll-top")); }} style={{
             padding: "10px 20px", background: "transparent", border: "none",
             borderBottom: pipeTab === tab.id ? "2px solid #4cc9ff" : "2px solid transparent",
-            color: pipeTab === tab.id ? "#4cc9ff" : "rgba(167,177,195,0.5)",
+            color: pipeTab === tab.id ? "#4cc9ff" : "rgba(167,177,195,0.7)",
             fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
             transition: "all .15s",
           }}>{tab.label}</button>
@@ -92,17 +92,17 @@ export default function PipelineView() {
           { color: "#10b981", label: t("legend_ok") || "OK" },
           { color: "#ff8a2a", label: t("legend_process") || "Prozess" },
           { color: "#ef4444", label: t("legend_missing") || "Fehlt" },
-          { color: "rgba(167,177,195,0.3)", label: t("legend_open") || "Offen" },
+          { color: "rgba(167,177,195,0.7)", label: t("legend_open") || "Offen" },
         ].map(l => (
           <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <span style={{ width: 8, height: 8, borderRadius: "50%", background: l.color }} />
-            <span style={{ fontSize: 10, color: "rgba(167,177,195,0.4)", fontWeight: 600 }}>{l.label}</span>
+            <span style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", fontWeight: 600 }}>{l.label}</span>
           </div>
         ))}
       </div>
       {/* Pipeline empty hint — live mode only */}
       {myLeads.filter(l => l.stage !== "cancelled").length === 0 && !isDemoMode() && (
-        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_pipeline_empty_live")}</div>
+        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_pipeline_empty_live")}</div>
       )}
       {/* 4-Column Kanban */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, flex: 1, minHeight: "calc(100vh - 140px)" }}>
@@ -161,7 +161,7 @@ export default function PipelineView() {
               {/* Cards */}
               <div style={{ flex: 1, padding: 8, display: "flex", flexDirection: "column", gap: 8, overflowY: "auto" }}>
                 {items.length === 0 && (
-                  <div style={{ padding: "24px 12px", textAlign: "center", color: "rgba(167,177,195,0.3)", fontSize: 12 }}>
+                  <div style={{ padding: "24px 12px", textAlign: "center", color: "rgba(167,177,195,0.7)", fontSize: 12 }}>
                     {t("no_patients") || "Keine Patienten"}
                   </div>
                 )}
@@ -194,8 +194,8 @@ export default function PipelineView() {
           {archivedLeads.length === 0 ? (
             <div style={{ padding: "60px 40px", textAlign: "center", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
               <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.3 }}>📋</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.6)", marginBottom: 6 }}>{t("archive_empty_title")}</div>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.35)" }}>{t("archive_empty_desc")}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.95)", marginBottom: 6 }}>{t("archive_empty_title")}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.75)" }}>{t("archive_empty_desc")}</div>
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
@@ -209,8 +209,8 @@ export default function PipelineView() {
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: lead.stage === "done" ? "#10b981" : "#ef4444" }} />
                     <span style={{ fontWeight: 700, fontSize: 13, color: "rgba(232,238,252,0.85)" }}>{lead.name}</span>
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{lead.treatment || "—"}</div>
-                  <div style={{ fontSize: 10, color: "rgba(167,177,195,0.25)", marginTop: 4 }}>
+                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{lead.treatment || "—"}</div>
+                  <div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 4 }}>
                     {lead.stage === "done" ? ("✓ " + (t("stage_completed") || "Completed")) : ("✕ " + (t("badge_cancelled") || "Cancelled"))}
                   </div>
                 </div>
@@ -224,8 +224,8 @@ export default function PipelineView() {
       {pipeTab === "files" && (
         <div style={{ padding: "60px 40px", textAlign: "center", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
           <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.3 }}>📁</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.6)", marginBottom: 6 }}>{t("files_empty_title")}</div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.35)" }}>{t("files_empty_desc")}</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.95)", marginBottom: 6 }}>{t("files_empty_title")}</div>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.75)" }}>{t("files_empty_desc")}</div>
         </div>
       )}
     </div>
@@ -239,7 +239,7 @@ export default function PipelineView() {
 function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadScore, t, depositRequired, depositBeforeAppt, goToChat }) {
   // Conversation status badge map (computed but used for reference)
   const _convMap = {
-    ai_active: { color: "rgba(167,177,195,0.5)", icon: "BOT" },
+    ai_active: { color: "rgba(167,177,195,0.7)", icon: "BOT" },
     human_takeover: { color: "#ef4444", icon: "!" },
     needs_medical_review: { color: "#f59e0b", icon: "MR" },
     waiting_for_clinic_reply: { color: "#f59e0b", icon: "..." },
@@ -270,12 +270,12 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
   })();
 
   const agingColor = (() => {
-    if (!agingDate) return "rgba(167,177,195,0.3)";
+    if (!agingDate) return "rgba(167,177,195,0.7)";
     const diff = getNowMs() - new Date(agingDate).getTime();
     const days = diff / 86400000;
     if (days > 7) return "#ef4444";
     if (days > 3) return "#ff8a2a";
-    return "rgba(167,177,195,0.3)";
+    return "rgba(167,177,195,0.7)";
   })();
 
   // Local patient — no transfer needed
@@ -297,16 +297,24 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
     opBadges.push({ label: t("review_label"), ...bs.orange });
   if (isLocal)
     opBadges.push({ label: t("local_patient"), ...bs.green });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !(lead.flightConfirmed && lead.flightConfirmed.date))
-    opBadges.push({ label: t("flight_missing_badge") || "Flug fehlt", background: LOGISTICS_COLORS.flight_missing.bg, color: LOGISTICS_COLORS.flight_missing.color });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !(lead.logistics && lead.logistics.driverName))
-    opBadges.push({ label: t("driver_missing") || "Fahrer fehlt", background: LOGISTICS_COLORS.driver_missing.bg, color: LOGISTICS_COLORS.driver_missing.color });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !(lead.hotelInfo?.name || lead.hotel?.name))
-    opBadges.push({ label: t("hotel_missing") || "Hotel fehlt", background: LOGISTICS_COLORS.hotel_missing.bg, color: LOGISTICS_COLORS.hotel_missing.color });
+  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal) {
+    const hasFlightData = !!(lead.flightConfirmed && lead.flightConfirmed.date);
+    if (!hasFlightData) {
+      // No flight yet → just waiting, grey info badge
+      opBadges.push({ label: "✈️ " + (t("wait_flight") || "Waiting for flight"), background: "rgba(167,177,195,0.08)", color: "rgba(167,177,195,0.7)" });
+    } else {
+      if (!(lead.logistics && lead.logistics.driverName))
+        opBadges.push({ label: "🚗 " + (t("wait_driver") || "Waiting for driver"), background: LOGISTICS_COLORS.driver_missing.bg, color: LOGISTICS_COLORS.driver_missing.color });
+      if (!(lead.hotelInfo?.name || lead.hotel?.name))
+        opBadges.push({ label: "🏨 " + (t("wait_hotel") || "Waiting for hotel"), background: LOGISTICS_COLORS.hotel_missing.bg, color: LOGISTICS_COLORS.hotel_missing.color });
+    }
+  }
   if (lead.metadata?.depositPending)
     opBadges.push({ label: t("step_deposit") || "Anzahlung", background: "rgba(234,179,8,0.12)", color: "#eab308" });
   else if (opBadges.length === 0 && (lead.convStatus === "deposit_paid" || (lead.financials && lead.financials.depositStatus === "paid")))
     opBadges.push({ label: t("paid_label"), ...bs.green });
+  if (opBadges.length === 0 && lead.convStatus === "booking_pending")
+    opBadges.push({ label: t("booking_pending") || "Buchung offen", ...bs.purple });
   if (opBadges.length === 0 && lead.convStatus === "collecting_photos")
     opBadges.push({ label: t("collecting_photos") || "Collecting photos", background: "rgba(76,201,255,0.12)", color: "#4cc9ff" });
   if (opBadges.length === 0 && lead._hasFutureAppt && lead.stage === "contacted")
@@ -396,7 +404,7 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
       )}
 
       {/* Third row: Country */}
-      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginBottom: 6, paddingLeft: 30 }}>
+      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginBottom: 6, paddingLeft: 30 }}>
         {translateValue(lead.country) || ""}
       </div>
 
@@ -426,23 +434,23 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
       <div style={{ display: "flex", gap: 3, paddingLeft: 30, marginTop: 4 }}>
         {(() => {
           const baseSteps = [
-            { done: true, t: t("step_inquiry") || "Anfrage" },
-            { done: (lead.photoUrls || []).length >= 3 || lead.photos, t: t("step_photos") || "Fotos" },
-            { done: !!lead.reviewData, t: t("step_review") || "Bewertung" },
+            { key: "inquiry", done: true, t: t("step_inquiry") || "Anfrage" },
+            { key: "photos", done: (lead.photoUrls || []).length >= 3 || lead.photos, t: t("step_photos") || "Fotos" },
+            { key: "review", done: !!lead.reviewData, t: t("step_review") || "Bewertung" },
           ];
           if (depositRequired && depositBeforeAppt) {
-            baseSteps.push({ done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "booked" || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
+            baseSteps.push({ key: "deposit", done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "booked" || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
           }
-          baseSteps.push({ done: lead.stage === "booked" || lead.stage === "done", t: t("step_booked") || "Gebucht" });
+          baseSteps.push({ key: "booked", done: lead.stage === "booked" || lead.stage === "done", t: t("step_booked") || "Gebucht" });
           if (depositRequired && !depositBeforeAppt) {
-            baseSteps.push({ done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
+            baseSteps.push({ key: "deposit", done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
           }
           // Transfer steps — skip for local patients
           if (!isLocal) {
             baseSteps.push(
-              { done: !!(lead.flightConfirmed && lead.flightConfirmed.date) || !!(lead.metadata && lead.metadata.noFlightNeeded), t: t("step_flight") || "Flug" },
-              { done: !!(lead.logistics?.driverName), t: t("driver") || "Fahrer" },
-              { done: !!(lead.hotelInfo?.name || lead.hotel?.name), t: t("hotel") || "Hotel" },
+              { key: "flight", done: !!(lead.flightConfirmed && lead.flightConfirmed.date) || !!(lead.metadata && lead.metadata.noFlightNeeded), t: t("step_flight") || "Flug" },
+              { key: "driver", done: !!(lead.logistics?.driverName), t: t("driver") || "Fahrer" },
+              { key: "hotel", done: !!(lead.hotelInfo?.name || lead.hotel?.name), t: t("hotel") || "Hotel" },
             );
           }
           const steps = baseSteps;
@@ -454,9 +462,11 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
           const isHandover = lead.convStatus === "human_takeover";
           return steps.map((s, i) => {
             let color;
-            const isReviewStep = s.t.includes("Bewertung") || s.t.includes("Review") || s.t.includes("İnceleme");
+            const isReviewStep = s.key === "review";
+            const isDepositStep = s.key === "deposit";
+            const depositPending = isDepositStep && !s.done && lead.reviewData;
             // Blink red↔orange when handover active on the current step the patient is stuck at
-            const shouldBlink = isHandover && !s.done && i === firstNotDone;
+            const shouldBlink = (isHandover && !s.done && i === firstNotDone) || depositPending;
             if (allDone) {
               color = "#10b981";
             } else if (s.done) {
@@ -465,8 +475,10 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
               color = isHandover ? "#ef4444" : "#ff8a2a";
             } else if (i === firstNotDone) {
               color = isHandover ? "#ef4444" : "#ff8a2a";
+            } else if (depositPending) {
+              color = "#fbbf24";
             } else {
-              color = "rgba(167,177,195,0.2)";
+              color = "rgba(167,177,195,0.6)";
             }
             return (
               <div key={i} title={s.t} style={{

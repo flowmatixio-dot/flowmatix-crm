@@ -40,17 +40,27 @@ export const usePatientStore = create((set, get) => ({
       name: p.name || [p.first_name, p.last_name].filter(Boolean).join(' ') || p.phone || 'Unknown',
       treatment: p.treatment || p.intake_data?.treatment || p.metadata?.treatment || '',
       stage: (() => {
-        const s = p.stage || p.metadata?.stage || 'new';
+        const s = p.metadata?.stage || p.case_status || p.caseStatus || 'new';
         const cs = p.convStatus || p.conversation_state || 'ai_active';
         const hasPhotos = (p.photoUrls || p.photo_urls || []).length > 0 || p.photos;
         const hasReview = !!p.reviewData;
         const needsReview = cs === 'needs_medical_review';
         const isHandover = cs === 'human_takeover';
         const isCollecting = cs === 'collecting_photos';
+        // Handover: patient stays in current stage — do NOT move
+        if (isHandover) return s === 'new' ? 'new' : s;
         // new → contacted (Arzt-Review): patient has photos, review, or needs attention
-        if (s === 'new' && (hasPhotos || hasReview || needsReview || isHandover || isCollecting)) return 'contacted';
-        // contacted → booked: deposit paid or booking confirmed
-        if ((cs === 'deposit_paid' || cs === 'booking_pending') && (s === 'new' || s === 'contacted')) return 'booked';
+        if (s === 'new' && (hasPhotos || hasReview || needsReview || isCollecting)) return 'contacted';
+        // termin stages always = booked (even with deposit_paid)
+        if (['termin_bestaetigt', 'termin_reserviert', 'termin_gebucht'].includes(s)) return 'booked';
+        // deposit_paid WITHOUT termin = still waiting, not booked yet
+        if (cs === 'deposit_paid') return 'contacted';
+        if (cs === 'booking_pending') return 'contacted';
+        if (s === 'angebot_gesendet' && cs !== 'deposit_paid' && cs !== 'booking_pending' && cs !== 'needs_medical_review') return 'booked';
+        if (s === 'abgeschlossen') return 'done';
+        if (s === 'storniert') return 'cancelled';
+        if (['neue_anfrage', 'anfrage_neu', 'new_inquiry'].includes(s)) return 'new';
+        if (['contacted', 'arzt_zugewiesen', 'review_broadcast', 'fotos_erhalten', 'bewertung_ausstehend'].includes(s)) return 'contacted';
         return s;
       })(),
       convStatus: p.convStatus || p.conversation_state || 'ai_active',
@@ -207,11 +217,14 @@ export const usePatientStore = create((set, get) => ({
       resolved: 'closed', closed: 'closed',
     };
     set((s) => ({
-      leads: s.leads.map((l) =>
-        l.id === lid
-          ? { ...l, convStatus: status, controlMode: controlMap[status] || 'ai', controlUpdatedAt: new Date().toISOString() }
-          : l
-      ),
+      leads: s.leads.map((l) => {
+        if (l.id !== lid) return l;
+        const updated = { ...l, convStatus: status, controlMode: controlMap[status] || 'ai', controlUpdatedAt: new Date().toISOString() };
+        // Recalculate stage immediately to prevent flickering
+        if (status === 'deposit_paid' || status === 'booking_pending') updated.stage = 'contacted';
+        if (status === 'resolved' || status === 'closed') updated.stage = 'done';
+        return updated;
+      }),
     }));
     fmApi.updatePatient(lid, { convStatus: status }).catch(e => {
       console.error('[patientStore] setConvStatus failed:', e.message || e);

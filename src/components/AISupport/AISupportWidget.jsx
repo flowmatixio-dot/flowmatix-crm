@@ -490,7 +490,7 @@ export default function AISupportWidget() {
                 <div style={{ fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "-0.01em" }}>
                   Flowmatix AI Support
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", marginTop: 1 }}>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.65)", marginTop: 1 }}>
                   {lang === "de" ? "Setup · WhatsApp · CRM Hilfe" : lang === "tr" ? "Kurulum · WhatsApp · CRM Yardım" : "Setup · WhatsApp · CRM Help"}
                 </div>
               </div>
@@ -498,7 +498,7 @@ export default function AISupportWidget() {
             <button onClick={() => setIsOpen(false)} style={{
               width: 28, height: 28, borderRadius: 7,
               background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-              color: "rgba(167,177,195,0.4)", fontSize: 14, cursor: "pointer",
+              color: "rgba(167,177,195,0.6)", fontSize: 14, cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontFamily: "inherit", transition: "all .15s",
             }}
@@ -520,7 +520,7 @@ export default function AISupportWidget() {
                 <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(232,238,252,0.85)", marginBottom: 5 }}>
                   {lang === "de" ? "Wie kann ich helfen?" : lang === "tr" ? "Nasil yardimci olabilirim?" : "How can I help?"}
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", lineHeight: 1.5 }}>
+                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", lineHeight: 1.5 }}>
                   {lang === "de"
                     ? "Fragen zu Setup, WhatsApp, Bot oder CRM-Funktionen."
                     : lang === "tr"
@@ -636,7 +636,7 @@ export default function AISupportWidget() {
                 background: draft.trim() && !busy
                   ? "linear-gradient(135deg, #4cc9ff, #2b7cff)"
                   : "rgba(255,255,255,0.05)",
-                color: draft.trim() && !busy ? "#fff" : "rgba(167,177,195,0.25)",
+                color: draft.trim() && !busy ? "#fff" : "rgba(167,177,195,0.65)",
                 fontSize: 16, cursor: draft.trim() && !busy ? "pointer" : "not-allowed",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0, transition: "all .2s",
@@ -645,7 +645,7 @@ export default function AISupportWidget() {
               }}
             >↑</button>
           </div>
-          <div style={{ textAlign: "center", marginTop: 5, fontSize: 9.5, color: "rgba(167,177,195,0.2)", letterSpacing: "0.02em" }}>
+          <div style={{ textAlign: "center", marginTop: 5, fontSize: 9.5, color: "rgba(167,177,195,0.6)", letterSpacing: "0.02em" }}>
             Powered by Flowmatix AI
           </div>
         </div>
@@ -675,7 +675,7 @@ export default function AISupportWidget() {
         }}
       >
         {isOpen ? (
-          <span style={{ fontSize: 16, lineHeight: 1, color: "rgba(167,177,195,0.5)" }}>✕</span>
+          <span style={{ fontSize: 16, lineHeight: 1, color: "rgba(167,177,195,0.7)" }}>✕</span>
         ) : (
           <>
             <FlowmatixOrb size={32} />

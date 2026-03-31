@@ -160,7 +160,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
             onClick={onClose}
             style={{
               background: "none", border: "none",
-              color: "rgba(167,177,195,0.5)", fontSize: 20, cursor: "pointer",
+              color: "rgba(167,177,195,0.7)", fontSize: 20, cursor: "pointer",
             }}
           >
             ✕
@@ -245,7 +245,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
             { key: "duration_4500_plus", label: "> 4.500", def: 10 },
           ].map(d => (
             <div key={d.key} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{d.label}</div>
+              <div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{d.label}</div>
               <select value={opDurations[d.key]} onChange={e => setOpDurations(p => ({ ...p, [d.key]: parseInt(e.target.value) }))} style={{
                 width: "100%", padding: "8px 4px", borderRadius: 8,
                 background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
@@ -257,7 +257,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
             </div>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.3)", marginBottom: 20, marginTop: -8 }}>ℹ️ Der Kalender berechnet die OP-Dauer automatisch anhand der Graft-Anzahl aus der Arzt-Bewertung.</div>
+        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginBottom: 20, marginTop: -8 }}>ℹ️ Der Kalender berechnet die OP-Dauer automatisch anhand der Graft-Anzahl aus der Arzt-Bewertung.</div>
 
         {/* Treatment types */}
         <SectionTitle>{t("treatment_types")}</SectionTitle>
@@ -273,7 +273,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
                   cursor: "pointer", fontFamily: "inherit", outline: "none",
                   border: `1px solid ${active ? "#4cc9ff" : "rgba(255,255,255,0.1)"}`,
                   background: active ? "rgba(76,201,255,0.12)" : "rgba(255,255,255,0.03)",
-                  color: active ? "#4cc9ff" : "rgba(167,177,195,0.5)",
+                  color: active ? "#4cc9ff" : "rgba(167,177,195,0.7)",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -297,7 +297,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
                   cursor: "pointer", fontFamily: "inherit", outline: "none",
                   border: `1px solid ${active ? "rgba(76,201,255,0.3)" : "rgba(255,255,255,0.06)"}`,
                   background: active ? "rgba(76,201,255,0.12)" : "rgba(255,255,255,0.02)",
-                  color: active ? "#4cc9ff" : "rgba(167,177,195,0.3)",
+                  color: active ? "#4cc9ff" : "rgba(167,177,195,0.7)",
                   transition: "all .15s",
                 }}
               >
@@ -321,7 +321,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
                   cursor: "pointer", fontFamily: "inherit", outline: "none",
                   border: `1px solid ${active ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.06)"}`,
                   background: active ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.02)",
-                  color: active ? "#10b981" : "rgba(167,177,195,0.3)",
+                  color: active ? "#10b981" : "rgba(167,177,195,0.7)",
                   transition: "all .15s",
                 }}
               >
@@ -454,7 +454,7 @@ function SectionTitle({ children }) {
 function CapacityInput({ label, value, onChange }) {
   return (
     <div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.5)", marginBottom: 4 }}>
+      <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 4 }}>
         {label}
       </div>
       <input
