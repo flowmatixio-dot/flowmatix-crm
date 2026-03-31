@@ -25,6 +25,8 @@ export default function WhatsAppSetupPage() {
       desc: "Verbinde deine Klinik-Nummer f\u00fcr automatische Patientenkommunikation.",
       btn: "Jetzt verbinden",
       connecting: "Verbinde Nummer\u2026",
+      requested_title: "WhatsApp wird eingerichtet",
+      requested_desc: "Du bekommst in den n\u00e4chsten 1\u20132 Stunden einen SMS-Code auf deine Nummer.\nBitte gib ihn dann hier ein.",
       phone_label: "Telefonnummer",
       phone_hint: "z.B. +49 170 1234567",
       micro: "In den meisten F\u00e4llen ist deine Nummer in wenigen Minuten aktiv. Falls eine zus\u00e4tzliche Best\u00e4tigung erforderlich ist, wirst du automatisch durch die n\u00e4chsten Schritte gef\u00fchrt.",
@@ -69,6 +71,8 @@ export default function WhatsAppSetupPage() {
       desc: "Connect your clinic number for automatic patient communication.",
       btn: "Connect now",
       connecting: "Connecting\u2026",
+      requested_title: "WhatsApp is being set up",
+      requested_desc: "You will receive an SMS code on your number within the next 1\u20132 hours.\nPlease enter it here when it arrives.",
       phone_label: "Phone number",
       phone_hint: "e.g. +49 170 1234567",
       micro: "In most cases your number will be active within minutes.",
@@ -113,6 +117,8 @@ export default function WhatsAppSetupPage() {
       desc: "Otomatik hasta ileti\u015fimi i\u00e7in klinik numaran\u0131 ba\u011fla.",
       btn: "Ba\u011fla",
       connecting: "Ba\u011flan\u0131yor\u2026",
+      requested_title: "WhatsApp kuruluyor",
+      requested_desc: "1\u20132 saat i\u00e7inde numaran\u0131za bir SMS kodu gelecek.\nL\u00fctfen geldi\u011finde buraya girin.",
       phone_label: "Telefon",
       phone_hint: "\u00f6rn. +90 555 123 4567",
       micro: "Numaran\u0131z genellikle dakikalar i\u00e7inde aktif olur.",
@@ -362,6 +368,30 @@ export default function WhatsAppSetupPage() {
     );
 
   /* ══════════════════════════════════════════════ */
+  /*  STATE: requested (waiting for operator)        */
+  /* ══════════════════════════════════════════════ */
+  if (S === "requested") {
+    // Poll every 10s to detect when operator provisions
+    setTimeout(() => {
+      fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" })
+        .then(r => r.json())
+        .then(d => { if (d?.onboarding?.state && d.onboarding.state !== "requested") location.reload(); });
+    }, 10000);
+    return (
+      <div style={{ ...wrap, textAlign: "center" }}>
+        <div>
+          <div style={{ fontSize: 40, marginBottom: 16, animation: "fmpulse 1.5s ease-in-out infinite" }}>⏳</div>
+          <div style={{ fontSize: 16, fontWeight: 700 }}>{tx.requested_title}</div>
+          <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 8, lineHeight: 1.6, whiteSpace: "pre-line" }}>
+            {tx.requested_desc}
+          </div>
+          <style>{"@keyframes fmpulse{0%,100%{opacity:1}50%{opacity:0.4}}"}</style>
+        </div>
+      </div>
+    );
+  }
+
+  /* ══════════════════════════════════════════════ */
   /*  STATE: connecting / verifying_otp             */
   /* ══════════════════════════════════════════════ */
   if (S === "connecting" || S === "verifying_otp")
@@ -390,7 +420,7 @@ export default function WhatsAppSetupPage() {
           if (!ph || ph.replace(/[^0-9+]/g, "").length < 8) return;
           const b = document.getElementById("wa-connect-btn");
           if (b) { b.textContent = tx.connecting; b.disabled = true; b.style.opacity = "0.7"; }
-          api("start", { phone: ph.trim(), clinicName: n?.name || "" }).then(go);
+          api("submit-number", { phone: ph.trim() }).then(go);
         }}>{tx.btn}</button>
         <div style={{ marginTop: 14, fontSize: 12, color: "rgba(232,238,252,0.3)", lineHeight: 1.5, textAlign: "center" }}>{tx.micro}</div>
       </div>
