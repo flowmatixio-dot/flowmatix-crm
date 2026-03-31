@@ -794,10 +794,50 @@ function TabOutreach({ d, load }) {
 function TabClinics({ d, load }) {
   const [search, setSearch] = useState('');
   const [actionMsg, setActionMsg] = useState(null);
+  const [waStatus, setWaStatus] = useState(null);
+  const [provLoading, setProvLoading] = useState(null);
   const clinics = d.clinics;
 
   const doSearch = () => load('clinics', () => api.getPlatformClinics({ search }));
   const refresh = () => load('clinics', api.getPlatformClinics);
+
+  // Load WhatsApp status
+  useEffect(() => {
+    api.getWaProvisionStatus().then(r => setWaStatus(r.clinics || [])).catch(() => {});
+  }, []);
+
+  const getWaState = (orgId) => {
+    if (!waStatus) return null;
+    return waStatus.find(w => w.organization_id === orgId);
+  };
+
+  const waStateBadge = (state) => {
+    const map = {
+      'requested': { label: '📱 Nummer eingereicht', color: '#fbbf24' },
+      'awaiting_otp': { label: '🟡 Warte auf OTP', color: '#fbbf24' },
+      'active': { label: '🟢 Verbunden', color: '#10b981' },
+      'connected': { label: '🟢 Verbunden', color: '#10b981' },
+      'not_connected': { label: '⚪ Nicht verbunden', color: '#666' },
+      'failed': { label: '🔴 Fehler', color: '#ef4444' },
+    };
+    const m = map[state] || { label: state || '—', color: '#666' };
+    return <span style={{ fontSize: 11, fontWeight: 700, color: m.color }}>{m.label}</span>;
+  };
+
+  const handleProvision = async (orgId, orgName) => {
+    setProvLoading(orgId);
+    setActionMsg(null);
+    try {
+      await api.provisionWhatsApp(orgId);
+      setActionMsg({ type: 'ok', text: `${orgName}: WhatsApp provisioniert — OTP wurde gesendet` });
+      // Refresh WA status
+      const r = await api.getWaProvisionStatus();
+      setWaStatus(r.clinics || []);
+    } catch (err) {
+      setActionMsg({ type: 'err', text: `${orgName}: ${err.message}` });
+    }
+    setProvLoading(null);
+  };
 
   const handleAction = async (action, orgId, orgName) => {
     try {
@@ -830,6 +870,25 @@ function TabClinics({ d, load }) {
           <div style={{ fontSize: 13, color: actionMsg.type === 'ok' ? S.green : S.red, wordBreak: 'break-all' }}>{actionMsg.text}</div>
         </div>
       )}
+
+      {/* WhatsApp Requests Alert */}
+      {waStatus && waStatus.filter(w => w.onboarding_state === 'requested').length > 0 && (
+        <div style={{ ...S.card, borderLeft: '3px solid #fbbf24', marginBottom: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fbbf24', marginBottom: 8 }}>📱 WhatsApp-Anfragen</div>
+          {waStatus.filter(w => w.onboarding_state === 'requested').map(w => (
+            <div key={w.organization_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #1e1e3e' }}>
+              <div>
+                <span style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>{w.clinic_name}</span>
+                <span style={{ color: '#888', fontSize: 12, marginLeft: 8 }}>{w.phone_number}</span>
+              </div>
+              <Btn small onClick={() => handleProvision(w.organization_id, w.clinic_name)} disabled={provLoading === w.organization_id}>
+                {provLoading === w.organization_id ? 'Wird provisioniert...' : 'Provisionieren'}
+              </Btn>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && doSearch()} placeholder="Kliniken durchsuchen..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
         <Btn onClick={doSearch}>Suchen</Btn>
@@ -838,15 +897,25 @@ function TabClinics({ d, load }) {
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Name</th><th style={S.th}>Status</th><th style={S.th}>Plan</th><th style={S.th}>Bereitstellung</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
+              <th style={S.th}>Name</th><th style={S.th}>Status</th><th style={S.th}>Plan</th><th style={S.th}>WhatsApp</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
-              {clinics.clinics.map(c => (
+              {clinics.clinics.map(c => {
+                const wa = getWaState(c.id);
+                return (
                 <tr key={c.id}>
                   <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.name}</span><br /><span style={{ fontSize: 11, color: '#666' }}>{c.email}</span></td>
                   <td style={S.td}>{statusBadge(c.is_active ? 'active' : 'inactive')}</td>
                   <td style={S.td}>{c.plan_name || '-'}</td>
-                  <td style={S.td}>{statusBadge(c.provisioning_status || 'pending')}</td>
+                  <td style={S.td}>
+                    {waStateBadge(wa?.onboarding_state || wa?.status)}
+                    {wa?.phone_number && <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>{wa.phone_number}</div>}
+                    {wa?.onboarding_state === 'requested' && (
+                      <Btn small onClick={() => handleProvision(c.id, c.name)} disabled={provLoading === c.id} style={{ marginTop: 4 }}>
+                        {provLoading === c.id ? '...' : 'Provisionieren'}
+                      </Btn>
+                    )}
+                  </td>
                   <td style={S.td}>{c.created_at ? timeAgo(c.created_at) : '-'}</td>
                   <td style={S.td}>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
@@ -858,7 +927,8 @@ function TabClinics({ d, load }) {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

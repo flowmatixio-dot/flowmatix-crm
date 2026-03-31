@@ -595,6 +595,19 @@ export async function updateAgentConfig(orgId, data) {
   });
 }
 
+// ── WhatsApp Provisioning (Operator) ──────────────────────
+
+export async function getWaProvisionStatus() {
+  return apiFetch('/api/v1/ops/whatsapp/status');
+}
+
+export async function provisionWhatsApp(orgId) {
+  return apiFetch('/api/v1/ops/whatsapp/provision', {
+    method: 'POST',
+    body: JSON.stringify({ orgId }),
+  });
+}
+
 // ── Health ────────────────────────────────────────────────
 
 export async function getHealth() {
