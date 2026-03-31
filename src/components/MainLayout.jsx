@@ -464,7 +464,7 @@ export default function MainLayout() {
       );
     })()}
 
-    <div style={{ display: "flex", height: "100vh", background: "#0f1623", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "rgba(232,238,252,0.96)", overflow: "hidden", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
+    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "#0f1623", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "rgba(232,238,252,0.96)", overflow: "hidden", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
       {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "#162032", border: "1px solid rgba(16,185,129,0.2)", color: "#10b981", fontWeight: 700, fontSize: 14, boxShadow: "0 4px 12px rgba(0,0,0,0.3)" }}>✓ {toast}</div>}
 
       {/* ── Doctor: New Task Popup (global, any view) ── */}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWaProfile, updateWaProfile, uploadWaProfilePhoto } from "../../api/client";
+import { getWaProfile, updateWaProfile, uploadWaProfilePhoto, saveWaProfileRequest } from "../../api/client";
 import { Field } from "./setupShared";
 
 // WhatsApp Bot Profile — AI engine, logo, banner, opening hours, preview
@@ -65,12 +65,6 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
     setWaProfileSaving(true);
     setWaProfileError(null);
     try {
-      // 1. Upload profile photo if changed (base64 data URL = new upload)
-      if (waLogoPreview && waLogoPreview.startsWith("data:")) {
-        await uploadWaProfilePhoto(waLogoPreview);
-      }
-
-      // 2. Sync profile fields to Meta API
       const hours = profile.hours || {};
       const businessHours = [];
       const dayMap = { weekdays: ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY"], saturday: ["SATURDAY"], sunday: ["SUNDAY"] };
@@ -86,7 +80,8 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         }
       }
 
-      await updateWaProfile({
+      await saveWaProfileRequest({
+        botName: profile.botName || clinic.name || "",
         about: profile.infoText || "",
         address: profile.address || "",
         email: profile.email || "",
@@ -94,10 +89,12 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         vertical: profile.category || "HEALTH",
         websites: profile.website ? [profile.website] : [],
         businessHours: businessHours.length ? { business_hours: businessHours, timezone: "Europe/Berlin" } : undefined,
+        logoUrl: profile.logoUrl || null,
+        bannerUrl: profile.bannerUrl || null,
       });
 
-      showT(t("wa_profile_synced"));
-      setWaLogoPreview(null); // clear dirty flag
+      showT(t("wa_profile_saved") || "Profil gespeichert — wird von Flowmatix eingerichtet");
+      setWaLogoPreview(null);
     } catch (err) {
       const msg = err?.body?.error || err?.message || t("error_saving");
       setWaProfileError(msg);
@@ -227,6 +224,10 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
       {waProfileError}
     </div>}
 
+    <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", fontSize: 11, color: "rgba(167,177,195,0.7)", marginBottom: 12, lineHeight: 1.6 }}>
+      {"ℹ️"} {t("wa_profile_setup_hint") || "Ihr WhatsApp-Profil wird von unserem Team eingerichtet. Nach dem Speichern kann die Aktivierung bis zu 24 Stunden dauern."}
+    </div>
+
     <button
       onClick={saveProfile}
       disabled={waProfileSaving || !isConnected}
@@ -237,7 +238,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         opacity: waProfileSaving ? 0.7 : 1,
       }}
     >
-      {waProfileSaving ? (t("saving")) : (t("wa_sync_to_meta"))}
+      {waProfileSaving ? (t("saving")) : (t("wa_profile_save_btn") || "Profil speichern")}
     </button>
   </div>;
 }

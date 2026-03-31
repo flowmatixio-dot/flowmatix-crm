@@ -164,14 +164,14 @@ export default function AutomationsView() {
         </div>
         <div style={{ padding: "0 12px" }}>
           {[
-            { name: t("tpl_treatment_plan") || "Behandlungsplan", desc: t("tpl_treatment_plan_desc") || "Nach Arzt-Bewertung — Methode, Grafts, Preis", icon: "🩺", cat: "medical", tplKey: "treatment_plan" },
-            { name: t("tpl_deposit_confirmed") || "Anzahlung bestätigt", desc: t("tpl_deposit_confirmed_desc") || "Nach Zahlungseingang — Terminbuchung anbieten", icon: "💰", cat: "payment", tplKey: "deposit_confirmed" },
-            { name: t("tpl_booking") || "Terminbestätigung", desc: t("tpl_booking_desc") || "Nach OP-Terminbuchung", icon: "✅", cat: "booking", tplKey: "booking_confirmation" },
-            { name: t("tpl_reminder") || "Erinnerung + Flugdaten", desc: t("tpl_reminder_desc") || "3 Tage vor OP — Erinnerung + Flugticket anfordern", icon: "📅", cat: "booking", tplKey: "appointment_reminder_flight" },
-            { name: t("tpl_driver_pickup") || "Fahrer-Info", desc: t("tpl_driver_pickup_desc") || "1 Tag vor Flug — Fahrer, Auto, Kennzeichen", icon: "🚗", cat: "logistics", tplKey: "driver_pickup_info" },
-            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung — Pflegeanweisungen", icon: "💊", cat: "aftercare", tplKey: "aftercare_followup" },
-            { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge — Google Maps Bewertung", icon: "⭐", cat: "aftercare", tplKey: "review_request" },
-            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen — Gespräch fortsetzen", icon: "📨", cat: "reactivation", tplKey: "fm_reactivation" },
+            { name: t("tpl_treatment_plan") || "Behandlungsplan", desc: t("tpl_treatment_plan_desc") || "Nach Arzt-Bewertung — Methode, Grafts, Preis", icon: "🩺", cat: "medical", tplKey: "fm_treatment_plan" },
+            { name: t("tpl_deposit_confirmed") || "Anzahlung bestätigt", desc: t("tpl_deposit_confirmed_desc") || "Nach Zahlungseingang — Terminbuchung anbieten", icon: "💰", cat: "payment", tplKey: "fm_deposit_confirmed" },
+            { name: t("tpl_booking") || "Terminbestätigung", desc: t("tpl_booking_desc") || "Nach OP-Terminbuchung", icon: "✅", cat: "booking", tplKey: "fm_booking_confirmation" },
+            { name: t("tpl_reminder") || "Erinnerung + Flugdaten", desc: t("tpl_reminder_desc") || "3 Tage vor OP — Erinnerung + Flugticket anfordern", icon: "📅", cat: "booking", tplKey: "fm_appointment_reminder_flight" },
+            { name: t("tpl_driver_pickup") || "Fahrer-Info", desc: t("tpl_driver_pickup_desc") || "1 Tag vor Flug — Fahrer, Auto, Kennzeichen", icon: "🚗", cat: "logistics", tplKey: "fm_driver_pickup_info" },
+            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung — Pflegeanweisungen", icon: "💊", cat: "aftercare", tplKey: "fm_aftercare_followup" },
+            { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge — Google Maps Bewertung", icon: "⭐", cat: "aftercare", tplKey: "fm_review_request" },
+            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen — Gespräch fortsetzen", icon: "📨", cat: "reactivation", tplKey: "fm_reactivation_v2" },
           ].map(tpl => (
             <div key={tpl.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>

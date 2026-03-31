@@ -640,6 +640,13 @@ export async function uploadWaProfilePhoto(imageData) {
   });
 }
 
+export async function saveWaProfileRequest(data) {
+  return apiFetch('/api/v1/clinic/whatsapp/profile/save', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 // ── Google OAuth (per clinic) ──────────────────────────
 
 export async function getGoogleStatus(orgId) {
