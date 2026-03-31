@@ -79,7 +79,7 @@ export default function CalendarToolbar({
             padding: "6px 14px", borderRadius: 8,
             background: "transparent",
             border: "1px solid rgba(255,255,255,0.08)",
-            color: "rgba(232,238,252,0.6)", fontWeight: 600, fontSize: 12,
+            color: "rgba(232,238,252,0.95)", fontWeight: 600, fontSize: 12,
             cursor: "pointer", fontFamily: "inherit",
             transition: "all 0.15s ease",
           }}
@@ -89,7 +89,7 @@ export default function CalendarToolbar({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-            e.currentTarget.style.color = "rgba(232,238,252,0.6)";
+            e.currentTarget.style.color = "rgba(232,238,252,0.95)";
           }}
         >
           {tFb(t, "cal_block_days", "Tage blocken")}
@@ -134,7 +134,7 @@ export default function CalendarToolbar({
                 background: currentView === v ? "rgba(76,201,255,0.1)" : "transparent",
                 border: "none",
                 borderRight: v !== "month" ? "1px solid rgba(255,255,255,0.06)" : "none",
-                color: currentView === v ? "#4cc9ff" : "rgba(167,177,195,0.5)",
+                color: currentView === v ? "#4cc9ff" : "rgba(167,177,195,0.7)",
                 fontWeight: currentView === v ? 700 : 600,
                 fontSize: 12, cursor: "pointer", fontFamily: "inherit",
                 transition: "all 0.15s ease",
@@ -160,7 +160,7 @@ export default function CalendarToolbar({
 const navBtnStyle = {
   padding: "5px 8px", borderRadius: 6,
   background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
-  color: "rgba(232,238,252,0.6)", cursor: "pointer", fontFamily: "inherit",
+  color: "rgba(232,238,252,0.95)", cursor: "pointer", fontFamily: "inherit",
   fontSize: 14, display: "inline-flex", alignItems: "center", justifyContent: "center",
   transition: "all 0.15s ease",
 };

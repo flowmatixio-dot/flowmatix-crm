@@ -81,7 +81,7 @@ export default function AutomationsView() {
                 <span style={{ fontSize: 16 }}>{group.icon}</span>
                 <span style={{ fontWeight: 700, fontSize: 15 }}>{group.label}</span>
                 {anyActive && <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 700, background: "rgba(16,185,129,0.12)", color: "#10b981" }}>{t("auto_aktiv") || "aktiv"}</span>}
-                {!group.alwaysOpen && <span style={{ fontSize: 12, color: "rgba(167,177,195,0.3)", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>}
+                {!group.alwaysOpen && <span style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 {group.locked ? <span style={{padding:"3px 10px",borderRadius:6,fontSize:10,fontWeight:700,background:"rgba(16,185,129,0.12)",color:"#10b981"}}>{t("always_active")}</span> : <Toggle value={anyActive} onChange={(e) => { e?.stopPropagation?.(); items.forEach(a => { if (a.active === anyActive && !a.locked) toggleAutomation(a.id); }); }} />}
@@ -94,29 +94,29 @@ export default function AutomationsView() {
                 {items.map(aut => (
                   <div key={aut.id} style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
                     <div style={{ fontWeight: 600, fontSize: 13, color: "rgba(232,238,252,0.85)", marginBottom: 4 }}>{aut.name}</div>
-                    <div style={{ fontSize: 12, color: "rgba(167,177,195,0.45)" }}>{aut.trigger}</div>
+                    <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)" }}>{aut.trigger}</div>
 
                     {/* Inline settings per type */}
                     {aut.type === "booking_confirm" && (
-                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 6 }}>
+                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 6 }}>
                         ℹ️ {t("auto_booking_confirm_desc") || "Patient automatically receives booking confirmation with appointment, address and preparation instructions."}
                       </div>
                     )}
 
                     {aut.type === "appt_reminder" && (<>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
-                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("auto_reminder_times") || "Reminder times"}</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.7)", padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>{t("auto_reminder_3days") || "3 days before"}</span>
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{t("auto_reminder_times") || "Reminder times"}</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.9)", padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>{t("auto_reminder_3days") || "3 days before"}</span>
                       </div>
-                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 6 }}>
+                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 6 }}>
                         ℹ️ {t("auto_reminder_combined") || "Combined message: appointment reminder + hotel info + flight ticket request — all in one message."}
                       </div>
                     </>)}
 
                     {aut.type === "aftercare" && (
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
-                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("auto_aftercare_label") || "Aftercare"}</span>
-                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.35)" }}>
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{t("auto_aftercare_label") || "Aftercare"}</span>
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.75)" }}>
                           ℹ️ {t("auto_aftercare_lang_note") || "Message is automatically sent in the patient's language"}
                         </span>
                         {sel(clinic?.aftercareDelayHours || 4, v => saveSetting("aftercareDelayHours", parseInt(v)), [
@@ -127,8 +127,8 @@ export default function AutomationsView() {
 
                     {aut.type === "review_request" && (
                       <div style={{ marginTop: 8 }}>
-                        <div style={{padding:"8px 12px",borderRadius:8,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,lineHeight:1.6,marginBottom:10,display:"flex",alignItems:"flex-start",gap:6}}>{"ℹ️"} {t("hint_review_timing") || "Wird automatisch einige Stunden nach der Nachsorge-Nachricht an den Patienten gesendet. Der Patient erhaelt einen direkten Link zu deinem Google Maps Profil."}</div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Google Maps Link</div>
+                        <div style={{padding:"8px 12px",borderRadius:8,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.7)",fontSize:11,lineHeight:1.6,marginBottom:10,display:"flex",alignItems:"flex-start",gap:6}}>{"ℹ️"} {t("hint_review_timing") || "Wird automatisch einige Stunden nach der Nachsorge-Nachricht an den Patienten gesendet. Der Patient erhaelt einen direkten Link zu deinem Google Maps Profil."}</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Google Maps Link</div>
                         <div style={{ display: "flex", gap: 8 }}>
                           <input value={reviewLink} onChange={e => setReviewLink(e.target.value)} placeholder="https://g.page/r/..." style={{ flex: 1, padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 12, outline: "none" }} />
                           <button onClick={() => saveSetting("googleMapsLink", reviewLink)} style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(76,201,255,0.1)", border: "1px solid rgba(76,201,255,0.2)", color: "#4cc9ff", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>{t("save") || "Speichern"}</button>
@@ -138,7 +138,7 @@ export default function AutomationsView() {
                     )}
 
                     {aut.type === "driver_notify" && (
-                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 6 }}>
+                      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 6 }}>
                         ℹ️ {t("auto_driver_desc") || "1 day before arrival, the patient receives a message with driver name, vehicle and pickup details. Driver is notified via Telegram."}
                       </div>
                     )}
@@ -158,9 +158,9 @@ export default function AutomationsView() {
               <span style={{ fontSize: 16 }}>📋</span>
               <span style={{ fontWeight: 700, fontSize: 15 }}>WhatsApp Templates</span>
             </div>
-            <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("auto_lang_auto_detect") || "Language is automatically detected"}</span>
+            <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{t("auto_lang_auto_detect") || "Language is automatically detected"}</span>
           </div>
-          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,lineHeight:1.6,marginBottom:14,display:"flex",alignItems:"flex-start",gap:8}}>{"ℹ️"} {t("hint_templates")}</div>
+          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.7)",fontSize:11,lineHeight:1.6,marginBottom:14,display:"flex",alignItems:"flex-start",gap:8}}>{"ℹ️"} {t("hint_templates")}</div>
         </div>
         <div style={{ padding: "0 12px" }}>
           {[
@@ -169,22 +169,22 @@ export default function AutomationsView() {
             { name: t("tpl_booking") || "Terminbestätigung", desc: t("tpl_booking_desc") || "Nach OP-Terminbuchung", icon: "✅", cat: "booking", tplKey: "booking_confirmation" },
             { name: t("tpl_reminder") || "Erinnerung + Flugdaten", desc: t("tpl_reminder_desc") || "3 Tage vor OP — Erinnerung + Flugticket anfordern", icon: "📅", cat: "booking", tplKey: "appointment_reminder_flight" },
             { name: t("tpl_driver_pickup") || "Fahrer-Info", desc: t("tpl_driver_pickup_desc") || "1 Tag vor Flug — Fahrer, Auto, Kennzeichen", icon: "🚗", cat: "logistics", tplKey: "driver_pickup_info" },
-            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung — Pflegeanweisungen", icon: "💊", cat: "aftercare", tplKey: "aftercare_instructions" },
+            { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung — Pflegeanweisungen", icon: "💊", cat: "aftercare", tplKey: "aftercare_followup" },
             { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge — Google Maps Bewertung", icon: "⭐", cat: "aftercare", tplKey: "review_request" },
-            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen — Gespräch fortsetzen", icon: "📨", cat: "reactivation", tplKey: "reactivation" },
+            { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen — Gespräch fortsetzen", icon: "📨", cat: "reactivation", tplKey: "fm_reactivation" },
           ].map(tpl => (
             <div key={tpl.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
                 <span style={{ fontSize: 14 }}>{tpl.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{tpl.name}</div>
-                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{tpl.desc}</div>
+                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{tpl.desc}</div>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                 {["de", "en", "tr"].map(l => {
                   const st = tplStatuses[`${tpl.tplKey}_${l}`] || 'draft';
-                  const colors = { approved: { bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)", color: "#10b981" }, pending: { bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)", color: "#fbbf24" }, rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", color: "#ef4444" }, error: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)", color: "#ef4444" }, draft: { bg: "rgba(167,177,195,0.06)", border: "rgba(167,177,195,0.15)", color: "rgba(167,177,195,0.5)" } };
+                  const colors = { approved: { bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)", color: "#10b981" }, pending: { bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)", color: "#fbbf24" }, rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", color: "#ef4444" }, error: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)", color: "#ef4444" }, draft: { bg: "rgba(167,177,195,0.06)", border: "rgba(167,177,195,0.15)", color: "rgba(167,177,195,0.7)" } };
                   const c = colors[st] || colors.draft;
                   return <span key={l} title={st} style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: c.bg, border: `1px solid ${c.border}`, color: c.color }}>{l.toUpperCase()}</span>;
                 })}

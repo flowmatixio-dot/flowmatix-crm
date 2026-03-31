@@ -8,7 +8,7 @@ import { translateValue, fmLocale } from "../../utils/helpers";
 
 /* ── Helper: 24h WhatsApp window state with remaining time ── */
 function getWindowState(lastPatientMsg) {
-  if (!lastPatientMsg) return { state: "no_interaction", label: "—", color: "rgba(167,177,195,0.4)", icon: "—", remaining: null };
+  if (!lastPatientMsg) return { state: "no_interaction", label: "—", color: "rgba(167,177,195,0.6)", icon: "—", remaining: null };
   const now = Date.now();
   const elapsed = now - new Date(lastPatientMsg).getTime();
   const hours = elapsed / 3600000;
@@ -146,7 +146,7 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
 
         {/* Last contact */}
         {lead.lastContactAt && (
-          <div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginBottom:12}}>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginBottom:12}}>
             {t("last_contact") || "Last contact"}: {new Date(lead.lastContactAt).toLocaleDateString(fmLocale())}
           </div>
         )}
@@ -444,7 +444,7 @@ export default function InboxView() {
                   <div style={{flex:1,minWidth:0}}>
                     {/* Name + time */}
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                      <span style={{fontWeight: ch.unread ? 800 : 700, fontSize:14, color: ch.unread ? "#fff" : "rgba(232,238,252,0.8)"}}>
+                      <span style={{fontWeight: ch.unread ? 800 : 700, fontSize:14, color: ch.unread ? "#fff" : "rgba(232,238,252,0.95)"}}>
                         {!!ch.unread && <span style={{display:"inline-block",width:7,height:7,borderRadius:99,background:"#4cc9ff",marginRight:6,verticalAlign:"middle"}} />}
                         {ch.name}
                         {score && <span style={{marginLeft:6,fontSize:10,fontWeight:700,color:score.color}} title={`Lead Score: ${score.score}%`}>{score.icon}</span>}
@@ -493,7 +493,7 @@ export default function InboxView() {
             <div style={{padding:40,textAlign:"center"}}>
               <div style={{fontSize:40,marginBottom:12}}>💬</div>
               <div style={{fontWeight:700,fontSize:16,marginBottom:6}}>{t('no_conversations') || "Keine Konversationen"}</div>
-              <div style={{fontSize:12,color:"rgba(167,177,195,0.5)",marginBottom:8}}>{t("hint_inbox_empty")}</div>
+              <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",marginBottom:8}}>{t("hint_inbox_empty")}</div>
             </div>
           )}
         </div>
@@ -948,14 +948,14 @@ export default function InboxView() {
                   <div style={{fontSize:16,fontWeight:700,color:"#fff"}}>Reaktivierung senden</div>
                   <button onClick={() => setReactivationPicker(false)} style={{width:28,height:28,borderRadius:8,background:"rgba(255,255,255,0.06)",border:"none",color:"rgba(167,177,195,0.6)",fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                 </div>
-                <div style={{fontSize:12,color:"rgba(167,177,195,0.5)",marginTop:4}}>
-                  An <b style={{color:"#e2e8f0"}}>{selChat.name}</b> — Sprache: <span style={{color:"#4cc9ff",fontWeight:600}}>{langLabel}</span> <span style={{color:"rgba(167,177,195,0.35)"}}>(automatisch erkannt)</span>
+                <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",marginTop:4}}>
+                  An <b style={{color:"#e2e8f0"}}>{selChat.name}</b> — Sprache: <span style={{color:"#4cc9ff",fontWeight:600}}>{langLabel}</span> <span style={{color:"rgba(167,177,195,0.75)"}}>(automatisch erkannt)</span>
                 </div>
               </div>
               {/* Preview */}
               <div style={{padding:"18px 22px"}}>
-                <div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.4)",textTransform:"uppercase",letterSpacing:"0.5px",marginBottom:8}}>Vorschau</div>
-                <div style={{padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",fontSize:13,color:"rgba(232,238,252,0.8)",lineHeight:1.6}}>
+                <div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.6)",textTransform:"uppercase",letterSpacing:"0.5px",marginBottom:8}}>Vorschau</div>
+                <div style={{padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",fontSize:13,color:"rgba(232,238,252,0.95)",lineHeight:1.6}}>
                   {preview}
                 </div>
               </div>
@@ -973,7 +973,7 @@ export default function InboxView() {
                 </button>
               </div>
               {/* Footer */}
-              <div style={{padding:"12px 22px",borderTop:"1px solid rgba(255,255,255,0.04)",fontSize:11,color:"rgba(167,177,195,0.3)",display:"flex",justifyContent:"space-between"}}>
+              <div style={{padding:"12px 22px",borderTop:"1px solid rgba(255,255,255,0.04)",fontSize:11,color:"rgba(167,177,195,0.7)",display:"flex",justifyContent:"space-between"}}>
                 <span>Wird als WhatsApp-Vorlage gesendet. Patient antwortet → Session reaktiviert → KI übernimmt.</span>
               </div>
             </div>

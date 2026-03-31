@@ -138,7 +138,7 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
             onClick={onClose}
             style={{
               background: "none", border: "none",
-              color: "rgba(167,177,195,0.5)", fontSize: 20, cursor: "pointer",
+              color: "rgba(167,177,195,0.7)", fontSize: 20, cursor: "pointer",
             }}
           >
             ✕
@@ -161,7 +161,7 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
 
         {/* Procedure type */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", fontWeight: 600, marginBottom: 3 }}>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", fontWeight: 600, marginBottom: 3 }}>
             {tFb(t, "cal_treatment", "Behandlung")}
           </div>
           <div style={{ fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
@@ -184,7 +184,7 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
               <span style={{ fontSize: 22, fontWeight: 800, color: "#4cc9ff" }}>
                 {Number(appt.grafts).toLocaleString()}
               </span>
-              <span style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginLeft: 4 }}>
+              <span style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginLeft: 4 }}>
                 Grafts
               </span>
             </div>
@@ -197,7 +197,7 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
               <span style={{ fontSize: 20, fontWeight: 800, color: "#10b981" }}>
                 {"\u20AC"}{estimatedRevenue.toLocaleString()}
               </span>
-              <span style={{ fontSize: 10, color: "rgba(167,177,195,0.4)", display: "block", marginTop: 2 }}>
+              <span style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", display: "block", marginTop: 2 }}>
                 {tFb(t, "drawer_revenue", "Umsatz")}
               </span>
             </div>
@@ -226,7 +226,7 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
             <span style={{ fontSize: 15, fontWeight: 700 }}>{timeRange.startTime}</span>
             {timeRange.endTime && (
               <>
-                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.5)" }}>{"\u2192"}</span>
+                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }}>{"\u2192"}</span>
                 <span style={{ fontSize: 15, fontWeight: 700 }}>{timeRange.endTime}</span>
               </>
             )}
@@ -246,7 +246,7 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Doctor with color dot */}
           <div>
-            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", fontWeight: 600, marginBottom: 3 }}>
+            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", fontWeight: 600, marginBottom: 3 }}>
               {tFb(t, "cal_doctor", "Arzt")}
             </div>
             <div style={{ fontSize: 15, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
@@ -377,7 +377,7 @@ function PrepChecklist({ appt, t }) {
         marginBottom: 10,
       }}>
         <span style={{
-          fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)",
+          fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)",
           textTransform: "uppercase", letterSpacing: "0.05em",
         }}>
           {tFb(t, "preparation", "Vorbereitung")}
@@ -428,7 +428,7 @@ function PrepChecklist({ appt, t }) {
 function InfoRow({ label, value }) {
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", fontWeight: 600, marginBottom: 4 }}>
+      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", fontWeight: 600, marginBottom: 4 }}>
         {label}
       </div>
       <div style={{ fontSize: 15, fontWeight: 600 }}>{value || "—"}</div>

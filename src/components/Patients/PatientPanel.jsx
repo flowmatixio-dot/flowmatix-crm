@@ -42,7 +42,7 @@ function Accordion({ icon, title, defaultOpen = false, children, badge }) {
         <span style={{ fontSize: 15, lineHeight: 1 }}>{icon}</span>
         <span style={{ fontSize: 13, fontWeight: 800, flex: 1, textAlign: "left" }}>{title}</span>
         {badge && badge}
-        <span style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", transition: "transform .2s", transform: open ? "rotate(0deg)" : "rotate(-90deg)" }}>&#9662;</span>
+        <span style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", transition: "transform .2s", transform: open ? "rotate(0deg)" : "rotate(-90deg)" }}>&#9662;</span>
       </button>
       <div style={{
         maxHeight: open ? 2000 : 0,
@@ -58,9 +58,9 @@ function Accordion({ icon, title, defaultOpen = false, children, badge }) {
 }
 
 /* ── Field display helpers ── */
-const fieldLabelStyle = { fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", marginBottom: 2 };
+const fieldLabelStyle = { fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", marginBottom: 2 };
 const fieldValueStyle = { fontSize: 13, color: "#e2e8f0", fontWeight: 500 };
-const mutedValueStyle = { fontSize: 13, color: "rgba(167,177,195,0.25)", fontWeight: 500 };
+const mutedValueStyle = { fontSize: 13, color: "rgba(167,177,195,0.65)", fontWeight: 500 };
 const flaggedValueStyle = { fontSize: 13, color: "#ef4444", fontWeight: 600 };
 
 function DataField({ label, value, flagged }) {
@@ -345,7 +345,7 @@ export default function PatientPanel() {
         const pct=Math.round(doneCount/steps.length*100);
         return<div style={{padding:"12px 24px",borderBottom:"1px solid rgba(255,255,255,0.06)",flexShrink:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <span style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.4)",textTransform:"uppercase",letterSpacing:"0.1em"}}>{t("patient_journey")}</span>
+            <span style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.6)",textTransform:"uppercase",letterSpacing:"0.1em"}}>{t("patient_journey")}</span>
             <span style={{fontSize:11,fontWeight:700,color:pct===100?"#10b981":"#4cc9ff"}}>{pct}%</span>
           </div>
           <div style={{height:3,borderRadius:2,background:"rgba(255,255,255,0.06)",marginBottom:10,overflow:"hidden"}}>
@@ -354,7 +354,7 @@ export default function PatientPanel() {
           <div style={{display:"flex",justifyContent:"space-between"}}>
             {steps.map((s,i)=>{const pending=s.id==="deposit"&&!s.done&&lead.reviewData&&lead.convStatus!=="resolved";return<div key={s.id} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,position:"relative"}}>
               <div style={{width:28,height:28,borderRadius:8,background:s.done?"rgba(16,185,129,0.12)":pending?"rgba(251,191,36,0.12)":"rgba(255,255,255,0.04)",border:`1.5px solid ${s.done?"rgba(16,185,129,0.4)":pending?"rgba(251,191,36,0.5)":"rgba(255,255,255,0.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,transition:"all .3s",animation:pending?"fmDepPulse 2s infinite":"none"}}>{s.done?<span style={{color:"#10b981"}}>✓</span>:pending?<span style={{color:"#fbbf24"}}>💳</span>:<span style={{opacity:0.4}}>{s.icon}</span>}</div>
-              <span style={{fontSize:9,fontWeight:700,color:s.done?"#10b981":pending?"#fbbf24":"rgba(167,177,195,0.35)",textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</span>
+              <span style={{fontSize:9,fontWeight:700,color:s.done?"#10b981":pending?"#fbbf24":"rgba(167,177,195,0.75)",textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</span>
               {i<steps.length-1&&<div style={{position:"absolute",top:14,left:"calc(100% + 2px)",width:20,height:1.5,background:steps[i+1]?.done?"rgba(16,185,129,0.3)":"rgba(255,255,255,0.06)"}}/>}
             </div>})}
           </div>
@@ -372,7 +372,7 @@ export default function PatientPanel() {
 
       {/* Tabs */}
       <div style={{display:"flex",borderBottom:"1px solid rgba(255,255,255,0.06)",flexShrink:0}}>
-        {tabs.map(tb=><button key={tb.id} onClick={()=>setPatientTab(tb.id)} style={{flex:1,padding:"12px 0",background:"transparent",border:"none",borderBottom:patientTab===tb.id?`2px solid #4cc9ff`:"2px solid transparent",color:patientTab===tb.id?"#4cc9ff":"rgba(167,177,195,0.5)",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",transition:"all .15s"}}>{tb.label}</button>)}
+        {tabs.map(tb=><button key={tb.id} onClick={()=>setPatientTab(tb.id)} style={{flex:1,padding:"12px 0",background:"transparent",border:"none",borderBottom:patientTab===tb.id?`2px solid #4cc9ff`:"2px solid transparent",color:patientTab===tb.id?"#4cc9ff":"rgba(167,177,195,0.7)",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",transition:"all .15s"}}>{tb.label}</button>)}
       </div>
 
       {/* ═══════════════════════ TAB CONTENT ═══════════════════════ */}
@@ -386,7 +386,7 @@ export default function PatientPanel() {
             <span style={{width:8,height:8,borderRadius:"50%",background:lead.reviewAssignedTo?"#10b981":"#f59e0b",animation:lead.reviewAssignedTo?"none":"fmPulse 2s infinite"}} />
             <div style={{flex:1}}>
               <div style={{fontSize:13,fontWeight:700,color:"#ff8a2a"}}>{t("review_pending") || "Bewertung ausstehend"}</div>
-              <div style={{fontSize:11,color:"rgba(167,177,195,0.4)"}}>
+              <div style={{fontSize:11,color:"rgba(167,177,195,0.6)"}}>
                 {lead.reviewAssignedTo ? `${t("assigned_to") || "Zugewiesen an"} ${lead.reviewAssignedToName || "Arzt"}` : (t("auto_assigned") || "Wird automatisch zugewiesen")}
                 {lead.lastAiInteraction ? ` · ${t("waiting_since") || "Wartet seit"} ${timeAgo(lead.lastAiInteraction)}` : ""}
               </div>
@@ -432,7 +432,7 @@ export default function PatientPanel() {
             {/* Patient photo thumbnails */}
             {(lead.photoUrls||[]).length > 0 && (
               <div style={{marginTop:14,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
-                <div style={{fontSize:10,fontWeight:700,color:"rgba(167,177,195,0.4)",textTransform:"uppercase",marginBottom:8}}>{t("patient_photos") || "Patientenfotos"}</div>
+                <div style={{fontSize:10,fontWeight:700,color:"rgba(167,177,195,0.6)",textTransform:"uppercase",marginBottom:8}}>{t("patient_photos") || "Patientenfotos"}</div>
                 <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                   {(lead.photoUrls||[]).slice(0,6).map((p,pi) => {
                     const photoUrl = typeof p === 'string' ? p : p?.url;
@@ -511,7 +511,7 @@ export default function PatientPanel() {
             {(()=>{
               const fin=lead.financials||{treatmentPrice:parseInt(String(rd.price||"0").replace(/[^0-9]/g,"")||0),currency:"EUR",depositAmount:0,depositStatus:"pending",paymentStatus:"pending"};
               const remaining=fin.paymentStatus==="paid"?0:fin.treatmentPrice-(fin.depositAmount||0);
-              const psc=fin.paymentStatus==="paid"?"#10b981":fin.paymentStatus==="partial"?"#fbbf24":"rgba(167,177,195,0.5)";
+              const psc=fin.paymentStatus==="paid"?"#10b981":fin.paymentStatus==="partial"?"#fbbf24":"rgba(167,177,195,0.7)";
               const leadInvs=invoices.filter(i=>i.leadId===lead.id);
               const latestInv=leadInvs[leadInvs.length-1];
               return <>
@@ -522,7 +522,7 @@ export default function PatientPanel() {
                   </div>
                   <div>
                     <div style={fieldLabelStyle}>{t("deposit") || "Anzahlung"}</div>
-                    <div style={{fontSize:18,fontWeight:800,marginTop:2}}>{fin.depositAmount>0?<span style={{color:"#10b981"}}>€{fin.depositAmount.toLocaleString()}</span>:<span style={{color:"rgba(167,177,195,0.3)"}}>—</span>}</div>
+                    <div style={{fontSize:18,fontWeight:800,marginTop:2}}>{fin.depositAmount>0?<span style={{color:"#10b981"}}>€{fin.depositAmount.toLocaleString()}</span>:<span style={{color:"rgba(167,177,195,0.7)"}}>—</span>}</div>
                     {fin.depositStatus==="paid"&&<span style={{fontSize:9,fontWeight:700,color:"#10b981"}}>✓ PAID</span>}
                   </div>
                   <div>
@@ -535,7 +535,7 @@ export default function PatientPanel() {
                   </div>
                 </div>
                 {latestInv&&<div style={{padding:10,borderRadius:10,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div style={{fontSize:12}}><span style={{fontWeight:700}}>{latestInv.nr}</span><span style={{color:"rgba(167,177,195,0.4)",marginLeft:8}}>€{(latestInv.gross||0).toLocaleString()}</span></div>
+                  <div style={{fontSize:12}}><span style={{fontWeight:700}}>{latestInv.nr}</span><span style={{color:"rgba(167,177,195,0.6)",marginLeft:8}}>€{(latestInv.gross||0).toLocaleString()}</span></div>
                   <span style={{padding:"2px 8px",borderRadius:5,fontSize:10,fontWeight:700,background:latestInv.status==="paid"?"rgba(16,185,129,0.12)":"rgba(251,191,36,0.12)",color:latestInv.status==="paid"?"#10b981":"#fbbf24"}}>{latestInv.status}</span>
                 </div>}
                 {!clinic?.stripeConnected && fin.depositStatus!=="paid" && fin.paymentStatus!=="paid" && <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(251,191,36,0.06)",border:"1px solid rgba(251,191,36,0.12)",color:"rgba(251,191,36,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6,marginBottom:10}}>{"ℹ️"} {t("payment_manual_hint") || "Keine Zahlungsmethode verbunden — Zahlungen manuell als bezahlt markieren wenn eingegangen."}</div>}
@@ -555,16 +555,16 @@ export default function PatientPanel() {
             {!lead.flightConfirmed?.date && (
               <div style={{marginBottom:14,padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px dashed rgba(76,201,255,0.15)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)"}}>{t("flight_tracking")}</span>
+                  <span style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.7)"}}>{t("flight_tracking")}</span>
                   {!flightForm&&<button onClick={()=>setFlightForm(true)} style={{padding:"6px 14px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>+ {t("add_flight")}</button>}
                 </div>
-                {!flightForm&&<div style={{fontSize:12,color:"rgba(167,177,195,0.35)",marginTop:6}}>{t("no_flight_details")}</div>}
+                {!flightForm&&<div style={{fontSize:12,color:"rgba(167,177,195,0.75)",marginTop:6}}>{t("no_flight_details")}</div>}
                 {flightForm&&<div style={{marginTop:10,display:"grid",gap:8}}>
                   <input value={flightAirline} onChange={e=>setFlightAirline(e.target.value)} placeholder={t("airline_flight_placeholder")} style={{width:"100%",padding:"8px 12px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box"}}/>
                   <input type="date" value={flightDate} onChange={e=>setFlightDate(e.target.value)} style={{width:"100%",padding:"8px 12px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box"}}/>
                   <div style={{display:"flex",gap:8}}>
                     <button onClick={()=>{if(!flightAirline.trim()||!flightDate){showT(t("enter_airline_date"));return;}setLeads(prev=>prev.map(l=>l.id===lead.id?{...l,flightConfirmed:{date:flightDate,airline:flightAirline,detected:new Date().toISOString()}}:l));addTL(lead.id,"system","Flight added: "+flightAirline+" on "+flightDate);showT(t("flight_saved"));setFlightForm(false);setFlightAirline("");setFlightDate("");}} style={{padding:"7px 14px",borderRadius:8,background:"rgba(16,185,129,0.12)",border:"1px solid rgba(16,185,129,0.25)",color:"#10b981",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("save")}</button>
-                    <button onClick={()=>{setFlightForm(false);setFlightAirline("");setFlightDate("");}} style={{padding:"7px 14px",borderRadius:8,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
+                    <button onClick={()=>{setFlightForm(false);setFlightAirline("");setFlightDate("");}} style={{padding:"7px 14px",borderRadius:8,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.7)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
                   </div>
                 </div>}
               </div>
@@ -585,10 +585,10 @@ export default function PatientPanel() {
                     <div style={{padding:10,borderRadius:12,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",fontSize:24,lineHeight:1}}>{flag}</div>
                     <div style={{flex:1}}>
                       <div style={{fontWeight:800,fontSize:15}}>{lead.flightConfirmed.airline}</div>
-                      <div style={{fontSize:12,color:"rgba(167,177,195,0.5)",fontFamily:"monospace",marginTop:2}}>{t("arrival")}: <span style={{color:isMismatch?"#ef4444":"#10b981",fontWeight:700}}>{lead.flightConfirmed.date}</span>{daysUntil>0&&<span style={{marginLeft:6}}>({daysUntil} {t("days")})</span>}</div>
+                      <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",fontFamily:"monospace",marginTop:2}}>{t("arrival")}: <span style={{color:isMismatch?"#ef4444":"#10b981",fontWeight:700}}>{lead.flightConfirmed.date}</span>{daysUntil>0&&<span style={{marginLeft:6}}>({daysUntil} {t("days")})</span>}</div>
                     </div>
                     <div style={{textAlign:"right"}}>
-                      <div style={{fontSize:10,color:"rgba(167,177,195,0.4)",fontWeight:700}}>{t("appointment")}</div>
+                      <div style={{fontSize:10,color:"rgba(167,177,195,0.6)",fontWeight:700}}>{t("appointment")}</div>
                       <div style={{fontSize:13,fontWeight:700,marginTop:2}}>{lead.booking?.date||t("not_booked")}</div>
                     </div>
                   </div>
@@ -598,24 +598,24 @@ export default function PatientPanel() {
                 {/* Driver Assignment */}
                 <div style={{marginBottom:14}}>
                   {!lg&&clinicDrivers.length>0&&<div style={{padding:12,borderRadius:10,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)"}}>
-                    <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.4)",textTransform:"uppercase",marginBottom:8}}>{"\uD83D\uDE97"} {t("assign_driver")}</div>
+                    <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.6)",textTransform:"uppercase",marginBottom:8}}>{"\uD83D\uDE97"} {t("assign_driver")}</div>
                     <div style={{display:"flex",gap:8}}>
                       <select value={selDriverId} onChange={e=>setSelDriverId(e.target.value)} style={{flex:1,padding:"7px 10px",borderRadius:8,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"inherit",fontSize:13,outline:"none",cursor:"pointer"}}>
                         <option value="">{t("select_driver")}</option>
                         {clinicDrivers.map(d=><option key={d.id} value={d.id}>{d.name} ({d.role}) — {d.vehicle}</option>)}
                       </select>
-                      <button disabled={!selDriverId} onClick={()=>{assignDriver(lead.id,selDriverId);setSelDriverId("");}} style={{padding:"7px 14px",borderRadius:8,background:selDriverId?"rgba(0,180,216,0.12)":"rgba(255,255,255,0.04)",border:`1px solid ${selDriverId?"rgba(0,180,216,0.25)":"rgba(255,255,255,0.08)"}`,color:selDriverId?"#00B4D8":"rgba(167,177,195,0.4)",fontWeight:700,fontSize:12,cursor:selDriverId?"pointer":"default",fontFamily:"inherit"}}>{t("assign")}</button>
+                      <button disabled={!selDriverId} onClick={()=>{assignDriver(lead.id,selDriverId);setSelDriverId("");}} style={{padding:"7px 14px",borderRadius:8,background:selDriverId?"rgba(0,180,216,0.12)":"rgba(255,255,255,0.04)",border:`1px solid ${selDriverId?"rgba(0,180,216,0.25)":"rgba(255,255,255,0.08)"}`,color:selDriverId?"#00B4D8":"rgba(167,177,195,0.6)",fontWeight:700,fontSize:12,cursor:selDriverId?"pointer":"default",fontFamily:"inherit"}}>{t("assign")}</button>
                     </div>
                   </div>}
                   {!lg&&clinicDrivers.length===0&&<div style={{padding:10,borderRadius:10,background:"rgba(251,191,36,0.04)",border:"1px solid rgba(251,191,36,0.15)",fontSize:12,color:"rgba(251,191,36,0.8)"}}>{"⚠\uFE0F"} {t("no_drivers_configured")}</div>}
                   {lg&&<div style={{padding:12,borderRadius:10,background:`${ds?.color||"#4cc9ff"}08`,border:`1px solid ${ds?.color||"#4cc9ff"}20`}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                      <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.4)",textTransform:"uppercase"}}>{"\uD83D\uDE97"} {t("driver")} {lg.status==="escalated"||lg.status==="backup_confirmed"||lg.status==="backup_declined"?"("+t("backup")+")":"("+t("primary")+")"}</div>
+                      <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.6)",textTransform:"uppercase"}}>{"\uD83D\uDE97"} {t("driver")} {lg.status==="escalated"||lg.status==="backup_confirmed"||lg.status==="backup_declined"?"("+t("backup")+")":"("+t("primary")+")"}</div>
                       <span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:`${ds?.color||"#4cc9ff"}18`,color:ds?.color||"#4cc9ff"}}>{ds?.icon} {ds?.label}</span>
                     </div>
                     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:13}}>
-                      <div><span style={{color:"rgba(167,177,195,0.5)",fontSize:11}}>{t("name")}</span><div style={{fontWeight:700,marginTop:1}}>{lg.status==="escalated"||lg.status==="backup_confirmed"||lg.status==="backup_declined"?lg.backupDriverName:lg.driverName}</div></div>
-                      {(()=>{const drvId=lg.status==="escalated"||lg.status==="backup_confirmed"||lg.status==="backup_declined"?lg.backupDriverId:lg.driverId;const drv=(clinic?.drivers||[]).find(d=>d.id===drvId);return drv?<><div><span style={{color:"rgba(167,177,195,0.5)",fontSize:11}}>{t("vehicle")}</span><div style={{marginTop:1}}>{drv.vehicle}</div></div><div><span style={{color:"rgba(167,177,195,0.5)",fontSize:11}}>{t("plate")}</span><div style={{marginTop:1,fontFamily:"monospace"}}>{drv.plateNo}</div></div><div><span style={{color:"rgba(167,177,195,0.5)",fontSize:11}}>{t("phone")}</span><div style={{marginTop:1,fontFamily:"monospace",fontSize:12}}>{drv.phone}</div></div></>:null;})()}
+                      <div><span style={{color:"rgba(167,177,195,0.7)",fontSize:11}}>{t("name")}</span><div style={{fontWeight:700,marginTop:1}}>{lg.status==="escalated"||lg.status==="backup_confirmed"||lg.status==="backup_declined"?lg.backupDriverName:lg.driverName}</div></div>
+                      {(()=>{const drvId=lg.status==="escalated"||lg.status==="backup_confirmed"||lg.status==="backup_declined"?lg.backupDriverId:lg.driverId;const drv=(clinic?.drivers||[]).find(d=>d.id===drvId);return drv?<><div><span style={{color:"rgba(167,177,195,0.7)",fontSize:11}}>{t("vehicle")}</span><div style={{marginTop:1}}>{drv.vehicle}</div></div><div><span style={{color:"rgba(167,177,195,0.7)",fontSize:11}}>{t("plate")}</span><div style={{marginTop:1,fontFamily:"monospace"}}>{drv.plateNo}</div></div><div><span style={{color:"rgba(167,177,195,0.7)",fontSize:11}}>{t("phone")}</span><div style={{marginTop:1,fontFamily:"monospace",fontSize:12}}>{drv.phone}</div></div></>:null;})()}
                     </div>
                     {/* Driver Action Buttons */}
                     <div style={{display:"flex",gap:6,marginTop:10,flexWrap:"wrap"}}>
@@ -639,7 +639,7 @@ export default function PatientPanel() {
                             <option value="">{t("reassign_driver")}</option>
                             {clinicDrivers.map(d=><option key={d.id} value={d.id}>{d.name} ({d.role})</option>)}
                           </select>
-                          <button disabled={!selDriverId} onClick={()=>{assignDriver(lead.id,selDriverId);setSelDriverId("");}} style={{padding:"6px 12px",borderRadius:8,background:selDriverId?"rgba(0,180,216,0.12)":"rgba(255,255,255,0.04)",border:`1px solid ${selDriverId?"rgba(0,180,216,0.25)":"rgba(255,255,255,0.08)"}`,color:selDriverId?"#00B4D8":"rgba(167,177,195,0.4)",fontWeight:700,fontSize:11,cursor:selDriverId?"pointer":"default",fontFamily:"inherit"}}>{t("assign")}</button>
+                          <button disabled={!selDriverId} onClick={()=>{assignDriver(lead.id,selDriverId);setSelDriverId("");}} style={{padding:"6px 12px",borderRadius:8,background:selDriverId?"rgba(0,180,216,0.12)":"rgba(255,255,255,0.04)",border:`1px solid ${selDriverId?"rgba(0,180,216,0.25)":"rgba(255,255,255,0.08)"}`,color:selDriverId?"#00B4D8":"rgba(167,177,195,0.6)",fontWeight:700,fontSize:11,cursor:selDriverId?"pointer":"default",fontFamily:"inherit"}}>{t("assign")}</button>
                         </div>
                       </div>}
                     </div>
@@ -662,12 +662,12 @@ export default function PatientPanel() {
                         <div><div style={fieldLabelStyle}>{t("check_in") || "Check-in"}</div><div style={{fontSize:13,fontWeight:600,color:"#4cc9ff"}}>{h.checkIn||lead.flightConfirmed?.date||"—"}</div></div>
                         <div><div style={fieldLabelStyle}>{t("check_out") || "Check-out"}</div><div style={{fontSize:13,fontWeight:600}}>{h.checkOut||(lead.booking?.date?(() => { const d = new Date(lead.booking.date); d.setDate(d.getDate() + 2); return d.toISOString().slice(0,10); })():"—")}</div></div>
                       </div>
-                      <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.5)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
+                      <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
                     </>:<>
-                    <div style={{textAlign:"center",padding:"12px 0",color:"rgba(167,177,195,0.4)",fontSize:12}}>
+                    <div style={{textAlign:"center",padding:"12px 0",color:"rgba(167,177,195,0.6)",fontSize:12}}>
                       {t("no_hotel") || "No hotel assigned"}
                     </div>
-                    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.5)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6,marginTop:8}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
+                    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6,marginTop:8}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
                     </>}
                   </div>;
                 })()}
@@ -685,13 +685,13 @@ export default function PatientPanel() {
           {/* ── Activity Timeline ── */}
           {lead.notes&&<Section title={t("notes")}><div style={{padding:14,borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",fontSize:14}}>{lead.notes}</div></Section>}
           <Section title={t("activity_timeline")}><div style={{position:"relative",paddingLeft:28}}><div style={{position:"absolute",left:9,top:4,bottom:4,width:2,background:"rgba(255,255,255,0.06)"}}/>
-            {(lead.timeline?.length ? lead.timeline : detailTimeline).map((ev,i)=>{const m=ev.icon?{i:ev.icon,c:ev.color||"#6b7280"}:(TL[ev.type]||TL.system);const evLabel=ev.icon?translateTimeline(ev.text):(translateTimeline(ev.text)||"");return<div key={i} style={{display:"flex",gap:14,marginBottom:12,position:"relative"}}><div style={{position:"absolute",left:-23,top:2,width:20,height:20,borderRadius:6,background:`${m.c}15`,border:`1.5px solid ${m.c}40`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10}}>{m.i}</div><div><div style={{display:"flex",gap:8,marginBottom:2}}><span style={{fontSize:13,fontWeight:700,color:"rgba(232,238,252,0.85)"}}>{evLabel}</span></div><div style={{fontSize:11,color:"rgba(167,177,195,0.4)"}}>{ev.time?new Date(ev.time).toLocaleString((localStorage.getItem("fm_lang")||"de")==="tr"?"tr-TR":(localStorage.getItem("fm_lang")||"de")==="en"?"en-GB":"de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):""}</div></div></div>;})}
+            {(lead.timeline?.length ? lead.timeline : detailTimeline).map((ev,i)=>{const m=ev.icon?{i:ev.icon,c:ev.color||"#6b7280"}:(TL[ev.type]||TL.system);const evLabel=ev.icon?translateTimeline(ev.text):(translateTimeline(ev.text)||"");return<div key={i} style={{display:"flex",gap:14,marginBottom:12,position:"relative"}}><div style={{position:"absolute",left:-23,top:2,width:20,height:20,borderRadius:6,background:`${m.c}15`,border:`1.5px solid ${m.c}40`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10}}>{m.i}</div><div><div style={{display:"flex",gap:8,marginBottom:2}}><span style={{fontSize:13,fontWeight:700,color:"rgba(232,238,252,0.85)"}}>{evLabel}</span></div><div style={{fontSize:11,color:"rgba(167,177,195,0.6)"}}>{ev.time?new Date(ev.time).toLocaleString((localStorage.getItem("fm_lang")||"de")==="tr"?"tr-TR":(localStorage.getItem("fm_lang")||"de")==="en"?"en-GB":"de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):""}</div></div></div>;})}
           </div></Section>
         </>}
 
         {/* ═══ APPOINTMENTS TAB ═══ */}
         {patientTab==="appointments"&&<div>
-          {leadAppts.length===0&&<div style={{textAlign:"center",padding:40,color:"rgba(167,177,195,0.4)"}}>{t("no_appointments_yet")}</div>}
+          {leadAppts.length===0&&<div style={{textAlign:"center",padding:40,color:"rgba(167,177,195,0.6)"}}>{t("no_appointments_yet")}</div>}
           {leadAppts.map(a=>{const ac=APPT_C[a.status]||APPT_C.booked;return<div key={a.id} style={{padding:16,borderRadius:14,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",marginBottom:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <div><div style={{fontWeight:700,fontSize:15}}>{a.treatment||a.title||t("appointment")||"Appointment"}</div><div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginTop:4}}>{a.date} · {a.time}{a.endTime?`–${a.endTime}`:""}{(a.assigned||a.doctorName)?` · ${a.assigned||a.doctorName}`:""}</div></div>
             <span style={{padding:"4px 12px",borderRadius:8,fontSize:12,fontWeight:700,background:`${ac.c}18`,color:ac.c}}>{ac.l}</span>
@@ -706,7 +706,7 @@ export default function PatientPanel() {
             {lead.reviewData&&<button onClick={()=>{const amt=parseInt(lead.reviewData.price?.replace(/[^0-9]/g,""))||0;if(amt>0){const dep=Math.round(amt*0.25);generateDepositLink(lead.id,dep);}else showT(t("no_price_set"));}} style={{padding:"10px 18px",borderRadius:10,background:"rgba(167,107,255,0.08)",border:"1px solid rgba(167,107,255,0.2)",color:"#a78bfa",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8}}>{"\uD83D\uDCB3"} {t("deposit_link_25")}</button>}
           </div>
           {(()=>{const li=invoices.filter(i=>i.leadId===lead.id);
-            if(li.length===0)return<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.4)"}}>
+            if(li.length===0)return<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.6)"}}>
               <div style={{fontSize:32,marginBottom:8}}>{"\uD83E\uDDFE"}</div>
               <div style={{fontWeight:600,marginBottom:4}}>{t("no_invoices_yet")}</div>
               <div style={{fontSize:13}}>{t("create_invoice_after_plan")}</div>
@@ -720,21 +720,21 @@ export default function PatientPanel() {
                       {inv.nr}
                       <span style={{padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:700,background:isPaid?"rgba(16,185,129,0.12)":"rgba(251,191,36,0.12)",color:isPaid?"#10b981":"#fbbf24"}}>{isPaid?t("paid_upper"):t("unpaid")}</span>
                     </div>
-                    <div style={{fontSize:12,color:"rgba(167,177,195,0.5)",marginTop:2}}>{t("created")} {new Date(inv.created).toLocaleDateString()} · {t("due")} {inv.dueDate}</div>
+                    <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",marginTop:2}}>{t("created")} {new Date(inv.created).toLocaleDateString()} · {t("due")} {inv.dueDate}</div>
                   </div>
                   <div style={{fontSize:20,fontWeight:800,color:isPaid?"#10b981":"rgba(232,238,252,0.9)"}}>€{inv.gross?.toLocaleString()}</div>
                 </div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:10,padding:"8px 12px",borderRadius:8,background:"rgba(255,255,255,0.02)"}}>
-                  <div><div style={{fontSize:10,color:"rgba(167,177,195,0.4)",fontWeight:700}}>NET</div><div style={{fontSize:13,fontWeight:600}}>€{inv.net?.toLocaleString()}</div></div>
-                  <div><div style={{fontSize:10,color:"rgba(167,177,195,0.4)",fontWeight:700}}>VAT {inv.vatPct}%</div><div style={{fontSize:13,fontWeight:600}}>€{inv.vatAmount?.toLocaleString()}</div></div>
-                  <div><div style={{fontSize:10,color:"rgba(167,177,195,0.4)",fontWeight:700}}>GROSS</div><div style={{fontSize:13,fontWeight:700,color:"#10b981"}}>€{inv.gross?.toLocaleString()}</div></div>
+                  <div><div style={{fontSize:10,color:"rgba(167,177,195,0.6)",fontWeight:700}}>NET</div><div style={{fontSize:13,fontWeight:600}}>€{inv.net?.toLocaleString()}</div></div>
+                  <div><div style={{fontSize:10,color:"rgba(167,177,195,0.6)",fontWeight:700}}>VAT {inv.vatPct}%</div><div style={{fontSize:13,fontWeight:600}}>€{inv.vatAmount?.toLocaleString()}</div></div>
+                  <div><div style={{fontSize:10,color:"rgba(167,177,195,0.6)",fontWeight:700}}>GROSS</div><div style={{fontSize:13,fontWeight:700,color:"#10b981"}}>€{inv.gross?.toLocaleString()}</div></div>
                 </div>
                 <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                   <button onClick={()=>generateInvoicePDF(inv)} style={{padding:"5px 12px",borderRadius:7,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{"\uD83D\uDCC4"} PDF</button>
                   {!isPaid&&<button onClick={()=>generateStripeLink(inv)} style={{padding:"5px 12px",borderRadius:7,background:"rgba(167,107,255,0.08)",border:"1px solid rgba(167,107,255,0.15)",color:"#a78bfa",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{"\uD83D\uDCB3"} {t("stripe_link")}</button>}
                   {!isPaid&&<button onClick={()=>markInvoicePaid(inv.id,"cash")} style={{padding:"5px 12px",borderRadius:7,background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.15)",color:"#10b981",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{"✓"} {t("mark_paid_cash")}</button>}
                   {!isPaid&&<button onClick={()=>markInvoicePaid(inv.id,"card")} style={{padding:"5px 12px",borderRadius:7,background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.15)",color:"#10b981",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{"✓"} {t("mark_paid_card")}</button>}
-                  {inv.stripeLink&&<div style={{fontSize:11,color:"rgba(167,177,195,0.4)",display:"flex",alignItems:"center",gap:4}}>{"\uD83D\uDD17"} <button onClick={()=>{navigator.clipboard?.writeText(inv.stripeLink);showT(t("link_copied"));}} style={{background:"none",border:"none",color:"#a78bfa",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",textDecoration:"underline"}}>{t("copy_payment_link")}</button></div>}
+                  {inv.stripeLink&&<div style={{fontSize:11,color:"rgba(167,177,195,0.6)",display:"flex",alignItems:"center",gap:4}}>{"\uD83D\uDD17"} <button onClick={()=>{navigator.clipboard?.writeText(inv.stripeLink);showT(t("link_copied"));}} style={{background:"none",border:"none",color:"#a78bfa",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",textDecoration:"underline"}}>{t("copy_payment_link")}</button></div>}
                 </div>
                 {isPaid&&<div style={{marginTop:8,fontSize:12,color:"#10b981",fontWeight:600}}>{"✓"} {t("paid")} {inv.paidDate?new Date(inv.paidDate).toLocaleDateString():""} {t("via")} {inv.paidMethod}</div>}
               </div>;
@@ -748,11 +748,11 @@ export default function PatientPanel() {
             <button onClick={()=>generateMagicLink(lead.id)} style={{padding:"10px 18px",borderRadius:10,background:"linear-gradient(135deg,rgba(76,201,255,0.15),rgba(45,168,255,0.1))",border:"1px solid rgba(76,201,255,0.25)",color:"#4cc9ff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8}}>{"\uD83D\uDD17"} {t("generate_photo_upload_link")}</button>
             {magicLinks[lead.id]&&<div style={{flex:1,padding:"8px 12px",borderRadius:10,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
               <span style={{color:"#10b981",fontWeight:700}}>{"✓"} {t("link_active")}</span>
-              <span style={{color:"rgba(167,177,195,0.4)",fontSize:11}}>{magicLinks[lead.id].status}</span>
+              <span style={{color:"rgba(167,177,195,0.6)",fontSize:11}}>{magicLinks[lead.id].status}</span>
               <button onClick={()=>{navigator.clipboard?.writeText(magicLinks[lead.id].link);showT(t("copied"));}} style={{marginLeft:"auto",padding:"3px 10px",borderRadius:6,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("copy")}</button>
             </div>}
           </div>
-          {(lead.photoUrls||[]).length===0&&<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.4)"}}>
+          {(lead.photoUrls||[]).length===0&&<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.6)"}}>
             <div style={{fontSize:32,marginBottom:8}}>{"\uD83D\uDCF8"}</div>
             <div style={{fontWeight:600,marginBottom:4}}>{t("no_photos_yet")}</div>
             <div style={{fontSize:13}}>{t("send_magic_link_for_photos")}</div>
@@ -767,7 +767,7 @@ export default function PatientPanel() {
             {[t("photo_front"),t("photo_left"),t("photo_right"),t("photo_top_back")].map((angle,i)=>
               <div key={i} style={{aspectRatio:"0.75",borderRadius:14,background:"rgba(255,255,255,0.02)",border:"2px dashed rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:6}}>
                 <span style={{fontSize:28}}>{"\u2B1C"}</span>
-                <span style={{fontSize:10,color:"rgba(167,177,195,0.3)",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em"}}>{angle}</span>
+                <span style={{fontSize:10,color:"rgba(167,177,195,0.7)",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em"}}>{angle}</span>
               </div>
             )}
           </div>}
@@ -777,12 +777,12 @@ export default function PatientPanel() {
         {patientTab==="notes"&&<div>
           <div style={{marginBottom:16}}>
             <textarea id="newNote" name="newNote" value={newNote} onChange={e=>setNewNote(e.target.value)} placeholder={t("add_internal_note_placeholder")} rows={3} style={{width:"100%",padding:"12px 14px",borderRadius:12,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"inherit",fontSize:14,outline:"none",boxSizing:"border-box",resize:"vertical"}}/>
-            <button onClick={()=>addInternalNote(lead.id)} disabled={!newNote.trim()} style={{marginTop:8,padding:"8px 18px",borderRadius:10,background:newNote.trim()?"rgba(76,201,255,0.12)":"rgba(255,255,255,0.04)",border:`1px solid ${newNote.trim()?"rgba(76,201,255,0.25)":"rgba(255,255,255,0.08)"}`,color:newNote.trim()?"#4cc9ff":"rgba(167,177,195,0.4)",fontWeight:700,fontSize:13,cursor:newNote.trim()?"pointer":"default",fontFamily:"inherit"}}>{t("add_note")}</button>
+            <button onClick={()=>addInternalNote(lead.id)} disabled={!newNote.trim()} style={{marginTop:8,padding:"8px 18px",borderRadius:10,background:newNote.trim()?"rgba(76,201,255,0.12)":"rgba(255,255,255,0.04)",border:`1px solid ${newNote.trim()?"rgba(76,201,255,0.25)":"rgba(255,255,255,0.08)"}`,color:newNote.trim()?"#4cc9ff":"rgba(167,177,195,0.6)",fontWeight:700,fontSize:13,cursor:newNote.trim()?"pointer":"default",fontFamily:"inherit"}}>{t("add_note")}</button>
           </div>
-          {(detailNotes||lead.internalNotes||[]).length===0&&<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.4)"}}>{t("no_internal_notes_yet")}</div>}
+          {(detailNotes||lead.internalNotes||[]).length===0&&<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.6)"}}>{t("no_internal_notes_yet")}</div>}
           {(detailNotes||lead.internalNotes||[]).slice().reverse().map((n,i)=><div key={i} style={{padding:14,borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",marginBottom:8}}>
             <div style={{fontSize:14,lineHeight:1.5,marginBottom:6}}>{n.text}</div>
-            <div style={{fontSize:11,color:"rgba(167,177,195,0.4)"}}>by <span style={{fontWeight:600,color:"rgba(167,177,195,0.6)"}}>{n.author}</span> · {timeAgo(n.time)}</div>
+            <div style={{fontSize:11,color:"rgba(167,177,195,0.6)"}}>by <span style={{fontWeight:600,color:"rgba(167,177,195,0.6)"}}>{n.author}</span> · {timeAgo(n.time)}</div>
           </div>)}
         </div>}
       </div>

@@ -160,7 +160,7 @@ export default function AIControlView() {
         </div>
         <div style={{padding:14,borderRadius:12,background:"var(--bg-card)",border:"1px solid var(--border-default)"}}>
           <div style={{fontSize:11,fontWeight:700,color:"var(--text-faint)",marginBottom:4}}>{t("verify_token")}</div>
-          <div style={{fontFamily:"monospace",fontSize:12,color:"rgba(232,238,252,0.6)"}}>fm_{activeClinicId}_verify_2026</div>
+          <div style={{fontFamily:"monospace",fontSize:12,color:"rgba(232,238,252,0.95)"}}>fm_{activeClinicId}_verify_2026</div>
         </div>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14}}>
@@ -217,7 +217,7 @@ export default function AIControlView() {
     {/* System Prompt Preview */}
     {ac.systemPrompt && <Section title={t("generated_system_prompt")} right={<span style={{padding:"3px 10px",borderRadius:6,fontSize:10,fontWeight:700,background:"rgba(76,201,255,0.08)",color:"#4cc9ff"}}>{t("auto_generated")}</span>}>
       <div style={{padding:14,borderRadius:12,background:"rgba(0,0,0,0.3)",border:"1px solid var(--border-default)",maxHeight:200,overflowY:"auto"}}>
-        <pre style={{margin:0,fontSize:12,color:"rgba(232,238,252,0.6)",whiteSpace:"pre-wrap",fontFamily:"monospace",lineHeight:1.5}}>{ac.systemPrompt}</pre>
+        <pre style={{margin:0,fontSize:12,color:"rgba(232,238,252,0.95)",whiteSpace:"pre-wrap",fontFamily:"monospace",lineHeight:1.5}}>{ac.systemPrompt}</pre>
       </div>
       <div style={{fontSize:11,color:"var(--text-faint)",marginTop:8}}>{t("system_prompt_hint")}</div>
     </Section>}

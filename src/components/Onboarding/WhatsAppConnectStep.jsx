@@ -207,7 +207,7 @@ export default function WhatsAppConnectStep() {
         }}>
           <div style={{ fontSize: 42, marginBottom: 8 }}>✅</div>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#10b981" }}>{tx.connected_title}</div>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", marginTop: 6, lineHeight: 1.5 }}>{tx.connected_subtitle}</div>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 6, lineHeight: 1.5 }}>{tx.connected_subtitle}</div>
 
           <div style={{ marginTop: 20, display: "grid", gap: 6 }}>
             {[
@@ -216,15 +216,15 @@ export default function WhatsAppConnectStep() {
               { label: tx.status, value: tx.active, color: "#10b981" },
             ].map(r => (
               <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 16px" }}>
-                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.4)" }}>{r.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: r.color || "rgba(232,238,252,0.8)" }}>{r.value}</span>
+                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.6)" }}>{r.label}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: r.color || "rgba(232,238,252,0.95)" }}>{r.value}</span>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 10, background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)" }}>
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", lineHeight: 1.6 }}>💡 {tx.cost_hint}</div>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", lineHeight: 1.6 }}>💡 {tx.cost_hint}</div>
         </div>
 
         <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
@@ -245,7 +245,7 @@ export default function WhatsAppConnectStep() {
         }}>
           <div style={{ fontSize: 42, marginBottom: 8 }}>📱</div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{tx.otp_title}</div>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", marginTop: 6 }}>{tx.otp_subtitle}</div>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 6 }}>{tx.otp_subtitle}</div>
 
           <input
             type="text"
@@ -289,7 +289,7 @@ export default function WhatsAppConnectStep() {
       }}>
         {/* Phone input */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6, display: "block" }}>{tx.phone_label}</label>
+          <label style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6, display: "block" }}>{tx.phone_label}</label>
           <input
             type="tel"
             value={phone}
@@ -301,7 +301,7 @@ export default function WhatsAppConnectStep() {
               color: "#fff", fontFamily: "inherit", outline: "none", boxSizing: "border-box",
             }}
           />
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.3)", marginTop: 4 }}>{tx.phone_hint}</div>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 4 }}>{tx.phone_hint}</div>
         </div>
 
         {error && <ErrorBox message={error} onRetry={handleRetry} retryLabel={tx.retry} />}
@@ -325,7 +325,7 @@ export default function WhatsAppConnectStep() {
       </div>
 
       <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 10, background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)" }}>
-        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", lineHeight: 1.6 }}>💡 {tx.cost_hint}</div>
+        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", lineHeight: 1.6 }}>💡 {tx.cost_hint}</div>
       </div>
 
       <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>

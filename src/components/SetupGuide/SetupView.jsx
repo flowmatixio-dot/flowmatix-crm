@@ -28,7 +28,7 @@ const TIER_LABELS = {
 const TIER_COLORS = {
   required:    "#4cc9ff",
   recommended: "#ff8a2a",
-  optional:    "rgba(167,177,195,0.5)",
+  optional:    "rgba(167,177,195,0.7)",
 };
 
 export default function SetupView() {
@@ -59,7 +59,7 @@ export default function SetupView() {
   const TIER_META = {
     required:    { label: t("sg_required") || "Erforderlich",       color: "#4cc9ff",                bg: "rgba(76,201,255,0.06)", border: "rgba(76,201,255,0.15)" },
     recommended: { label: t("sg_recommended") || "Empfohlen",       color: "#ff8a2a",                bg: "rgba(255,138,42,0.04)", border: "rgba(255,138,42,0.1)" },
-    optional:    { label: t("sg_optional_label") || "Optional",      color: "rgba(167,177,195,0.5)", bg: "rgba(255,255,255,0.02)", border: "rgba(255,255,255,0.06)" },
+    optional:    { label: t("sg_optional_label") || "Optional",      color: "rgba(167,177,195,0.7)", bg: "rgba(255,255,255,0.02)", border: "rgba(255,255,255,0.06)" },
   };
 
   const renderTab = () => {

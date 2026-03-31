@@ -24,7 +24,7 @@ export const STATUS_COLORS = {
   collecting: { bg: "rgba(76,201,255,0.12)", color: "#4cc9ff", border: "rgba(76,201,255,0.25)" },
 
   // Neutral
-  neutral: { bg: "rgba(167,177,195,0.08)", color: "rgba(167,177,195,0.5)", border: "rgba(167,177,195,0.15)" },
+  neutral: { bg: "rgba(167,177,195,0.08)", color: "rgba(167,177,195,0.7)", border: "rgba(167,177,195,0.15)" },
 };
 
 // Task type colors
@@ -33,11 +33,11 @@ export const TASK_COLORS = {
   hotel: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
   driver: { bg: "rgba(59,130,246,0.08)", color: "#3b82f6", border: "rgba(59,130,246,0.15)", dot: "#3b82f6" },
   dsgvo: { bg: "rgba(167,139,250,0.08)", color: "#a78bfa", border: "rgba(167,139,250,0.15)", dot: "#a78bfa" },
-  followup: { bg: "rgba(167,177,195,0.06)", color: "rgba(167,177,195,0.5)", border: "rgba(167,177,195,0.1)", dot: "rgba(167,177,195,0.4)" },
+  followup: { bg: "rgba(167,177,195,0.06)", color: "rgba(167,177,195,0.7)", border: "rgba(167,177,195,0.1)", dot: "rgba(167,177,195,0.6)" },
   flight: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
   cancel: { bg: "rgba(239,68,68,0.08)", color: "#ef4444", border: "rgba(239,68,68,0.15)", dot: "#ef4444" },
   deposit: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
-  flight_wait: { bg: "rgba(167,177,195,0.06)", color: "rgba(167,177,195,0.5)", border: "rgba(167,177,195,0.1)", dot: "rgba(167,177,195,0.4)" },
+  flight_wait: { bg: "rgba(167,177,195,0.06)", color: "rgba(167,177,195,0.7)", border: "rgba(167,177,195,0.1)", dot: "rgba(167,177,195,0.6)" },
 };
 
 // Logistics badge colors (NOT red)
@@ -49,7 +49,7 @@ export const LOGISTICS_COLORS = {
 
 // Time badge colors (for waiting time display)
 export function getTimeBadgeColor(days) {
-  if (days <= 1) return { bg: "rgba(167,177,195,0.08)", color: "rgba(167,177,195,0.5)" };
+  if (days <= 1) return { bg: "rgba(167,177,195,0.08)", color: "rgba(167,177,195,0.7)" };
   if (days <= 7) return { bg: "rgba(251,191,36,0.08)", color: "#fbbf24" };
   return { bg: "rgba(239,68,68,0.08)", color: "#ef4444" };
 }

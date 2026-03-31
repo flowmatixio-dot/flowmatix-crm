@@ -54,7 +54,7 @@ export default function DoctorFilter({ doctors, selectedDoctorIds, onToggle, onS
         style={{
           padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600,
           cursor: "pointer", fontFamily: "inherit", outline: "none",
-          border: `1px solid ${allSelected ? "rgba(167,177,195,0.25)" : "rgba(167,177,195,0.1)"}`,
+          border: `1px solid ${allSelected ? "rgba(167,177,195,0.65)" : "rgba(167,177,195,0.1)"}`,
           background: allSelected ? "rgba(167,177,195,0.08)" : "transparent",
           color: `rgba(167,177,195,${allSelected ? "0.8" : "0.35"})`,
           transition: "all 0.15s ease",
@@ -96,7 +96,7 @@ export default function DoctorFilter({ doctors, selectedDoctorIds, onToggle, onS
                 cursor: "pointer", fontFamily: "inherit", outline: "none",
                 border: `1px solid ${active ? docColor : "rgba(255,255,255,0.06)"}`,
                 background: active ? `${docColor}18` : "rgba(255,255,255,0.02)",
-                color: active ? docColor : "rgba(232,238,252,0.6)",
+                color: active ? docColor : "rgba(232,238,252,0.95)",
                 transition: "all .15s",
                 display: "inline-flex", alignItems: "center", gap: 6,
                 position: "relative",
@@ -114,7 +114,7 @@ export default function DoctorFilter({ doctors, selectedDoctorIds, onToggle, onS
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 3,
                 fontSize: 10, fontWeight: 700,
-                color: active ? "rgba(232,238,252,0.6)" : "rgba(167,177,195,0.4)",
+                color: active ? "rgba(232,238,252,0.95)" : "rgba(167,177,195,0.6)",
                 borderLeft: "1px solid rgba(255,255,255,0.06)",
                 paddingLeft: 6, marginLeft: 2,
               }}>
@@ -140,11 +140,11 @@ export default function DoctorFilter({ doctors, selectedDoctorIds, onToggle, onS
                 title={`${doc.name} Settings`}
                 style={{
                   padding: "2px 4px", border: "none", background: "transparent",
-                  color: "rgba(167,177,195,0.25)", fontSize: 13, cursor: "pointer",
+                  color: "rgba(167,177,195,0.65)", fontSize: 13, cursor: "pointer",
                   transition: "color .15s", marginLeft: -1, lineHeight: 1,
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = docColor}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(167,177,195,0.25)"}
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(167,177,195,0.65)"}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>

@@ -184,7 +184,7 @@ export default function WhatsAppEmbeddedSignup() {
             }}>💬</div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981" }}>{t("wa_connected_title") || "WhatsApp connected"}</div>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>{t("wa_auto_messages_active") || "Automatic messages active"}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{t("wa_auto_messages_active") || "Automatic messages active"}</div>
             </div>
           </div>
 
@@ -196,8 +196,8 @@ export default function WhatsAppEmbeddedSignup() {
               { label: t("wa_status_label") || "Status", value: t("wa_status_active") || "Active", color: "#10b981" },
             ].map(row => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.4)" }}>{row.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: row.color || "rgba(232,238,252,0.8)" }}>{row.value}</span>
+                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.6)" }}>{row.label}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: row.color || "rgba(232,238,252,0.95)" }}>{row.value}</span>
               </div>
             ))}
           </div>
@@ -209,13 +209,13 @@ export default function WhatsAppEmbeddedSignup() {
           background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)",
         }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(76,201,255,0.6)", marginBottom: 6 }}>💡 {t("wa_cost_hint_title") || "WhatsApp cost info"}</div>
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", lineHeight: 1.7 }}>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", lineHeight: 1.7 }}>
             {t("wa_cost_hint_body") || "The AI bot communicates via WhatsApp."}<br/><br/>
-            • {({ de: "Wenn ein Patient zuerst schreibt, kann die Klinik", en: "When a patient writes first, the clinic can reply", tr: "Bir hasta ilk yazdığında, klinik" }[localStorage.getItem("fm_lang") || "de"] || "When a patient writes first, the clinic can reply")} <strong style={{color:"rgba(232,238,252,0.6)"}}>{t("wa_cost_24h") || "24 hours free"}</strong> {({ de: "antworten.", en: ".", tr: "yanıt verebilir." }[localStorage.getItem("fm_lang") || "de"] || ".")}<br/>
+            • {({ de: "Wenn ein Patient zuerst schreibt, kann die Klinik", en: "When a patient writes first, the clinic can reply", tr: "Bir hasta ilk yazdığında, klinik" }[localStorage.getItem("fm_lang") || "de"] || "When a patient writes first, the clinic can reply")} <strong style={{color:"rgba(232,238,252,0.95)"}}>{t("wa_cost_24h") || "24 hours free"}</strong> {({ de: "antworten.", en: ".", tr: "yanıt verebilir." }[localStorage.getItem("fm_lang") || "de"] || ".")}<br/>
             • {t("wa_cost_new_conv") || "Only when a new message is started after this 24-hour window, Meta charges a new conversation."}<br/><br/>
             {t("wa_cost_example") || "Example prices per conversation:"}<br/>
-            <span style={{marginLeft:8}}>🇹🇷 Turkey: ~<strong style={{color:"rgba(232,238,252,0.6)"}}>€0.005</strong></span><br/>
-            <span style={{marginLeft:8}}>🇩🇪 Germany: ~<strong style={{color:"rgba(232,238,252,0.6)"}}>€0.05</strong></span><br/><br/>
+            <span style={{marginLeft:8}}>🇹🇷 Turkey: ~<strong style={{color:"rgba(232,238,252,0.95)"}}>€0.005</strong></span><br/>
+            <span style={{marginLeft:8}}>🇩🇪 Germany: ~<strong style={{color:"rgba(232,238,252,0.95)"}}>€0.05</strong></span><br/><br/>
             {t("wa_cost_billing") || "Billing is done directly through the clinic's WhatsApp Business Account."}<br/>
             {t("wa_cost_no_extra") || "Flowmatix does not charge any additional fees for this."}
           </div>
@@ -254,7 +254,7 @@ export default function WhatsAppEmbeddedSignup() {
             animation: "pulse 1.5s ease-in-out infinite",
           }}>🔄</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: "rgba(232,238,252,0.9)" }}>Code wird überprüft...</div>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", marginTop: 8 }}>Bitte kurz warten.</div>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 8 }}>Bitte kurz warten.</div>
         </div>
         <style>{`@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }`}</style>
       </div>
@@ -281,7 +281,7 @@ export default function WhatsAppEmbeddedSignup() {
             }}>📱</div>
             <div>
               <div style={{ fontSize: 18, fontWeight: 800, color: "rgba(232,238,252,0.95)" }}>SMS-Code eingeben</div>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", marginTop: 2 }}>Verifizierung</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", marginTop: 2 }}>Verifizierung</div>
             </div>
           </div>
 
@@ -302,7 +302,7 @@ export default function WhatsAppEmbeddedSignup() {
             background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
             marginBottom: 16,
           }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 10 }}>6-stelliger SMS-Code</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 10 }}>6-stelliger SMS-Code</div>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <input
                 value={otpCode}
@@ -324,7 +324,7 @@ export default function WhatsAppEmbeddedSignup() {
                   padding: "12px 24px", borderRadius: 10,
                   background: otpCode.length === 6 ? "linear-gradient(135deg, #10b981, #059669)" : "rgba(255,255,255,0.04)",
                   border: "none",
-                  color: otpCode.length === 6 ? "#fff" : "rgba(167,177,195,0.3)",
+                  color: otpCode.length === 6 ? "#fff" : "rgba(167,177,195,0.7)",
                   fontWeight: 700, fontSize: 14, cursor: otpCode.length === 6 ? "pointer" : "not-allowed",
                   fontFamily: "inherit",
                 }}
@@ -382,7 +382,7 @@ export default function WhatsAppEmbeddedSignup() {
             }}>⏳</div>
             <div>
               <div style={{ fontSize: 18, fontWeight: 800, color: "rgba(232,238,252,0.95)" }}>Wird eingerichtet</div>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", marginTop: 2 }}>WhatsApp-Einrichtung läuft</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", marginTop: 2 }}>WhatsApp-Einrichtung läuft</div>
             </div>
           </div>
 
@@ -404,7 +404,7 @@ export default function WhatsAppEmbeddedSignup() {
               background: "#fbbf24",
               animation: "pulse 1.5s ease-in-out infinite",
             }} />
-            <span style={{ fontSize: 12, color: "rgba(167,177,195,0.4)" }}>
+            <span style={{ fontSize: 12, color: "rgba(167,177,195,0.6)" }}>
               Warte auf Einrichtung durch unser Team...
             </span>
           </div>
@@ -432,12 +432,12 @@ export default function WhatsAppEmbeddedSignup() {
           }}>💬</div>
           <div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "rgba(232,238,252,0.95)" }}>WhatsApp verbinden</div>
-            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", marginTop: 2 }}>Nummer eingeben um loszulegen</div>
+            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", marginTop: 2 }}>Nummer eingeben um loszulegen</div>
           </div>
         </div>
 
         {/* Description */}
-        <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", lineHeight: 1.6, marginBottom: 20 }}>
+        <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", lineHeight: 1.6, marginBottom: 20 }}>
           Gib die Telefonnummer ein, die du für WhatsApp Business nutzen möchtest. Unser Team richtet alles für dich ein — du bekommst dann einen SMS-Code zur Verifizierung.
         </div>
 
@@ -447,7 +447,7 @@ export default function WhatsAppEmbeddedSignup() {
           background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
           marginBottom: 16,
         }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 10 }}>WhatsApp-Nummer</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 10 }}>WhatsApp-Nummer</div>
           <div style={{ display: "flex", gap: 10 }}>
             <input
               value={phone}
@@ -461,7 +461,7 @@ export default function WhatsAppEmbeddedSignup() {
               onKeyDown={e => { if (e.key === "Enter") handleSubmitPhone(); }}
             />
           </div>
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.3)", marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 8 }}>
             Am besten deine bestehende Praxisnummer verwenden.
           </div>
         </div>

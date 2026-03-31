@@ -352,9 +352,9 @@ const S = {
   grid4: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16 },
   kpi: { fontSize: 28, fontWeight: 800, color: '#fff' },
   kpiSm: { fontSize: 22, fontWeight: 800, color: '#fff' },
-  kpiLabel: { fontSize: 11, color: 'rgba(167,177,195,0.5)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
+  kpiLabel: { fontSize: 11, color: 'rgba(167,177,195,0.7)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
-  th: { textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.5)', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 },
+  th: { textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.7)', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 },
   td: { padding: '10px 12px', borderBottom: '1px solid #1e1e3e', color: '#ccc' },
   accent: '#d4af37',
   green: '#22c55e',
@@ -376,7 +376,7 @@ const pctColor = (pct) => pct >= 80 ? S.red : pct >= 60 ? S.yellow : S.green;
 
 const ProgressBar = ({ pct, label }) => (
   <div style={{ marginBottom: 8 }}>
-    {label && <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.5)', marginBottom: 4 }}>{label}</div>}
+    {label && <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.7)', marginBottom: 4 }}>{label}</div>}
     <div style={{ height: 8, borderRadius: 4, background: '#1a1a2e', overflow: 'hidden' }}>
       <div style={{ height: '100%', width: `${Math.min(100, pct)}%`, borderRadius: 4, background: pctColor(pct), transition: 'width .3s' }} />
     </div>
@@ -389,7 +389,7 @@ const Btn = ({ children, onClick, small, danger, disabled }) => (
 );
 
 const Empty = ({ text }) => <div style={{ padding: 32, textAlign: 'center', color: '#666' }}>{text || 'No data yet'}</div>;
-const Spin = () => <div style={{ padding: 32, textAlign: 'center', color: 'rgba(167,177,195,0.5)' }}>Loading...</div>;
+const Spin = () => <div style={{ padding: 32, textAlign: 'center', color: 'rgba(167,177,195,0.7)' }}>Loading...</div>;
 
 const fmtBytes = (b) => { if (!b) return '0 B'; const u = ['B','KB','MB','GB','TB']; let i = 0; let v = Number(b); while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; } return v.toFixed(i > 1 ? 1 : 0) + ' ' + u[i]; };
 const fmtSec = (s) => { const d = Math.floor(s/86400); const h = Math.floor((s%86400)/3600); return d > 0 ? `${d}d ${h}h` : `${h}h ${Math.floor((s%3600)/60)}m`; };
@@ -500,8 +500,8 @@ export default function OperatorPanel() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, padding: '10px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: apiConnected ? '#10b981' : apiConnected === false ? '#ef4444' : '#fbbf24', boxShadow: apiConnected ? '0 0 6px rgba(16,185,129,0.4)' : 'none' }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: apiConnected ? 'rgba(16,185,129,0.8)' : 'rgba(167,177,195,0.5)' }}>{apiConnected ? 'System Online' : apiConnected === false ? 'Getrennt' : 'Verbinde...'}</span>
-          <span style={{ fontSize: 11, color: 'rgba(167,177,195,0.3)', fontWeight: 500 }}>v1.0.0</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: apiConnected ? 'rgba(16,185,129,0.8)' : 'rgba(167,177,195,0.7)' }}>{apiConnected ? 'System Online' : apiConnected === false ? 'Getrennt' : 'Verbinde...'}</span>
+          <span style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)', fontWeight: 500 }}>v1.0.0</span>
           {visitorCount !== null && <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, background: 'rgba(212,175,55,0.10)', color: '#d4af37', marginLeft: 4 }}>{visitorCount} visitors today</span>}
         </div>
         <button onClick={reload} style={{ padding: '7px 18px', borderRadius: 8, background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.15)', color: '#d4af37', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.03em', position: 'relative', zIndex: 10 }}>Refresh</button>
@@ -1302,7 +1302,7 @@ function TabTrials({ d, load }) {
           const isAct = effectiveFilter === f;
           const color = stageColors[f] || '#d4af37';
           const count = f === 'all' ? categorized.length : (counts[f] || 0);
-          return <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 18px', borderRadius: 10, border: `1px solid ${isAct ? color : 'rgba(255,255,255,0.06)'}`, background: isAct ? color + '18' : 'transparent', color: isAct ? color : 'rgba(167,177,195,0.4)', fontWeight: isAct ? 700 : 500, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s' }}>
+          return <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 18px', borderRadius: 10, border: `1px solid ${isAct ? color : 'rgba(255,255,255,0.06)'}`, background: isAct ? color + '18' : 'transparent', color: isAct ? color : 'rgba(167,177,195,0.6)', fontWeight: isAct ? 700 : 500, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s' }}>
             <span style={{ marginRight: 4 }}>{stageIcons[f] || '\u25C6'}</span>
             {f === 'all' ? 'Alle' : stageLabels[f]} ({count})
           </button>;
@@ -1438,19 +1438,19 @@ function TabTrials({ d, load }) {
                 {/* Details grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginTop: 8 }}>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Klinik</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Klinik</div>
                     <div style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>{c.name}</div>
                     {c.website && <a href={c.website.startsWith('http') ? c.website : `https://${c.website}`} target="_blank" rel="noopener" style={{ fontSize: 12, color: '#d4af37', textDecoration: 'none' }}>{c.website}</a>}
                     {c.city && <div style={{ fontSize: 12, color: MUTED, marginTop: 4 }}>{c.city}{c.country ? `, ${c.country}` : ''}</div>}
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Kontakt</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Kontakt</div>
                     <div style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>{c.contact_name || c.name}</div>
                     <div style={{ fontSize: 12, color: MUTED }}>{c.email}</div>
                     {c.phone && <div style={{ fontSize: 12, color: MUTED }}>{c.phone}</div>}
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Subscription</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Subscription</div>
                     <div style={{ fontSize: 13, color: '#ccc' }}>Plan: <span style={{ fontWeight: 700, color: planColors[c.plan] || '#fff' }}>{planLabel}</span> ({fmtEur(planMrr)}/Mo.)</div>
                     <div style={{ fontSize: 13, color: '#ccc' }}>Workspace: {c.workspace_state || '\u2014'}</div>
                     <div style={{ fontSize: 13, color: '#ccc' }}>Abo: {c.subscription_status ? <span style={{ color: c.subscription_status === 'active' ? '#10b981' : '#fbbf24' }}>{c.subscription_status}</span> : <span style={{ color: MUTED }}>Kein Abo</span>}</div>
@@ -1651,12 +1651,12 @@ function TabOutreach({ d, load }) {
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
             <span style={{ fontSize: 18, fontWeight: 800, color: s.color }}>{stats[s.key] || 0}</span>
-            <span style={{ fontSize: 11, color: filter === s.key ? s.color : 'rgba(167,177,195,0.5)', fontWeight: filter === s.key ? 700 : 500 }}>{s.label}</span>
+            <span style={{ fontSize: 11, color: filter === s.key ? s.color : 'rgba(167,177,195,0.7)', fontWeight: filter === s.key ? 700 : 500 }}>{s.label}</span>
           </div>
         ))}
         <div style={{ padding: '6px 14px', borderRadius: 8, background: '#162032', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{stats.total || 0}</span>
-          <span style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>Total</span>
+          <span style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>Total</span>
         </div>
       </div>
 
@@ -1683,7 +1683,7 @@ function TabOutreach({ d, load }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => setExpandedId(isExpanded ? null : lead.id)}>
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{lead.clinic_name}</div>
-                    <div style={{ fontSize: 13, color: 'rgba(167,177,195,0.5)', marginTop: 2 }}>
+                    <div style={{ fontSize: 13, color: 'rgba(167,177,195,0.7)', marginTop: 2 }}>
                       {lead.contact_name && <span>{lead.contact_name}</span>}
                       {lead.contact_title && <span style={{ color: '#666' }}> · {lead.contact_title}</span>}
                       {lead.city && <span style={{ color: '#666' }}> · {lead.city}</span>}
@@ -1700,9 +1700,9 @@ function TabOutreach({ d, load }) {
                 </div>
 
                 {/* Quick info row */}
-                <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 11, color: 'rgba(167,177,195,0.5)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 11, color: 'rgba(167,177,195,0.7)', flexWrap: 'wrap' }}>
                   {lead.tags && lead.tags.split(',').map(t => (
-                    <span key={t.trim()} style={{ padding: '1px 8px', borderRadius: 99, background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.06)', fontSize: 10, color: 'rgba(167,177,195,0.5)' }}>{t.trim()}</span>
+                    <span key={t.trim()} style={{ padding: '1px 8px', borderRadius: 99, background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.06)', fontSize: 10, color: 'rgba(167,177,195,0.7)' }}>{t.trim()}</span>
                   ))}
                   {lead.last_contacted_at && <span>Last: {timeAgo(lead.last_contacted_at)}</span>}
                   {lead.next_follow_up_at && <span style={{ color: new Date(lead.next_follow_up_at) < new Date() ? S.red : S.yellow }}>Follow-up: {new Date(lead.next_follow_up_at).toLocaleDateString()}</span>}
@@ -1713,20 +1713,20 @@ function TabOutreach({ d, load }) {
                   <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #1e1e3e' }}>
                     <div style={S.grid3}>
                       <div>
-                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)', marginBottom: 4 }}>Contact Info</div>
+                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)', marginBottom: 4 }}>Contact Info</div>
                         {lead.email && <div style={{ fontSize: 13, color: '#ccc' }}>Email: {lead.email}</div>}
                         {lead.phone && <div style={{ fontSize: 13, color: '#ccc' }}>Phone: {lead.phone}</div>}
                         {lead.whatsapp && <div style={{ fontSize: 13, color: '#ccc' }}>WhatsApp: {lead.whatsapp}</div>}
                         {lead.linkedin_url && <a href={lead.linkedin_url} target="_blank" rel="noopener" style={{ fontSize: 13, color: S.accent }}>LinkedIn</a>}
                       </div>
                       <div>
-                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)', marginBottom: 4 }}>Location</div>
+                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)', marginBottom: 4 }}>Location</div>
                         <div style={{ fontSize: 13, color: '#ccc' }}>{lead.city}, {lead.country || 'Turkey'}</div>
                         <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Source: {lead.source || 'research'}</div>
                         <div style={{ fontSize: 11, color: '#666' }}>Added: {timeAgo(lead.created_at)}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)', marginBottom: 4 }}>Status</div>
+                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)', marginBottom: 4 }}>Status</div>
                         <select
                           value={lead.status}
                           onChange={e => handleStatusChange(lead, e.target.value)}
@@ -1741,7 +1741,7 @@ function TabOutreach({ d, load }) {
 
                     {/* Notes */}
                     <div style={{ marginTop: 12 }}>
-                      <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)', marginBottom: 4 }}>Notes</div>
+                      <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)', marginBottom: 4 }}>Notes</div>
                       <textarea
                         value={currentNotes}
                         onChange={e => setNotesMap(prev => ({ ...prev, [lead.id]: e.target.value }))}
@@ -1758,7 +1758,7 @@ function TabOutreach({ d, load }) {
 
                     {/* Copy Template buttons */}
                     <div style={{ marginTop: 12 }}>
-                      <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)', marginBottom: 6 }}>Copy Templates</div>
+                      <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)', marginBottom: 6 }}>Copy Templates</div>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                         <button onClick={() => copyTemplate('en_message_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.06)', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>EN Message 1</button>
                         <button onClick={() => copyTemplate('tr_message_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.06)', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>TR Message 1</button>
@@ -2676,7 +2676,7 @@ function TabIntegrations({ d, load }) {
                     <span style={{ fontSize: 20 }}>📅</span>
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Google Calendar</div>
-                      <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.5)' }}>{t("sync_appointments_auto") || "Termine automatisch synchronisieren"}</div>
+                      <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.7)' }}>{t("sync_appointments_auto") || "Termine automatisch synchronisieren"}</div>
                     </div>
                   </div>
                   {googleStatus?.connected ? badge(S.green, 'Verbunden') : badge(S.gray, 'Not connected')}
@@ -2686,15 +2686,15 @@ function TabIntegrations({ d, load }) {
                   <div>
                     <div style={S.grid3}>
                       <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>Connected Since</div>
+                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>Connected Since</div>
                         <div style={{ fontSize: 13, color: '#ccc', marginTop: 4 }}>{googleStatus.connectedAt ? timeAgo(googleStatus.connectedAt) : '-'}</div>
                       </div>
                       <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>Last Used</div>
+                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>Last Used</div>
                         <div style={{ fontSize: 13, color: '#ccc', marginTop: 4 }}>{googleStatus.lastUsed ? timeAgo(googleStatus.lastUsed) : 'Never'}</div>
                       </div>
                       <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>Status</div>
+                        <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>Status</div>
                         <div style={{ fontSize: 13, color: googleStatus.lastError ? S.red : S.green, marginTop: 4 }}>{googleStatus.lastError || 'OK'}</div>
                       </div>
                     </div>
@@ -2707,7 +2707,7 @@ function TabIntegrations({ d, load }) {
                     {googleStatus?.googleOAuthAvailable ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <Btn onClick={handleConnect}>Google Calendar verbinden</Btn>
-                        <span style={{ fontSize: 12, color: 'rgba(167,177,195,0.5)' }}>{t("clinic_admin_google") || "Klinik-Admin wird zu Google weitergeleitet"}</span>
+                        <span style={{ fontSize: 12, color: 'rgba(167,177,195,0.7)' }}>{t("clinic_admin_google") || "Klinik-Admin wird zu Google weitergeleitet"}</span>
                       </div>
                     ) : (
                       <div style={{ fontSize: 12, color: S.yellow }}>Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env</div>
@@ -2722,22 +2722,22 @@ function TabIntegrations({ d, load }) {
                   <span style={{ fontSize: 20 }}>📊</span>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>API Usage (Flowmatix-managed)</div>
-                    <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.5)' }}>OpenAI, SMTP, n8n — globale Keys, Limits per Plan</div>
+                    <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.7)' }}>OpenAI, SMTP, n8n — globale Keys, Limits per Plan</div>
                   </div>
                 </div>
                 <div style={S.grid3}>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>OpenAI</div>
+                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>OpenAI</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: S.green, marginTop: 4 }}>Flowmatix Key</div>
                     <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Usage tracked per plan limits</div>
                   </div>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>SMTP / E-Mail</div>
+                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>SMTP / E-Mail</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: S.green, marginTop: 4 }}>Flowmatix Key</div>
                     <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Transactional emails</div>
                   </div>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.5)' }}>n8n Workflows</div>
+                    <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.7)' }}>n8n Workflows</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: S.green, marginTop: 4 }}>Flowmatix Key</div>
                     <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Automation engine</div>
                   </div>
@@ -3682,7 +3682,7 @@ function TabSecurity({ d, load }) {
       {keys?.apiKeys?.length > 0 && (
         <div style={S.card}>
           <div style={S.kpiLabel}>API Keys ({keys.apiKeys.length})</div>
-          <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.5)', marginTop: 4 }}>Manage in API & Secrets tab</div>
+          <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.7)', marginTop: 4 }}>Manage in API & Secrets tab</div>
         </div>
       )}
 

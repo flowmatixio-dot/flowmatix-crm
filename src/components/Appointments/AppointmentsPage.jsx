@@ -63,8 +63,8 @@ function GoogleCalBanner({ isDoctor, clinic, showT }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
         <span style={{ fontSize: 16 }}>{connected ? "✅" : "📅"}</span>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: connected ? "rgba(16,185,129,0.8)" : "rgba(232,238,252,0.6)" }}>{connected ? (t("gcal_connected_label") || "Google Calendar connected") : (t("gcal_label") || "Google Calendar")}</div>
-          <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>{connected ? (t("gcal_sync_active") || "Calendar sync active") : (t("gcal_sync_inactive") || "Connect Google Calendar")}</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: connected ? "rgba(16,185,129,0.8)" : "rgba(232,238,252,0.95)" }}>{connected ? (t("gcal_connected_label") || "Google Calendar connected") : (t("gcal_label") || "Google Calendar")}</div>
+          <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{connected ? (t("gcal_sync_active") || "Calendar sync active") : (t("gcal_sync_inactive") || "Connect Google Calendar")}</div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
@@ -394,7 +394,7 @@ export default function AppointmentsPage() {
         {stats && stats.ops > 0 && (
           <span className="fm-op-badge" style={{
             fontSize: 9, fontWeight: 700, letterSpacing: "0.02em",
-            color: isBusy ? "#ef4444" : stats.ops >= 3 ? "#f59e0b" : "rgba(167,177,195,0.4)",
+            color: isBusy ? "#ef4444" : stats.ops >= 3 ? "#f59e0b" : "rgba(167,177,195,0.6)",
             background: isBusy ? "rgba(239,68,68,0.1)" : stats.ops >= 3 ? "rgba(245,158,11,0.08)" : "transparent",
             borderRadius: 4, padding: "1px 5px",
             display: "inline-flex", alignItems: "center", gap: 3,
@@ -440,7 +440,7 @@ export default function AppointmentsPage() {
               boxShadow: "0 0 6px rgba(16,185,129,0.4)",
               animation: "fmPulse 2s infinite",
             }} />
-            <span style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", fontWeight: 500 }}>
+            <span style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", fontWeight: 500 }}>
               {tFb(t, "synced_calendar", "Mit Kalender synchronisiert")}
             </span>
           </div>
@@ -461,7 +461,7 @@ export default function AppointmentsPage() {
         <div style={{ position: "relative", maxWidth: 260 }}>
           <span style={{
             position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)",
-            fontSize: 14, color: "rgba(167,177,195,0.3)", pointerEvents: "none",
+            fontSize: 14, color: "rgba(167,177,195,0.7)", pointerEvents: "none",
           }}>&#x1F50D;</span>
           <input
             type="text"
@@ -486,8 +486,8 @@ export default function AppointmentsPage() {
         <div style={{ marginBottom: 14, padding: "10px 16px", borderRadius: 10, background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 16 }}>📅</span>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.6)" }}>Persönlicher Kalender</div>
-            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>Deine Termine und OP-Blöcke. Urlaub und Blocker werden vom Admin verwaltet.</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.95)" }}>Persönlicher Kalender</div>
+            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>Deine Termine und OP-Blöcke. Urlaub und Blocker werden vom Admin verwaltet.</div>
           </div>
         </div>
       )}
@@ -577,7 +577,7 @@ export default function AppointmentsPage() {
             marginBottom: 12, borderRadius: 10,
             background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
           }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)" }}>Woche</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)" }}>Woche</span>
             <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.06)" }} />
             <DayStat label={t("appt_ops") || "OPs"} value={weekOps} color="#4cc9ff" />
             {weekGrafts > 0 && <DayStat label={t("grafts_label_ui")} value={weekGrafts.toLocaleString()} color="#10b981" />}
@@ -588,7 +588,7 @@ export default function AppointmentsPage() {
 
       {/* ── Empty state when no appointments ── */}
       {myAppts.length === 0 && (
-        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_appointments_empty")}</div>
+        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_appointments_empty")}</div>
       )}
 
       {/* ── Calendar ── */}
@@ -705,7 +705,7 @@ function KpiPill({ label, value, color }) {
       padding: "5px 12px", borderRadius: 8,
       background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.05)",
     }}>
-      <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.45)", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+      <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.65)", textTransform: "uppercase", letterSpacing: "0.03em" }}>
         {label}
       </span>
       <span style={{ fontSize: 13, fontWeight: 800, color, letterSpacing: "-0.02em" }}>
@@ -720,7 +720,7 @@ function DayStat({ label, value, color }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
       <span style={{ fontSize: 14, fontWeight: 800, color }}>{value}</span>
-      <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(167,177,195,0.5)" }}>{label}</span>
+      <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(167,177,195,0.7)" }}>{label}</span>
     </div>
   );
 }
@@ -743,7 +743,7 @@ function StatusLegend() {
             display: "inline-block", width: 7, height: 7, borderRadius: "50%",
             background: item.color, opacity: 0.85,
           }} />
-          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(167,177,195,0.5)", letterSpacing: "0.01em" }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(167,177,195,0.7)", letterSpacing: "0.01em" }}>
             {item.label}
           </span>
         </div>
@@ -760,7 +760,7 @@ function renderEventContent(eventInfo) {
   if (props.type === "blocked") return null;
 
   const isTimeGrid = view.type.startsWith("timeGrid");
-  const treatColor = props.treatmentColor || "rgba(167,177,195,0.3)";
+  const treatColor = props.treatmentColor || "rgba(167,177,195,0.7)";
   const statusColor = APPT_C[props.status]?.c || "#4cc9ff";
   const abbr = TREAT_ABBR[(props.appt?.treatment || "")] || (props.appt?.treatment || "").slice(0, 3).toUpperCase();
   const revenue = props.appt?.price || TREAT_REVENUE[props.appt?.treatment] || null;
@@ -796,7 +796,7 @@ function renderEventContent(eventInfo) {
             {abbr}
           </span>
           {props.grafts && (
-            <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.55)" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)" }}>
               {(Number(props.grafts) / 1000).toFixed(1)}k Grafts
             </span>
           )}
@@ -818,7 +818,7 @@ function renderEventContent(eventInfo) {
               display: "inline-block", width: 5, height: 5, borderRadius: "50%",
               background: props.doctorColor || "#4cc9ff", flexShrink: 0,
             }} />
-            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.4)" }}>
+            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.6)" }}>
               {props.doctorName}
             </span>
           </div>
@@ -856,7 +856,7 @@ function renderEventContent(eventInfo) {
           display: "flex", alignItems: "center", gap: 4,
           whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
         }}>
-          <span style={{ fontWeight: 700, fontSize: 10, color: "rgba(167,177,195,0.55)", flexShrink: 0 }}>{props.time}</span>
+          <span style={{ fontWeight: 700, fontSize: 10, color: "rgba(167,177,195,0.75)", flexShrink: 0 }}>{props.time}</span>
           <span style={{ fontWeight: 700, fontSize: 11, color: "rgba(232,238,252,0.9)", overflow: "hidden", textOverflow: "ellipsis" }}>
             {event.title}
           </span>
@@ -869,12 +869,12 @@ function renderEventContent(eventInfo) {
             {abbr}
           </span>
           {graftStr && (
-            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.35)" }}>
+            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.75)" }}>
               {graftStr}
             </span>
           )}
           {props.durationMinutes && (
-            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.25)" }}>
+            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.65)" }}>
               • {Math.floor(props.durationMinutes / 60)}h
             </span>
           )}
@@ -896,7 +896,7 @@ function renderEventContent(eventInfo) {
 function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic }) {
   const sc = APPT_C[status] || APPT_C.booked;
   const revenue = appt?.price || TREAT_REVENUE[appt?.treatment] || null;
-  const procColor = TREAT_COLORS[appt?.treatment] || treatmentColor || "rgba(167,177,195,0.3)";
+  const procColor = TREAT_COLORS[appt?.treatment] || treatmentColor || "rgba(167,177,195,0.7)";
 
   // Preparation status — always show if appointment has any prep fields or grafts
   const prep = useMemo(() => {
@@ -1036,7 +1036,7 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
             marginBottom: 8,
           }}>
             <span style={{
-              fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.4)",
+              fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.6)",
               textTransform: "uppercase", letterSpacing: "0.06em",
             }}>
               {t("preparation") || "Vorbereitung"}
@@ -1064,7 +1064,7 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
                 </span>
                 <span style={{
                   fontWeight: 600,
-                  color: p.done ? "rgba(232,238,252,0.7)" : "rgba(239,68,68,0.6)",
+                  color: p.done ? "rgba(232,238,252,0.9)" : "rgba(239,68,68,0.6)",
                 }}>
                   {p.label}
                 </span>
@@ -1081,7 +1081,7 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
           borderTop: "1px solid rgba(255,255,255,0.05)",
         }}>
           <div style={{
-            fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)",
+            fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)",
             textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6,
           }}>
             {t("day_overview_label") || "Tagesübersicht"}
@@ -1095,10 +1095,10 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
                 display: "inline-block", width: 5, height: 5, borderRadius: "50%",
                 background: dl.color, flexShrink: 0,
               }} />
-              <span style={{ fontWeight: 600, flex: 1, color: "rgba(232,238,252,0.7)" }}>{dl.name}</span>
+              <span style={{ fontWeight: 600, flex: 1, color: "rgba(232,238,252,0.9)" }}>{dl.name}</span>
               <span style={{
                 fontWeight: 700, fontSize: 10,
-                color: dl.count >= dl.capacity ? "#ef4444" : dl.count >= dl.capacity * 0.8 ? "#f59e0b" : "rgba(167,177,195,0.45)",
+                color: dl.count >= dl.capacity ? "#ef4444" : dl.count >= dl.capacity * 0.8 ? "#f59e0b" : "rgba(167,177,195,0.65)",
               }}>
                 {dl.count}/{dl.capacity}
               </span>
@@ -1118,7 +1118,7 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
 function DetailCell({ label, value, valueColor, bold, children }) {
   return (
     <div>
-      <div style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
+      <div style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
         {label}
       </div>
       {children || (
@@ -1156,7 +1156,7 @@ const calendarStyles = `
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 .fm-calendar-wrap .fc .fc-col-header-cell-cushion {
-  color: rgba(167,177,195,0.45);
+  color: rgba(167,177,195,0.65);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1177,7 +1177,7 @@ const calendarStyles = `
   align-items: center;
 }
 .fm-calendar-wrap .fc .fc-daygrid-day-number {
-  color: rgba(232,238,252,0.5);
+  color: rgba(232,238,252,0.9);
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
@@ -1211,7 +1211,7 @@ const calendarStyles = `
   height: 48px;
 }
 .fm-calendar-wrap .fc .fc-timegrid-slot-label-cushion {
-  color: rgba(167,177,195,0.25);
+  color: rgba(167,177,195,0.65);
   font-size: 11px;
   font-weight: 600;
 }

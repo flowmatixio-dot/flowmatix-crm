@@ -182,7 +182,7 @@ export default function WhatsAppSetupPage() {
         <div style={{ fontSize: 14, fontWeight: 700, color: "#ff8a2a", marginBottom: 16 }}>{lockTx.locked}</div>
         <p style={{ color: "rgba(232,238,252,0.4)", fontSize: 13, lineHeight: 1.6, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>{lockTx.desc}</p>
         <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 32, opacity: 0.3, pointerEvents: "none", filter: "blur(2px)" }}>
-          <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.5)" }}>{tx.phone_label}</div>
+          <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.9)" }}>{tx.phone_label}</div>
           <div style={{ padding: "14px 16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.3)", fontSize: 18, textAlign: "center" }}>{tx.phone_hint}</div>
           <div style={{ padding: "14px 24px", borderRadius: 12, background: "#10b981", color: "#fff", fontWeight: 700, fontSize: 15, marginTop: 16, textAlign: "center" }}>{tx.btn}</div>
         </div>
@@ -215,7 +215,7 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(16,185,129,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>✅</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.active_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 2 }}>{tx.active_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{tx.active_desc}</div>
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -245,7 +245,7 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(76,201,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📱</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.otp_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 2 }}>{tx.otp_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{tx.otp_desc}</div>
             </div>
           </div>
           {ob.error_message && <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, color: "#ef4444", fontSize: 13 }}>{ob.error_message}</div>}
@@ -268,10 +268,10 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📱</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.migration_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 2 }}>{tx.migration_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{tx.migration_desc}</div>
             </div>
           </div>
-          <div style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 12, padding: 16, marginBottom: 16, fontSize: 13, color: "rgba(232,238,252,0.7)", lineHeight: 1.8 }}>
+          <div style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 12, padding: 16, marginBottom: 16, fontSize: 13, color: "rgba(232,238,252,0.9)", lineHeight: 1.8 }}>
             <div style={{ fontWeight: 700, marginBottom: 8, color: "#fbbf24" }}>{tx.migration_warning}</div>
             <div>{tx.migration_step1}</div>
             <div>{tx.migration_step2}</div>
@@ -296,9 +296,9 @@ export default function WhatsAppSetupPage() {
         <div style={{ ...cd, border: "1px solid rgba(76,201,255,0.12)", background: "rgba(76,201,255,0.03)", textAlign: "center", padding: 40 }}>
           <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
           <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>{tx.verification_title}</div>
-          <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)" }}>{tx.verification_desc}</div>
+          <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)" }}>{tx.verification_desc}</div>
           <div style={{ fontSize: 11, color: "rgba(76,201,255,0.4)", marginTop: 12 }}>↻ Status wird automatisch aktualisiert</div>
-          <button style={{ ...bt, background: "rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.6)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 16 }} onClick={() => { fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" }).then(go); }}>{tx.verification_refresh}</button>
+          <button style={{ ...bt, background: "rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.95)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 16 }} onClick={() => { fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" }).then(go); }}>{tx.verification_refresh}</button>
         </div>
       </div>
     );
@@ -316,10 +316,10 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📄</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.verification_action_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 2 }}>{tx.verification_action_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{tx.verification_action_desc}</div>
             </div>
           </div>
-          <div style={{ background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: "rgba(232,238,252,0.5)" }}>{tx.verification_support_hint}</div>
+          <div style={{ background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: "rgba(232,238,252,0.9)" }}>{tx.verification_support_hint}</div>
           <a href="mailto:support@flowmatix.io?subject=WhatsApp%20Verifizierung" style={{ ...bt, background: "#10b981", color: "#fff", textDecoration: "none", display: "block", textAlign: "center" }}>{tx.verification_upload}</a>
           <button style={{ ...bt, background: "transparent", color: "rgba(232,238,252,0.4)", marginTop: 8, fontSize: 13 }} onClick={() => { fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" }).then(go); }}>{tx.verification_refresh}</button>
         </div>
@@ -338,7 +338,7 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>⛔</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.rejected_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 2 }}>{tx.rejected_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{tx.rejected_desc}</div>
             </div>
           </div>
           <div style={{ background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.08)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, fontSize: 12, color: "rgba(232,238,252,0.4)" }}>{tx.rejected_hint}</div>
@@ -359,7 +359,7 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>⚠️</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.failed_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 2 }}>{ob.error_message || tx.failed_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{ob.error_message || tx.failed_desc}</div>
             </div>
           </div>
           <button style={{ ...bt, background: "#10b981", color: "#fff" }} onClick={() => { api("retry").then(go); }}>{tx.retry}</button>
@@ -382,7 +382,7 @@ export default function WhatsAppSetupPage() {
         <div>
           <div style={{ fontSize: 40, marginBottom: 16, animation: "fmpulse 1.5s ease-in-out infinite" }}>⏳</div>
           <div style={{ fontSize: 16, fontWeight: 700 }}>{tx.requested_title}</div>
-          <div style={{ fontSize: 13, color: "rgba(232,238,252,0.5)", marginTop: 8, lineHeight: 1.6, whiteSpace: "pre-line" }}>
+          <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 8, lineHeight: 1.6, whiteSpace: "pre-line" }}>
             {tx.requested_desc}
           </div>
           <style>{"@keyframes fmpulse{0%,100%{opacity:1}50%{opacity:0.4}}"}</style>
@@ -411,9 +411,9 @@ export default function WhatsAppSetupPage() {
   return (
     <div style={wrap}>
       <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, textAlign: "center" }}>{tx.title}</h2>
-      <p style={{ color: "rgba(232,238,252,0.5)", marginBottom: 24, fontSize: 14, textAlign: "center" }}>{tx.desc}</p>
+      <p style={{ color: "rgba(232,238,252,0.9)", marginBottom: 24, fontSize: 14, textAlign: "center" }}>{tx.desc}</p>
       <div style={cd}>
-        <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.5)", textAlign: "center" }}>{tx.phone_label}</div>
+        <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.9)", textAlign: "center" }}>{tx.phone_label}</div>
         <input id="wa-phone" type="tel" placeholder={tx.phone_hint} defaultValue={ob.phone_number || n?.phone || ""} style={ip} />
         <button id="wa-connect-btn" style={{ ...bt, background: "#10b981", color: "#fff", marginTop: 16 }} onClick={() => {
           const ph = document.getElementById("wa-phone")?.value;

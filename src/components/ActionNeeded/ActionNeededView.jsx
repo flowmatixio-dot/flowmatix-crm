@@ -107,7 +107,7 @@ export default function ActionNeededView() {
           id: "dsgvo_" + p.id,
           type: "dsgvo",
           icon: "\u{1F4CB}",
-          color: "rgba(167,177,195,0.35)",
+          color: "rgba(167,177,195,0.75)",
           title: t("action_dsgvo_missing") || "DSGVO Zustimmung fehlt",
           desc: t("action_dsgvo_desc") || "Patient hat Fotos gesendet — Einwilligung muss eingeholt werden",
           subtle: true,
@@ -157,7 +157,7 @@ export default function ActionNeededView() {
                   '<h3 style="font-size:16px;font-weight:800;color:#fff;margin:0">' + (t("assign_driver") || "Fahrer zuweisen") + '</h3>' +
                   '<button onclick="document.getElementById(\'fm-drv-assign\').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">\u2715</button></div>';
 
-                html += '<div style="font-size:12px;color:rgba(167,177,195,0.5);margin-bottom:16px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>';
+                html += '<div style="font-size:12px;color:rgba(167,177,195,0.7);margin-bottom:16px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>';
 
                 for (let di = 0; di < drivers.length; di++) {
                   const dr = drivers[di];
@@ -175,7 +175,7 @@ export default function ActionNeededView() {
                     (dr.name ? escHtml(dr.name[0].toUpperCase()) : "?") + '</div>';
 
                   html += '<div style="flex:1"><div style="font-weight:700;font-size:13px;color:rgba(232,238,252,0.9)">' + escHtml(dr.name || "") + '</div>';
-                  html += '<div style="font-size:11px;color:rgba(167,177,195,0.4);margin-top:2px"><a href="tel:' +
+                  html += '<div style="font-size:11px;color:rgba(167,177,195,0.6);margin-top:2px"><a href="tel:' +
                     encodeURI((dr.phone || "").replace(/\s/g, "")) + '" style="color:#4cc9ff;text-decoration:none">' + escHtml(dr.phone || "") + '</a></div></div>';
 
                   if (declined) {
@@ -192,7 +192,7 @@ export default function ActionNeededView() {
                   html += '</div>';
                 }
 
-                html += '<div style="font-size:11px;color:rgba(167,177,195,0.3);margin-top:12px;text-align:center">' +
+                html += '<div style="font-size:11px;color:rgba(167,177,195,0.7);margin-top:12px;text-align:center">' +
                   (t("click_assign_driver") || "Klicke Zuweisen um den Fahrer manuell zuzuteilen") + '</div>';
 
                 panel.innerHTML = html;
@@ -258,13 +258,13 @@ export default function ActionNeededView() {
             panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
               '<h3 style="font-size:16px;font-weight:800;color:#fff;margin:0">\u{1F3E8} ' + (t("assign_hotel") || "Hotel zuweisen") + '</h3>' +
               '<button onclick="document.getElementById(\'fm-hotel-assign\').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">\u2715</button></div>' +
-              '<div style="font-size:12px;color:rgba(167,177,195,0.5);margin-bottom:12px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>' +
+              '<div style="font-size:12px;color:rgba(167,177,195,0.7);margin-bottom:12px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>' +
               '<input id="fm-hotel-name" placeholder="' + (t("hotel_name") || "Hotelname") + '" style="' + iStyle + '">' +
               '<input id="fm-hotel-link" placeholder="' + (t("booking_link") || "Buchungslink (optional)") + '" style="' + iStyle + '">' +
               '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">' +
-              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.4);text-transform:uppercase">' + (t("check_in") || "Check-in") + '</label><input id="fm-hotel-checkin" type="date" style="' + iStyle + 'margin-top:4px"></div>' +
-              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.4);text-transform:uppercase">' + (t("check_out") || "Check-out") + '</label><input id="fm-hotel-checkout" type="date" style="' + iStyle + 'margin-top:4px"></div></div>' +
-              '<div style="padding:8px 12px;border-radius:8px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.12);color:rgba(167,177,195,0.5);font-size:11px;margin-bottom:12px;display:flex;align-items:center;gap:6px">\u{1F4EC} ' + (t("hotel_auto_hint") || "Hotel-Info wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Terminerinnerung & Flugticket-Anfrage)") + '</div>' +
+              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.6);text-transform:uppercase">' + (t("check_in") || "Check-in") + '</label><input id="fm-hotel-checkin" type="date" style="' + iStyle + 'margin-top:4px"></div>' +
+              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.6);text-transform:uppercase">' + (t("check_out") || "Check-out") + '</label><input id="fm-hotel-checkout" type="date" style="' + iStyle + 'margin-top:4px"></div></div>' +
+              '<div style="padding:8px 12px;border-radius:8px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.12);color:rgba(167,177,195,0.7);font-size:11px;margin-bottom:12px;display:flex;align-items:center;gap:6px">\u{1F4EC} ' + (t("hotel_auto_hint") || "Hotel-Info wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Terminerinnerung & Flugticket-Anfrage)") + '</div>' +
               '<button id="fm-hotel-save" style="width:100%;padding:10px;border-radius:10px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:#a78bfa;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (t("assign_hotel") || "Hotel zuweisen") + '</button>';
 
             document.body.appendChild(panel);
@@ -319,14 +319,14 @@ export default function ActionNeededView() {
             panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
               '<h3 style="font-size:16px;font-weight:800;color:#fff;margin:0">\u2708\uFE0F ' + (t("add_flight") || "Flug eintragen") + '</h3>' +
               '<button onclick="document.getElementById(\'fm-flight-assign\').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">\u2715</button></div>' +
-              '<div style="font-size:12px;color:rgba(167,177,195,0.5);margin-bottom:12px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>' +
+              '<div style="font-size:12px;color:rgba(167,177,195,0.7);margin-bottom:12px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>' +
               '<input id="fm-flight-airline" placeholder="' + (t("airline") || "Airline (z.B. Turkish Airlines)") + '" style="' + iStyle + '">' +
               '<input id="fm-flight-nr" placeholder="' + (t("flight_number") || "Flugnummer (z.B. TK1834)") + '" style="' + iStyle + '">' +
               '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">' +
-              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.4);text-transform:uppercase">' + (t("arrival_date") || "Ankunft Datum") + '</label><input id="fm-flight-date" type="date" style="' + iStyle + 'margin-top:4px"></div>' +
-              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.4);text-transform:uppercase">' + (t("arrival_time") || "Ankunft Uhrzeit") + '</label><input id="fm-flight-time" type="time" style="' + iStyle + 'margin-top:4px"></div></div>' +
+              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.6);text-transform:uppercase">' + (t("arrival_date") || "Ankunft Datum") + '</label><input id="fm-flight-date" type="date" style="' + iStyle + 'margin-top:4px"></div>' +
+              '<div><label style="font-size:10px;font-weight:700;color:rgba(167,177,195,0.6);text-transform:uppercase">' + (t("arrival_time") || "Ankunft Uhrzeit") + '</label><input id="fm-flight-time" type="time" style="' + iStyle + 'margin-top:4px"></div></div>' +
               '<button id="fm-flight-save" style="width:100%;padding:10px;border-radius:10px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">' + (t("save_flight") || "Flug speichern") + '</button>' +
-              '<button id="fm-flight-local" style="width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:rgba(167,177,195,0.4);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">' + (t("no_flight_needed") || "Kein Flug nötig — Patient ist vor Ort") + '</button>';
+              '<button id="fm-flight-local" style="width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:rgba(167,177,195,0.6);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">' + (t("no_flight_needed") || "Kein Flug nötig — Patient ist vor Ort") + '</button>';
 
             document.body.appendChild(panel);
 
@@ -408,7 +408,7 @@ export default function ActionNeededView() {
           id: "flight_wait_" + p.id,
           type: "flight_wait",
           icon: "⏳",
-          color: "rgba(167,177,195,0.5)",
+          color: "rgba(167,177,195,0.7)",
           title: tFb(t, "action_waiting_flight", "Warte auf Flugdaten"),
           desc: tFb(t, "action_waiting_flight_desc", "3 Tage vor dem OP-Termin wird automatisch eine Erinnerung gesendet"),
           patient: p.name, patientId: p.id,
@@ -462,7 +462,7 @@ export default function ActionNeededView() {
       {tasks.length > 0 && (
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, padding: "14px 20px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
           <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", lineHeight: 1 }}>{tasks.length}</div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", lineHeight: 1.4 }}>{t("tasks_open")}</div>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", lineHeight: 1.4 }}>{t("tasks_open")}</div>
           <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.06)", margin: "0 4px" }} />
           {categories.filter(c => c.items.length > 0).map(c => (
             <div key={c.key} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 8, background: `${c.color}10` }}>
@@ -479,7 +479,7 @@ export default function ActionNeededView() {
           <div style={{ fontSize: 20, fontWeight: 800, color: "#10b981", marginBottom: 8 }}>
             {tFb(t, "all_running_auto", "Alles läuft automatisch")}
           </div>
-          <div style={{ fontSize: 14, color: "rgba(167,177,195,0.4)", lineHeight: 1.6 }}>
+          <div style={{ fontSize: 14, color: "rgba(167,177,195,0.6)", lineHeight: 1.6 }}>
             {tFb(t, "no_manual_actions", "Derzeit sind keine manuellen Aktionen erforderlich.")}
           </div>
         </div>
@@ -497,13 +497,13 @@ export default function ActionNeededView() {
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: cat.dotColor }} />
                 <span style={{ fontSize: 14, fontWeight: 800, color: cat.color }}>{cat.label}</span>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: `${cat.color}15`, color: cat.color }}>{cat.items.length}</span>
-                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.3)", marginLeft: 4, transition: "transform 0.2s", transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>▼</span>
+                <span style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginLeft: 4, transition: "transform 0.2s", transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}>▼</span>
               </div>
               {isOpen && <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {cat.items.map((task, fi) => {
           const waitStr = formatWaiting(task.time);
           const waitDays = task.time ? (getNowMs() - new Date(task.time).getTime()) / 86400000 : 0;
-          const waitColor = waitDays > 7 ? "#ef4444" : waitDays > 3 ? "#ff8a2a" : "rgba(167,177,195,0.35)";
+          const waitColor = waitDays > 7 ? "#ef4444" : waitDays > 3 ? "#ff8a2a" : "rgba(167,177,195,0.75)";
           const initials = getInitials(task.patient);
 
           return (
@@ -540,7 +540,7 @@ export default function ActionNeededView() {
                 <span onClick={(e) => { e.stopPropagation(); openPatient(task.patientId); }} style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.9)", cursor: "pointer", borderBottom: "1px dashed rgba(255,255,255,0.15)" }} onMouseEnter={e => e.currentTarget.style.color = "#4cc9ff"} onMouseLeave={e => e.currentTarget.style.color = "rgba(232,238,252,0.9)"}>
                   {task.patient}
                 </span>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 2 }}>
                   {task.desc}
                 </div>
               </div>

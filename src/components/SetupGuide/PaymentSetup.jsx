@@ -42,8 +42,8 @@ export default function PaymentSetup({ clinic, updateClinic, showT, t }) {
               border: `1px solid ${(c.depositPolicy || "none") === opt.val ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.06)"}`,
               transition: "all 0.15s",
             }}>
-              <div style={{ fontWeight: 700, fontSize: 14, color: (c.depositPolicy || "none") === opt.val ? "#4cc9ff" : "rgba(232,238,252,0.7)" }}>{opt.label}</div>
-              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 3 }}>{opt.desc}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: (c.depositPolicy || "none") === opt.val ? "#4cc9ff" : "rgba(232,238,252,0.9)" }}>{opt.label}</div>
+              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 3 }}>{opt.desc}</div>
             </div>
           ))}
         </div>
@@ -78,8 +78,8 @@ export default function PaymentSetup({ clinic, updateClinic, showT, t }) {
               border: `1px solid ${(c.paymentTiming || "on_booking") === opt.val ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.06)"}`,
               transition: "all 0.15s",
             }}>
-              <div style={{ fontWeight: 700, fontSize: 13, color: (c.paymentTiming || "on_booking") === opt.val ? "#10b981" : "rgba(232,238,252,0.6)" }}>{opt.label}</div>
-              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 3 }}>{opt.desc}</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: (c.paymentTiming || "on_booking") === opt.val ? "#10b981" : "rgba(232,238,252,0.95)" }}>{opt.label}</div>
+              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 3 }}>{opt.desc}</div>
             </div>
           ))}
         </div>
@@ -100,8 +100,8 @@ export default function PaymentSetup({ clinic, updateClinic, showT, t }) {
               }}>
                 <span style={{ fontSize: 18 }}>{pm.icon}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: active ? "rgba(232,238,252,0.85)" : "rgba(167,177,195,0.5)" }}>{pm.label}</div>
-                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 1 }}>{pm.desc}</div>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: active ? "rgba(232,238,252,0.85)" : "rgba(167,177,195,0.7)" }}>{pm.label}</div>
+                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 1 }}>{pm.desc}</div>
                 </div>
                 <div style={{
                   width: 34, height: 18, borderRadius: 9, position: "relative",

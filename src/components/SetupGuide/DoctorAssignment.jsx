@@ -41,8 +41,8 @@ export default function DoctorAssignment({ clinic, updateClinic, showT, t }) {
               transition: "all 0.15s",
             }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>{m.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: mode === m.val ? "#4cc9ff" : "rgba(232,238,252,0.7)" }}>{m.label}</div>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", marginTop: 4, lineHeight: 1.4 }}>{m.desc}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: mode === m.val ? "#4cc9ff" : "rgba(232,238,252,0.9)" }}>{m.label}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 4, lineHeight: 1.4 }}>{m.desc}</div>
             </div>
           ))}
         </div>
@@ -69,8 +69,8 @@ export default function DoctorAssignment({ clinic, updateClinic, showT, t }) {
                   {algo === a.val && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981" }} />}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: algo === a.val ? "#10b981" : "rgba(232,238,252,0.7)" }}>{a.label}</div>
-                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 2 }}>{a.desc}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: algo === a.val ? "#10b981" : "rgba(232,238,252,0.9)" }}>{a.label}</div>
+                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 2 }}>{a.desc}</div>
                 </div>
               </div>
             ))}

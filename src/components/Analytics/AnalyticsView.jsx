@@ -43,7 +43,7 @@ function SectionBlock({ title, children }) {
   return (
     <div style={{ marginBottom: 32 }}>
       <div style={{
-        fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)",
+        fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)",
         textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14,
         paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}>
@@ -62,8 +62,8 @@ function HeroStat({ label, value, color, sub }) {
       background: `${color}06`, border: `1px solid ${color}15`,
     }}>
       <div style={{ fontSize: 32, fontWeight: 800, color, letterSpacing: "-0.03em", lineHeight: 1.1 }}>{value}</div>
-      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", fontWeight: 600, marginTop: 6 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.3)", marginTop: 2 }}>{sub}</div>}
+      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", fontWeight: 600, marginTop: 6 }}>{label}</div>
+      {sub && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{sub}</div>}
     </div>
   );
 }
@@ -75,7 +75,7 @@ function BarRow({ label, value, pct, color, suffix }) {
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
         <span style={{ fontWeight: 600, color: "rgba(232,238,252,0.75)" }}>{label}</span>
         <span style={{ fontWeight: 700, color, display: "flex", alignItems: "center", gap: 6 }}>
-          {value}{suffix && <span style={{ fontSize: 10, color: "rgba(167,177,195,0.35)", fontWeight: 500 }}>{suffix}</span>}
+          {value}{suffix && <span style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 500 }}>{suffix}</span>}
         </span>
       </div>
       <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.05)" }}>
@@ -87,7 +87,7 @@ function BarRow({ label, value, pct, color, suffix }) {
 
 /* ─── Empty Hint ─── */
 function EmptyHint({ text }) {
-  return <div style={{ fontSize: 12, color: "rgba(167,177,195,0.25)", padding: "16px 0", textAlign: "center", fontStyle: "italic" }}>{text}</div>;
+  return <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", padding: "16px 0", textAlign: "center", fontStyle: "italic" }}>{text}</div>;
 }
 
 export default function AnalyticsView() {
@@ -202,7 +202,7 @@ export default function AnalyticsView() {
     return { totalValue, bookingsPending, evalsPending, activeLeads: activePipeline.length };
   }, [myLeads]);
 
-  const SOURCE_COLORS = { WhatsApp: "#25D366", Website: "#4cc9ff", Referral: "#a78bfa", Ads: "#f59e0b", Sonstige: "rgba(167,177,195,0.4)" };
+  const SOURCE_COLORS = { WhatsApp: "#25D366", Website: "#4cc9ff", Referral: "#a78bfa", Ads: "#f59e0b", Sonstige: "rgba(167,177,195,0.6)" };
   const cardStyle = { padding: 18, borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" };
 
   return (
@@ -210,7 +210,7 @@ export default function AnalyticsView() {
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em", color: "rgba(232,238,252,0.95)" }}>
         {t("analytics_title") || "Statistiken"}
       </h1>
-      <p style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", margin: "0 0 28px", fontWeight: 500 }}>
+      <p style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", margin: "0 0 28px", fontWeight: 500 }}>
         {clinic.name} — {t("clinic_analytics_subtitle") || "Operative Klinik-Analytik"}
       </p>
 
@@ -246,10 +246,10 @@ export default function AnalyticsView() {
           {/* Leads by Country */}
           <div style={cardStyle}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.45)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.65)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 {t("stat_leads_by_country") || "Leads nach Land"}
               </span>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.25)" }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.65)" }}>
                 {myLeads.length} {t("total_label") || "gesamt"}
               </span>
             </div>
@@ -264,7 +264,7 @@ export default function AnalyticsView() {
 
           {/* Treatment Breakdown */}
           <div style={cardStyle}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.65)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>
               {t("analytics_treatment_types") || "Behandlungstypen"}
             </div>
             {marketingStats.treatEntries.length > 0 ? (
@@ -278,7 +278,7 @@ export default function AnalyticsView() {
 
           {/* Lead Sources */}
           <div style={cardStyle}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.65)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>
               {t("stat_lead_sources") || "Lead-Quellen"}
             </div>
             {marketingStats.sourceEntries.length > 0 ? (

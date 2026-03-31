@@ -175,7 +175,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
       <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#0a0f1a", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter', system-ui, sans-serif" }}>
         <div style={{ textAlign: "center", maxWidth: 520, padding: "0 24px" }}>
           <span style={{ fontSize: 32, fontWeight: 800, background: "linear-gradient(135deg, #4cc9ff, #2da8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block", marginBottom: 40 }}>FLOWMATIX</span>
-          <div style={{ fontSize: 15, color: "rgba(167,177,195,0.5)", marginBottom: 48 }}>Please select your language</div>
+          <div style={{ fontSize: 15, color: "rgba(167,177,195,0.7)", marginBottom: 48 }}>Please select your language</div>
           <div style={{ display: "flex", gap: 20, justifyContent: "center" }}>
             {[
               { code: "de", flag: "🇩🇪", label: "Deutsch" },
@@ -210,7 +210,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
           <span style={{ fontSize: 32, fontWeight: 800, background: "linear-gradient(135deg, #4cc9ff, #2da8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block", marginBottom: 28 }}>FLOWMATIX</span>
           <h1 style={{ fontSize: 30, fontWeight: 800, color: "#fff", margin: "0 0 10px", lineHeight: 1.3 }}>{w.greeting}</h1>
           <p style={{ fontSize: 16, color: "rgba(167,177,195,0.6)", margin: "0 0 24px" }}>{w.thanks}</p>
-          <p style={{ fontSize: 14, color: "rgba(167,177,195,0.45)", margin: "0 0 32px", lineHeight: 1.7 }}>{w.desc}</p>
+          <p style={{ fontSize: 14, color: "rgba(167,177,195,0.65)", margin: "0 0 32px", lineHeight: 1.7 }}>{w.desc}</p>
           <div style={{ display: "inline-flex", flexDirection: "column", gap: 14, marginBottom: 40, textAlign: "left" }}>
             {w.bullets.map((b, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "rgba(232,238,252,0.75)" }}>
@@ -231,9 +231,9 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
             </button>
           </div>
           <div style={{ marginTop: 20 }}>
-            <button onClick={() => setIntroPhase("lang")} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.35)", fontSize: 12, cursor: "pointer", fontFamily: "inherit", transition: "color 0.15s" }}
+            <button onClick={() => setIntroPhase("lang")} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.75)", fontSize: 12, cursor: "pointer", fontFamily: "inherit", transition: "color 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.color = "rgba(167,177,195,0.6)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "rgba(167,177,195,0.35)"; }}>
+              onMouseLeave={e => { e.currentTarget.style.color = "rgba(167,177,195,0.75)"; }}>
               ← {l === "de" ? "Sprache ändern" : l === "tr" ? "Dili değiştir" : "Change language"}
             </button>
           </div>
@@ -256,7 +256,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
           <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 8 }}>
             {l === "de" ? "Automatisierungen sind vorkonfiguriert" : l === "tr" ? "Otomasyonlar önceden yapılandırıldı" : "Automations are pre-configured"}
           </div>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto" }}>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto" }}>
             {l === "de" ? "Follow-up Nachrichten, Terminerinnerungen und Nachsorge-Workflows sind bereits aktiviert. Du kannst diese nach dem Setup in den Einstellungen anpassen." : l === "tr" ? "Takip mesajları, randevu hatırlatmaları ve bakım sonrası iş akışları zaten etkin. Kurulumdan sonra Ayarlar'dan düzenleyebilirsiniz." : "Follow-up messages, appointment reminders and aftercare workflows are already enabled. You can customize them after setup in Settings."}
           </div>
         </div>;
@@ -273,7 +273,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
       <div style={{ padding: "14px 32px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 18, fontWeight: 800, background: "linear-gradient(135deg, #4cc9ff, #2da8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>FLOWMATIX</span>
-          <span style={{ fontSize: 12, color: "rgba(167,177,195,0.3)", fontWeight: 600 }}>Setup</span>
+          <span style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", fontWeight: 600 }}>Setup</span>
         </div>
 
         {/* Step dots with labels */}
@@ -286,7 +286,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
                 background: i === step ? "#4cc9ff" : isDone(s) ? "#10b981" : "rgba(255,255,255,0.1)",
                 transition: "all 0.3s",
               }} />
-              <span style={{ fontSize: 10, fontWeight: i === step ? 700 : 500, color: i === step ? "#4cc9ff" : isDone(s) ? "#10b981" : "rgba(167,177,195,0.3)", whiteSpace: "nowrap", transition: "all .2s" }}>
+              <span style={{ fontSize: 10, fontWeight: i === step ? 700 : 500, color: i === step ? "#4cc9ff" : isDone(s) ? "#10b981" : "rgba(167,177,195,0.7)", whiteSpace: "nowrap", transition: "all .2s" }}>
                 {s.label[l] || s.label.de}
               </span>
             </div>
@@ -294,12 +294,12 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.3)" }}>
+          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.7)" }}>
             {progress.requiredDone}/{progress.requiredTotal}
           </span>
-          {onSkip && <button onClick={onSkip} style={{ background: "none", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 12px", color: "rgba(167,177,195,0.4)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
+          {onSkip && <button onClick={onSkip} style={{ background: "none", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 12px", color: "rgba(167,177,195,0.6)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}
             onMouseEnter={e => { e.currentTarget.style.color = "rgba(167,177,195,0.7)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(167,177,195,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}>
+            onMouseLeave={e => { e.currentTarget.style.color = "rgba(167,177,195,0.6)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}>
             {l === "de" ? "Überspringen" : l === "tr" ? "Atla" : "Skip"}
           </button>}
         </div>
@@ -321,7 +321,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
             <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, color: "#fff", lineHeight: 1.3 }}>
               {currentStep.headline[l] || currentStep.headline.de}
             </h1>
-            <p style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", margin: "6px 0 0", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", margin: "6px 0 0", lineHeight: 1.5 }}>
               {currentStep.subtitle[l] || currentStep.subtitle.de}
             </p>
           </div>
@@ -362,7 +362,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
 
         {/* Center: bigger progress (FIX #3) */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flex: 1, maxWidth: 300, margin: "0 24px" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(232,238,252,0.8)" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(232,238,252,0.95)" }}>
             {l === "de" ? "Schritt" : l === "tr" ? "Adım" : "Step"} {step + 1} / {totalSteps}
           </div>
           <div style={{ width: "100%", height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)" }}>
@@ -380,7 +380,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
             padding: "10px 28px", borderRadius: 10, fontSize: 14, fontWeight: 800, fontFamily: "inherit",
             cursor: progress.allRequiredDone ? "pointer" : "default", border: "none", minWidth: 160,
             background: progress.allRequiredDone ? "linear-gradient(135deg, #10b981, #059669)" : "rgba(255,255,255,0.04)",
-            color: progress.allRequiredDone ? "#fff" : "rgba(167,177,195,0.3)", transition: "all .2s",
+            color: progress.allRequiredDone ? "#fff" : "rgba(167,177,195,0.7)", transition: "all .2s",
             boxShadow: progress.allRequiredDone ? "0 4px 20px rgba(16,185,129,0.3)" : "none",
           }}>
             {completing ? "..." : l === "de" ? "🚀 System starten" : l === "tr" ? "🚀 Sistemi Başlat" : "🚀 Launch System"}
@@ -391,7 +391,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
               <button onClick={goNext} style={{
                 padding: "10px 16px", borderRadius: 10, fontSize: 12, fontWeight: 600, fontFamily: "inherit",
                 cursor: "pointer", background: "transparent", border: "1px solid rgba(255,255,255,0.08)",
-                color: "rgba(167,177,195,0.5)", transition: "all .2s",
+                color: "rgba(167,177,195,0.7)", transition: "all .2s",
               }}>
                 {l === "de" ? "Überspringen" : l === "tr" ? "Atla" : "Skip"}
               </button>
@@ -400,7 +400,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
               padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: "inherit",
               cursor: canProceed ? "pointer" : "default", border: "none",
               background: canProceed ? "linear-gradient(135deg, #4cc9ff, #2da8ff)" : "rgba(255,255,255,0.04)",
-              color: canProceed ? "#fff" : "rgba(167,177,195,0.3)", transition: "all .2s",
+              color: canProceed ? "#fff" : "rgba(167,177,195,0.7)", transition: "all .2s",
               boxShadow: canProceed ? "0 4px 20px rgba(76,201,255,0.2)" : "none",
             }}>
               {l === "de" ? "Weiter →" : l === "tr" ? "İleri →" : "Next →"}
@@ -428,7 +428,7 @@ function ExtrasStep({ lang }) {
             <span style={{ fontSize: 24, flexShrink: 0, marginTop: 2 }}>{item.icon}</span>
             <div>
               <div style={{ fontWeight: 700, fontSize: 14, color: "rgba(232,238,252,0.85)", marginBottom: 3 }}>{item.title[l] || item.title.de}</div>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", lineHeight: 1.4 }}>{item.desc[l] || item.desc.de}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", lineHeight: 1.4 }}>{item.desc[l] || item.desc.de}</div>
             </div>
           </div>
         ))}
@@ -462,7 +462,7 @@ function WizardWhatsApp({ clinic, t, l }) {
               {isConnected ? "WhatsApp aktiv" : (l === "en" ? "Not connected" : l === "tr" ? "Bağlı değil" : "Nicht verbunden")}
             </div>
             {isConnected && clinic?.wa_phone_display && (
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>
                 {t("number") || "Nummer"}: <span style={{ color: "#4cc9ff", fontWeight: 600 }}>{clinic.wa_phone_display}</span>
               </div>
             )}
@@ -490,7 +490,7 @@ function WizardWhatsApp({ clinic, t, l }) {
       <div style={{ background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)", borderRadius: 12, padding: "16px 20px", marginTop: 12 }}>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
           <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
-          <div style={{ fontSize: 12, color: "rgba(200,215,240,0.4)", lineHeight: 1.7 }}>
+          <div style={{ fontSize: 12, color: "rgba(200,215,240,0.6)", lineHeight: 1.7 }}>
             {l === "en" ? "After setup, your WhatsApp communication is managed centrally in Flowmatix. All incoming messages are automatically processed by the bot and recorded in the CRM." : l === "tr" ? "Kurulumdan sonra WhatsApp iletişiminiz Flowmatix'te merkezi olarak yönetilir. Tüm gelen mesajlar otomatik olarak bot tarafından işlenir ve CRM'de kaydedilir." : "Nach der Einrichtung wird deine WhatsApp-Kommunikation zentral in Flowmatix verwaltet. Alle eingehenden Nachrichten werden automatisch vom Bot bearbeitet und im CRM erfasst."}
           </div>
         </div>
@@ -567,7 +567,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
          onMouseLeave={e => { if (!inviteOpen) { e.currentTarget.style.background = "rgba(76,201,255,0.06)"; e.currentTarget.style.borderColor = "rgba(76,201,255,0.3)"; } }}>
         + {t("invite_member") || "Mitglied einladen"}
       </button>
-      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", marginBottom: 14 }}>
+      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginBottom: 14 }}>
         {team.length} {team.length !== 1 ? (t("ob_team_members_pl") || "Team members") : (t("ob_team_member_sg") || "Team member")}
       </div>
 
@@ -577,16 +577,16 @@ function WizardTeamAccess({ clinic, showT, t }) {
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "#4cc9ff" }}>{t("ob_invite_new_member") || "Invite new team member"}</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>Name</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>Name</div>
               <input value={invName} onChange={e => setInvName(e.target.value)} placeholder="Max Mustermann" style={inp} />
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>E-Mail</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>E-Mail</div>
               <input value={invEmail} onChange={e => setInvEmail(e.target.value)} placeholder="max@klinik.de" type="email" style={inp} />
             </div>
           </div>
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 8 }}>{t("role_label") || "Rolle"}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 8 }}>{t("role_label") || "Rolle"}</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
               {Object.entries(ROLE_META).map(([key, meta]) => (
                 <div key={key} onClick={() => setInvRole(key)} style={{
@@ -596,8 +596,8 @@ function WizardTeamAccess({ clinic, showT, t }) {
                   transition: "all 0.15s",
                 }}>
                   <div style={{ fontSize: 16, marginBottom: 4 }}>{meta.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: invRole === key ? meta.color : "rgba(232,238,252,0.6)" }}>{meta.label}</div>
-                  <div style={{ fontSize: 9, color: "rgba(167,177,195,0.35)", marginTop: 2, lineHeight: 1.3 }}>{meta.desc}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: invRole === key ? meta.color : "rgba(232,238,252,0.95)" }}>{meta.label}</div>
+                  <div style={{ fontSize: 9, color: "rgba(167,177,195,0.75)", marginTop: 2, lineHeight: 1.3 }}>{meta.desc}</div>
                 </div>
               ))}
             </div>
@@ -611,7 +611,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
             </button>
             <button onClick={() => setInviteOpen(false)} style={{
               padding: "8px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)",
+              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
             }}>
               {t("cancel") || "Cancel"}
             </button>
@@ -625,7 +625,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
           <div style={{
             display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 0.8fr auto", gap: 8,
             padding: "8px 16px", background: "rgba(255,255,255,0.02)",
-            fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.3)", textTransform: "uppercase", letterSpacing: "0.05em",
+            fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.7)", textTransform: "uppercase", letterSpacing: "0.05em",
           }}>
             <div>Name</div><div>E-Mail</div><div>Rolle</div><div>Status</div><div></div>
           </div>
@@ -644,7 +644,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
                   <div style={{ fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{member.name || "—"}</div>
                   {isCurrentUser && <span style={{ fontSize: 9, color: "#4cc9ff", fontWeight: 700 }}>{t("ob_you_label") || "You"}</span>}
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", overflow: "hidden", textOverflow: "ellipsis" }}>{member.email}</div>
+                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", overflow: "hidden", textOverflow: "ellipsis" }}>{member.email}</div>
                 <div>
                   {isEditing ? (
                     <select value={editRole} onChange={e => setEditRole(e.target.value)} style={{ ...inp, padding: "4px 8px", fontSize: 11, cursor: "pointer" }}>
@@ -660,7 +660,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
                   <span style={{
                     fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
                     background: member.lastLogin ? "rgba(16,185,129,0.08)" : "rgba(167,177,195,0.06)",
-                    color: member.lastLogin ? "#10b981" : "rgba(167,177,195,0.35)",
+                    color: member.lastLogin ? "#10b981" : "rgba(167,177,195,0.75)",
                   }}>
                     {member.lastLogin ? (t("ob_active_status") || "Active") : (t("ob_invited_status") || "Invited")}
                   </span>
@@ -670,7 +670,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
                     <>
                       <button onClick={() => { setEditingId(member.id); setEditRole(role); }} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)",
+                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
                       }}>{t("ob_role_btn") || "Role"}</button>
                       <button onClick={() => handleDeactivate(member.id, member.name)} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
@@ -686,7 +686,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
                       }}>{t("save")}</button>
                       <button onClick={() => setEditingId(null)} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.4)",
+                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.6)",
                       }}>{t("cancel")}</button>
                     </>
                   )}
@@ -699,7 +699,7 @@ function WizardTeamAccess({ clinic, showT, t }) {
 
       {team.length === 0 && (
         <div style={{ padding: "30px 20px", textAlign: "center", borderRadius: 10, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.35)" }}>{t("ob_no_team_yet")||"No team members yet. Invite your team."}</div>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.75)" }}>{t("ob_no_team_yet")||"No team members yet. Invite your team."}</div>
         </div>
       )}
     </div>

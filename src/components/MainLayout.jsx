@@ -194,10 +194,10 @@ export default function MainLayout() {
           {rescheduleAppt === a.id && <Section title={`📅 ${t("reschedule")}`}>
             <div style={{ padding: 16, borderRadius: 12, background: "rgba(76,201,255,0.05)", border: "1px solid rgba(76,201,255,0.15)" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
-                <div><div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 4 }}>{t("new_date")}</div><input id="rescheduleDate" name="rescheduleDate" type="date" value={rescheduleDate} onChange={e => setRescheduleDate(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} /></div>
-                <div><div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 4 }}>{t("new_time")}</div><input id="rescheduleTime" name="rescheduleTime" type="time" value={rescheduleTime} onChange={e => setRescheduleTime(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} /></div>
+                <div><div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 4 }}>{t("new_date")}</div><input id="rescheduleDate" name="rescheduleDate" type="date" value={rescheduleDate} onChange={e => setRescheduleDate(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} /></div>
+                <div><div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 4 }}>{t("new_time")}</div><input id="rescheduleTime" name="rescheduleTime" type="time" value={rescheduleTime} onChange={e => setRescheduleTime(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} /></div>
               </div>
-              <div style={{ display: "flex", gap: 8 }}><Btn color="#4cc9ff" icon="✓" label={t("save")} onClick={doReschedule} /><Btn color="rgba(167,177,195,0.5)" icon="✕" label={t("cancel")} secondary onClick={() => { setRescheduleAppt(null); setRescheduleDate(""); setRescheduleTime(""); }} /></div>
+              <div style={{ display: "flex", gap: 8 }}><Btn color="#4cc9ff" icon="✓" label={t("save")} onClick={doReschedule} /><Btn color="rgba(167,177,195,0.7)" icon="✕" label={t("cancel")} secondary onClick={() => { setRescheduleAppt(null); setRescheduleDate(""); setRescheduleTime(""); }} /></div>
             </div>
           </Section>}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 22 }}><IC label={t("date")} value={a.date} /><IC label={t("time")} value={`${a.time}–${a.endTime}`} /><IC label={t("assigned")} value={a.assigned} /><IC label={t("source")} value={a.source} /></div>
@@ -285,12 +285,12 @@ export default function MainLayout() {
                 <span style={{ fontSize: 20 }}>{"⚕️"}</span>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{t("trial_review_title") || "Arzt-Bewertung — Live Preview"}</div>
-                  <div style={{ fontSize: 11, color: "rgba(200,215,240,0.4)", marginTop: 2 }}>{t("trial_review_sub") || "Bewerten Sie den Patienten — die Nachricht geht direkt raus"}</div>
+                  <div style={{ fontSize: 11, color: "rgba(200,215,240,0.6)", marginTop: 2 }}>{t("trial_review_sub") || "Bewerten Sie den Patienten — die Nachricht geht direkt raus"}</div>
                 </div>
               </div>
-              <button onClick={() => setShowTrialReviewPopup(false)} style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "none", color: "rgba(200,215,240,0.4)", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{"✕"}</button>
+              <button onClick={() => setShowTrialReviewPopup(false)} style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "none", color: "rgba(200,215,240,0.6)", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{"✕"}</button>
             </div>
-            <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", fontSize: 11, color: "rgba(200,215,240,0.5)", lineHeight: 1.6 }}>
+            <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", fontSize: 11, color: "rgba(200,215,240,0.7)", lineHeight: 1.6 }}>
               {"💡"} {t("trial_review_hint") || "Im Live-Betrieb sehen Ihre Ärzte diese Ansicht in ihrem eigenen Portal. Jeder Arzt bekommt die Bewertung. Der erste der bewertet, schließt den Fall ab — der Patient wird automatisch kontaktiert."}
             </div>
           </div>
@@ -345,7 +345,7 @@ export default function MainLayout() {
         <div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(8,12,22,0.95)", backdropFilter: "blur(16px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, overflowY: "auto" }}>
           <div style={{ maxWidth: 960, width: "100%", position: "relative" }}>
             {!isForced && (
-              <button onClick={() => ctx.setShowPlanPicker(false)} style={{ position: "absolute", top: -12, right: -12, width: 36, height: 36, borderRadius: 99, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(200,215,240,0.5)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}>✕</button>
+              <button onClick={() => ctx.setShowPlanPicker(false)} style={{ position: "absolute", top: -12, right: -12, width: 36, height: 36, borderRadius: 99, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(200,215,240,0.7)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}>✕</button>
             )}
 
             {/* Header */}
@@ -356,10 +356,10 @@ export default function MainLayout() {
               <h2 style={{ color: "white", fontSize: 24, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.3 }}>
                 {isForced ? (t("pp_title_expired")||"Your system is currently paused") : (t("pp_title")||"Choose your plan")}
               </h2>
-              <p style={{ color: "rgba(200,215,240,0.4)", fontSize: 13, margin: "0 0 4px", maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
+              <p style={{ color: "rgba(200,215,240,0.6)", fontSize: 13, margin: "0 0 4px", maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
                 {isForced ? (t("pp_desc_expired")||"Activate your plan to continue receiving and converting patient inquiries via WhatsApp") : (t("pp_desc")||"Select the right plan for your clinic")}
               </p>
-              <p style={{ color: "rgba(167,177,195,0.3)", fontSize: 11, margin: 0 }}>
+              <p style={{ color: "rgba(167,177,195,0.7)", fontSize: 11, margin: 0 }}>
                 {t("pp_trust")||"Activation takes less than 2 minutes \u00b7 No setup required"}
               </p>
             </div>
@@ -367,7 +367,7 @@ export default function MainLayout() {
             {/* Value Bar */}
             <div style={{ display: "flex", justifyContent: "center", gap: 24, marginBottom: 24, flexWrap: "wrap" }}>
               {valueItems.map((v, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(167,177,195,0.5)" }}>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "rgba(167,177,195,0.7)" }}>
                   <span style={{ fontSize: 14 }}>{v.icon}</span>{v.text}
                 </div>
               ))}
@@ -376,8 +376,8 @@ export default function MainLayout() {
             {/* Billing Cycle Toggle */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
               <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 3, border: "1px solid rgba(255,255,255,0.06)" }}>
-                <button onClick={() => setBillingCycle('monthly')} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "none", background: !isYearly ? "rgba(76,201,255,0.12)" : "transparent", color: !isYearly ? "#4cc9ff" : "rgba(167,177,195,0.4)" }}>{t("pp_monthly")||"Monatlich"}</button>
-                <button onClick={() => setBillingCycle('yearly')} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "none", background: isYearly ? "rgba(16,185,129,0.12)" : "transparent", color: isYearly ? "#10b981" : "rgba(167,177,195,0.4)" }}>
+                <button onClick={() => setBillingCycle('monthly')} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "none", background: !isYearly ? "rgba(76,201,255,0.12)" : "transparent", color: !isYearly ? "#4cc9ff" : "rgba(167,177,195,0.6)" }}>{t("pp_monthly")||"Monatlich"}</button>
+                <button onClick={() => setBillingCycle('yearly')} style={{ padding: "8px 20px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", border: "none", background: isYearly ? "rgba(16,185,129,0.12)" : "transparent", color: isYearly ? "#10b981" : "rgba(167,177,195,0.6)" }}>
                   {t("pp_yearly")||"Jährlich"} <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "rgba(16,185,129,0.1)", color: "#10b981", marginLeft: 4 }}>{t("pp_no_setup")||"Keine Setup-Gebühr"}</span>
                 </button>
               </div>
@@ -407,15 +407,15 @@ export default function MainLayout() {
 
                     <div style={{ fontWeight: 800, fontSize: 13, color, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>{PLAN_LABELS[pk]}</div>
                     <div style={{ fontSize: 28, fontWeight: 800, color: "rgba(232,238,252,0.95)", marginBottom: 2 }}>
-                      {(() => { const prices = { core: 690, pro: 990, operations: 1490, enterprise: 2500 }; const m = prices[pk] || 0; return isYearly ? `€${(m * 12).toLocaleString('de-DE')}` : PLAN_PRICE[pk]; })()}<span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.3)" }}>{isYearly ? "/Jahr" : "/mo"}</span>
+                      {(() => { const prices = { core: 690, pro: 990, operations: 1490, enterprise: 2500 }; const m = prices[pk] || 0; return isYearly ? `€${(m * 12).toLocaleString('de-DE')}` : PLAN_PRICE[pk]; })()}<span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.7)" }}>{isYearly ? "/Jahr" : "/mo"}</span>
                     </div>
-                    <div style={{ fontSize: 10, color: isYearly ? "rgba(16,185,129,0.5)" : "rgba(167,177,195,0.25)", marginBottom: 16 }}>
+                    <div style={{ fontSize: 10, color: isYearly ? "rgba(16,185,129,0.5)" : "rgba(167,177,195,0.65)", marginBottom: 16 }}>
                       {isYearly ? (t("pp_no_setup_fee")||"Keine Setup-Gebühr") : `+ ${t("pp_setup")||"€1.990 Setup-Gebühr (einmalig)"}`}
                     </div>
 
                     <div style={{ flex: 1, marginBottom: 18 }}>
                       {features.map((f, i) => (
-                        <div key={i} style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", padding: "4px 0", display: "flex", alignItems: "flex-start", gap: 7 }}>
+                        <div key={i} style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", padding: "4px 0", display: "flex", alignItems: "flex-start", gap: 7 }}>
                           <span style={{ color, fontSize: 10, marginTop: 1, flexShrink: 0 }}>✓</span><span>{f}</span>
                         </div>
                       ))}
@@ -475,12 +475,12 @@ export default function MainLayout() {
               <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,138,42,0.12)", border: "1px solid rgba(255,138,42,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚕️</div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "#ff8a2a" }}>{ctx.t("doctor_alert_title") || "Neuer Patient zur Bewertung"}</div>
-                <div style={{ fontSize: 13, color: "rgba(232,238,252,0.8)", marginTop: 1 }}>{doctorAlert.name}</div>
+                <div style={{ fontSize: 13, color: "rgba(232,238,252,0.95)", marginTop: 1 }}>{doctorAlert.name}</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => { setDoctorAlert(null); if (ctx.setView) ctx.setView("doctor_portal"); }} style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#ff8a2a,#ff6b00)", border: "none", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(255,138,42,0.3)" }}>{ctx.t("review_now")||"Review Now"}</button>
-              <button onClick={() => setDoctorAlert(null)} style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.5)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{ctx.t("ob_skip")||"Later"}</button>
+              <button onClick={() => setDoctorAlert(null)} style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{ctx.t("ob_skip")||"Later"}</button>
             </div>
           </div>
         </div>
@@ -498,11 +498,11 @@ export default function MainLayout() {
           <div style={{ padding: "20px 28px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
               <div style={{ padding: 12, borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", marginBottom: 4 }}>Patient</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", marginBottom: 4 }}>Patient</div>
                 <div style={{ fontSize: 15, fontWeight: 800 }}>{successModal.lead?.name || "—"}</div>
               </div>
               <div style={{ padding: 12, borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", marginBottom: 4 }}>Treatment</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", marginBottom: 4 }}>Treatment</div>
                 <div style={{ fontSize: 15, fontWeight: 800 }}>{successModal.treatment || "—"}</div>
               </div>
             </div>
@@ -511,7 +511,7 @@ export default function MainLayout() {
               <div style={{ fontSize: 32, fontWeight: 800, color: "#10b981" }}>{successModal.revenue}</div>
             </div>}
             <div style={{ padding: 12, borderRadius: 12, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", marginBottom: 20 }}>
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)" }}>🤖 AI handled <span style={{ color: "#4cc9ff", fontWeight: 800 }}>{clinic?.stats?.aiHandled || 82}%</span> of conversations automatically this week</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }}>🤖 AI handled <span style={{ color: "#4cc9ff", fontWeight: 800 }}>{clinic?.stats?.aiHandled || 82}%</span> of conversations automatically this week</div>
             </div>
             <button onClick={() => setSuccessModal(null)} style={{ width: "100%", padding: 14, borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(16,185,129,0.25)" }}>Continue →</button>
           </div>
@@ -541,20 +541,20 @@ export default function MainLayout() {
         <div onClick={() => setInvoiceModal(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }} />
         <div style={{ position: "relative", width: "min(520px,90vw)", background: "#162032", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 28, animation: "slI .2s ease", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <div><div style={{ fontSize: 18, fontWeight: 800 }}>🧾 Create Invoice</div><div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>for {lead.name} — {lead.treatment}</div></div>
-            <button onClick={() => setInvoiceModal(null)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
+            <div><div style={{ fontSize: 18, fontWeight: 800 }}>🧾 Create Invoice</div><div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>for {lead.name} — {lead.treatment}</div></div>
+            <button onClick={() => setInvoiceModal(null)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", fontSize: 20, cursor: "pointer" }}>✕</button>
           </div>
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Line Items / Description</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Line Items / Description</div>
             <textarea id="invItems" name="invItems" value={invItems} onChange={e => setInvItems(e.target.value)} rows={3} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", resize: "vertical" }} placeholder="FUE Hair Transplant 3000 grafts&#10;Hotel package (3 nights)&#10;Airport transfer" />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 14 }}>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Net Amount (€)</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Net Amount (€)</div>
               <input id="invAmount" name="invAmount" type="number" value={invAmount} onChange={e => setInvAmount(e.target.value)} placeholder="2800" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
             </div>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>VAT %</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>VAT %</div>
               <div style={{ display: "flex", gap: 8 }}>
                 <select id="invVat" name="invVat" value={["0", "8", "19", "20"].includes(String(invVat)) ? invVat : "custom"} onChange={e => { if (e.target.value === "custom") { setInvVat(""); } else { setInvVat(e.target.value); } }} style={{ flex: 1, padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box", cursor: "pointer" }}>
                   <option value="0">0% (International)</option>
@@ -567,7 +567,7 @@ export default function MainLayout() {
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Total (Gross)</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Total (Gross)</div>
               <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", fontSize: 16, fontWeight: 800, color: "#10b981" }}>€{((parseInt(invAmount) || 0) + (parseInt(invAmount) || 0) * (parseInt(invVat) || 0) / 100).toLocaleString()}</div>
             </div>
           </div>
@@ -576,7 +576,7 @@ export default function MainLayout() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#a78bfa" }}>💳 Generate Stripe Deposit Link?</div>
               <div style={{ display: "flex", gap: 6 }}>
-                {[25, 50].map(pct => <button key={pct} onClick={() => setInvDeposit(String(Math.round((parseInt(invAmount) || 0) * pct / 100)))} style={{ padding: "4px 10px", borderRadius: 6, background: invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.3)" : "rgba(255,255,255,0.08)"}`, color: invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "#a78bfa" : "rgba(167,177,195,0.5)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{pct}% — €{Math.round((parseInt(invAmount) || 0) * pct / 100)}</button>)}
+                {[25, 50].map(pct => <button key={pct} onClick={() => setInvDeposit(String(Math.round((parseInt(invAmount) || 0) * pct / 100)))} style={{ padding: "4px 10px", borderRadius: 6, background: invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.3)" : "rgba(255,255,255,0.08)"}`, color: invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "#a78bfa" : "rgba(167,177,195,0.7)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{pct}% — €{Math.round((parseInt(invAmount) || 0) * pct / 100)}</button>)}
               </div>
             </div>
           </div>
@@ -599,31 +599,31 @@ export default function MainLayout() {
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg,rgba(0,180,216,0.08),rgba(76,201,255,0.04))", borderBottom: "1px solid rgba(0,180,216,0.12)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 44, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#00B4D8,#4cc9ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#fff", fontWeight: 800, boxShadow: "0 4px 12px rgba(0,180,216,0.3)" }}>💳</div>
-              <div><div style={{ fontSize: 16, fontWeight: 800 }}>Generate Payment Link</div><div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 1 }}>for {lead.name} — {lead.treatment}</div></div>
+              <div><div style={{ fontSize: 16, fontWeight: 800 }}>Generate Payment Link</div><div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 1 }}>for {lead.name} — {lead.treatment}</div></div>
             </div>
           </div>
           <div style={{ padding: "20px 24px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Amount</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Amount</div>
                 <input id="payAmount" name="payAmount" type="number" value={payAmount} onChange={e => setPayAmount(e.target.value)} style={{ width: "100%", padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(0,180,216,0.15)", color: "#fff", fontFamily: "inherit", fontSize: 18, fontWeight: 800, outline: "none", boxSizing: "border-box" }} />
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 6 }}>Currency</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Currency</div>
                 <select id="payCurrency" name="payCurrency" value={payCurrency} onChange={e => setPayCurrency(e.target.value)} style={{ width: "100%", padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(0,180,216,0.15)", color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, outline: "none", boxSizing: "border-box", cursor: "pointer" }}>
                   <option value="EUR">€ EUR</option><option value="USD">$ USD</option><option value="GBP">£ GBP</option><option value="TRY">₺ TRY</option>
                 </select>
               </div>
             </div>
             <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-              {[250, 500, 1000].map(a => <button key={a} onClick={() => setPayAmount(String(a))} style={{ flex: 1, padding: "8px 0", borderRadius: 8, background: payAmount === String(a) ? "rgba(0,180,216,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${payAmount === String(a) ? "rgba(0,180,216,0.25)" : "rgba(255,255,255,0.06)"}`, color: payAmount === String(a) ? "#4cc9ff" : "rgba(167,177,195,0.5)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>€{a}</button>)}
+              {[250, 500, 1000].map(a => <button key={a} onClick={() => setPayAmount(String(a))} style={{ flex: 1, padding: "8px 0", borderRadius: 8, background: payAmount === String(a) ? "rgba(0,180,216,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${payAmount === String(a) ? "rgba(0,180,216,0.25)" : "rgba(255,255,255,0.06)"}`, color: payAmount === String(a) ? "#4cc9ff" : "rgba(167,177,195,0.7)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>€{a}</button>)}
               {lead.reviewData?.price && <button onClick={() => { const p = parseInt(lead.reviewData.price.replace(/[^0-9]/g, "")) || 0; setPayAmount(String(Math.round(p * 0.25))); }} style={{ flex: 1, padding: "8px 0", borderRadius: 8, background: "rgba(167,107,255,0.08)", border: "1px solid rgba(167,107,255,0.15)", color: "#a78bfa", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>25%</button>}
             </div>
             <div style={{ padding: 14, borderRadius: 12, background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.1)", display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <div style={{ width: 40, height: 26, borderRadius: 5, background: "linear-gradient(135deg,#00B4D8,#4cc9ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 800 }}>💳</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: "#4cc9ff" }}>{payCurrency === "EUR" ? "€" : payCurrency === "USD" ? "$" : payCurrency === "GBP" ? "£" : "₺"}{amt.toLocaleString()}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>Stripe Payment Link · ⏳ Pending</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>Stripe Payment Link · ⏳ Pending</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
@@ -653,14 +653,14 @@ export default function MainLayout() {
           <div style={{ width: 26, height: 26, borderRadius: 8, background: totalActions > 0 ? "#ef4444" : "#10b981", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{totalActions > 0 ? totalActions : "\u2713"}</div>
           {sidebar && <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: totalActions > 0 ? "#ef4444" : "#10b981" }}>{totalActions > 0 ? (t("action_needed") || "Aktion Erforderlich") : (t("all_clear") || "Alles OK")}</div>
-            {totalActions > 0 && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.4)", marginTop: 1 }}>{totalActions} {t("tasks_open") || "offene Aufgaben"}</div>}
+            {totalActions > 0 && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", marginTop: 1 }}>{totalActions} {t("tasks_open") || "offene Aufgaben"}</div>}
           </div>}
         </div>}
         <nav style={{ flex: 1, padding: "8px 10px", overflowY: "auto" }}>{(() => {
           const navItems = [...nav];
           return navItems;
-        })().map((it, idx) => { if (it === "div") return <div key={idx} style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "10px 8px" }} />; const isOpSub = it.id.startsWith("op_") && it.id !== "op_prep"; const isActive = isOpSub ? (view === "operator" && opSubTab === it.id.replace("op_", "")) : (view === it.id); return <div key={it.id} data-tour={it.id} onClick={() => { if (isOpSub) { setView("operator"); setOpSubTab(it.id.replace("op_", "")); } else if (it.id === "operator") { setView("operator"); setOpSubTab("dashboard"); } else { setView(it.id); } setSelChat(null); if (it.id === "settings") setSettingsData(clinic ? { ...clinic } : null); if (it.id === "ai_control") setAiConfigData(clinic?.aiConfig ? { ...clinic.aiConfig } : null); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: sidebar ? "10px 14px" : "10px 0", justifyContent: sidebar ? "flex-start" : "center", borderRadius: 10, cursor: "pointer", marginBottom: 3, background: isActive ? (IS_CLIENT_MODE ? "rgba(76,201,255,0.08)" : "rgba(212,175,55,0.08)") : "transparent", borderLeft: isActive ? "3px solid " + (IS_CLIENT_MODE ? (it.color || "#4cc9ff") : (it.color || "#d4af37")) : "3px solid transparent", color: isActive ? "#fff" : it.color || "rgba(167,177,195,0.55)", fontWeight: isActive ? 700 : 500, fontSize: 14, transition: "all .2s cubic-bezier(.4,0,.2,1)", letterSpacing: isActive ? "0.01em" : "0" }}><span style={{ fontSize: 16, flexShrink: 0, opacity: isActive ? 1 : 0.7, transition: "opacity .2s" }}>{it.icon}</span>{sidebar && <span style={{ textTransform: "capitalize" }}>{it.l}</span>}{sidebar && it.badge && <span style={{ marginLeft: "auto", background: "#ff8a2a", color: "#fff", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 99, minWidth: 16, textAlign: "center" }}>{it.badge}</span>}</div>; })}</nav>
-        <div style={{ padding: sidebar ? "14px 16px" : "14px 10px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>{sidebar ? <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 32, height: 32, borderRadius: 10, background: getAvatarGradient(user.name), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>{getInitials(user.name)}</div><div><div style={{ fontWeight: 600, color: "rgba(232,238,252,0.8)", fontSize: 13 }}>{user.name}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.35)", fontWeight: 500 }}>{isAdmin ? "Admin" : clinic?.name}</div></div></div><button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 13, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }} title="Logout">↗</button></div> : <div onClick={handleLogout} style={{ cursor: "pointer", textAlign: "center", color: "rgba(167,177,195,0.4)", fontSize: 13, width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>↗</div>}</div>
+        })().map((it, idx) => { if (it === "div") return <div key={idx} style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "10px 8px" }} />; const isOpSub = it.id.startsWith("op_") && it.id !== "op_prep"; const isActive = isOpSub ? (view === "operator" && opSubTab === it.id.replace("op_", "")) : (view === it.id); return <div key={it.id} data-tour={it.id} onClick={() => { if (isOpSub) { setView("operator"); setOpSubTab(it.id.replace("op_", "")); } else if (it.id === "operator") { setView("operator"); setOpSubTab("dashboard"); } else { setView(it.id); } setSelChat(null); if (it.id === "settings") setSettingsData(clinic ? { ...clinic } : null); if (it.id === "ai_control") setAiConfigData(clinic?.aiConfig ? { ...clinic.aiConfig } : null); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: sidebar ? "10px 14px" : "10px 0", justifyContent: sidebar ? "flex-start" : "center", borderRadius: 10, cursor: "pointer", marginBottom: 3, background: isActive ? (IS_CLIENT_MODE ? "rgba(76,201,255,0.08)" : "rgba(212,175,55,0.08)") : "transparent", borderLeft: isActive ? "3px solid " + (IS_CLIENT_MODE ? (it.color || "#4cc9ff") : (it.color || "#d4af37")) : "3px solid transparent", color: isActive ? "#fff" : it.color || "rgba(167,177,195,0.75)", fontWeight: isActive ? 700 : 500, fontSize: 14, transition: "all .2s cubic-bezier(.4,0,.2,1)", letterSpacing: isActive ? "0.01em" : "0" }}><span style={{ fontSize: 16, flexShrink: 0, opacity: isActive ? 1 : 0.7, transition: "opacity .2s" }}>{it.icon}</span>{sidebar && <span style={{ textTransform: "capitalize" }}>{it.l}</span>}{sidebar && it.badge && <span style={{ marginLeft: "auto", background: "#ff8a2a", color: "#fff", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 99, minWidth: 16, textAlign: "center" }}>{it.badge}</span>}</div>; })}</nav>
+        <div style={{ padding: sidebar ? "14px 16px" : "14px 10px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>{sidebar ? <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 32, height: 32, borderRadius: 10, background: getAvatarGradient(user.name), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>{getInitials(user.name)}</div><div><div style={{ fontWeight: 600, color: "rgba(232,238,252,0.95)", fontSize: 13 }}>{user.name}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 500 }}>{isAdmin ? "Admin" : clinic?.name}</div></div></div><button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 13, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }} title="Logout">↗</button></div> : <div onClick={handleLogout} style={{ cursor: "pointer", textAlign: "center", color: "rgba(167,177,195,0.6)", fontSize: 13, width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>↗</div>}</div>
       </div>
 
       {/* Main */}
@@ -689,10 +689,10 @@ export default function MainLayout() {
 
           {/* ── LEFT: Global Search (hidden for doctor) ── */}
           <div style={{ flex: "0 0 340px", position: "relative" }}>
-            {!isOperator && effectiveRole !== "doctor" && <><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }} onFocus={(e) => { setSearchOpen(true); e.target.style.borderColor = "rgba(76,201,255,0.15)"; }} onBlur={(e) => { setTimeout(() => setSearchOpen(false), 200); e.target.style.borderColor = "rgba(255,255,255,0.04)"; }} placeholder={t("search_placeholder") || `Search... (${navigator.platform?.includes("Mac") ? "⌘" : "Ctrl"}+K)`} style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 8, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.8)", fontFamily: "inherit", fontSize: 12, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }} />
-            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "rgba(167,177,195,0.2)" }}>🔍</span></>}
+            {!isOperator && effectiveRole !== "doctor" && <><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }} onFocus={(e) => { setSearchOpen(true); e.target.style.borderColor = "rgba(76,201,255,0.15)"; }} onBlur={(e) => { setTimeout(() => setSearchOpen(false), 200); e.target.style.borderColor = "rgba(255,255,255,0.04)"; }} placeholder={t("search_placeholder") || `Search... (${navigator.platform?.includes("Mac") ? "⌘" : "Ctrl"}+K)`} style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 8, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.95)", fontFamily: "inherit", fontSize: 12, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }} />
+            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "rgba(167,177,195,0.6)" }}>🔍</span></>}
             {searchOpen && searchResults.length > 0 && <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", maxHeight: 320, overflowY: "auto", marginTop: 4, borderRadius: 10, background: "#162032", border: "1px solid rgba(255,255,255,0.08)", zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
-              <div style={{ padding: "6px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.35)" }}>{searchResults.length} Ergebnisse</span><span style={{ fontSize: 9, color: "rgba(167,177,195,0.2)" }}>ESC</span></div>
+              <div style={{ padding: "6px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)" }}>{searchResults.length} Ergebnisse</span><span style={{ fontSize: 9, color: "rgba(167,177,195,0.6)" }}>ESC</span></div>
               {searchResults.map((r, i) => <div key={i} style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.03)", display: "flex", gap: 8, alignItems: "center" }} onMouseDown={() => {
                 if (r.type === "lead") setSelLead(r.id);
                 else if (r.type === "appt") setSelAppt(r.id);
@@ -700,7 +700,7 @@ export default function MainLayout() {
                 setSearchQuery(""); setSearchOpen(false);
               }} onMouseEnter={e => e.currentTarget.style.background = "rgba(76,201,255,0.04)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                 <span style={{ fontSize: 14 }}>{r.icon}</span>
-                <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 12 }}>{r.label}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.4)" }}>{r.sub}</div></div>
+                <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 12 }}>{r.label}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)" }}>{r.sub}</div></div>
               </div>)}
             </div>}
           </div>
@@ -713,7 +713,7 @@ export default function MainLayout() {
               { label: ({de:"Neue Leads",en:"New Leads",tr:"Yeni Leadler"}[lang]||"Neue Leads"), value: myLeads.filter(l => l.stage === "new").length, color: "#4cc9ff", icon: "👤", view: "pipeline" },
             ].map((k, i) => <div key={i} onClick={() => setView(k.view)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 6, cursor: "pointer", background: "transparent", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = `${k.color}08`} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
               <span style={{ fontSize: 14, fontWeight: 800, color: k.color, letterSpacing: "-0.02em" }}>{k.value}</span>
-              <span style={{ fontSize: 10, color: "rgba(167,177,195,0.35)", fontWeight: 600 }}>{k.label}</span>
+              <span style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 600 }}>{k.label}</span>
             </div>)}
             {/* Operator badges */}
             {!IS_CLIENT_MODE && isOperator && <>
@@ -736,16 +736,16 @@ export default function MainLayout() {
               const pct = Math.round((myLeads.length / limit) * 100);
               return <div onClick={() => setView("subscription")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, cursor: "pointer" }} title={`${myLeads.length} / ${limit} Patienten`}>
                 <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                  <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "#ef4444" : pct > 50 ? "#f59e0b" : "rgba(167,177,195,0.25)", transition: "width 0.3s" }} />
+                  <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "#ef4444" : pct > 50 ? "#f59e0b" : "rgba(167,177,195,0.65)", transition: "width 0.3s" }} />
                 </div>
-                <span style={{ fontSize: 10, color: "rgba(167,177,195,0.25)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
+                <span style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
               </div>;
             })()}
 
             {/* System status */}
             {IS_CLIENT_MODE && <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 8px" }} title="System Online">
               <span style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981", boxShadow: "0 0 6px rgba(16,185,129,0.4)" }} />
-              <span style={{ fontSize: 9, color: "rgba(167,177,195,0.25)", fontWeight: 600 }}>Online</span>
+              <span style={{ fontSize: 9, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>Online</span>
             </div>}
 
             {/* Demo/Live toggle */}
@@ -753,15 +753,15 @@ export default function MainLayout() {
 
             {/* Notification bell (hidden for doctor) */}
             {IS_CLIENT_MODE && effectiveRole !== "doctor" && <div style={{ position: "relative" }}>
-              <button data-notif-bell onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markNotifsRead(); }} style={{ width: 32, height: 32, borderRadius: 8, background: notifOpen ? "rgba(76,201,255,0.06)" : "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.4)", position: "relative", transition: "all .15s" }}>🔔
+              <button data-notif-bell onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markNotifsRead(); }} style={{ width: 32, height: 32, borderRadius: 8, background: notifOpen ? "rgba(76,201,255,0.06)" : "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.6)", position: "relative", transition: "all .15s" }}>🔔
                 {unreadNotifs > 0 && <span style={{ position: "absolute", top: -2, right: -2, width: 14, height: 14, borderRadius: 99, background: "#ff8a2a", color: "#fff", fontSize: 8, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadNotifs}</span>}
               </button>
               {notifOpen && <div data-notif-panel style={{ position: "absolute", top: "100%", right: 0, width: 360, maxHeight: 400, overflowY: "auto", marginTop: 6, borderRadius: 12, background: "#141820", border: "1px solid rgba(255,255,255,0.06)", zIndex: 9000, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
                 <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", fontWeight: 700, fontSize: 13 }}>{t("notif_title")}</div>
-                {myNotifs.length === 0 && <div style={{ padding: 20, textAlign: "center", color: "rgba(167,177,195,0.3)", fontSize: 12 }}>{t("no_notifications")}</div>}
+                {myNotifs.length === 0 && <div style={{ padding: 20, textAlign: "center", color: "rgba(167,177,195,0.7)", fontSize: 12 }}>{t("no_notifications")}</div>}
                 {myNotifs.map(n => <div key={n.id} style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.03)", display: "flex", gap: 8, alignItems: "flex-start", background: n.read ? "transparent" : "rgba(76,201,255,0.02)" }}>
                   <div style={{ width: 24, height: 24, borderRadius: 6, background: `${NOTIF_COLORS[n.type] || "rgba(167,177,195,0.1)"}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0 }}>{NOTIF_ICONS[n.type] || "🔔"}</div>
-                  <div><div style={{ fontSize: 12, lineHeight: 1.4, color: n.read ? "rgba(167,177,195,0.5)" : "rgba(232,238,252,0.85)" }}>{n.text}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.25)", marginTop: 2 }}>{timeAgo(n.time)}</div></div>
+                  <div><div style={{ fontSize: 12, lineHeight: 1.4, color: n.read ? "rgba(167,177,195,0.7)" : "rgba(232,238,252,0.85)" }}>{n.text}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 2 }}>{timeAgo(n.time)}</div></div>
                 </div>)}
               </div>}
             </div>}
@@ -772,13 +772,13 @@ export default function MainLayout() {
             {(() => {
               const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
               return <div style={{ position: "relative" }} data-gear-menu>
-                <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.4)" }}>
+                <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.6)" }}>
                   ⚙️
                 </button>
                 <div style={{ display: "none", position: "absolute", top: 38, right: 0, minWidth: 180, background: "#141820", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: 6, zIndex: 200, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
                   <div style={{ padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 4 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(232,238,252,0.85)" }}>{user.name}</div>
-                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
+                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
                   </div>
                   {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
                   <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
@@ -803,21 +803,21 @@ export default function MainLayout() {
               <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
                   <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
                   <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.4)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
                   <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               </div>
               {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', color: pwToast.type === 'error' ? '#ef4444' : '#10b981', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-                <button onClick={() => setShowPwModal(false)} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.5)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
+                <button onClick={() => setShowPwModal(false)} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.7)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
                 <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'rgba(255,138,42,0.3)' : 'rgba(255,138,42,0.9)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
               </div>
             </div>
@@ -829,7 +829,7 @@ export default function MainLayout() {
           <div style={{ padding: "8px 20px", background: "rgba(76,201,255,0.04)", borderBottom: "1px solid rgba(76,201,255,0.08)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13 }}>⏱</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: trialCountdown.includes('hours') || trialCountdown.includes('today') ? "#ff8a2a" : "rgba(200,215,240,0.5)" }}>{trialCountdown}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: trialCountdown.includes('hours') || trialCountdown.includes('today') ? "#ff8a2a" : "rgba(200,215,240,0.7)" }}>{trialCountdown}</span>
             </div>
             <button onClick={() => ctx.setShowPlanPicker(true)} style={{ padding: "4px 14px", background: "transparent", border: "1px solid rgba(76,201,255,0.15)", borderRadius: 8, color: "#4CC9FF", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
               {t("skip_trial")||"Skip trial — choose plan"}
@@ -867,7 +867,7 @@ export default function MainLayout() {
                   <div style={{ width: 14, height: 14, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
                   <div>
                     <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>{t("lt_title")}</div>
-                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.5)", marginTop: 3 }}>{t("lt_sub")}</div>
+                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>{t("lt_sub")}</div>
                   </div>
                 </div>
                 <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, textDecoration: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.25)", transition: "transform 0.15s, box-shadow 0.15s" }}>
@@ -900,10 +900,10 @@ export default function MainLayout() {
               <button onClick={() => { ctx.setShowActivation(false); ctx.setShowBillingConfirm(true); }} style={{ width: "100%", padding: "14px", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, cursor: "pointer", marginBottom: 10 }}>
                 {t("lt_go_live")}
               </button>
-              <button onClick={() => ctx.setShowActivation(false)} style={{ width: "100%", padding: "12px", background: "transparent", color: "rgba(200,215,240,0.5)", fontWeight: 500, fontSize: 14, border: "1px solid rgba(200,215,240,0.1)", borderRadius: 12, cursor: "pointer" }}>
+              <button onClick={() => ctx.setShowActivation(false)} style={{ width: "100%", padding: "12px", background: "transparent", color: "rgba(200,215,240,0.7)", fontWeight: 500, fontSize: 14, border: "1px solid rgba(200,215,240,0.1)", borderRadius: 12, cursor: "pointer" }}>
                 {t("lt_continue_testing")}
               </button>
-              <p style={{ color: "rgba(200,215,240,0.3)", fontSize: 12, marginTop: 14 }}>
+              <p style={{ color: "rgba(200,215,240,0.7)", fontSize: 12, marginTop: 14 }}>
                 {t("lt_test_limit_note")}
               </p>
             </div>

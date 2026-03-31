@@ -115,7 +115,7 @@ export default function ReviewBoard() {
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em", color: "rgba(232,238,252,0.95)" }}>
             {t("medical_review_board") || "Medical Review Board"}
           </h1>
-          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", margin: 0 }}>
+          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", margin: 0 }}>
             {reviewCases.length} {reviewCases.length === 1 ? (t("case_singular")||"Fall") : (t("cases_plural")||"Fälle")} {t("cases_awaiting_review") || "warten auf ärztliche Bewertung"}
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function ReviewBoard() {
               display: "flex", alignItems: "center", gap: 8,
             }}>
               <span style={{ fontSize: 18, fontWeight: 800, color: u.color }}>{count}</span>
-              <span style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", fontWeight: 600 }}>{u.label}</span>
+              <span style={{ fontSize: 11, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>{u.label}</span>
             </div>
           );
         })}
@@ -164,7 +164,7 @@ export default function ReviewBoard() {
         <div style={{ padding: "60px 20px", textAlign: "center", borderRadius: 14, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.08)" }}>
           <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.4 }}>✓</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#10b981" }}>{t("no_open_reviews") || "Keine offenen Bewertungen"}</div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.35)", marginTop: 4 }}>{t("all_cases_reviewed") || "Alle Fälle wurden bewertet"}</div>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", marginTop: 4 }}>{t("all_cases_reviewed") || "Alle Fälle wurden bewertet"}</div>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
@@ -189,14 +189,14 @@ export default function ReviewBoard() {
                     fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
                     background: u.bg, color: u.color, border: `1px solid ${u.color}20`,
                   }}>{u.label}</span>
-                  <span style={{ fontSize: 10, color: "rgba(167,177,195,0.35)", fontWeight: 600 }}>
+                  <span style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 600 }}>
                     {t("review_waiting") || "Wartet"}: {timeWaiting(lead.lastAiInteraction || lead.createdAt)}
                   </span>
                 </div>
 
                 {/* Patient info */}
                 <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(232,238,252,0.9)", marginBottom: 2 }}>{lead.name}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", marginBottom: 8 }}>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.65)", marginBottom: 8 }}>
                   {lead.treatment || "—"}{lead.country ? ` · ${translateValue(lead.country)}` : ""}{lead.intake?.age ? ` · ${lead.intake.age} ${t("age_years") || "Jahre"}` : ""}
                 </div>
 
@@ -215,7 +215,7 @@ export default function ReviewBoard() {
                         </div>
                       );
                     })}
-                    {photos.length > 4 && <span style={{ fontSize: 10, color: "rgba(167,177,195,0.3)", alignSelf: "center" }}>+{photos.length - 4}</span>}
+                    {photos.length > 4 && <span style={{ fontSize: 10, color: "rgba(167,177,195,0.7)", alignSelf: "center" }}>+{photos.length - 4}</span>}
                   </div>
                 )}
 
@@ -237,7 +237,7 @@ export default function ReviewBoard() {
                   cursor: isClaimedByOther ? "default" : "pointer", fontFamily: "inherit",
                   background: isClaimedByOther ? "rgba(255,255,255,0.02)" : isClaimedByMe ? "rgba(16,185,129,0.08)" : "rgba(76,201,255,0.06)",
                   border: `1px solid ${isClaimedByOther ? "rgba(255,255,255,0.04)" : isClaimedByMe ? "rgba(16,185,129,0.15)" : "rgba(76,201,255,0.12)"}`,
-                  color: isClaimedByOther ? "rgba(167,177,195,0.3)" : isClaimedByMe ? "#10b981" : "#4cc9ff",
+                  color: isClaimedByOther ? "rgba(167,177,195,0.7)" : isClaimedByMe ? "#10b981" : "#4cc9ff",
                 }}>
                   {isClaimedByMe ? (t("review_continue") || "✓ Bewertung fortsetzen") : isClaimedByOther ? (t("review_locked") || "Gesperrt") : (t("review_start") || "Bewertung starten")}
                 </button>

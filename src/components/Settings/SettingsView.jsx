@@ -48,36 +48,36 @@ function AccountSection({ t, showT, user }) {
     <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 20, color: "rgba(232,238,252,0.9)" }}>{t("account")}</div>
 
     <div style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 20 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>{t("logged_in_as")}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>{t("logged_in_as")}</div>
       <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(232,238,252,0.9)" }}>{user?.email || "—"}</div>
-      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", marginTop: 4 }}>{t("role")}: {roleLabel}</div>
+      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 4 }}>{t("role")}: {roleLabel}</div>
     </div>
 
     <div style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
       <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 16 }}>{t("change_password")}</div>
       <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.5)", display: "block", marginBottom: 4 }}>{t("current_password") || "Aktuelles Passwort"}</label>
+        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", display: "block", marginBottom: 4 }}>{t("current_password") || "Aktuelles Passwort"}</label>
         <div style={{ position: "relative" }}>
           <input type={showPw ? "text" : "password"} value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" style={{...inp, paddingRight: 40}} />
-          <span onClick={() => setShowPw(p => !p)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.4)", userSelect: "none" }}>{showPw ? "🙈" : "👁"}</span>
+          <span onClick={() => setShowPw(p => !p)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.6)", userSelect: "none" }}>{showPw ? "🙈" : "👁"}</span>
         </div>
       </div>
       <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.5)", display: "block", marginBottom: 4 }}>{t("new_password")}</label>
+        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", display: "block", marginBottom: 4 }}>{t("new_password")}</label>
         <div style={{ position: "relative" }}>
           <input type={showPw ? "text" : "password"} value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="••••••••" style={{...inp, paddingRight: 40}} />
-          <span onClick={() => setShowPw(p => !p)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.4)", userSelect: "none" }}>{showPw ? "🙈" : "👁"}</span>
+          <span onClick={() => setShowPw(p => !p)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.6)", userSelect: "none" }}>{showPw ? "🙈" : "👁"}</span>
         </div>
       </div>
       <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.5)", display: "block", marginBottom: 4 }}>{t("confirm_password")}</label>
+        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", display: "block", marginBottom: 4 }}>{t("confirm_password")}</label>
         <div style={{ position: "relative" }}>
           <input type={showPw ? "text" : "password"} value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="••••••••" style={{...inp, paddingRight: 40}} />
-          <span onClick={() => setShowPw(p => !p)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.4)", userSelect: "none" }}>{showPw ? "🙈" : "👁"}</span>
+          <span onClick={() => setShowPw(p => !p)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.6)", userSelect: "none" }}>{showPw ? "🙈" : "👁"}</span>
         </div>
       </div>
       {error && <div style={{ fontSize: 13, color: "#ef4444", marginBottom: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>{error}</div>}
-      <button onClick={handleSave} disabled={saving || !newPw} style={{ padding: "10px 24px", borderRadius: 10, background: saving || !newPw ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg,#10b981,#059669)", border: "none", color: saving || !newPw ? "rgba(167,177,195,0.3)" : "#fff", fontWeight: 700, fontSize: 14, cursor: saving || !newPw ? "default" : "pointer", fontFamily: "inherit", boxShadow: saving || !newPw ? "none" : "0 4px 12px rgba(16,185,129,0.3)" }}>
+      <button onClick={handleSave} disabled={saving || !newPw} style={{ padding: "10px 24px", borderRadius: 10, background: saving || !newPw ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg,#10b981,#059669)", border: "none", color: saving || !newPw ? "rgba(167,177,195,0.7)" : "#fff", fontWeight: 700, fontSize: 14, cursor: saving || !newPw ? "default" : "pointer", fontFamily: "inherit", boxShadow: saving || !newPw ? "none" : "0 4px 12px rgba(16,185,129,0.3)" }}>
         {saving ? t("saving") : t("change_password")}
       </button>
     </div>
@@ -312,8 +312,8 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
       <Section title={`👥 ${t("team_access") || "Team & Zugriff"}`}>
         <div style={{ padding: "30px 20px", textAlign: "center", borderRadius: 14, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
           <div style={{ fontSize: 32, marginBottom: 12, opacity: 0.3 }}>🔒</div>
-          <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(232,238,252,0.6)" }}>{t("ops_plan_required") || "Operations oder Enterprise Plan erforderlich"}</div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.35)", marginTop: 6, maxWidth: 340, margin: "6px auto 0", lineHeight: 1.5 }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(232,238,252,0.95)" }}>{t("ops_plan_required") || "Operations oder Enterprise Plan erforderlich"}</div>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", marginTop: 6, maxWidth: 340, margin: "6px auto 0", lineHeight: 1.5 }}>
             {t("team_mgmt_desc") || "Team-Verwaltung und Rollenverteilung sind ab dem Operations-Plan verfügbar. Damit kannst du Koordinatoren, Ärzte und Finanzmitarbeiter mit eigenen Zugriffsrechten hinzufügen."}
           </div>
           <div style={{ marginTop: 16 }}>
@@ -330,7 +330,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
     <Section title={`👥 ${t("team_access") || "Team & Zugriff"}`}>
       {/* Team list header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)" }}>
+        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)" }}>
           {team.length} {team.length !== 1 ? (t("team_members_count") || "Teammitglieder") : (t("team_member_count") || "Teammitglied")}
         </div>
         <button onClick={() => setInviteOpen(!inviteOpen)} style={{
@@ -347,16 +347,16 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "#4cc9ff" }}>{t("invite_new_member") || "Neues Teammitglied einladen"}</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>Name</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>Name</div>
               <input value={invName} onChange={e => setInvName(e.target.value)} placeholder="Max Mustermann" style={inp} />
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>E-Mail</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>E-Mail</div>
               <input value={invEmail} onChange={e => setInvEmail(e.target.value)} placeholder="max@klinik.de" type="email" style={inp} />
             </div>
           </div>
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", marginBottom: 8 }}>{t("role_label")}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 8 }}>{t("role_label")}</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
               {Object.entries(ROLE_META).map(([key, meta]) => (
                 <div key={key} onClick={() => setInvRole(key)} style={{
@@ -366,8 +366,8 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                   transition: "all 0.15s",
                 }}>
                   <div style={{ fontSize: 16, marginBottom: 4 }}>{meta.icon}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: invRole === key ? meta.color : "rgba(232,238,252,0.6)" }}>{meta.label}</div>
-                  <div style={{ fontSize: 9, color: "rgba(167,177,195,0.35)", marginTop: 2, lineHeight: 1.3 }}>{meta.desc}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: invRole === key ? meta.color : "rgba(232,238,252,0.95)" }}>{meta.label}</div>
+                  <div style={{ fontSize: 9, color: "rgba(167,177,195,0.75)", marginTop: 2, lineHeight: 1.3 }}>{meta.desc}</div>
                 </div>
               ))}
             </div>
@@ -381,7 +381,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
             </button>
             <button onClick={() => setInviteOpen(false)} style={{
               padding: "8px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)",
+              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
             }}>
               {t("cancel") || "Abbrechen"}
             </button>
@@ -396,7 +396,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
           <div style={{
             display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 0.8fr auto", gap: 8,
             padding: "8px 16px", background: "rgba(255,255,255,0.02)",
-            fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.3)", textTransform: "uppercase", letterSpacing: "0.05em",
+            fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.7)", textTransform: "uppercase", letterSpacing: "0.05em",
           }}>
             <div>Name</div><div>{t("email") || "E-Mail"}</div><div>{t("role") || "Rolle"}</div><div>{t("lbl_status") || "Status"}</div><div></div>
           </div>
@@ -418,7 +418,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                   {isCurrentUser && <span style={{ fontSize: 9, color: "#4cc9ff", fontWeight: 700 }}>{t("you_label")}</span>}
                 </div>
                 {/* Email */}
-                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", overflow: "hidden", textOverflow: "ellipsis" }}>{member.email}</div>
+                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", overflow: "hidden", textOverflow: "ellipsis" }}>{member.email}</div>
                 {/* Role */}
                 <div>
                   {isEditing ? (
@@ -439,7 +439,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                   <span style={{
                     fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
                     background: member.lastLogin ? "rgba(16,185,129,0.08)" : "rgba(167,177,195,0.06)",
-                    color: member.lastLogin ? "#10b981" : "rgba(167,177,195,0.35)",
+                    color: member.lastLogin ? "#10b981" : "rgba(167,177,195,0.75)",
                   }}>
                     {member.lastLogin ? (t("member_active") || "Active") : (t("member_invited") || "Invited")}
                   </span>
@@ -450,7 +450,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                     <>
                       <button onClick={() => { setEditingId(member.id); setEditRole(role); }} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)",
+                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
                       }}>{t("role_label")}</button>
                       <button onClick={() => handleDeactivate(member.id, member.name)} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
@@ -466,7 +466,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                       }}>{t("save") || "Speichern"}</button>
                       <button onClick={() => setEditingId(null)} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.4)",
+                        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.6)",
                       }}>{t("cancel") || "Abbrechen"}</button>
                     </>
                   )}
@@ -479,7 +479,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
 
       {team.length === 0 && (
         <div style={{ padding: "30px 20px", textAlign: "center", borderRadius: 10, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.35)" }}>{t("no_team_members")}</div>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.75)" }}>{t("no_team_members")}</div>
         </div>
       )}
 
@@ -518,7 +518,7 @@ function PermissionMatrix() {
       <button onClick={() => setOpen(!open)} style={{
         display: "flex", alignItems: "center", gap: 6, padding: "8px 0",
         background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-        fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.4)",
+        fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.6)",
       }}>
         <span style={{ fontSize: 10, transition: "transform 0.2s", transform: open ? "rotate(90deg)" : "rotate(0)" }}>▶</span>
         {t("show_permissions_matrix") || "Berechtigungsmatrix anzeigen"}
@@ -534,7 +534,7 @@ function PermissionMatrix() {
             ))}
             {modules.map(mod => (
               <div key={mod.key} style={{ display: "contents" }}>
-                <div style={{ padding: "6px 12px", fontSize: 11, color: "rgba(167,177,195,0.5)", borderTop: "1px solid rgba(255,255,255,0.025)" }}>
+                <div style={{ padding: "6px 12px", fontSize: 11, color: "rgba(167,177,195,0.7)", borderTop: "1px solid rgba(255,255,255,0.025)" }}>
                   {mod.label}
                 </div>
                 {roles.map(r => {
@@ -548,7 +548,7 @@ function PermissionMatrix() {
               </div>
             ))}
           </div>
-          <div style={{ padding: "8px 12px", fontSize: 10, color: "rgba(167,177,195,0.25)", background: "rgba(255,255,255,0.01)" }}>
+          <div style={{ padding: "8px 12px", fontSize: 10, color: "rgba(167,177,195,0.65)", background: "rgba(255,255,255,0.01)" }}>
             {t("settings_permissions_enforced") || "Permissions are enforced in frontend and backend."}
           </div>
         </div>
@@ -603,10 +603,10 @@ function DoctorCapabilities({ clinic, showT }) {
 
   return (
     <div style={{ marginTop: 20 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
         {t("doctors_roles") || "Ärzte — Rollen & Behandlungstypen"}
       </div>
-      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.3)", marginBottom: 12 }}>
+      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginBottom: 12 }}>
         {t("doctors_roles_desc") || "Konfiguriere welche Ärzte Bewertungen durchführen, welche operieren dürfen und welche Behandlungen sie beherrschen."}
       </div>
       {doctors.map(doc => {
@@ -644,7 +644,7 @@ function DoctorCapabilities({ clinic, showT }) {
               ) : (
                 <div style={{ display: "flex", gap: 4 }}>
                   <button onClick={() => saveTypes(doc.id)} style={{ padding: "3px 10px", borderRadius: 5, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.12)", color: "#10b981" }}>{t("save") || "Speichern"}</button>
-                  <button onClick={() => setEditId(null)} style={{ padding: "3px 10px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.4)" }}>{t("cancel_btn") || "Abbrechen"}</button>
+                  <button onClick={() => setEditId(null)} style={{ padding: "3px 10px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.6)" }}>{t("cancel_btn") || "Abbrechen"}</button>
                 </div>
               )}
             </div>
@@ -661,8 +661,8 @@ function DoctorCapabilities({ clinic, showT }) {
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}>
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: flag.active ? flag.color : "rgba(167,177,195,0.3)" }}>{flag.label}</div>
-                    <div style={{ fontSize: 9, color: "rgba(167,177,195,0.25)" }}>{flag.desc}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: flag.active ? flag.color : "rgba(167,177,195,0.7)" }}>{flag.label}</div>
+                    <div style={{ fontSize: 9, color: "rgba(167,177,195,0.65)" }}>{flag.desc}</div>
                   </div>
                   <div style={{ width: 28, height: 16, borderRadius: 8, background: flag.active ? flag.color : "rgba(255,255,255,0.08)", position: "relative", transition: "background 0.2s" }}>
                     <div style={{ width: 12, height: 12, borderRadius: 6, background: "#fff", position: "absolute", top: 2, left: flag.active ? 14 : 2, transition: "left 0.2s", boxShadow: "0 1px 2px rgba(0,0,0,0.3)" }} />
@@ -670,8 +670,8 @@ function DoctorCapabilities({ clinic, showT }) {
                 </div>
               ))}
               <div style={{ flex: 0.6, padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.03)" }}>
-                <div style={{ fontSize: 9, color: "rgba(167,177,195,0.25)" }}>{t("max_ops_day") || "Max OPs/Tag"}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "rgba(232,238,252,0.7)" }}>{maxOps}</div>
+                <div style={{ fontSize: 9, color: "rgba(167,177,195,0.65)" }}>{t("max_ops_day") || "Max OPs/Tag"}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "rgba(232,238,252,0.9)" }}>{maxOps}</div>
               </div>
             </div>
 
@@ -681,7 +681,7 @@ function DoctorCapabilities({ clinic, showT }) {
                 {types.length > 0 ? types.map(t => (
                   <span key={t} style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: `${TREAT_COLORS[t] || "#4cc9ff"}12`, color: TREAT_COLORS[t] || "#4cc9ff", border: `1px solid ${TREAT_COLORS[t] || "#4cc9ff"}20` }}>{t}</span>
                 )) : (
-                  <span style={{ fontSize: 10, color: "rgba(167,177,195,0.25)", fontStyle: "italic" }}>{t("all_treatments_unrestricted")}</span>
+                  <span style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", fontStyle: "italic" }}>{t("all_treatments_unrestricted")}</span>
                 )}
               </div>
             ) : (
@@ -693,7 +693,7 @@ function DoctorCapabilities({ clinic, showT }) {
                       padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                       background: active ? `${TREAT_COLORS[t] || "#4cc9ff"}15` : "rgba(255,255,255,0.02)",
                       border: `1px solid ${active ? `${TREAT_COLORS[t] || "#4cc9ff"}30` : "rgba(255,255,255,0.05)"}`,
-                      color: active ? TREAT_COLORS[t] || "#4cc9ff" : "rgba(167,177,195,0.3)",
+                      color: active ? TREAT_COLORS[t] || "#4cc9ff" : "rgba(167,177,195,0.7)",
                     }}>{t}</button>
                   );
                 })}
@@ -793,16 +793,16 @@ export default function SettingsView() {
     <div style={{width:200,minWidth:200,borderRight:"1px solid rgba(255,255,255,0.04)",padding:"20px 0",flexShrink:0,position:"sticky",top:0,alignSelf:"flex-start",maxHeight:"calc(100vh - 120px)",overflowY:"auto"}}>
       <div style={{padding:"0 16px 16px"}}>
         <div style={{fontSize:18,fontWeight:800,color:"rgba(232,238,252,0.95)",letterSpacing:"-0.02em"}}>{t("settings_title") || "Einstellungen"}</div>
-        <div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginTop:2}}>{c.name}</div>
+        <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:2}}>{c.name}</div>
       </div>
       {SETTINGS_TABS.map((tab, idx) => {
-        if (typeof tab === "string" && tab.startsWith("grp:")) return <div key={`grp-${idx}`} style={{ fontSize: 9, fontWeight: 800, color: "rgba(167,177,195,0.25)", padding: "14px 16px 4px", letterSpacing: "0.08em" }}>{tab.replace("grp:","")}</div>;
+        if (typeof tab === "string" && tab.startsWith("grp:")) return <div key={`grp-${idx}`} style={{ fontSize: 9, fontWeight: 800, color: "rgba(167,177,195,0.65)", padding: "14px 16px 4px", letterSpacing: "0.08em" }}>{tab.replace("grp:","")}</div>;
         const isActive = settingsTab === tab.id;
         return <div key={tab.id} onClick={() => { setSettingsTab(tab.id); window.dispatchEvent(new Event("fm:scroll-top")); }} style={{
           display:"flex",alignItems:"center",gap:8,padding:"8px 16px",cursor:"pointer",
           background:isActive?"rgba(76,201,255,0.06)":"transparent",
           borderLeft:isActive?"3px solid #4cc9ff":"3px solid transparent",
-          color:isActive?"#fff":"rgba(167,177,195,0.5)",
+          color:isActive?"#fff":"rgba(167,177,195,0.7)",
           fontWeight:isActive?700:500,fontSize:13,transition:"all .15s",
         }}>
           <span style={{fontSize:13,opacity:isActive?1:0.6}}>{tab.icon}</span>
@@ -817,7 +817,7 @@ export default function SettingsView() {
     {/* ═══ GENERAL ═══ */}
     {settingsTab === "general" && <>
     <div style={{fontSize:16,fontWeight:800,marginBottom:16,color:"rgba(232,238,252,0.9)"}}>{t("general_label") || "Allgemein"}</div>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_general")}</div>
+    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_general")}</div>
     <Field label={t("clinic_name") || "Klinikname"} value={c.name || ""} onChange={v=>up("name",v)}/>
     <Field label={t("address") || "Adresse"} value={c.address || ""} onChange={v=>up("address",v)}/>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 16px"}}>
@@ -833,7 +833,7 @@ export default function SettingsView() {
 
     {/* ═══ TREATMENTS ═══ */}
     {settingsTab === "clinic_treatments" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_treatments")}</div>
+    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_treatments")}</div>
     <TreatmentTypes />
     </>}
 
@@ -849,8 +849,8 @@ export default function SettingsView() {
               background:(c.depositPolicy||"none")===opt.v?"rgba(76,201,255,0.06)":"rgba(255,255,255,0.02)",
               border:`1px solid ${(c.depositPolicy||"none")===opt.v?"rgba(76,201,255,0.2)":"rgba(255,255,255,0.06)"}`,
             }}>
-              <div style={{fontWeight:700,fontSize:13,color:(c.depositPolicy||"none")===opt.v?"#4cc9ff":"rgba(232,238,252,0.6)"}}>{opt.l}</div>
-              <div style={{fontSize:10,color:"rgba(167,177,195,0.35)",marginTop:2}}>{opt.d}</div>
+              <div style={{fontWeight:700,fontSize:13,color:(c.depositPolicy||"none")===opt.v?"#4cc9ff":"rgba(232,238,252,0.95)"}}>{opt.l}</div>
+              <div style={{fontSize:10,color:"rgba(167,177,195,0.75)",marginTop:2}}>{opt.d}</div>
             </div>
           ))}
         </div>
@@ -887,7 +887,7 @@ export default function SettingsView() {
               )}
               {/* Stripe API key hint */}
               {pm.key === "payStripe" && c.payStripe !== false && (
-                <div style={{padding:"4px 0 8px",fontSize:10,color:"rgba(167,177,195,0.25)"}}>
+                <div style={{padding:"4px 0 8px",fontSize:10,color:"rgba(167,177,195,0.65)"}}>
                   {t("stripe_config_hint") || "Stripe wird über Integrationen → Stripe konfiguriert"}
                 </div>
               )}
@@ -902,14 +902,14 @@ export default function SettingsView() {
           ))}
         </div>
         {(c.depositPolicy||"none")!=="none" && (
-          <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.5)",fontSize:11,lineHeight:1.6,display:"flex",alignItems:"flex-start",gap:8,marginTop:12}}>{"ℹ️"} {c.payStripe ? (t("payment_stripe_hint") || "Stripe ist aktiv — Anzahlungen werden automatisch erkannt. Der Patient erhaelt einen Zahlungslink per WhatsApp und das System bestaetigt die Zahlung automatisch.") : (t("payment_no_method_hint") || "Keine Zahlungsmethode aktiv. Zahlungen muessen in der Patientenkarte manuell als bezahlt markiert werden. Mit Stripe werden Zahlungen automatisch erkannt.")}</div>
+          <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.7)",fontSize:11,lineHeight:1.6,display:"flex",alignItems:"flex-start",gap:8,marginTop:12}}>{"ℹ️"} {c.payStripe ? (t("payment_stripe_hint") || "Stripe ist aktiv — Anzahlungen werden automatisch erkannt. Der Patient erhaelt einen Zahlungslink per WhatsApp und das System bestaetigt die Zahlung automatisch.") : (t("payment_no_method_hint") || "Keine Zahlungsmethode aktiv. Zahlungen muessen in der Patientenkarte manuell als bezahlt markiert werden. Mit Stripe werden Zahlungen automatisch erkannt.")}</div>
         )}
       </div>
     </Section>
 
     {/* Deposit Tracking */}
     <div style={{marginTop:24}}>
-      <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.4)"}}>...</div>}>
+      <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.6)"}}>...</div>}>
         <PaymentsView />
       </Suspense>
     </div>
@@ -924,9 +924,9 @@ export default function SettingsView() {
           <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("settings_min_lead_days") || "Minimum lead time (days)"}</div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <input type="number" min={0} max={30} value={c.minNoticeDays ?? 5} onChange={e => up("minNoticeDays", Math.max(0, Math.min(30, parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
-            <span style={{fontSize:13,color:"rgba(167,177,195,0.5)"}}>{t("settings_days_unit") || "days"}</span>
+            <span style={{fontSize:13,color:"rgba(167,177,195,0.7)"}}>{t("settings_days_unit") || "days"}</span>
           </div>
-          <div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginTop:6,lineHeight:1.5}}>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:6,lineHeight:1.5}}>
             {t("settings_min_lead_desc") || "Determines how many days must be between today and the earliest bookable appointment. Default: 5 days."}
           </div>
         </div>
@@ -934,9 +934,9 @@ export default function SettingsView() {
           <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("settings_checkin_offset_label") || "Patienten-Ankunft vor OP (Minuten)"}</div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <input type="number" min={0} max={180} value={c.checkinOffsetMinutes ?? 60} onChange={e => up("checkinOffsetMinutes", Math.max(0, Math.min(180, parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
-            <span style={{fontSize:13,color:"rgba(167,177,195,0.5)"}}>min</span>
+            <span style={{fontSize:13,color:"rgba(167,177,195,0.7)"}}>min</span>
           </div>
-          <div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginTop:6,lineHeight:1.5}}>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:6,lineHeight:1.5}}>
             {t("settings_checkin_offset_desc") || "Wie viele Minuten vor der OP soll der Patient in der Klinik sein? Diese Zeit wird für Vorgespräch, Haarlinie und Vorbereitung benötigt. Der Patient erhält automatisch die berechnete Ankunftszeit per WhatsApp."}
           </div>
           <div style={{marginTop:8,padding:"10px 14px",borderRadius:8,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",fontSize:11,color:"rgba(76,201,255,0.7)",lineHeight:1.5}}>
@@ -949,14 +949,14 @@ export default function SettingsView() {
 
     {/* ═══ DOCTOR ASSIGNMENT ═══ */}
     {settingsTab === "doctors" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_doctor_assign")}</div>
+    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_doctor_assign")}</div>
     <Section title={t("doctor_assignment") || "Arzt-Zuweisung"}>
       {/* Automatic assignment info */}
       <div style={{padding:"14px 16px",borderRadius:12,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,display:"flex",alignItems:"center",gap:10}}>
         <span style={{fontSize:20}}>🤖</span>
         <div>
           <div style={{fontSize:14,fontWeight:700,color:"#4cc9ff"}}>{t("auto_assign_active") || "Automatische Zuweisung aktiv"}</div>
-          <div style={{fontSize:11,color:"rgba(167,177,195,0.4)"}}>{t("auto_assign_desc")}</div>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.6)"}}>{t("auto_assign_desc")}</div>
         </div>
       </div>
 
@@ -972,11 +972,11 @@ export default function SettingsView() {
         </div>
 
         {/* Explanation box */}
-        <div style={{padding:"12px 14px",borderRadius:10,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",fontSize:12,color:"rgba(167,177,195,0.45)",lineHeight:1.6}}>
+        <div style={{padding:"12px 14px",borderRadius:10,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",fontSize:12,color:"rgba(167,177,195,0.65)",lineHeight:1.6}}>
           <div style={{fontWeight:700,color:"rgba(76,201,255,0.6)",marginBottom:4}}>{t("how_it_works") || "How it works:"}</div>
           {t("assign_how_desc")}
           <br/><br/>
-          <strong style={{color:"rgba(232,238,252,0.6)"}}>{c.assignAlgorithm === "least_booked" ? t("least_busy") : c.assignAlgorithm === "random" ? t("even_distribution") : t("earliest_available")}:</strong>
+          <strong style={{color:"rgba(232,238,252,0.95)"}}>{c.assignAlgorithm === "least_booked" ? t("least_busy") : c.assignAlgorithm === "random" ? t("even_distribution") : t("earliest_available")}:</strong>
           {" "}
           {c.assignAlgorithm === "least_booked" ? t("algo_desc_least_booked") :
            c.assignAlgorithm === "random" ? t("algo_desc_random") :
@@ -992,7 +992,7 @@ export default function SettingsView() {
 
     {/* ═══ AI BOT SETTINGS ═══ */}
     {settingsTab === "ai" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_ai")}</div>
+    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_ai")}</div>
     {/* WhatsApp cost info removed — Flowmatix covers messaging costs */}
     <Section title={t("ai_bot_settings") || "KI-Bot Einstellungen"}>
       <div style={{display:"grid",gap:12}}>
@@ -1006,7 +1006,7 @@ export default function SettingsView() {
 
     {/* Bot Profile */}
     <div style={{ marginTop: 16 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
         {t("bot_profile") || "Bot-Profil & Persönlichkeit"}
       </div>
       <BotProfile clinic={clinic} updateClinic={(patch) => { Object.entries(patch).forEach(([k,v]) => up(k,v)); }} showT={showT} t={t} />
@@ -1014,7 +1014,7 @@ export default function SettingsView() {
 
     {/* Knowledge Base / FAQ */}
     <div style={{ marginTop: 24 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
         {t("knowledge_base") || "Wissensdatenbank (FAQ)"}
       </div>
       <FAQKnowledgeBase />
@@ -1031,28 +1031,28 @@ export default function SettingsView() {
 
     {/* ═══ TEAM & ZUGRIFF ═══ */}
     {settingsTab === "team" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_team")}</div>
+    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_team")}</div>
     <TeamAccessSection clinic={clinic} showT={showT} t={t} setClinics={setClinics} />
     </>}
 
 
 
     {/* ═══ AUTOMATIONS ═══ */}
-    {settingsTab === "automations" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.4)"}}>...</div>}><AutomationsView /></Suspense>}
+    {settingsTab === "automations" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.6)"}}>...</div>}><AutomationsView /></Suspense>}
 
     {/* ═══ ANALYTICS & REVENUE ═══ */}
-    {settingsTab === "analytics" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.4)"}}>...</div>}>
+    {settingsTab === "analytics" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.6)"}}>...</div>}>
       <AnalyticsView />
     </Suspense>}
 
     {/* ═══ SUBSCRIPTION ═══ */}
-    {settingsTab === "subscription" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.4)"}}>...</div>}><SubscriptionView /></Suspense>}
+    {settingsTab === "subscription" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.6)"}}>...</div>}><SubscriptionView /></Suspense>}
 
     {/* ═══ DRIVERS ═══ */}
     {settingsTab === "drivers" && <>
     <div style={{marginBottom:20}}>
       <div style={{fontSize:16,fontWeight:800,color:"rgba(232,238,252,0.95)"}}>{t("driver_mgmt_title")}</div>
-      <div style={{fontSize:12,color:"rgba(167,177,195,0.4)",marginTop:4}}>{t("driver_mgmt_desc")}</div>
+      <div style={{fontSize:12,color:"rgba(167,177,195,0.6)",marginTop:4}}>{t("driver_mgmt_desc")}</div>
     </div>
 
     {/* Existing drivers list */}
@@ -1060,8 +1060,8 @@ export default function SettingsView() {
       {drivers.map(d=>(
         <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",marginBottom:8,borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)"}}>
           <div>
-            <div style={{fontWeight:700,fontSize:13}}>{d.name} <span style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginLeft:4}}>{d.role==="primary"?t("primary_role"):"Backup"}</span></div>
-            <div style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginTop:3}}>{d.phone}{d.telegramChatId?" · ✅ Telegram":"" }{d.vehicle?` · ${d.vehicle}`:""}{d.plateNo?` · ${d.plateNo}`:""}</div>
+            <div style={{fontWeight:700,fontSize:13}}>{d.name} <span style={{fontSize:11,color:"rgba(167,177,195,0.6)",marginLeft:4}}>{d.role==="primary"?t("primary_role"):"Backup"}</span></div>
+            <div style={{fontSize:11,color:"rgba(167,177,195,0.6)",marginTop:3}}>{d.phone}{d.telegramChatId?" · ✅ Telegram":"" }{d.vehicle?` · ${d.vehicle}`:""}{d.plateNo?` · ${d.plateNo}`:""}</div>
           </div>
           <div style={{display:"flex",gap:6}}>
             <button onClick={()=>startEditDriver(d)} style={{padding:"5px 12px",borderRadius:8,background:"rgba(76,201,255,0.06)",border:"1px solid rgba(76,201,255,0.12)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("edit")||"Bearbeiten"}</button>
@@ -1076,17 +1076,17 @@ export default function SettingsView() {
       <div style={{borderRadius:14,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",overflow:"hidden"}}>
         <div style={{padding:"14px 20px",borderBottom:"1px solid rgba(255,255,255,0.04)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div style={{fontWeight:700,fontSize:14,color:"rgba(232,238,252,0.9)"}}>{t("add_new_driver")}</div>
-          <button onClick={()=>{setDrvForm(false);setEditDriverId(null);setDrvName("");setDrvPhone("");setDrvVehicle("");setDrvPlate("");setDrvTelegram("");setDrvRole("primary");}} style={{padding:"4px 12px",borderRadius:6,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.5)",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
+          <button onClick={()=>{setDrvForm(false);setEditDriverId(null);setDrvName("");setDrvPhone("");setDrvVehicle("");setDrvPlate("");setDrvTelegram("");setDrvRole("primary");}} style={{padding:"4px 12px",borderRadius:6,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
         </div>
         <div style={{padding:20}}>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px 16px"}}>
-            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>Name *</div><input value={drvName} onChange={e=>setDrvName(e.target.value)} placeholder="Max Mustermann" style={inp}/></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("phone")} *</div><input value={drvPhone} onChange={e=>setDrvPhone(e.target.value)} placeholder="+49 170 1234567" style={inp}/></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("vehicle")}</div><input value={drvVehicle} onChange={e=>setDrvVehicle(e.target.value)} placeholder="Mercedes V-Klasse" style={inp}/></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("license_plate")}</div><input value={drvPlate} onChange={e=>setDrvPlate(e.target.value)} placeholder="B-FM 1234" style={inp}/></div>
-            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.5)",marginBottom:4}}>{t("role")}</div><select value={drvRole} onChange={e=>setDrvRole(e.target.value)} style={inp}><option value="primary">{t("primary_role")}</option><option value="backup">Backup</option></select></div>
+            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>Name *</div><input value={drvName} onChange={e=>setDrvName(e.target.value)} placeholder="Max Mustermann" style={inp}/></div>
+            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>{t("phone")} *</div><input value={drvPhone} onChange={e=>setDrvPhone(e.target.value)} placeholder="+49 170 1234567" style={inp}/></div>
+            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>{t("vehicle")}</div><input value={drvVehicle} onChange={e=>setDrvVehicle(e.target.value)} placeholder="Mercedes V-Klasse" style={inp}/></div>
+            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>{t("license_plate")}</div><input value={drvPlate} onChange={e=>setDrvPlate(e.target.value)} placeholder="B-FM 1234" style={inp}/></div>
+            <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>{t("role")}</div><select value={drvRole} onChange={e=>setDrvRole(e.target.value)} style={inp}><option value="primary">{t("primary_role")}</option><option value="backup">Backup</option></select></div>
           </div>
-          <div style={{marginTop:16,padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",fontSize:11,color:"rgba(167,177,195,0.35)",lineHeight:1.6}}>
+          <div style={{marginTop:16,padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",fontSize:11,color:"rgba(167,177,195,0.75)",lineHeight:1.6}}>
             💡 {t("driver_telegram_hint")}
           </div>
           <div style={{marginTop:16,display:"flex",justifyContent:"flex-end"}}>
@@ -1103,7 +1103,7 @@ export default function SettingsView() {
     {settingsTab === "account" && <AccountSection t={t} showT={showT} user={user} />}
 
     {/* ═══ AUDIT LOG ═══ */}
-    {settingsTab === "audit_log" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.4)"}}>...</div>}><AuditLogView /></Suspense>}
+    {settingsTab === "audit_log" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.6)"}}>...</div>}><AuditLogView /></Suspense>}
 
     {/* Save button removed — all settings auto-save on change */}
     </div>

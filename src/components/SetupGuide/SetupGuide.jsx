@@ -64,12 +64,12 @@ export default function SetupGuide() {
           <span style={{ fontSize: 18 }}>{progress.pct === 100 ? "✅" : "🛠️"}</span>
           <div>
             <div style={{ fontWeight: 800, fontSize: 15 }}>{progress.pct === 100 ? "Setup Complete!" : t("sg_title")}</div>
-            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>{progress.done} / {progress.total} {t("sg_steps_done")}</div>
+            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{progress.done} / {progress.total} {t("sg_steps_done")}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 20, fontWeight: 800, color: progress.pct === 100 ? "#10b981" : "#4cc9ff" }}>{progress.pct}%</span>
-          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>▼</span>
+          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>▼</span>
         </div>
       </div>
       {/* Progress bar */}
@@ -82,8 +82,8 @@ export default function SetupGuide() {
           const cp = progress.byCategory[cat];
           return <div key={cat} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
             <span>{meta.icon}</span>
-            <span style={{ color: cp?.done === cp?.total ? "#10b981" : "rgba(167,177,195,0.5)", fontWeight: 600 }}>{t(meta.label)}</span>
-            <span style={{ color: "rgba(167,177,195,0.3)" }}>{cp?.done}/{cp?.total}</span>
+            <span style={{ color: cp?.done === cp?.total ? "#10b981" : "rgba(167,177,195,0.7)", fontWeight: 600 }}>{t(meta.label)}</span>
+            <span style={{ color: "rgba(167,177,195,0.7)" }}>{cp?.done}/{cp?.total}</span>
           </div>;
         })}
       </div>
@@ -97,10 +97,10 @@ export default function SetupGuide() {
         <span style={{ fontSize: 20 }}>🛠️</span>
         <div>
           <div style={{ fontWeight: 800, fontSize: 17 }}>Clinic Setup Guide</div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>{progress.done} / {progress.total} — {progress.pct}% {t("sg_pct_done")}</div>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{progress.done} / {progress.total} — {progress.pct}% {t("sg_pct_done")}</div>
         </div>
       </div>
-      <button onClick={() => setExpanded(false)} style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.5)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>▲ {t("collapse")}</button>
+      <button onClick={() => setExpanded(false)} style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>▲ {t("collapse")}</button>
     </div>
 
     {/* Progress bar */}
@@ -116,8 +116,8 @@ export default function SetupGuide() {
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ fontSize: 12 }}>{meta.icon}</span>
           <span style={{ fontSize: 11, fontWeight: 800, color: meta.color, textTransform: "uppercase", letterSpacing: "0.5px" }}>{t(meta.label)}</span>
-          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.3)" }}>— {t(meta.desc)}</span>
-          <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: cp?.done === cp?.total ? "#10b981" : "rgba(167,177,195,0.4)" }}>{cp?.done}/{cp?.total}</span>
+          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.7)" }}>— {t(meta.desc)}</span>
+          <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: cp?.done === cp?.total ? "#10b981" : "rgba(167,177,195,0.6)" }}>{cp?.done}/{cp?.total}</span>
         </div>
         <div style={{ display: "grid", gap: 6 }}>
           {steps.map(step => {
@@ -128,7 +128,7 @@ export default function SetupGuide() {
                 <span style={{ fontSize: 16, width: 24, textAlign: "center" }}>{done ? "✅" : step.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 13, color: done ? "#10b981" : "rgba(232,238,252,0.88)", textDecoration: done ? "line-through" : "none" }}>{t(step.label)}</div>
-                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 1 }}>{t(step.desc)}</div>
+                  <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 1 }}>{t(step.desc)}</div>
                 </div>
                 {!done && <button onClick={e => { e.stopPropagation(); handleStepClick(step); }} style={{ padding: "5px 12px", borderRadius: 7, background: `${meta.color}12`, border: `1px solid ${meta.color}25`, color: meta.color, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>{t("sg_setup")} →</button>}
                 {done && <span style={{ fontSize: 11, fontWeight: 600, color: "#10b981" }}>{t("done")}</span>}
@@ -142,7 +142,7 @@ export default function SetupGuide() {
     {progress.pct === 100 && <div style={{ padding: 14, borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", textAlign: "center", marginTop: 8 }}>
       <span style={{ fontSize: 24 }}>🎉</span>
       <div style={{ fontWeight: 800, fontSize: 15, color: "#10b981", marginTop: 4 }}>{t("sg_all_set")}</div>
-      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 4 }}>{t("sg_ai_ready")}</div>
+      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 4 }}>{t("sg_ai_ready")}</div>
     </div>}
   </div>;
 }

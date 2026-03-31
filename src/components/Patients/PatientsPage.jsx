@@ -127,7 +127,7 @@ function FilterDropdown({ label, icon, options, value, onChange, multi }) {
         padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
         background: active ? "rgba(76,201,255,0.08)" : "rgba(255,255,255,0.02)",
         border: `1px solid ${active ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.05)"}`,
-        color: active ? "#4cc9ff" : "rgba(167,177,195,0.45)",
+        color: active ? "#4cc9ff" : "rgba(167,177,195,0.65)",
         display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap",
       }}>
         {icon && <span style={{ fontSize: 10 }}>{icon}</span>}
@@ -171,7 +171,7 @@ function FilterDropdown({ label, icon, options, value, onChange, multi }) {
               }} style={{
                 width: "100%", padding: "6px 10px", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: "pointer",
                 background: selected ? "rgba(76,201,255,0.08)" : "transparent",
-                border: "none", color: selected ? "#4cc9ff" : "rgba(232,238,252,0.7)", textAlign: "left", fontFamily: "inherit",
+                border: "none", color: selected ? "#4cc9ff" : "rgba(232,238,252,0.9)", textAlign: "left", fontFamily: "inherit",
                 display: "flex", alignItems: "center", gap: 6,
               }}>
                 {multi && <span style={{ width: 14, height: 14, borderRadius: 3, border: `1.5px solid ${selected ? "#4cc9ff" : "rgba(255,255,255,0.15)"}`, background: selected ? "rgba(76,201,255,0.15)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "#4cc9ff", flexShrink: 0 }}>
@@ -203,7 +203,7 @@ function ColumnChooser({ columns, visibleCols, setVisibleCols }) {
     <div ref={ref} style={{ position: "relative" }}>
       <button onClick={() => setOpen(!open)} style={{
         padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-        background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", color: "rgba(167,177,195,0.45)",
+        background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", color: "rgba(167,177,195,0.65)",
         display: "flex", alignItems: "center", gap: 4,
       }}>
         <span style={{ fontSize: 10 }}>⚙️</span> {t("columns_label") || "Spalten"}
@@ -222,7 +222,7 @@ function ColumnChooser({ columns, visibleCols, setVisibleCols }) {
               }} style={{
                 width: "100%", padding: "6px 10px", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: "pointer",
                 background: active ? "rgba(76,201,255,0.06)" : "transparent",
-                border: "none", color: active ? "#4cc9ff" : "rgba(167,177,195,0.5)", textAlign: "left", fontFamily: "inherit",
+                border: "none", color: active ? "#4cc9ff" : "rgba(167,177,195,0.7)", textAlign: "left", fontFamily: "inherit",
                 display: "flex", alignItems: "center", gap: 6,
               }}>
                 <span style={{ width: 14, height: 14, borderRadius: 3, border: `1.5px solid ${active ? "#4cc9ff" : "rgba(255,255,255,0.12)"}`, background: active ? "rgba(76,201,255,0.12)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "#4cc9ff", flexShrink: 0 }}>
@@ -308,22 +308,22 @@ function BulkBar({ count, onClear, onExport, onAssignDoctor, onArchive, doctors 
             {doctors.map(d => (
               <button key={d} onClick={() => { onAssignDoctor(d); setShowDocPicker(false); }} style={{
                 width: "100%", padding: "6px 10px", borderRadius: 4, fontSize: 11, fontWeight: 600,
-                background: "transparent", border: "none", color: "rgba(232,238,252,0.8)",
+                background: "transparent", border: "none", color: "rgba(232,238,252,0.95)",
                 cursor: "pointer", textAlign: "left", fontFamily: "inherit",
               }}>{d}</button>
             ))}
-            {doctors.length === 0 && <div style={{ padding: 8, fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{t("no_doctors_label") || "Keine Ärzte"}</div>}
+            {doctors.length === 0 && <div style={{ padding: 8, fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{t("no_doctors_label") || "Keine Ärzte"}</div>}
           </div>
         )}
       </div>
-      <button onClick={onClear} style={{ ...bulkBtnStyle, color: "rgba(167,177,195,0.5)" }}>✕</button>
+      <button onClick={onClear} style={{ ...bulkBtnStyle, color: "rgba(167,177,195,0.7)" }}>✕</button>
     </div>
   );
 }
 
 const bulkBtnStyle = {
   padding: "6px 14px", borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(232,238,252,0.8)",
+  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(232,238,252,0.95)",
 };
 
 /* ═══════════════════════════════════════════════════════
@@ -605,7 +605,7 @@ export default function PatientsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em", color: "rgba(232,238,252,0.95)" }}>{t("patients_title") || "Patienten"}</h1>
-          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", margin: 0, fontWeight: 500 }}>
+          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", margin: 0, fontWeight: 500 }}>
             {isDoctor ? (t("my_assigned_patients") || "Meine zugewiesenen Patienten") : (t("all_clinic_patients") || "Alle Klinik-Patienten und Datensätze")}
           </p>
         </div>
@@ -613,7 +613,7 @@ export default function PatientsPage() {
           <ColumnChooser columns={getAllColumns(t)} visibleCols={visibleCols} setVisibleCols={setVisibleCols} />
           <button onClick={() => handleExport()} style={{
             padding: "7px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)",
+            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
           }}>📥 Export</button>
           {canEdit && (
             <button onClick={() => setShowNewLead(true)} style={{
@@ -639,7 +639,7 @@ export default function PatientsPage() {
       <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center", flexWrap: "wrap" }}>
         {/* Search */}
         <div style={{ position: "relative", flex: "0 0 280px" }}>
-          <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(167,177,195,0.25)", pointerEvents: "none" }}>🔍</span>
+          <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(167,177,195,0.65)", pointerEvents: "none" }}>🔍</span>
           <input
             value={search} onChange={e => setSearch(e.target.value)}
             placeholder={t("search_patients_placeholder") || "Name, Telefon, Behandlung..."}
@@ -664,7 +664,7 @@ export default function PatientsPage() {
               padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
               background: stageFilter === f.id ? "rgba(76,201,255,0.1)" : "rgba(255,255,255,0.02)",
               border: `1px solid ${stageFilter === f.id ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.05)"}`,
-              color: stageFilter === f.id ? "#4cc9ff" : "rgba(167,177,195,0.45)",
+              color: stageFilter === f.id ? "#4cc9ff" : "rgba(167,177,195,0.65)",
             }}>{f.label}</button>
           ))}
         </div>
@@ -674,7 +674,7 @@ export default function PatientsPage() {
           padding: "6px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
           background: activeFilterCount > 0 ? "rgba(76,201,255,0.08)" : "rgba(255,255,255,0.02)",
           border: `1px solid ${activeFilterCount > 0 ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.05)"}`,
-          color: activeFilterCount > 0 ? "#4cc9ff" : "rgba(167,177,195,0.45)",
+          color: activeFilterCount > 0 ? "#4cc9ff" : "rgba(167,177,195,0.65)",
           display: "flex", alignItems: "center", gap: 4,
         }}>
           🎛️ Filter
@@ -683,7 +683,7 @@ export default function PatientsPage() {
           )}
         </button>
 
-        <div style={{ marginLeft: "auto", fontSize: 11, color: "rgba(167,177,195,0.3)" }}>
+        <div style={{ marginLeft: "auto", fontSize: 11, color: "rgba(167,177,195,0.7)" }}>
           {filtered.length} {filtered.length === 1 ? (t("patients_count_single") || "Patient") : (t("patients_count_plural") || "Patienten")}
         </div>
       </div>
@@ -707,13 +707,13 @@ export default function PatientsPage() {
             padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
             background: filterApptToday ? "rgba(76,201,255,0.08)" : "rgba(255,255,255,0.02)",
             border: `1px solid ${filterApptToday ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.05)"}`,
-            color: filterApptToday ? "#4cc9ff" : "rgba(167,177,195,0.45)",
+            color: filterApptToday ? "#4cc9ff" : "rgba(167,177,195,0.65)",
           }}>{"\uD83D\uDCC5"} {t("today_label") || "Heute"}</button>
           <button onClick={() => setFilterApptWeek(!filterApptWeek)} style={{
             padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
             background: filterApptWeek ? "rgba(76,201,255,0.08)" : "rgba(255,255,255,0.02)",
             border: `1px solid ${filterApptWeek ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.05)"}`,
-            color: filterApptWeek ? "#4cc9ff" : "rgba(167,177,195,0.45)",
+            color: filterApptWeek ? "#4cc9ff" : "rgba(167,177,195,0.65)",
           }}>{"\uD83D\uDCC5"} {t("this_week_label") || "Diese Woche"}</button>
 
           {activeFilterCount > 0 && (
@@ -732,7 +732,7 @@ export default function PatientsPage() {
         <div style={{
           display: "grid", gridTemplateColumns: `36px ${gridTemplate}`,
           gap: 8, padding: "8px 16px", background: "rgba(255,255,255,0.02)",
-          fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em",
+          fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em",
           alignItems: "center",
         }}>
           {/* Checkbox */}
@@ -753,10 +753,10 @@ export default function PatientsPage() {
           <SkeletonRows count={8} colCount={activeCols.length - 1} />
         ) : paged.length === 0 ? (
           <div style={{ padding: "50px 20px", textAlign: "center" }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(167,177,195,0.35)" }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(167,177,195,0.75)" }}>
               {search || activeFilterCount > 0 ? (t("no_results") || "Keine Ergebnisse") : (t("no_patients_yet") || "Noch keine Patienten")}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.2)", marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 4 }}>
               {search ? (t("try_different_search") || "Versuche einen anderen Suchbegriff") : (t("patients_auto_created") || "Patienten werden automatisch angelegt wenn sie über WhatsApp schreiben")}
             </div>
           </div>
@@ -806,14 +806,14 @@ export default function PatientsPage() {
                         )}
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontWeight: 700, fontSize: 13, color: "rgba(232,238,252,0.9)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.name}</div>
-                          <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {lead.treatment || "—"}{lead.country ? ` · ${translateValue(lead.country)}` : ""}
                           </div>
                         </div>
                       </div>
                     );
                   case "phone":
-                    return <div key={col.id} style={{ color: "rgba(167,177,195,0.5)", fontSize: 11 }}>{lead.phone || lead.from || "—"}</div>;
+                    return <div key={col.id} style={{ color: "rgba(167,177,195,0.7)", fontSize: 11 }}>{lead.phone || lead.from || "—"}</div>;
                   case "status":
                     return (
                       <div key={col.id}>
@@ -824,24 +824,24 @@ export default function PatientsPage() {
                       </div>
                     );
                   case "doctor":
-                    return <div key={col.id} style={{ color: "rgba(167,177,195,0.5)", fontSize: 11 }}>{lead.appointmentDoctor || lead.reviewData?.doctorName || lead.assignedDoctor || "—"}</div>;
+                    return <div key={col.id} style={{ color: "rgba(167,177,195,0.7)", fontSize: 11 }}>{lead.appointmentDoctor || lead.reviewData?.doctorName || lead.assignedDoctor || "—"}</div>;
                   case "nextAppt":
                     return (
                       <div key={col.id} style={{ fontSize: 11 }}>
                         {appt ? (
-                          <span style={{ color: isToday(appt.date) ? "#10b981" : "rgba(232,238,252,0.6)", fontWeight: isToday(appt.date) ? 700 : 400 }}>
+                          <span style={{ color: isToday(appt.date) ? "#10b981" : "rgba(232,238,252,0.95)", fontWeight: isToday(appt.date) ? 700 : 400 }}>
                             {isToday(appt.date) ? (t("today_label") || "Heute") : new Date(appt.date).toLocaleDateString(fmLocale(), { day: "numeric", month: "short" })}
                             {appt.time ? ` · ${appt.time}` : ""}
                           </span>
-                        ) : <span style={{ color: "rgba(167,177,195,0.2)" }}>—</span>}
+                        ) : <span style={{ color: "rgba(167,177,195,0.6)" }}>—</span>}
                       </div>
                     );
                   case "grafts":
-                    return <div key={col.id} style={{ fontSize: 11, color: grafts ? "#10b981" : "rgba(167,177,195,0.2)", fontWeight: grafts ? 700 : 400 }}>{grafts ? Number(grafts).toLocaleString("de-DE") : "—"}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, color: grafts ? "#10b981" : "rgba(167,177,195,0.6)", fontWeight: grafts ? 700 : 400 }}>{grafts ? Number(grafts).toLocaleString("de-DE") : "—"}</div>;
                   case "treatment":
-                    return <div key={col.id} style={{ fontSize: 11, color: "rgba(232,238,252,0.6)" }}>{lead.treatment || "—"}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, color: "rgba(232,238,252,0.95)" }}>{lead.treatment || "—"}</div>;
                   case "country":
-                    return <div key={col.id} style={{ fontSize: 11, color: "rgba(232,238,252,0.6)" }}>{translateValue(lead.country) || "—"}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, color: "rgba(232,238,252,0.95)" }}>{translateValue(lead.country) || "—"}</div>;
                   case "source":
                     return (
                       <div key={col.id} style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
@@ -849,7 +849,7 @@ export default function PatientsPage() {
                       </div>
                     );
                   case "revenue":
-                    return <div key={col.id} style={{ fontSize: 11, fontWeight: fin.price ? 700 : 400, color: fin.price ? "rgba(232,238,252,0.8)" : "rgba(167,177,195,0.2)" }}>{fin.price ? `€${fin.price.toLocaleString()}` : "—"}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, fontWeight: fin.price ? 700 : 400, color: fin.price ? "rgba(232,238,252,0.95)" : "rgba(167,177,195,0.6)" }}>{fin.price ? `€${fin.price.toLocaleString()}` : "—"}</div>;
                   case "deposit":
                     return (
                       <div key={col.id} style={{ fontSize: 11 }}>
@@ -857,21 +857,21 @@ export default function PatientsPage() {
                           <span style={{ color: fin.depositPaid ? "#10b981" : "#fbbf24", fontWeight: 700 }}>
                             €{fin.deposit.toLocaleString()} {fin.depositPaid ? "✓" : ""}
                           </span>
-                        ) : <span style={{ color: "rgba(167,177,195,0.2)" }}>—</span>}
+                        ) : <span style={{ color: "rgba(167,177,195,0.6)" }}>—</span>}
                       </div>
                     );
                   case "remaining":
-                    return <div key={col.id} style={{ fontSize: 11, fontWeight: 700, color: fin.remaining > 0 ? "#fbbf24" : fin.price > 0 ? "#10b981" : "rgba(167,177,195,0.2)" }}>{fin.price > 0 ? `€${fin.remaining.toLocaleString()}` : "—"}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, fontWeight: 700, color: fin.remaining > 0 ? "#fbbf24" : fin.price > 0 ? "#10b981" : "rgba(167,177,195,0.6)" }}>{fin.price > 0 ? `€${fin.remaining.toLocaleString()}` : "—"}</div>;
                   case "photos":
                     return (
                       <div key={col.id} style={{ fontSize: 11, display: "flex", alignItems: "center", gap: 3 }}>
                         {photoCount > 0 ? (
                           <span style={{ color: "#a78bfa", fontWeight: 700 }}>📷 {photoCount}</span>
-                        ) : <span style={{ color: "rgba(167,177,195,0.2)" }}>—</span>}
+                        ) : <span style={{ color: "rgba(167,177,195,0.6)" }}>—</span>}
                       </div>
                     );
                   case "lastContact":
-                    return <div key={col.id} style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{timeAgoShort(lead.lastAiInteraction || lead.createdAt, t)}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{timeAgoShort(lead.lastAiInteraction || lead.createdAt, t)}</div>;
                   case "actions":
                     return (
                       <div key={col.id} style={{ display: "flex", gap: 3 }} onClick={e => e.stopPropagation()}>
@@ -891,7 +891,7 @@ export default function PatientsPage() {
       {totalPages > 1 && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "16px 0" }}>
           <button disabled={page === 0} onClick={() => setPage(p => p - 1)} style={pageBtnStyle(page === 0)}>← {t("back_nav") || "Zurück"}</button>
-          <span style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", fontWeight: 600 }}>
+          <span style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", fontWeight: 600 }}>
             {t("page_label") || "Seite"} {page + 1} {t("of_label") || "von"} {totalPages}
           </span>
           <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} style={pageBtnStyle(page >= totalPages - 1)}>{t("next_page") || "Weiter →"}</button>
@@ -900,7 +900,7 @@ export default function PatientsPage() {
 
       {/* Footer count */}
       {filtered.length > 0 && (
-        <div style={{ padding: "4px 16px 16px", fontSize: 11, color: "rgba(167,177,195,0.2)" }}>
+        <div style={{ padding: "4px 16px 16px", fontSize: 11, color: "rgba(167,177,195,0.6)" }}>
           {filtered.length} {t("patients_of_total") || "von"} {myLeads.length} {t("patients_count_plural") || "Patienten"}
           {totalPages > 1 && ` · ${t("page_label") || "Seite"} ${page + 1}/${totalPages} (${PAGE_SIZE} ${t("per_page") || "pro Seite"})`}
         </div>
@@ -944,6 +944,6 @@ function pageBtnStyle(disabled) {
   return {
     padding: "6px 14px", borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: disabled ? "default" : "pointer",
     fontFamily: "inherit", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
-    color: disabled ? "rgba(167,177,195,0.2)" : "rgba(232,238,252,0.7)", opacity: disabled ? 0.5 : 1,
+    color: disabled ? "rgba(167,177,195,0.6)" : "rgba(232,238,252,0.9)", opacity: disabled ? 0.5 : 1,
   };
 }

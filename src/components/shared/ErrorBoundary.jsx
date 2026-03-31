@@ -25,7 +25,7 @@ export default class ErrorBoundary extends Component {
         <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: "#ef4444" }}>{t("something_went_wrong")}</div>
         <div style={{ fontSize: 14, color: "rgba(167,177,195,0.6)", marginBottom: 20, lineHeight: 1.5 }}>
           {this.state.error?.message || t("unexpected_error")}
-          <pre style={{ fontSize: 10, color: "rgba(167,177,195,0.4)", textAlign: "left", marginTop: 8, maxHeight: 100, overflow: "auto", whiteSpace: "pre-wrap" }}>{this.state.error?.stack}</pre>
+          <pre style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", textAlign: "left", marginTop: 8, maxHeight: 100, overflow: "auto", whiteSpace: "pre-wrap" }}>{this.state.error?.stack}</pre>
         </div>
         <button onClick={() => { this.setState({ hasError: false, error: null }); }} style={{
           padding: "10px 24px", borderRadius: 12, background: "rgba(76,201,255,0.08)",

@@ -93,7 +93,7 @@ export function waitingUrgency(mins, category) {
 export const WAITING_COLORS = {
   critical: "#ef4444",
   warning: "#fbbf24",
-  normal: "rgba(167,177,195,0.45)",
+  normal: "rgba(167,177,195,0.65)",
 };
 
 /* ═══ Locale for date formatting (DE/EN/TR) ═══ */

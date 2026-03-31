@@ -52,13 +52,13 @@ export default function LoginScreen({
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 8px" }}>{tl("auth_failed")}</h1>
         <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", marginBottom: 16, color: "#ef4444", fontSize: 13, fontWeight: 600 }}>{authCallbackErr || tl("link_expired_hint")}</div>
         <button onClick={() => { window.history.replaceState(null, "", "/"); setAuthCallbackMode(null); }} style={{ width: "100%", padding: 16, borderRadius: 14, background: "linear-gradient(135deg,#00B4D8,#0096c7)", border: "none", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(0,180,216,0.15)" }}>{tl("back_to_login")}</button>
-        <p style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", marginTop: 16 }}>{tl("need_help_email")} <a href="mailto:info@flowmatix.io" style={{ color: "#4cc9ff" }}>info@flowmatix.io</a></p>
+        <p style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 16 }}>{tl("need_help_email")} <a href="mailto:info@flowmatix.io" style={{ color: "#4cc9ff" }}>info@flowmatix.io</a></p>
       </div>
     </div>
   );
 
   /* ======== LOADING ======== */
-  if (authLoading) return <div style={{ minHeight: "100vh", background: AUTH_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif" }}><div style={{ textAlign: "center" }}><img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{ width: 56, height: 56, borderRadius: 16, objectFit: "cover", marginBottom: 16 }} /><div style={{ fontWeight: 800, fontSize: 22, letterSpacing: "0.12em", background: "linear-gradient(135deg,#fff,rgba(76,201,255,.7))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 16 }}>FLOWMATIX</div><div style={{ fontSize: 14, color: "rgba(167,177,195,0.5)" }}>{({de:"Laden...",en:"Loading...",tr:"Yükleniyor..."}[localStorage.getItem("fm_lang")||"de"]||"Laden...")}</div></div></div>;
+  if (authLoading) return <div style={{ minHeight: "100vh", background: AUTH_BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif" }}><div style={{ textAlign: "center" }}><img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{ width: 56, height: 56, borderRadius: 16, objectFit: "cover", marginBottom: 16 }} /><div style={{ fontWeight: 800, fontSize: 22, letterSpacing: "0.12em", background: "linear-gradient(135deg,#fff,rgba(76,201,255,.7))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 16 }}>FLOWMATIX</div><div style={{ fontSize: 14, color: "rgba(167,177,195,0.7)" }}>{({de:"Laden...",en:"Loading...",tr:"Yükleniyor..."}[localStorage.getItem("fm_lang")||"de"]||"Laden...")}</div></div></div>;
 
   /* ======== LOGIN FORM ======== */
   return (
@@ -97,7 +97,7 @@ export default function LoginScreen({
         <div style={{ marginBottom: 18 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(76,201,255,0.6)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{(T[loginLang] || T.en).email_address}</div>
           <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(167,177,195,0.35)" }}>✉</span>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(167,177,195,0.75)" }}>✉</span>
             <input id="loginEmail" name="loginEmail" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="you@clinic.com" onKeyDown={e => { if (e.key === "Enter") { if (loginMode === "magic") handleMagicLink(); else if (loginMode === "password") handleLogin(); else if (loginMode === "forgot") handleForgotPw(); } }} style={{ width: "100%", padding: "14px 16px 14px 40px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: `1px solid ${loginErr && !loginEmail ? "rgba(239,68,68,0.4)" : "rgba(76,201,255,0.15)"}`, color: "#fff", fontFamily: "inherit", fontSize: 15, outline: "none", boxSizing: "border-box", transition: "border .2s" }} autoFocus />
           </div>
         </div>
@@ -106,12 +106,12 @@ export default function LoginScreen({
         {loginMode === "password" && <div style={{ marginBottom: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(76,201,255,0.6)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{(T[loginLang] || T.en).password}</div>
-            <button onClick={() => { setLoginMode("forgot"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 600, padding: 0 }}>{(T[loginLang] || T.en).forgot}</button>
+            <button onClick={() => { setLoginMode("forgot"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 600, padding: 0 }}>{(T[loginLang] || T.en).forgot}</button>
           </div>
           <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(167,177,195,0.35)" }}>🔒</span>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(167,177,195,0.75)" }}>🔒</span>
             <input id="loginPass" name="loginPass" type={showPass ? "text" : "password"} value={loginPass} onChange={e => setLoginPass(e.target.value)} placeholder="••••••••" onKeyDown={e => e.key === "Enter" && handleLogin()} style={{ width: "100%", padding: "14px 44px 14px 40px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(76,201,255,0.15)", color: "#fff", fontFamily: "inherit", fontSize: 15, outline: "none", boxSizing: "border-box" }} />
-            <button onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.4)", padding: 4 }}>{showPass ? "🙈" : "👁"}</button>
+            <button onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "rgba(167,177,195,0.6)", padding: 4 }}>{showPass ? "🙈" : "👁"}</button>
           </div>
         </div>}
 
@@ -122,8 +122,8 @@ export default function LoginScreen({
 
         {/* ═══ MODE SWITCHER ═══ */}
         <div style={{ textAlign: "center", marginTop: 14 }}>
-          {loginMode === "magic" && <button onClick={() => { setLoginMode("password"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>{tl("sign_in_password_mode")}</button>}
-          {loginMode === "password" && <button onClick={() => { setLoginMode("magic"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>{tl("sign_in_magic_mode")}</button>}
+          {loginMode === "magic" && <button onClick={() => { setLoginMode("password"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>{tl("sign_in_password_mode")}</button>}
+          {loginMode === "password" && <button onClick={() => { setLoginMode("magic"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>{tl("sign_in_magic_mode")}</button>}
           {loginMode === "forgot" && <button onClick={() => { setLoginMode("password"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>}
         </div>
 
@@ -132,17 +132,17 @@ export default function LoginScreen({
       {/* Trust badges */}
       <div style={{ display: "flex", gap: 16, marginTop: 28, position: "relative", zIndex: 1 }}>
         {[{ icon: "🔒", key: "trust_e2e" }, { icon: "🛡", key: "trust_hipaa" }, { icon: "⏱", key: "trust_uptime" }].map((b, i) =>
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", fontSize: 12, color: "rgba(167,177,195,0.5)", fontWeight: 600 }}><span style={{ fontSize: 13 }}>{b.icon}</span>{(T[loginLang] || T.en)[b.key]}</div>
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", fontSize: 12, color: "rgba(167,177,195,0.7)", fontWeight: 600 }}><span style={{ fontSize: 13 }}>{b.icon}</span>{(T[loginLang] || T.en)[b.key]}</div>
         )}
       </div>
       {/* Footer */}
       <div style={{ marginTop: 24, display: "flex", gap: 16, position: "relative", zIndex: 1 }}>
         {[{ key: "footer_privacy", fb: "Privacy" }, { key: "footer_terms", fb: "Terms" }, { key: "footer_imprint", fb: "Imprint" }].map((l, i) =>
-          <span key={i} style={{ fontSize: 12, color: "rgba(167,177,195,0.35)", cursor: "pointer", fontWeight: 500 }} onMouseEnter={e => e.currentTarget.style.color = "rgba(167,177,195,0.6)"} onMouseLeave={e => e.currentTarget.style.color = "rgba(167,177,195,0.35)"}>{(T[loginLang] || T.en)[l.key] || l.fb}</span>
+          <span key={i} style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", cursor: "pointer", fontWeight: 500 }} onMouseEnter={e => e.currentTarget.style.color = "rgba(167,177,195,0.6)"} onMouseLeave={e => e.currentTarget.style.color = "rgba(167,177,195,0.75)"}>{(T[loginLang] || T.en)[l.key] || l.fb}</span>
         )}
       </div>
-      <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.25)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix GmbH</div>
-      <div style={{ marginTop: 12, fontSize: 12, color: "rgba(167,177,195,0.2)", position: "relative", zIndex: 1, textAlign: "center", maxWidth: 400 }}>{tl("accounts_created")} <a href="https://flowmatix.io" style={{ color: "rgba(76,201,255,0.4)" }}>flowmatix.io</a></div>
+      <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.65)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix GmbH</div>
+      <div style={{ marginTop: 12, fontSize: 12, color: "rgba(167,177,195,0.6)", position: "relative", zIndex: 1, textAlign: "center", maxWidth: 400 }}>{tl("accounts_created")} <a href="https://flowmatix.io" style={{ color: "rgba(76,201,255,0.4)" }}>flowmatix.io</a></div>
     </div>
   );
 }

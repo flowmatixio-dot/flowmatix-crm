@@ -16,7 +16,7 @@ const S = {
     padding: "16px 0", position: "sticky", top: 80, alignSelf: "flex-start",
   },
   sidebarLabel: {
-    fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.35)",
+    fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)",
     textTransform: "uppercase", letterSpacing: 1.2, padding: "12px 20px 6px",
   },
   sidebarItem: (active) => ({
@@ -33,7 +33,7 @@ const S = {
     fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 4,
   },
   sectionDesc: {
-    fontSize: 13, color: "rgba(167,177,195,0.5)", marginBottom: 24,
+    fontSize: 13, color: "rgba(167,177,195,0.7)", marginBottom: 24,
   },
   card: {
     background: "#162032", borderRadius: 12, padding: 24, marginBottom: 16,
@@ -47,7 +47,7 @@ const S = {
     padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)",
   },
   fieldLabel: { fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.85)" },
-  fieldDesc: { fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 2 },
+  fieldDesc: { fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 },
   input: {
     width: 280, padding: "9px 14px", borderRadius: 10,
     background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
@@ -115,7 +115,7 @@ function SettingsDropdown({ label, desc, value, onChange, options }) {
             </option>
           ))}
         </select>
-        <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "rgba(167,177,195,0.4)", fontSize: 10, pointerEvents: "none" }}>▼</span>
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "rgba(167,177,195,0.6)", fontSize: 10, pointerEvents: "none" }}>▼</span>
       </div>
     </div>
   );

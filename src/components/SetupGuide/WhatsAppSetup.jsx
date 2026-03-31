@@ -182,7 +182,7 @@ export default function WhatsAppSetup() {
         {completedSteps}/{META_STEPS.length} {lang === "tr" ? "Adim" : lang === "en" ? "Steps" : "Schritte"}
       </span>
     </div>
-    <p style={{ fontSize: 14, color: "rgba(167,177,195,0.5)", margin: "0 0 20px" }}>
+    <p style={{ fontSize: 14, color: "rgba(167,177,195,0.7)", margin: "0 0 20px" }}>
       {t("wa_setup_desc") || "Schritt-fuer-Schritt Anleitung um WhatsApp Business API mit deiner Praxis zu verbinden."}
     </p>
 
@@ -191,7 +191,7 @@ export default function WhatsAppSetup() {
       <span style={{ fontSize: 24 }}>✅</span>
       <div>
         <div style={{ fontWeight: 800, fontSize: 15, color: "#10b981" }}>{t("wa_already_connected") || "WhatsApp ist bereits verbunden"}</div>
-        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>
+        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>
           {clinic?.display_name && <span>{clinic.display_name} · </span>}
           {clinic?.phone || ""} · {t("wa_quality") || "Qualitaet"}: {clinic?.quality_rating || "GREEN"}
         </div>
@@ -205,7 +205,7 @@ export default function WhatsAppSetup() {
 
     {/* Phone number request — country code selection */}
     <div style={{ padding: 16, borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 8 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 8 }}>{t("wa_clinic_number") || "WhatsApp-Nummer fuer deine Praxis"}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("wa_clinic_number") || "WhatsApp-Nummer fuer deine Praxis"}</div>
       {isAlreadyConnected ? (
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ flex: 1, padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", color: "#10b981", fontSize: 15, fontWeight: 700 }}>
@@ -217,7 +217,7 @@ export default function WhatsAppSetup() {
           <span style={{ fontSize: 18 }}>✅</span>
           <div>
             <div style={{ fontWeight: 700, color: "#10b981", fontSize: 14 }}>{lang === "tr" ? "Atanan Numara" : lang === "en" ? "Assigned Number" : "Zugewiesene Nummer"}: {clinic.assignedPhoneNumber}</div>
-            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>{lang === "tr" ? "Ozel WhatsApp numaraniz hazir." : lang === "en" ? "Your dedicated WhatsApp number is ready." : "Deine dedizierte WhatsApp-Nummer ist bereit."}</div>
+            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{lang === "tr" ? "Ozel WhatsApp numaraniz hazir." : lang === "en" ? "Your dedicated WhatsApp number is ready." : "Deine dedizierte WhatsApp-Nummer ist bereit."}</div>
           </div>
         </div>
       ) : clinic?.numberRequestStatus === "pending" ? (
@@ -225,7 +225,7 @@ export default function WhatsAppSetup() {
           <span style={{ fontSize: 18 }}>⏳</span>
           <div>
             <div style={{ fontWeight: 700, color: "#ff8a2a", fontSize: 14 }}>{lang === "tr" ? "Numara hazirlaniyor" : lang === "en" ? "Number being provisioned" : "Nummer wird bereitgestellt"} ({clinic?.requestedCountryCode})</div>
-            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>{lang === "tr" ? "Flowmatix numaranizi organize ediyor. Aktif olunca bilgilendirileceksiniz." : lang === "en" ? "Flowmatix is organizing your number. You will be notified once it is active." : "Flowmatix organisiert deine Nummer. Du wirst benachrichtigt sobald sie aktiv ist."}</div>
+            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{lang === "tr" ? "Flowmatix numaranizi organize ediyor. Aktif olunca bilgilendirileceksiniz." : lang === "en" ? "Flowmatix is organizing your number. You will be notified once it is active." : "Flowmatix organisiert deine Nummer. Du wirst benachrichtigt sobald sie aktiv ist."}</div>
           </div>
         </div>
       ) : (
@@ -289,7 +289,7 @@ export default function WhatsAppSetup() {
     {!isAlreadyConnected && <div style={{ padding: 16, borderRadius: 14, background: "rgba(167,134,255,0.04)", border: "1px solid rgba(167,134,255,0.12)", marginBottom: 20 }}>
       <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8 }}>{t("wa_already_have_meta") || "Haben Sie bereits ein Meta Business Konto?"}</div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <button onClick={() => skipTo(0)} style={{ padding: "7px 14px", borderRadius: 8, background: completedSteps === 0 ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${completedSteps === 0 ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.1)"}`, color: "rgba(232,238,252,0.8)", fontWeight: completedSteps === 0 ? 700 : 500, fontSize: 11, cursor: "pointer", fontFamily: "inherit" }}>
+        <button onClick={() => skipTo(0)} style={{ padding: "7px 14px", borderRadius: 8, background: completedSteps === 0 ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${completedSteps === 0 ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.1)"}`, color: "rgba(232,238,252,0.95)", fontWeight: completedSteps === 0 ? 700 : 500, fontSize: 11, cursor: "pointer", fontFamily: "inherit" }}>
           {t("wa_no_start_fresh") || "Nein — von vorne starten"}
         </button>
         <button onClick={() => skipTo(1)} style={{ padding: "7px 14px", borderRadius: 8, background: waSetup.meta_account_created && !waSetup.meta_verified ? "rgba(76,201,255,0.15)" : "rgba(76,201,255,0.05)", border: `1px solid rgba(76,201,255,0.15)`, color: "#4cc9ff", fontWeight: waSetup.meta_account_created && !waSetup.meta_verified ? 700 : 500, fontSize: 11, cursor: "pointer", fontFamily: "inherit" }}>
@@ -328,19 +328,19 @@ export default function WhatsAppSetup() {
             width: 32, height: 32, borderRadius: 10,
             background: isDone ? "#10b981" : isActive ? "#4cc9ff" : "rgba(255,255,255,0.06)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 14, fontWeight: 800, color: (isDone || isActive) ? "#fff" : "rgba(167,177,195,0.5)",
+            fontSize: 14, fontWeight: 800, color: (isDone || isActive) ? "#fff" : "rgba(167,177,195,0.7)",
           }}>
             {isDone ? "✓" : step.num}
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 14, color: isDone ? "#10b981" : "rgba(232,238,252,0.88)" }}>{title}</div>
-            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 }}>
               {step.time}
               {isFlowmatixStep && !isDone && <span style={{ marginLeft: 8, color: "#4cc9ff", fontWeight: 600 }}>— Flowmatix</span>}
             </div>
           </div>
           {isDone && <span style={{ fontSize: 11, fontWeight: 700, color: "#10b981", padding: "3px 10px", borderRadius: 6, background: "rgba(16,185,129,0.08)" }}>{t("done") || "Erledigt"}</span>}
-          {!isDone && !isLocked && !isAlreadyConnected && <span style={{ fontSize: 16, color: "rgba(167,177,195,0.3)" }}>{isActive ? "▲" : "▼"}</span>}
+          {!isDone && !isLocked && !isAlreadyConnected && <span style={{ fontSize: 16, color: "rgba(167,177,195,0.7)" }}>{isActive ? "▲" : "▼"}</span>}
         </div>
 
         {isActive && !isLocked && <div style={{
@@ -364,7 +364,7 @@ export default function WhatsAppSetup() {
                 color: inst.bold ? "rgba(232,238,252,0.88)" : "rgba(167,177,195,0.7)",
                 fontFamily: inst.mono ? "monospace" : "inherit",
               }}>
-                {inst.num && <span style={{ color: "rgba(167,177,195,0.4)", fontWeight: 600, fontSize: 12, minWidth: 24, flexShrink: 0 }}>{inst.num}</span>}
+                {inst.num && <span style={{ color: "rgba(167,177,195,0.6)", fontWeight: 600, fontSize: 12, minWidth: 24, flexShrink: 0 }}>{inst.num}</span>}
                 <span>
                   {inst.link
                     ? <a href={inst.link} target="_blank" rel="noopener noreferrer" style={{ color: "#4cc9ff", textDecoration: "underline" }}>{displayText}</a>
@@ -380,18 +380,18 @@ export default function WhatsAppSetup() {
           </div>}
 
           {step.hasUpload && <div style={{ padding: 14, borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", marginBottom: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 8 }}>{t("upload_documents") || "Dokumente hochladen (fuer unseren Support)"}</div>
-            <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" onChange={handleUpload} style={{ fontSize: 12, color: "rgba(167,177,195,0.5)" }} />
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("upload_documents") || "Dokumente hochladen (fuer unseren Support)"}</div>
+            <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" onChange={handleUpload} style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }} />
             {(uploads.docs || []).length > 0 && <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 6 }}>
               {uploads.docs.map((f, i) => <span key={i} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", fontSize: 11, color: "#10b981" }}>{f}</span>)}
             </div>}
           </div>}
 
           {step.hasSmsInput && <div style={{ padding: 14, borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", marginBottom: 8 }}>{t("sms_verification_code") || "SMS-Verifizierungscode"}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("sms_verification_code") || "SMS-Verifizierungscode"}</div>
             <div style={{ display: "flex", gap: 10 }}>
               <input value={smsCode} onChange={e => setSmsCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder={lang === "tr" ? "6 haneli kod" : lang === "en" ? "6-digit code" : "6-stelliger Code"} maxLength={6} style={{ width: 160, padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "monospace", fontSize: 20, letterSpacing: 8, textAlign: "center", outline: "none" }} />
-              <button onClick={() => { if (smsCode.length === 6) { showT(t("code_verifying") || "Code wird verifiziert..."); } }} disabled={smsCode.length !== 6} style={{ padding: "10px 20px", borderRadius: 10, background: smsCode.length === 6 ? "linear-gradient(135deg,#10b981,#059669)" : "rgba(255,255,255,0.04)", border: "none", color: smsCode.length === 6 ? "#fff" : "rgba(167,177,195,0.3)", fontWeight: 700, fontSize: 13, cursor: smsCode.length === 6 ? "pointer" : "not-allowed", fontFamily: "inherit" }}>{t("verify") || "Verifizieren"}</button>
+              <button onClick={() => { if (smsCode.length === 6) { showT(t("code_verifying") || "Code wird verifiziert..."); } }} disabled={smsCode.length !== 6} style={{ padding: "10px 20px", borderRadius: 10, background: smsCode.length === 6 ? "linear-gradient(135deg,#10b981,#059669)" : "rgba(255,255,255,0.04)", border: "none", color: smsCode.length === 6 ? "#fff" : "rgba(167,177,195,0.7)", fontWeight: 700, fontSize: 13, cursor: smsCode.length === 6 ? "pointer" : "not-allowed", fontFamily: "inherit" }}>{t("verify") || "Verifizieren"}</button>
             </div>
           </div>}
 
@@ -410,12 +410,12 @@ export default function WhatsAppSetup() {
     {progress === 100 && !isAlreadyConnected && <div style={{ padding: 20, borderRadius: 14, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)", textAlign: "center", marginTop: 12 }}>
       <span style={{ fontSize: 32 }}>✅</span>
       <div style={{ fontWeight: 800, fontSize: 17, color: "#4cc9ff", marginTop: 8 }}>{t("wa_your_part_done") || "Ihr Teil ist erledigt!"}</div>
-      <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", marginTop: 6, maxWidth: 400, margin: "6px auto 0" }}>{t("wa_flowmatix_takes_over") || "Flowmatix uebernimmt jetzt die Nummer-Registrierung und Konfiguration. Sie werden benachrichtigt, sobald WhatsApp aktiv ist."}</div>
+      <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 6, maxWidth: 400, margin: "6px auto 0" }}>{t("wa_flowmatix_takes_over") || "Flowmatix uebernimmt jetzt die Nummer-Registrierung und Konfiguration. Sie werden benachrichtigt, sobald WhatsApp aktiv ist."}</div>
     </div>}
     {isAlreadyConnected && <div style={{ padding: 20, borderRadius: 14, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", textAlign: "center", marginTop: 12 }}>
       <span style={{ fontSize: 32 }}>🎉</span>
       <div style={{ fontWeight: 800, fontSize: 17, color: "#10b981", marginTop: 8 }}>{t("wa_is_live") || "WhatsApp ist live!"}</div>
-      <div style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", marginTop: 6 }}>{t("wa_live_desc") || "Ihr AI-Assistent antwortet jetzt automatisch auf Patientenanfragen."}</div>
+      <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginTop: 6 }}>{t("wa_live_desc") || "Ihr AI-Assistent antwortet jetzt automatisch auf Patientenanfragen."}</div>
     </div>}
   </div>;
 }

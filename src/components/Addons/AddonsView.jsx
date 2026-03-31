@@ -71,13 +71,13 @@ export default function AddonsView() {
     }
   };
 
-  if (loading) return <div style={{ padding: 60, textAlign: "center", color: "rgba(167,177,195,0.5)" }}>{t("loading_subscription")}</div>;
+  if (loading) return <div style={{ padding: 60, textAlign: "center", color: "rgba(167,177,195,0.7)" }}>{t("loading_subscription")}</div>;
 
   if (!sub?.stripe) return (
     <div style={{ padding: 60, textAlign: "center" }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>💳</div>
       <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{t("no_active_subscription")}</div>
-      <p style={{ fontSize: 13, color: "rgba(167,177,195,0.5)", margin: 0 }}>
+      <p style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", margin: 0 }}>
         {t("need_subscription_for_addons")}
       </p>
     </div>
@@ -99,7 +99,7 @@ export default function AddonsView() {
                 <div style={{ fontSize: 28, marginBottom: 8 }}>👥</div>
                 <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 4 }}>{p.cap} {t("patients")}</div>
                 <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)", marginBottom: 14 }}>{t(p.descKey)}</div>
-                <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 14 }}>EUR {p.price} <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.5)" }}>/{t("mth")}</span></div>
+                <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 14 }}>EUR {p.price} <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.7)" }}>/{t("mth")}</span></div>
                 {active ? (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                     <div style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 700, fontSize: 13 }}>✓ {t("active")}</div>
@@ -125,13 +125,13 @@ export default function AddonsView() {
                   <span style={{ fontSize: 28 }}>{a.icon}</span>
                   <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                     {active && <span style={{ padding: "2px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700, background: "rgba(16,185,129,0.12)", color: "#10b981" }}>{t("active")}</span>}
-                    <span style={{ padding: "2px 10px", borderRadius: 8, fontSize: 10, fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)" }}>{t(a.forPlansKey)}</span>
+                    <span style={{ padding: "2px 10px", borderRadius: 8, fontSize: 10, fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)" }}>{t(a.forPlansKey)}</span>
                   </div>
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{t(a.nameKey)}</div>
                 <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)", marginBottom: 14 }}>{t(a.descKey)}</div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontWeight: 800, fontSize: 16 }}>EUR {a.price} <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(167,177,195,0.5)" }}>/{t("mth")}</span></span>
+                  <span style={{ fontWeight: 800, fontSize: 16 }}>EUR {a.price} <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(167,177,195,0.7)" }}>/{t("mth")}</span></span>
                   {active ? (
                     <button disabled={isBusy} onClick={() => handleRemove(a)} style={{ padding: "5px 12px", borderRadius: 8, background: "none", border: "1px solid rgba(239,68,68,0.2)", color: "rgba(239,68,68,0.6)", fontWeight: 600, fontSize: 11, cursor: isBusy ? "wait" : "pointer", fontFamily: "inherit", opacity: isBusy ? 0.5 : 1 }}>{isBusy ? t("removing") : t("remove")}</button>
                   ) : (
@@ -144,7 +144,7 @@ export default function AddonsView() {
         </div>
       </Section>
 
-      <div style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", fontSize: 12, color: "rgba(167,177,195,0.4)" }}>
+      <div style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", fontSize: 12, color: "rgba(167,177,195,0.6)" }}>
         ℹ️ {t("addons_billing_info")}
       </div>
     </div>

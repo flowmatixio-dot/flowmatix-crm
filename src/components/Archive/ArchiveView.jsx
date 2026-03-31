@@ -61,7 +61,7 @@ export default function ArchiveView() {
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px", letterSpacing: "-0.03em", color: "rgba(232,238,252,0.95)" }}>
             {t("archive_title") || "Archiv"}
           </h1>
-          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", margin: 0, fontWeight: 500 }}>
+          <p style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", margin: 0, fontWeight: 500 }}>
             {t("archive_inactive_desc") || "Patienten die seit über 6 Monaten inaktiv sind"}
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function ArchiveView() {
             background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.05)",
             display: "flex", alignItems: "center", gap: 6,
           }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.03em" }}>{t("archived") || "Archiviert"}</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.03em" }}>{t("archived") || "Archiviert"}</span>
             <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(167,177,195,0.6)" }}>{archived.length}</span>
           </div>
         )}
@@ -94,7 +94,7 @@ export default function ArchiveView() {
           onFocus={e => e.target.style.borderColor = "rgba(76,201,255,0.2)"}
           onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.05)"}
         />
-        <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(167,177,195,0.25)" }}>🔍</span>
+        <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(167,177,195,0.65)" }}>🔍</span>
       </div>
 
       {/* Table header (only when there are results) */}
@@ -102,7 +102,7 @@ export default function ArchiveView() {
         <div style={{
           display: "grid", gridTemplateColumns: "2fr 1fr 1fr auto",
           gap: 8, padding: "0 18px", marginBottom: 8,
-          fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.3)",
+          fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.7)",
           textTransform: "uppercase", letterSpacing: "0.05em",
         }}>
           <div>{t("patient") || "Patient"}</div>
@@ -114,14 +114,14 @@ export default function ArchiveView() {
 
       {/* Patient list */}
       {loading ? (
-        <div style={{ padding: 60, textAlign: "center", color: "rgba(167,177,195,0.4)", fontSize: 13 }}>{t("loading") || "Lade..."}</div>
+        <div style={{ padding: 60, textAlign: "center", color: "rgba(167,177,195,0.6)", fontSize: 13 }}>{t("loading") || "Lade..."}</div>
       ) : filtered.length === 0 ? (
         <div style={{ padding: "60px 20px", textAlign: "center", borderRadius: 14, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)" }}>
           <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.4 }}>📦</div>
-          <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(167,177,195,0.45)" }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: "rgba(167,177,195,0.65)" }}>
             {search ? (t("archive_no_patient") || "Kein Patient gefunden") : (t("archive_no_archived") || "Noch keine archivierten Patienten")}
           </div>
-          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.25)", marginTop: 6, maxWidth: 340, margin: "6px auto 0", lineHeight: 1.5 }}>
+          <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", marginTop: 6, maxWidth: 340, margin: "6px auto 0", lineHeight: 1.5 }}>
             {search
               ? `${t("no_results_for") || "Keine Ergebnisse für"} "${search}"`
               : (t("archive_auto_desc") || "Patienten werden automatisch archiviert wenn sie über 6 Monate inaktiv sind. Archivierte Patienten können jederzeit wiederhergestellt werden.")
@@ -159,7 +159,7 @@ export default function ArchiveView() {
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: "rgba(232,238,252,0.85)" }}>{lead.name}</div>
-                    <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", marginTop: 1 }}>
+                    <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", marginTop: 1 }}>
                       {lead.treatment || "—"}{lead.country ? ` · ${translateValue(lead.country)}` : ""}
                     </div>
                   </div>
@@ -167,9 +167,9 @@ export default function ArchiveView() {
 
                 {/* Last Activity */}
                 <div>
-                  <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)" }}>{formatDate(lastActive)}</div>
+                  <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)" }}>{formatDate(lastActive)}</div>
                   {monthsAgo !== null && (
-                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.25)", marginTop: 1 }}>
+                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 1 }}>
                       {monthsAgo} {monthsAgo !== 1 ? (t("months_ago_many") || "Monaten her") : (t("months_ago_one") || "Monat her")}
                     </div>
                   )}
@@ -180,7 +180,7 @@ export default function ArchiveView() {
                   <span style={{
                     fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
                     background: lead.stage === "done" ? "rgba(16,185,129,0.08)" : "rgba(167,177,195,0.06)",
-                    color: lead.stage === "done" ? "rgba(16,185,129,0.6)" : "rgba(167,177,195,0.35)",
+                    color: lead.stage === "done" ? "rgba(16,185,129,0.6)" : "rgba(167,177,195,0.75)",
                   }}>
                     {lead.stage === "done" ? (t("archive_completed") || "Abgeschlossen") : (t("archived") || "Archiviert")}
                   </span>
@@ -211,7 +211,7 @@ export default function ArchiveView() {
 
       {/* Footer info */}
       {archived.length > 0 && (
-        <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,255,255,0.01)", fontSize: 11, color: "rgba(167,177,195,0.2)" }}>
+        <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,255,255,0.01)", fontSize: 11, color: "rgba(167,177,195,0.6)" }}>
           {t("archive_footer_desc") || "Patienten werden nach 6 Monaten Inaktivität automatisch archiviert. Wiederhergestellte Patienten erscheinen als neue Anfrage in der Pipeline."}
         </div>
       )}

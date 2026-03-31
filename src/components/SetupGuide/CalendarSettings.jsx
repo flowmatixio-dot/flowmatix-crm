@@ -65,7 +65,7 @@ export default function CalendarSettings({ clinic, updateClinic, showT, t, wizar
 
     {/* Booking rules */}
     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>{t("booking_rules") || "Buchungsregeln"}</div>
-    {wizardMode && <div style={{ fontSize: 12, color: "rgba(167,177,195,0.45)", marginBottom: 12, lineHeight: 1.5 }}>
+    {wizardMode && <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", marginBottom: 12, lineHeight: 1.5 }}>
       {{ de: "Der KI-Bot nutzt diese Regeln um Patienten nur passende Termine vorzuschlagen. Mindestvorlauf = wie viele Stunden vorher ein Termin frühestens gebucht werden kann. Zeitfenster = Dauer pro Termin-Slot.", en: "The AI bot uses these rules to suggest suitable appointments to patients. Minimum notice = how many hours in advance an appointment can be booked. Slot duration = length per appointment slot.", tr: "Yapay zeka botu bu kuralları kullanarak hastalara uygun randevular önerir. Minimum önceden bildirim = randevunun en erken kaç saat önce alınabileceği. Zaman aralığı = randevu başına süre." }[localStorage.getItem("fm_lang") || "de"] || "The AI bot uses these rules to suggest suitable appointments to patients."}
     </div>}
     <Field label={t("min_notice") || "Mindestvorlauf (Stunden)"} value={rules.minNoticeHours || 24} onChange={v => updateClinic({ aiConfig: { ...clinic.aiConfig, bookingRules: { ...rules, minNoticeHours: parseInt(v) || 24 } } })} type="number" />

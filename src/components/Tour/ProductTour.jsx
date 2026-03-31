@@ -116,13 +116,13 @@ export default function ProductTour() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <button onClick={finish} style={{
           padding: "6px 14px", borderRadius: 8, background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.5)",
+          border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)",
           fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit"
         }}>{t("tour_skip")}</button>
         <div style={{ display: "flex", gap: 8 }}>
           {tourStep > 0 && <button onClick={goBack} style={{
             padding: "8px 16px", borderRadius: 8, background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.1)", color: "rgba(232,238,252,0.7)",
+            border: "1px solid rgba(255,255,255,0.1)", color: "rgba(232,238,252,0.9)",
             fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit"
           }}>{t("tour_back")}</button>}
           <button onClick={goNext} style={{

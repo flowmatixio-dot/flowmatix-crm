@@ -155,7 +155,7 @@ export default function FilesView() {
           <div style={{ fontWeight: 700, fontSize: 13, color: driveStatus.connected && driveStatus.hasDriveScope ? "#10b981" : "#ff8a2a" }}>
             {driveStatus.connected && driveStatus.hasDriveScope ? (t("drive_connected") || "Google Drive verbunden") : (t("drive_connect_prompt") || "Google Drive verbinden")}
           </div>
-          {driveStatus.connected && driveStatus.hasDriveScope && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 2 }}>{driveStatus.fileCount} {t("files_synced") || "synchronisiert"}</div>}
+          {driveStatus.connected && driveStatus.hasDriveScope && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.7)", marginTop: 2 }}>{driveStatus.fileCount} {t("files_synced") || "synchronisiert"}</div>}
         </div>
         {driveStatus.connected && driveStatus.hasDriveScope && driveStatus.folderId && <a href={`https://drive.google.com/drive/folders/${driveStatus.folderId}`} target="_blank" rel="noopener noreferrer" style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(76,201,255,0.08)", border: "1px solid rgba(76,201,255,0.15)", color: "#4cc9ff", fontWeight: 700, fontSize: 11, cursor: "pointer", fontFamily: "inherit", textDecoration: "none" }}>{t("open_in_drive") || "In Drive öffnen"}</a>}
       </div>}
@@ -178,7 +178,7 @@ export default function FilesView() {
       </div>
 
       {/* File table header */}
-      <div style={{ display: "grid", gridTemplateColumns: "3fr 1.4fr 0.8fr 0.6fr auto", gap: 8, marginBottom: 8, fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", padding: "0 16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "3fr 1.4fr 0.8fr 0.6fr auto", gap: 8, marginBottom: 8, fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", padding: "0 16px" }}>
         <div>{t("file_col") || "Datei"}</div><div>{t("patient_col") || "Patient"}</div><div>{t("category_col") || "Kategorie"}</div><div>{t("size_col") || "Größe"}</div><div>{t("actions_col") || "Aktionen"}</div>
       </div>
 
@@ -209,7 +209,7 @@ export default function FilesView() {
             )}
             <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13 }}>{f.name}</div>
-              <div style={{ fontSize: 10, color: "rgba(167,177,195,0.35)" }}>{timeAgo(f.uploaded)}{f.source === "whatsapp" ? " · WhatsApp" : ""}</div>
+              <div style={{ fontSize: 10, color: "rgba(167,177,195,0.75)" }}>{timeAgo(f.uploaded)}{f.source === "whatsapp" ? " · WhatsApp" : ""}</div>
             </div>
           </div>
 
@@ -218,10 +218,10 @@ export default function FilesView() {
             {pd.name ? (
               <div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.75)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pd.name}</div>
-                {pd.phone && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>{pd.phone}</div>}
+                {pd.phone && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{pd.phone}</div>}
               </div>
             ) : (
-              <span style={{ fontSize: 11, color: "rgba(167,177,195,0.25)", fontStyle: "italic" }}>{t("no_patient_assigned") || "Kein Patient zugewiesen"}</span>
+              <span style={{ fontSize: 11, color: "rgba(167,177,195,0.65)", fontStyle: "italic" }}>{t("no_patient_assigned") || "Kein Patient zugewiesen"}</span>
             )}
           </div>
 
@@ -237,7 +237,7 @@ export default function FilesView() {
           </div>
 
           {/* Size */}
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{f.size}</div>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{f.size}</div>
 
           {/* Actions */}
           <div style={{ display: "flex", gap: 3 }} onClick={e => e.stopPropagation()}>
@@ -252,7 +252,7 @@ export default function FilesView() {
             )}
             <button onClick={() => shareFile(f)} title={t("copy_link") || "Link kopieren"} style={{
               padding: "4px 6px", borderRadius: 5, background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.45)", fontSize: 10,
+              border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.65)", fontSize: 10,
               cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center",
             }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
@@ -270,11 +270,11 @@ export default function FilesView() {
 
       {/* Empty state */}
       {filtered.length === 0 && (
-        <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(167,177,195,0.3)" }}>
+        <div style={{ textAlign: "center", padding: "50px 20px", color: "rgba(167,177,195,0.7)" }}>
           <div style={{ fontSize: 14, fontWeight: 600 }}>
             {catFilter === "all" ? (t("no_files_yet") || "Noch keine Dateien vorhanden") : `${t("no_files") || "Keine"} ${FILE_CATEGORIES[catFilter]?.label || (t("files") || "Dateien")} ${t("no_files_in_category") || "in dieser Kategorie"}`}
           </div>
-          <div style={{ fontSize: 12, marginTop: 4, color: "rgba(167,177,195,0.2)" }}>
+          <div style={{ fontSize: 12, marginTop: 4, color: "rgba(167,177,195,0.6)" }}>
             {t("files_auto_added") || "Dateien werden automatisch hinzugefügt wenn Patienten Fotos oder Dokumente senden"}
           </div>
         </div>
@@ -296,8 +296,8 @@ export default function FilesView() {
     {/* Preview Panel */}
     {selFile && <div style={{ width: 340, flexShrink: 0, padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", alignSelf: "flex-start", position: "sticky", top: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.4)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("preview_label") || "Vorschau"}</span>
-        <button onClick={() => setSelFile(null)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.5)", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("preview_label") || "Vorschau"}</span>
+        <button onClick={() => setSelFile(null)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)", width: 24, height: 24, borderRadius: 6, cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
       </div>
 
       {/* Preview area */}
@@ -308,23 +308,23 @@ export default function FilesView() {
             ? <div style={{ fontSize: 60 + zoom * 20, transition: "font-size .2s", userSelect: "none" }}>📷</div>
             : <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 48, marginBottom: 8 }}>📄</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)" }}>{t("pdf_document") || "PDF / Dokument"}</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)" }}>{t("pdf_document") || "PDF / Dokument"}</div>
               </div>}
       </div>
 
       {/* Metadata */}
       <div style={{ display: "grid", gap: 10, fontSize: 13 }}>
         <div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("filename_label") || "Dateiname"}</div>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("filename_label") || "Dateiname"}</div>
           <div style={{ fontWeight: 600, wordBreak: "break-all", fontSize: 12 }}>{selFile.name}</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <div>
-            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("size_label") || "Größe"}</div>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("size_label") || "Größe"}</div>
             <div style={{ fontSize: 12 }}>{selFile.size}</div>
           </div>
           <div>
-            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("category_col") || "Kategorie"}</div>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("category_col") || "Kategorie"}</div>
             <div style={{ fontSize: 12 }}>
               {FILE_CATEGORIES[selFile.category] ? (
                 <span style={{ color: CAT_COLORS[selFile.category] || "#4cc9ff" }}>
@@ -335,25 +335,25 @@ export default function FilesView() {
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Patient</div>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Patient</div>
           {(() => {
             const pd = getPatientDisplay(selFile, leads);
             return pd.name ? (
               <div>
                 <div style={{ fontSize: 12, fontWeight: 600 }}>{pd.name}</div>
-                {pd.phone && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.35)" }}>{pd.phone}</div>}
+                {pd.phone && <div style={{ fontSize: 10, color: "rgba(167,177,195,0.75)" }}>{pd.phone}</div>}
               </div>
             ) : (
-              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.25)", fontStyle: "italic" }}>{t("no_patient_assigned") || "Kein Patient zugewiesen"}</div>
+              <div style={{ fontSize: 12, color: "rgba(167,177,195,0.65)", fontStyle: "italic" }}>{t("no_patient_assigned") || "Kein Patient zugewiesen"}</div>
             );
           })()}
         </div>
         {selFile.source && <div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("source_label") || "Quelle"}</div>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("source_label") || "Quelle"}</div>
           <div style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>{selFile.source === "whatsapp" ? "💬 WhatsApp" : `📤 ${t("source_manual") || "Manuell"}`}</div>
         </div>}
         <div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.35)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("uploaded_label") || "Hochgeladen"}</div>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.75)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>{t("uploaded_label") || "Hochgeladen"}</div>
           <div style={{ fontSize: 12 }}>{timeAgo(selFile.uploaded)}</div>
         </div>
       </div>

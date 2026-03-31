@@ -194,7 +194,7 @@ export default function DashboardView() {
       {/* ── Greeting ── */}
       <div style={{ marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
-          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.4)", marginBottom: 4 }}>{gr}</div>
+          <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{gr}</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, color: "#fff" }}>
             {t("welcome_back") || "Willkommen zurück"}, {un}
           </h1>
@@ -215,7 +215,7 @@ export default function DashboardView() {
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
-        <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.55)",fontSize:11,display:"flex",alignItems:"flex-start",gap:8,marginBottom:16,lineHeight:1.6}}>{"ℹ️"} {t("hint_first_steps")}</div>
+        <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"flex-start",gap:8,marginBottom:16,lineHeight:1.6}}>{"ℹ️"} {t("hint_first_steps")}</div>
       )}
 
       {/* ── Status Banner ── */}
@@ -225,7 +225,7 @@ export default function DashboardView() {
             <div style={{ width: 8, height: 8, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite" }} />
             <div>
               <div style={{ fontWeight: 700, fontSize: 14, color: "#10b981" }}>{T("Everything runs automatically", "Alles läuft automatisch", "Her şey otomatik çalışıyor")}</div>
-              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 2 }}>{T("No action required", "Keine Aktion erforderlich", "İşlem gerekmiyor")}</div>
+              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 }}>{T("No action required", "Keine Aktion erforderlich", "İşlem gerekmiyor")}</div>
             </div>
           </div>
           <span style={{ padding: "4px 12px", borderRadius: 8, fontSize: 11, fontWeight: 800, background: "rgba(16,185,129,0.15)", color: "#10b981", letterSpacing: "0.05em" }}>LIVE</span>
@@ -239,7 +239,7 @@ export default function DashboardView() {
               <div style={{ width: 8, height: 8, borderRadius: 99, background: "#fbbf24" }} />
               <div style={{ fontWeight: 700, fontSize: 14, color: "#fbbf24" }}>{T("Almost ready", "Fast fertig", "Neredeyse hazır")}</div>
             </div>
-            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", marginTop: 4 }}>{T("Connect Google Drive to automatically save patient files, photos, and patient cards as PDF to organized folders.", "Verbinde Google Drive um Patientenakten, Fotos und Patientenkarten als PDF automatisch in organisierten Ordnern zu speichern.", "Hasta dosyalarini, fotograflari ve hasta kartlarini PDF olarak otomatik kaydetmek icin Google Drive'i baglayin.")}</div>
+            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 4 }}>{T("Connect Google Drive to automatically save patient files, photos, and patient cards as PDF to organized folders.", "Verbinde Google Drive um Patientenakten, Fotos und Patientenkarten als PDF automatisch in organisierten Ordnern zu speichern.", "Hasta dosyalarini, fotograflari ve hasta kartlarini PDF olarak otomatik kaydetmek icin Google Drive'i baglayin.")}</div>
           </div>
           <button onClick={() => { window.location.href = "/settings#integrations"; }} style={{ padding: "8px 18px", borderRadius: 10, background: "#fbbf24", border: "none", color: "#000", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>{T("Connect now", "Jetzt verbinden", "Şimdi bağla")}</button>
         </div>
@@ -251,7 +251,7 @@ export default function DashboardView() {
             <div style={{ width: 10, height: 10, borderRadius: 99, background: "#ef4444", animation: "fmDotPulse 2s ease-in-out infinite" }} />
             <span style={{ fontSize: 14 }}>⚡</span>
             <span style={{ fontWeight: 700, fontSize: 14, color: "#10b981" }}>{T("System running", "System läuft", "Sistem çalışıyor")}</span>
-            <span style={{ color: "rgba(167,177,195,0.3)" }}>·</span>
+            <span style={{ color: "rgba(167,177,195,0.7)" }}>·</span>
             <span style={{ fontWeight: 700, fontSize: 14 }}>{crT} {T("actions required", "Aktionen erforderlich", "işlem gerekli")}</span>
           </div>
           {crG.map((c) => (
@@ -260,7 +260,7 @@ export default function DashboardView() {
                 <span style={{ fontSize: 16 }}>{c.icon}</span>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 13 }}>{c.label}</div>
-                  {c.desc && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 2 }}>{c.desc}</div>}
+                  {c.desc && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 }}>{c.desc}</div>}
                 </div>
               </div>
               <span onClick={() => setView("action_needed")} style={{ color: "#ef4444", cursor: "pointer", fontSize: 16 }}>→</span>
@@ -281,7 +281,7 @@ export default function DashboardView() {
               <span>{c.icon}</span>
               <div>
                 <div style={{ fontWeight: 600 }}>{c.label}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.35)", fontStyle: "italic", marginTop: 2 }}>{c.auto} →</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.75)", fontStyle: "italic", marginTop: 2 }}>{c.auto} →</div>
               </div>
             </div>
           ))}
@@ -298,7 +298,7 @@ export default function DashboardView() {
         ].map((s, i) => (
           <div key={i} style={statStyle(s.c)}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.c }}>{s.v}</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.35)", letterSpacing: "0.05em", marginTop: 4 }}>{s.l}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)", letterSpacing: "0.05em", marginTop: 4 }}>{s.l}</div>
           </div>
         ))}
       </div>
@@ -319,12 +319,12 @@ export default function DashboardView() {
 
       {/* ── Automation Badges ── */}
       <div style={{ padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.04)", marginBottom: 20 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.25)", letterSpacing: "0.06em", marginBottom: 10, display: "flex", alignItems: "center", gap: 4 }}>⚙️ {T("AUTOMATION", "AUTOMATISIERUNG", "OTOMASYON")}</div>
+        <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.65)", letterSpacing: "0.06em", marginBottom: 10, display: "flex", alignItems: "center", gap: 4 }}>⚙️ {T("AUTOMATION", "AUTOMATISIERUNG", "OTOMASYON")}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {systems.map((s, i) => (
             <div key={i} style={{ padding: "8px 16px", borderRadius: 10, background: s.ok ? "rgba(16,185,129,0.04)" : "rgba(239,68,68,0.04)", border: `1px solid ${s.ok ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)"}`, display: "flex", alignItems: "center", gap: 8, minWidth: 140 }}>
               <div style={{ width: 6, height: 6, borderRadius: 99, background: s.ok ? "#10b981" : "#ef4444", ...(s.ok ? { animation: "fmPulseGreen 2s infinite" } : {}) }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: s.ok ? "rgba(232,238,252,0.7)" : "#ef4444" }}>{s.l}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: s.ok ? "rgba(232,238,252,0.9)" : "#ef4444" }}>{s.l}</span>
             </div>
           ))}
         </div>
@@ -341,14 +341,14 @@ export default function DashboardView() {
             <div onClick={() => setView("appointments")} style={{ fontSize: 11, color: "#4cc9ff", cursor: "pointer", fontWeight: 600 }}>{T("Calendar", "Kalender", "Takvim")} →</div>
           </div>
           {tl.length === 0 ? (
-            <div style={{ fontSize: 13, color: "rgba(167,177,195,0.3)", padding: "20px 0", textAlign: "center" }}>{T("No appointments today", "Keine Termine heute", "Bugün randevu yok")}</div>
+            <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", padding: "20px 0", textAlign: "center" }}>{T("No appointments today", "Keine Termine heute", "Bugün randevu yok")}</div>
           ) : (
             tl.map((ev, i) => (
               <div key={i} onClick={() => ev.pid && openPatient(ev.pid)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < tl.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", cursor: ev.pid ? "pointer" : "default" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: ev.cl, minWidth: 42 }}>{ev.tm}</div>
                 <span style={{ fontSize: 13 }}>{ev.ic}</span>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{ev.tp}</div>
-                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.5)", marginLeft: "auto" }}>{ev.nm}</div>
+                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginLeft: "auto" }}>{ev.nm}</div>
               </div>
             ))
           )}
@@ -358,14 +358,14 @@ export default function DashboardView() {
         <div style={card}>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}>🏥 {T("UPCOMING OPS", "NÄCHSTE OPS", "YAKLAŞAN OP'LER")}</div>
           {uo.length === 0 ? (
-            <div style={{ fontSize: 13, color: "rgba(167,177,195,0.3)", padding: "20px 0", textAlign: "center" }}>{T("No upcoming operations", "Keine anstehenden OPs", "Yaklaşan operasyon yok")}</div>
+            <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", padding: "20px 0", textAlign: "center" }}>{T("No upcoming operations", "Keine anstehenden OPs", "Yaklaşan operasyon yok")}</div>
           ) : (
             uo.map((op, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < uo.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                 <div style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981" }} />
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.5)", minWidth: 38 }}>{op.dt}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", minWidth: 38 }}>{op.dt}</div>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{op.nm}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)", marginLeft: "auto" }}>{op.tx} · {op.gf}g · {op.dc}</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginLeft: "auto" }}>{op.tx} · {op.gf}g · {op.dc}</div>
               </div>
             ))
           )}
@@ -380,15 +380,15 @@ export default function DashboardView() {
             {ar.map((p) => (
               <div key={p.id} onClick={() => openPatient(p.id)} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
                 <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{p.nm}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{p.ft}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.4)" }}>{p.dt}</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{p.ft}</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{p.dt}</div>
                 <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
                   {p.drv ? (
-                    <><span style={{ color: "#10b981" }}>✓</span> <span style={{ color: "rgba(167,177,195,0.5)" }}>{p.drv.split(" ")[0]}</span></>
+                    <><span style={{ color: "#10b981" }}>✓</span> <span style={{ color: "rgba(167,177,195,0.7)" }}>{p.drv.split(" ")[0]}</span></>
                   ) : p.drvStatus === "all_declined" ? (
                     <span style={{ color: "#ef4444" }}>✕ {T("All declined", "Alle abgelehnt", "Tümü reddetti")}</span>
                   ) : (
-                    <span style={{ color: "rgba(167,177,195,0.3)" }}>⏳ {T("Pending", "Ausstehend", "Beklemede")}</span>
+                    <span style={{ color: "rgba(167,177,195,0.7)" }}>⏳ {T("Pending", "Ausstehend", "Beklemede")}</span>
                   )}
                 </div>
               </div>
