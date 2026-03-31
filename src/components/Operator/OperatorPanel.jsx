@@ -232,7 +232,7 @@ function TabDashboard({ d }) {
   const h = d.health;
   const st = d.platformStats;
   return (
-    <>
+    <><style>{`[id*="fm-analytics"] div, [id*="fm-analytics"] span, .fm-analytics-wrap div, .fm-analytics-wrap span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .fm-analytics-wrap { max-width: 100%; overflow: hidden; }`}</style>
       <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Plattformübersicht</h2>
       <div style={S.grid4}>
         <div style={S.card}>
@@ -1392,9 +1392,9 @@ function TabMonitoring({ d }) {
   if (!infra) return <Spin />;
   if (infra.error) return <div style={S.card}><div style={{ color: S.red }}>Infrastrukturdaten konnten nicht geladen werden: {infra.error}</div></div>;
 
-  const cpuPct = infra.cpu?.usagePercent ?? 0;
-  const memPct = infra.memory?.usagePercent ?? 0;
-  const diskPct = infra.disk?.usagePercent ?? 0;
+  const cpuPct = Number(infra.cpu?.usagePercent) || 0;
+  const memPct = Number(infra.memory?.usagePercent) || 0;
+  const diskPct = Number(infra.disk?.usagePercent) || 0;
 
   return (
     <>
@@ -1406,7 +1406,7 @@ function TabMonitoring({ d }) {
           <div style={S.kpiLabel}>CPU-Auslastung</div>
           <div style={{ ...S.kpi, color: pctColor(cpuPct) }}>{cpuPct.toFixed(1)}%</div>
           <ProgressBar pct={cpuPct} />
-          {infra.load && <div style={{ fontSize: 11, color: '#8888aa', marginTop: 4 }}>Load: {infra.load.load1?.toFixed(2)} / {infra.load.load5?.toFixed(2)} / {infra.load.load15?.toFixed(2)}</div>}
+          {infra.load && <div style={{ fontSize: 11, color: '#8888aa', marginTop: 4 }}>Load: {Number(infra.load.load1||0).toFixed(2)} / {Number(infra.load.load5||0).toFixed(2)} / {Number(infra.load.load15||0).toFixed(2)}</div>}
         </div>
         <div style={S.card}>
           <div style={S.kpiLabel}>Speicher</div>
@@ -1426,7 +1426,7 @@ function TabMonitoring({ d }) {
           <div style={S.kpiLabel}>System</div>
           <div style={{ fontSize: 13, color: '#ccc', lineHeight: 2 }}>
             <div>Betriebszeit: <b style={{ color: '#fff' }}>{fmtSec(infra.uptimeSeconds || 0)}</b></div>
-            <div>Load 1m/5m/15m: <b style={{ color: '#fff' }}>{infra.load?.load1?.toFixed(2)} / {infra.load?.load5?.toFixed(2)} / {infra.load?.load15?.toFixed(2)}</b></div>
+            <div>Load 1m/5m/15m: <b style={{ color: '#fff' }}>{Number(infra.load?.load1||0).toFixed(2)} / {Number(infra.load?.load5||0).toFixed(2)} / {Number(infra.load?.load15||0).toFixed(2)}</b></div>
           </div>
         </div>
         <div style={S.card}>
@@ -1450,9 +1450,9 @@ function TabMonitoring({ d }) {
             <tbody>
               {containers.containers.map((c, i) => (
                 <tr key={i}>
-                  <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.job || c.name}</span><br /><span style={{ fontSize: 11, color: '#555' }}>{c.instance}</span></td>
+                  <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{String(c.job || c.name || '?')}</span><br /><span style={{ fontSize: 11, color: '#555' }}>{String(c.instance || '')}</span></td>
                   <td style={S.td}>{statusBadge(c.status === 'up' || c.status === '1' || c.status === 1 ? 'up' : 'down')}</td>
-                  <td style={S.td}>{c.memory ? fmtBytes(c.memory) : '-'}</td>
+                  <td style={S.td}>{c.memory ? fmtBytes(Number(c.memory) || 0) : '-'}</td>
                 </tr>
               ))}
             </tbody>
