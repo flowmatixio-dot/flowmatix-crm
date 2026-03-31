@@ -1,4 +1,5 @@
 import { useApp } from "../../context/AppContext";
+import { disconnectWhatsApp } from "../../api/client";
 
 /**
  * WhatsApp Setup Page — 360dialog Partner Flow
@@ -192,10 +193,9 @@ export default function WhatsAppSetupPage() {
 
   /* ── API helper ── */
   const api = (path, body) =>
-    fetch("/api/v1/clinic/whatsapp/360/onboarding/" + path, {
+    fetch("https://api.flowmatix.io/api/v1/clinic/whatsapp/360/onboarding/" + path, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("fm_access_token") },
       body: body ? JSON.stringify(body) : undefined,
     })
       .then((r) => r.json())
@@ -228,7 +228,7 @@ export default function WhatsAppSetupPage() {
               <div style={{ fontSize: 15, fontWeight: 600, color: "#10b981" }}>🟢 {tx.active}</div>
             </div>
           </div>
-          <button style={{ ...bt, background: "rgba(239,68,68,0.06)", color: "rgba(239,68,68,0.7)", border: "1px solid rgba(239,68,68,0.12)", marginTop: 20, fontSize: 13 }} onClick={() => { if (!confirm("WhatsApp wirklich trennen?")) return; api("disconnect").then(go); }}>{tx.disconnect}</button>
+          <button style={{ ...bt, background: "rgba(239,68,68,0.06)", color: "rgba(239,68,68,0.7)", border: "1px solid rgba(239,68,68,0.12)", marginTop: 20, fontSize: 13 }} onClick={() => { if (!confirm("WhatsApp wirklich trennen?")) return; disconnectWhatsApp().then(() => { window.location.reload(); }).catch(() => alert("Fehler beim Trennen")); }}>{tx.disconnect}</button>
         </div>
       </div>
     );
@@ -289,7 +289,7 @@ export default function WhatsAppSetupPage() {
   /* ══════════════════════════════════════════════ */
   if (S === "verification_pending" || S === "migration_in_progress") {
     // Auto-refresh every 15 seconds
-    setTimeout(() => { fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" }).then(r => r.json()).then(d => { if (d?.onboarding?.state && d.onboarding.state !== S) location.reload(); }); }, 15000);
+    setTimeout(() => { fetch("https://api.flowmatix.io/api/v1/clinic/whatsapp/360/onboarding/state", { headers: { "Authorization": "Bearer " + localStorage.getItem("fm_access_token") } }).then(r => r.json()).then(d => { if (d?.onboarding?.state && d.onboarding.state !== S) location.reload(); }); }, 15000);
     return (
       <div style={wrap}>
         <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 24, textAlign: "center" }}>{tx.title}</h2>
@@ -298,7 +298,7 @@ export default function WhatsAppSetupPage() {
           <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>{tx.verification_title}</div>
           <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)" }}>{tx.verification_desc}</div>
           <div style={{ fontSize: 11, color: "rgba(76,201,255,0.4)", marginTop: 12 }}>↻ Status wird automatisch aktualisiert</div>
-          <button style={{ ...bt, background: "rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.95)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 16 }} onClick={() => { fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" }).then(go); }}>{tx.verification_refresh}</button>
+          <button style={{ ...bt, background: "rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.95)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 16 }} onClick={() => { fetch("https://api.flowmatix.io/api/v1/clinic/whatsapp/360/onboarding/state", { headers: { "Authorization": "Bearer " + localStorage.getItem("fm_access_token") } }).then(go); }}>{tx.verification_refresh}</button>
         </div>
       </div>
     );
@@ -321,7 +321,7 @@ export default function WhatsAppSetupPage() {
           </div>
           <div style={{ background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 12, color: "rgba(232,238,252,0.9)" }}>{tx.verification_support_hint}</div>
           <a href="mailto:support@flowmatix.io?subject=WhatsApp%20Verifizierung" style={{ ...bt, background: "#10b981", color: "#fff", textDecoration: "none", display: "block", textAlign: "center" }}>{tx.verification_upload}</a>
-          <button style={{ ...bt, background: "transparent", color: "rgba(232,238,252,0.4)", marginTop: 8, fontSize: 13 }} onClick={() => { fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" }).then(go); }}>{tx.verification_refresh}</button>
+          <button style={{ ...bt, background: "transparent", color: "rgba(232,238,252,0.4)", marginTop: 8, fontSize: 13 }} onClick={() => { fetch("https://api.flowmatix.io/api/v1/clinic/whatsapp/360/onboarding/state", { headers: { "Authorization": "Bearer " + localStorage.getItem("fm_access_token") } }).then(go); }}>{tx.verification_refresh}</button>
         </div>
       </div>
     );
@@ -373,7 +373,7 @@ export default function WhatsAppSetupPage() {
   if (S === "requested") {
     // Poll every 10s to detect when operator provisions
     setTimeout(() => {
-      fetch("/api/v1/clinic/whatsapp/360/onboarding/state", { credentials: "include" })
+      fetch("https://api.flowmatix.io/api/v1/clinic/whatsapp/360/onboarding/state", { headers: { "Authorization": "Bearer " + localStorage.getItem("fm_access_token") } })
         .then(r => r.json())
         .then(d => { if (d?.onboarding?.state && d.onboarding.state !== "requested") location.reload(); });
     }, 10000);

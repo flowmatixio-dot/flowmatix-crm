@@ -132,6 +132,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>{t("wa_bot_info") || "Info / Über-Text"}</div>
       {(() => {
+        const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
         const aboutOptions = [
           { de: "Hey! Ich benutze WhatsApp.", en: "Hey there! I am using WhatsApp.", tr: "Merhaba! WhatsApp kullanıyorum." },
           { de: "Verfügbar", en: "Available", tr: "Müsait" },
@@ -142,7 +143,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
         ];
         return <select value={profile.infoText || ""} onChange={e => update("infoText", e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated)", border: "1px solid var(--border-strong)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 13, outline: "none", marginBottom: 6 }}>
           <option value="" style={{ background: "#1a1d2e" }}>{"— Status auswählen —"}</option>
-          {aboutOptions.map((opt, i) => <option key={i} value={opt.de + " | " + opt.en + " | " + opt.tr} style={{ background: "#1a1d2e" }}>{opt.de} / {opt.en} / {opt.tr}</option>)}
+          {aboutOptions.map((opt, i) => <option key={i} value={opt[lang] || opt.en} style={{ background: "#1a1d2e" }}>{opt[lang] || opt.en}</option>)}
         </select>;
       })()}
       <div style={{ fontSize: 10, color: "var(--text-faint)" }}>{t("wa_bot_info_hint") || "WhatsApp Status-Text unter dem Profilnamen"}</div>

@@ -647,6 +647,10 @@ export async function saveWaProfileRequest(data) {
   });
 }
 
+export async function disconnectWhatsApp() {
+  return apiFetch('/api/v1/clinic/whatsapp/connection/disconnect', { method: 'POST' });
+}
+
 // ── Google OAuth (per clinic) ──────────────────────────
 
 export async function getGoogleStatus(orgId) {
