@@ -296,6 +296,42 @@ function TabDashboard({ d }) {
           )}
         </div>
       </div>
+
+      {/* WA Profile Requests from Clinics */}
+      {st?.profileRequests?.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <h3 style={{ color: '#fff', fontSize: 16, marginBottom: 12 }}>📱 WhatsApp-Profil Anfragen</h3>
+          {st.profileRequests.map(pr => {
+            const p = pr.wa_profile_request || {};
+            return (
+              <div key={pr.id} style={{ ...S.card, marginBottom: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{pr.name}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>Eingereicht: {new Date(pr.wa_profile_request_at).toLocaleString('de-DE')}</div>
+                  </div>
+                  <span style={{ padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: 'rgba(255,138,42,0.12)', color: '#ff8a2a' }}>Einrichten</span>
+                </div>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                  {p.logoUrl && (
+                    <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', border: '2px solid #333', flexShrink: 0 }}>
+                      <img src={p.logoUrl} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', fontSize: 12 }}>
+                    <div><span style={{ color: '#666' }}>Display Name:</span> <b style={{ color: '#fff' }}>{p.botName || '—'}</b></div>
+                    <div><span style={{ color: '#666' }}>About:</span> <b style={{ color: '#fff' }}>{p.about || '—'}</b></div>
+                    <div><span style={{ color: '#666' }}>Adresse:</span> <b style={{ color: '#fff' }}>{p.address || '—'}</b></div>
+                    <div><span style={{ color: '#666' }}>E-Mail:</span> <b style={{ color: '#fff' }}>{p.email || '—'}</b></div>
+                    <div><span style={{ color: '#666' }}>Website:</span> <b style={{ color: '#fff' }}>{p.websites?.join(', ') || '—'}</b></div>
+                    <div><span style={{ color: '#666' }}>Kategorie:</span> <b style={{ color: '#fff' }}>{p.vertical || '—'}</b></div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 }
