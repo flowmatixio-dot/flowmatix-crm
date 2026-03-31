@@ -49,8 +49,8 @@ const Btn = ({ children, onClick, small, danger, disabled }) => (
   <button onClick={onClick} disabled={disabled} style={{ padding: small ? '4px 12px' : '8px 16px', borderRadius: 8, border: 'none', background: danger ? S.red + '33' : S.accent + '22', color: danger ? S.red : S.accent, fontWeight: 600, fontSize: small ? 11 : 13, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? .5 : 1 }}>{children}</button>
 );
 
-const Empty = ({ text }) => <div style={{ padding: 32, textAlign: 'center', color: '#666' }}>{text || 'No data yet'}</div>;
-const Spin = () => <div style={{ padding: 32, textAlign: 'center', color: '#8888aa' }}>Loading...</div>;
+const Empty = ({ text }) => <div style={{ padding: 32, textAlign: 'center', color: '#666' }}>{text || 'Noch keine Daten'}</div>;
+const Spin = () => <div style={{ padding: 32, textAlign: 'center', color: '#8888aa' }}>Laden...</div>;
 
 const fmtBytes = (b) => { if (!b) return '0 B'; const u = ['B','KB','MB','GB','TB']; let i = 0; let v = Number(b); while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; } return v.toFixed(i > 1 ? 1 : 0) + ' ' + u[i]; };
 const fmtSec = (s) => { const d = Math.floor(s/86400); const h = Math.floor((s%86400)/3600); return d > 0 ? `${d}d ${h}h` : `${h}h ${Math.floor((s%3600)/60)}m`; };
@@ -156,8 +156,8 @@ export default function OperatorPanel() {
       {/* Connection status */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
         <div style={{ width: 8, height: 8, borderRadius: '50%', background: apiConnected ? S.green : apiConnected === false ? S.red : S.yellow }} />
-        <span style={{ fontSize: 12, color: '#8888aa' }}>{apiConnected ? 'API Connected' : apiConnected === false ? 'API Disconnected' : 'Connecting...'}</span>
-        <button onClick={reload} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: S.accent, fontSize: 12, cursor: 'pointer' }}>Refresh</button>
+        <span style={{ fontSize: 12, color: '#8888aa' }}>{apiConnected ? 'API verbunden' : apiConnected === false ? 'API getrennt' : 'Verbinden...'}</span>
+        <button onClick={reload} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: S.accent, fontSize: 12, cursor: 'pointer' }}>Aktualisieren</button>
       </div>
 
       {/* Pending applications alert banner */}
@@ -233,24 +233,24 @@ function TabDashboard({ d }) {
   const st = d.platformStats;
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Platform Overview</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Plattformübersicht</h2>
       <div style={S.grid4}>
         <div style={S.card}>
           <div style={S.kpiLabel}>MRR</div>
           <div style={S.kpi}>{fmtEur(ov?.totalMrr || ov?.mrr)}</div>
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Active Clinics</div>
+          <div style={S.kpiLabel}>Aktive Kliniken</div>
           <div style={S.kpi}>{ov?.activeClinics ?? ov?.clinicCount ?? 0}</div>
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Total Users</div>
+          <div style={S.kpiLabel}>Benutzer gesamt</div>
           <div style={S.kpi}>{ov?.totalUsers ?? ov?.userCount ?? 0}</div>
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>System Health</div>
+          <div style={S.kpiLabel}>Systemzustand</div>
           <div style={S.kpi}>{h?.status === 'healthy' ? '✓' : '!'}</div>
-          <div style={{ fontSize: 12, color: h?.status === 'healthy' ? S.green : S.red }}>{h?.status || 'unknown'}</div>
+          <div style={{ fontSize: 12, color: h?.status === 'healthy' ? S.green : S.red }}>{h?.status || 'unbekannt'}</div>
         </div>
       </div>
 
@@ -258,39 +258,39 @@ function TabDashboard({ d }) {
       {st && (
         <div style={S.grid3}>
           <div style={S.card}>
-            <div style={S.kpiLabel}>Messages Today</div>
+            <div style={S.kpiLabel}>Nachrichten heute</div>
             <div style={S.kpiSm}>{st.messagesToday ?? 0}</div>
           </div>
           <div style={S.card}>
-            <div style={S.kpiLabel}>Automation Success Rate</div>
+            <div style={S.kpiLabel}>Automatisierung Erfolgsrate</div>
             <div style={{ ...S.kpiSm, color: (st.automationSuccessRate ?? 100) >= 95 ? S.green : (st.automationSuccessRate ?? 100) >= 80 ? S.yellow : S.red }}>{st.automationSuccessRate ?? 100}%</div>
-            {st.automationStats && <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>{st.automationStats.success}/{st.automationStats.total} jobs OK, {st.automationStats.failed} failed</div>}
+            {st.automationStats && <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>{st.automationStats.success}/{st.automationStats.total} Jobs OK, {st.automationStats.failed} fehlgeschlagen</div>}
           </div>
           <div style={S.card}>
-            <div style={S.kpiLabel}>Webhook Error Rate</div>
+            <div style={S.kpiLabel}>Webhook-Fehlerrate</div>
             <div style={{ ...S.kpiSm, color: (st.webhookErrorRate ?? 0) <= 2 ? S.green : (st.webhookErrorRate ?? 0) <= 10 ? S.yellow : S.red }}>{st.webhookErrorRate ?? 0}%</div>
-            {st.webhookStats && <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>{st.webhookStats.failed}/{st.webhookStats.total} failed (24h)</div>}
+            {st.webhookStats && <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>{st.webhookStats.failed}/{st.webhookStats.total} fehlgeschlagen (24h)</div>}
           </div>
         </div>
       )}
 
       <div style={S.grid2}>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Services</div>
+          <div style={S.kpiLabel}>Dienste</div>
           {h?.checks ? Object.entries(h.checks).map(([k, v]) => (
             <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e1e3e' }}>
               <span style={{ color: '#ccc', textTransform: 'capitalize' }}>{k}</span>
               <span>{statusBadge(v.status)}</span>
             </div>
-          )) : <Empty text="No health data" />}
+          )) : <Empty text="Keine Gesundheitsdaten" />}
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>System Info</div>
+          <div style={S.kpiLabel}>Systeminfo</div>
           {h && (
             <div style={{ fontSize: 13, color: '#ccc', lineHeight: 2 }}>
-              <div>Uptime: <b style={{ color: '#fff' }}>{fmtSec(h.uptime || 0)}</b></div>
-              <div>DB Latency: <b style={{ color: '#fff' }}>{h.checks?.database?.latency ?? '?'}ms</b></div>
-              <div>Redis Latency: <b style={{ color: '#fff' }}>{h.checks?.redis?.latency ?? '?'}ms</b></div>
+              <div>Betriebszeit: <b style={{ color: '#fff' }}>{fmtSec(h.uptime || 0)}</b></div>
+              <div>DB-Latenz: <b style={{ color: '#fff' }}>{h.checks?.database?.latency ?? '?'}ms</b></div>
+              <div>Redis-Latenz: <b style={{ color: '#fff' }}>{h.checks?.redis?.latency ?? '?'}ms</b></div>
               <div>Version: <b style={{ color: '#fff' }}>{h.version}</b></div>
             </div>
           )}
@@ -507,14 +507,14 @@ const OUTREACH_TEMPLATES = {
 };
 
 const OUTREACH_STATUSES = [
-  { key: 'not_contacted', label: 'Not Contacted', color: '#6b7280' },
-  { key: 'message_1', label: 'Message 1', color: '#3b82f6' },
+  { key: 'not_contacted', label: 'Nicht kontaktiert', color: '#6b7280' },
+  { key: 'message_1', label: 'Nachricht 1', color: '#3b82f6' },
   { key: 'follow_up_1', label: 'Follow-up 1', color: '#8b5cf6' },
   { key: 'follow_up_2', label: 'Follow-up 2', color: '#a855f7' },
-  { key: 'replied', label: 'Replied', color: '#eab308' },
+  { key: 'replied', label: 'Geantwortet', color: '#eab308' },
   { key: 'demo_scheduled', label: 'Demo', color: '#f97316' },
-  { key: 'won', label: 'Won', color: '#22c55e' },
-  { key: 'lost', label: 'Lost', color: '#ef4444' },
+  { key: 'won', label: 'Gewonnen', color: '#22c55e' },
+  { key: 'lost', label: 'Verloren', color: '#ef4444' },
 ];
 
 function TabOutreach({ d, load }) {
@@ -553,7 +553,7 @@ function TabOutreach({ d, load }) {
       .replace(/\{contact\}/g, contact)
       .replace(/\{clinic\}/g, clinic);
     navigator.clipboard?.writeText(text);
-    showToast('Copied!');
+    showToast('Kopiert!');
   };
 
   const handleStatusChange = async (lead, newStatus) => {
@@ -585,7 +585,7 @@ function TabOutreach({ d, load }) {
     if (!newLead.clinic_name.trim()) return;
     try {
       await api.createOutreachLead(newLead);
-      setMsg({ type: 'ok', text: `${newLead.clinic_name} added` });
+      setMsg({ type: 'ok', text: `${newLead.clinic_name} hinzugefügt` });
       setNewLead({ clinic_name: '', contact_name: '', contact_title: '', city: 'Istanbul', website: '', email: '', phone: '', tags: '' });
       setShowAdd(false);
       refresh();
@@ -593,10 +593,10 @@ function TabOutreach({ d, load }) {
   };
 
   const handleDelete = async (lead) => {
-    if (!confirm(`Delete "${lead.clinic_name}"?`)) return;
+    if (!confirm(`"${lead.clinic_name}" wirklich löschen?`)) return;
     try {
       await api.deleteOutreachLead(lead.id);
-      setMsg({ type: 'ok', text: `${lead.clinic_name} deleted` });
+      setMsg({ type: 'ok', text: `${lead.clinic_name} gelöscht` });
       refresh();
     } catch (err) { setMsg({ type: 'err', text: err.message }); }
   };
@@ -612,8 +612,8 @@ function TabOutreach({ d, load }) {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ color: '#fff', fontSize: 20, margin: 0 }}>Outreach Pipeline</h2>
-        <Btn onClick={() => setShowAdd(!showAdd)}>{showAdd ? 'Cancel' : '+ Add Lead'}</Btn>
+        <h2 style={{ color: '#fff', fontSize: 20, margin: 0 }}>Outreach-Pipeline</h2>
+        <Btn onClick={() => setShowAdd(!showAdd)}>{showAdd ? 'Abbrechen' : '+ Lead hinzufügen'}</Btn>
       </div>
 
       {/* Toast */}
@@ -624,17 +624,17 @@ function TabOutreach({ d, load }) {
       {/* Add lead form */}
       {showAdd && (
         <div style={{ ...S.card, borderLeft: `3px solid ${S.accent}`, marginBottom: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 12 }}>New Lead</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 12 }}>Neuer Lead</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-            <input value={newLead.clinic_name} onChange={e => setNewLead({ ...newLead, clinic_name: e.target.value })} placeholder="Clinic Name *" style={inputStyle} />
-            <input value={newLead.contact_name} onChange={e => setNewLead({ ...newLead, contact_name: e.target.value })} placeholder="Contact Name" style={inputStyle} />
-            <input value={newLead.contact_title} onChange={e => setNewLead({ ...newLead, contact_title: e.target.value })} placeholder="Title (e.g. Owner)" style={inputStyle} />
-            <input value={newLead.city} onChange={e => setNewLead({ ...newLead, city: e.target.value })} placeholder="City" style={inputStyle} />
+            <input value={newLead.clinic_name} onChange={e => setNewLead({ ...newLead, clinic_name: e.target.value })} placeholder="Klinikname *" style={inputStyle} />
+            <input value={newLead.contact_name} onChange={e => setNewLead({ ...newLead, contact_name: e.target.value })} placeholder="Kontaktname" style={inputStyle} />
+            <input value={newLead.contact_title} onChange={e => setNewLead({ ...newLead, contact_title: e.target.value })} placeholder="Titel (z.B. Inhaber)" style={inputStyle} />
+            <input value={newLead.city} onChange={e => setNewLead({ ...newLead, city: e.target.value })} placeholder="Stadt" style={inputStyle} />
             <input value={newLead.website} onChange={e => setNewLead({ ...newLead, website: e.target.value })} placeholder="Website" style={inputStyle} />
-            <input value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email" style={inputStyle} />
-            <input value={newLead.phone} onChange={e => setNewLead({ ...newLead, phone: e.target.value })} placeholder="Phone" style={inputStyle} />
-            <input value={newLead.tags} onChange={e => setNewLead({ ...newLead, tags: e.target.value })} placeholder="Tags (comma-sep)" style={inputStyle} />
-            <div><Btn onClick={handleCreate}>Create Lead</Btn></div>
+            <input value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="E-Mail" style={inputStyle} />
+            <input value={newLead.phone} onChange={e => setNewLead({ ...newLead, phone: e.target.value })} placeholder="Telefon" style={inputStyle} />
+            <input value={newLead.tags} onChange={e => setNewLead({ ...newLead, tags: e.target.value })} placeholder="Tags (kommagetrennt)" style={inputStyle} />
+            <div><Btn onClick={handleCreate}>Lead erstellen</Btn></div>
           </div>
         </div>
       )}
@@ -660,19 +660,19 @@ function TabOutreach({ d, load }) {
         ))}
         <div style={{ padding: '6px 14px', borderRadius: 8, background: '#23234a', border: '1px solid #333366', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>{stats.total || 0}</span>
-          <span style={{ fontSize: 11, color: '#8888aa' }}>Total</span>
+          <span style={{ fontSize: 11, color: '#8888aa' }}>Gesamt</span>
         </div>
       </div>
 
       {/* Search */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && doSearch()} placeholder="Search clinics, contacts, cities, tags..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
-        <Btn onClick={doSearch}>Search</Btn>
-        {(search || filter) && <Btn onClick={() => { setSearch(''); setFilter(null); load('outreach', api.getOutreachLeads); }}>Clear</Btn>}
+        <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && doSearch()} placeholder="Kliniken, Kontakte, Städte, Tags suchen..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
+        <Btn onClick={doSearch}>Suchen</Btn>
+        {(search || filter) && <Btn onClick={() => { setSearch(''); setFilter(null); load('outreach', api.getOutreachLeads); }}>Zurücksetzen</Btn>}
       </div>
 
       {/* Leads list */}
-      {!d.outreach ? <Spin /> : !filteredLeads.length ? <Empty text="No leads found" /> : (
+      {!d.outreach ? <Spin /> : !filteredLeads.length ? <Empty text="Keine Leads gefunden" /> : (
         <div>
           {filteredLeads.map(lead => {
             const isExpanded = expandedId === lead.id;
@@ -708,7 +708,7 @@ function TabOutreach({ d, load }) {
                   {lead.tags && lead.tags.split(',').map(t => (
                     <span key={t.trim()} style={{ padding: '1px 8px', borderRadius: 99, background: '#1a1a2e', border: '1px solid #333366', fontSize: 10, color: '#8888aa' }}>{t.trim()}</span>
                   ))}
-                  {lead.last_contacted_at && <span>Last: {timeAgo(lead.last_contacted_at)}</span>}
+                  {lead.last_contacted_at && <span>Zuletzt: {timeAgo(lead.last_contacted_at)}</span>}
                   {lead.next_follow_up_at && <span style={{ color: new Date(lead.next_follow_up_at) < new Date() ? S.red : S.yellow }}>Follow-up: {new Date(lead.next_follow_up_at).toLocaleDateString()}</span>}
                 </div>
 
@@ -717,17 +717,17 @@ function TabOutreach({ d, load }) {
                   <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #1e1e3e' }}>
                     <div style={S.grid3}>
                       <div>
-                        <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Contact Info</div>
-                        {lead.email && <div style={{ fontSize: 13, color: '#ccc' }}>Email: {lead.email}</div>}
-                        {lead.phone && <div style={{ fontSize: 13, color: '#ccc' }}>Phone: {lead.phone}</div>}
+                        <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Kontaktdaten</div>
+                        {lead.email && <div style={{ fontSize: 13, color: '#ccc' }}>E-Mail: {lead.email}</div>}
+                        {lead.phone && <div style={{ fontSize: 13, color: '#ccc' }}>Telefon: {lead.phone}</div>}
                         {lead.whatsapp && <div style={{ fontSize: 13, color: '#ccc' }}>WhatsApp: {lead.whatsapp}</div>}
                         {lead.linkedin_url && <a href={lead.linkedin_url} target="_blank" rel="noopener" style={{ fontSize: 13, color: S.accent }}>LinkedIn</a>}
                       </div>
                       <div>
-                        <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Location</div>
+                        <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Standort</div>
                         <div style={{ fontSize: 13, color: '#ccc' }}>{lead.city}, {lead.country || 'Turkey'}</div>
-                        <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Source: {lead.source || 'research'}</div>
-                        <div style={{ fontSize: 11, color: '#666' }}>Added: {timeAgo(lead.created_at)}</div>
+                        <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Quelle: {lead.source || 'research'}</div>
+                        <div style={{ fontSize: 11, color: '#666' }}>Hinzugefügt: {timeAgo(lead.created_at)}</div>
                       </div>
                       <div>
                         <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Status</div>
@@ -745,7 +745,7 @@ function TabOutreach({ d, load }) {
 
                     {/* Notes */}
                     <div style={{ marginTop: 12 }}>
-                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Notes</div>
+                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Notizen</div>
                       <textarea
                         value={currentNotes}
                         onChange={e => setNotesMap(prev => ({ ...prev, [lead.id]: e.target.value }))}
@@ -754,7 +754,7 @@ function TabOutreach({ d, load }) {
                             handleNotesSave(lead, notesMap[lead.id]);
                           }
                         }}
-                        placeholder="Add notes..."
+                        placeholder="Notizen hinzufügen..."
                         rows={3}
                         style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
                       />
@@ -762,10 +762,10 @@ function TabOutreach({ d, load }) {
 
                     {/* Copy Template buttons */}
                     <div style={{ marginTop: 12 }}>
-                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 6 }}>Copy Templates</div>
+                      <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 6 }}>Vorlagen kopieren</div>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        <button onClick={() => copyTemplate('en_message_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>EN Message 1</button>
-                        <button onClick={() => copyTemplate('tr_message_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>TR Message 1</button>
+                        <button onClick={() => copyTemplate('en_message_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>EN Nachricht 1</button>
+                        <button onClick={() => copyTemplate('tr_message_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>TR Nachricht 1</button>
                         <button onClick={() => copyTemplate('en_follow_up_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>EN Follow-up 1</button>
                         <button onClick={() => copyTemplate('tr_follow_up_1', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>TR Follow-up 1</button>
                         <button onClick={() => copyTemplate('en_follow_up_2', lead)} style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#ccc', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>EN Follow-up 2</button>
@@ -775,7 +775,7 @@ function TabOutreach({ d, load }) {
 
                     {/* Actions */}
                     <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                      <Btn small danger onClick={() => handleDelete(lead)}>Delete</Btn>
+                      <Btn small danger onClick={() => handleDelete(lead)}>Löschen</Btn>
                     </div>
                   </div>
                 )}
@@ -803,20 +803,20 @@ function TabClinics({ d, load }) {
     try {
       setActionMsg(null);
       if (action === 'suspend') {
-        if (!confirm(`Suspend clinic "${orgName}"?`)) return;
+        if (!confirm(`Klinik "${orgName}" wirklich sperren?`)) return;
         await api.suspendClinic(orgId, 'Manual suspension from operator console');
-        setActionMsg({ type: 'ok', text: `${orgName} suspended` });
+        setActionMsg({ type: 'ok', text: `${orgName} gesperrt` });
       } else if (action === 'resume') {
         await api.resumeClinic(orgId, 'Resumed from operator console');
-        setActionMsg({ type: 'ok', text: `${orgName} resumed` });
+        setActionMsg({ type: 'ok', text: `${orgName} fortgesetzt` });
       } else if (action === 'impersonate') {
-        const reason = prompt('Reason for impersonation (min 5 chars):');
+        const reason = prompt('Grund für Impersonation (mind. 5 Zeichen):');
         if (!reason || reason.length < 5) return;
         const res = await api.impersonateClinic(orgId, reason);
-        setActionMsg({ type: 'ok', text: `Impersonating ${res.impersonation?.targetUser} — expires in ${res.impersonation?.expiresIn}` });
+        setActionMsg({ type: 'ok', text: `Impersonation als ${res.impersonation?.targetUser} — läuft ab in ${res.impersonation?.expiresIn}` });
       } else if (action === 'regen') {
         const res = await api.regenOnboardingLink(orgId);
-        setActionMsg({ type: 'ok', text: `New onboarding link: ${res.invitation?.link}` });
+        setActionMsg({ type: 'ok', text: `Neuer Onboarding-Link: ${res.invitation?.link}` });
       }
       await refresh();
     } catch (err) { setActionMsg({ type: 'err', text: err.message }); }
@@ -824,21 +824,21 @@ function TabClinics({ d, load }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Clinics</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Kliniken</h2>
       {actionMsg && (
         <div style={{ ...S.card, borderLeft: `3px solid ${actionMsg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
           <div style={{ fontSize: 13, color: actionMsg.type === 'ok' ? S.green : S.red, wordBreak: 'break-all' }}>{actionMsg.text}</div>
         </div>
       )}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && doSearch()} placeholder="Search clinics..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
-        <Btn onClick={doSearch}>Search</Btn>
+        <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && doSearch()} placeholder="Kliniken durchsuchen..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
+        <Btn onClick={doSearch}>Suchen</Btn>
       </div>
-      {!clinics ? <Spin /> : !clinics.clinics?.length ? <Empty text="No clinics onboarded yet" /> : (
+      {!clinics ? <Spin /> : !clinics.clinics?.length ? <Empty text="Noch keine Kliniken eingerichtet" /> : (
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Name</th><th style={S.th}>Status</th><th style={S.th}>Plan</th><th style={S.th}>Provisioning</th><th style={S.th}>Created</th><th style={S.th}>Actions</th>
+              <th style={S.th}>Name</th><th style={S.th}>Status</th><th style={S.th}>Plan</th><th style={S.th}>Bereitstellung</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {clinics.clinics.map(c => (
@@ -851,10 +851,10 @@ function TabClinics({ d, load }) {
                   <td style={S.td}>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                       {c.is_active
-                        ? <Btn small danger onClick={() => handleAction('suspend', c.id, c.name)}>Suspend</Btn>
-                        : <Btn small onClick={() => handleAction('resume', c.id, c.name)}>Resume</Btn>}
-                      <Btn small onClick={() => handleAction('impersonate', c.id, c.name)}>Impersonate</Btn>
-                      <Btn small onClick={() => handleAction('regen', c.id, c.name)}>Regen Link</Btn>
+                        ? <Btn small danger onClick={() => handleAction('suspend', c.id, c.name)}>Sperren</Btn>
+                        : <Btn small onClick={() => handleAction('resume', c.id, c.name)}>Fortsetzen</Btn>}
+                      <Btn small onClick={() => handleAction('impersonate', c.id, c.name)}>Impersonieren</Btn>
+                      <Btn small onClick={() => handleAction('regen', c.id, c.name)}>Link erneuern</Btn>
                     </div>
                   </td>
                 </tr>
@@ -885,15 +885,15 @@ function TabOnboarding({ d, load }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Onboarding & Provisioning</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Onboarding & Bereitstellung</h2>
       {!orgs ? <Spin /> : !orgs.organizations?.length ? (
-        <div style={S.card}><Empty text="No organizations yet. Clinics will appear here after onboarding." /></div>
+        <div style={S.card}><Empty text="Noch keine Organisationen. Kliniken erscheinen hier nach dem Onboarding." /></div>
       ) : (
         <>
           <div style={S.card}>
             <table style={S.table}>
               <thead><tr>
-                <th style={S.th}>Organization</th><th style={S.th}>Status</th><th style={S.th}>Provisioned By</th><th style={S.th}>Created</th><th style={S.th}>Actions</th>
+                <th style={S.th}>Organisation</th><th style={S.th}>Status</th><th style={S.th}>Bereitgestellt von</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
               </tr></thead>
               <tbody>
                 {orgs.organizations.map(o => (
@@ -902,7 +902,7 @@ function TabOnboarding({ d, load }) {
                     <td style={S.td}>{statusBadge(o.provisioning_status || 'pending')}</td>
                     <td style={S.td}>{o.provisioned_by_name || '-'}</td>
                     <td style={S.td}>{o.created_at ? timeAgo(o.created_at) : '-'}</td>
-                    <td style={S.td}><Btn small onClick={() => viewLogs(o.id)}>View Logs</Btn></td>
+                    <td style={S.td}><Btn small onClick={() => viewLogs(o.id)}>Logs anzeigen</Btn></td>
                   </tr>
                 ))}
               </tbody>
@@ -912,10 +912,10 @@ function TabOnboarding({ d, load }) {
           {selectedOrg && (
             <div style={S.card}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <div style={S.kpiLabel}>Provisioning Steps</div>
-                <Btn small onClick={() => setSelectedOrg(null)}>Close</Btn>
+                <div style={S.kpiLabel}>Bereitstellungsschritte</div>
+                <Btn small onClick={() => setSelectedOrg(null)}>Schließen</Btn>
               </div>
-              {!logs ? <Spin /> : !logs.length ? <Empty text="No provisioning logs found" /> : (
+              {!logs ? <Spin /> : !logs.length ? <Empty text="Keine Bereitstellungs-Logs gefunden" /> : (
                 <div>
                   {logs.map((l, i) => (
                     <div key={l.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid #1e1e3e' }}>
@@ -926,7 +926,7 @@ function TabOnboarding({ d, load }) {
                       </div>
                       <div>{statusBadge(l.status)}</div>
                       {l.duration_ms && <div style={{ fontSize: 11, color: '#666' }}>{l.duration_ms}ms</div>}
-                      {l.status === 'failed' && <Btn small onClick={async () => { try { await api.retryProvisioningStep(selectedOrg, l.step); await viewLogs(selectedOrg); } catch (err) { alert('Retry failed: ' + err.message); } }}>Retry</Btn>}
+                      {l.status === 'failed' && <Btn small onClick={async () => { try { await api.retryProvisioningStep(selectedOrg, l.step); await viewLogs(selectedOrg); } catch (err) { alert('Wiederholung fehlgeschlagen: ' + err.message); } }}>Wiederholen</Btn>}
                     </div>
                   ))}
                 </div>
@@ -984,7 +984,7 @@ function TabWhatsApp({ d, load }) {
       if (form.webhookVerifyToken) payload.webhookVerifyToken = form.webhookVerifyToken;
       payload.isActive = true;
       await api.updateClinicWhatsapp(selectedClinic, payload);
-      setMsg({ type: 'ok', text: 'WhatsApp credentials saved & activated' });
+      setMsg({ type: 'ok', text: 'WhatsApp-Zugangsdaten gespeichert & aktiviert' });
       await selectClinic(selectedClinic);
     } catch (err) { setMsg({ type: 'err', text: err.message }); }
     setSaving(false);
@@ -995,7 +995,7 @@ function TabWhatsApp({ d, load }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>WhatsApp / Meta — Per Clinic</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>WhatsApp / Meta — Pro Klinik</h2>
 
       {msg && (
         <div style={{ ...S.card, borderLeft: `3px solid ${msg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
@@ -1004,20 +1004,20 @@ function TabWhatsApp({ d, load }) {
       )}
 
       {/* Clinic list with WA status */}
-      {!clinics ? <Spin /> : !clinics.clinics?.length ? <Empty text="No clinics onboarded yet" /> : (
+      {!clinics ? <Spin /> : !clinics.clinics?.length ? <Empty text="Noch keine Kliniken eingerichtet" /> : (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Select Clinic to Configure</div>
+          <div style={S.kpiLabel}>Klinik zum Konfigurieren auswählen</div>
           <table style={{ ...S.table, marginTop: 12 }}>
             <thead><tr>
-              <th style={S.th}>Clinic</th><th style={S.th}>Phone Number ID</th><th style={S.th}>Status</th><th style={S.th}>Actions</th>
+              <th style={S.th}>Klinik</th><th style={S.th}>Phone Number ID</th><th style={S.th}>Status</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {clinics.clinics.map(c => (
                 <tr key={c.id} style={{ background: selectedClinic === c.id ? 'rgba(76,201,255,0.06)' : 'transparent' }}>
                   <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.name}</span><br /><span style={{ fontSize: 11, color: '#666' }}>{c.slug}</span></td>
-                  <td style={S.td}>{c.whatsapp_phone_id || <span style={{ color: '#666' }}>Not set</span>}</td>
-                  <td style={S.td}>{c.whatsapp_active ? badge(S.green, 'Active') : badge(S.gray, 'Inactive')}</td>
-                  <td style={S.td}><Btn small onClick={() => selectClinic(c.id)}>Configure</Btn></td>
+                  <td style={S.td}>{c.whatsapp_phone_id || <span style={{ color: '#666' }}>Nicht gesetzt</span>}</td>
+                  <td style={S.td}>{c.whatsapp_active ? badge(S.green, 'Aktiv') : badge(S.gray, 'Inaktiv')}</td>
+                  <td style={S.td}><Btn small onClick={() => selectClinic(c.id)}>Konfigurieren</Btn></td>
                 </tr>
               ))}
             </tbody>
@@ -1029,8 +1029,8 @@ function TabWhatsApp({ d, load }) {
       {selectedClinic && (
         <div style={{ ...S.card, borderLeft: `3px solid ${S.accent}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>WhatsApp Configuration</div>
-            <Btn small onClick={() => { setSelectedClinic(null); setWaConfig(null); }}>Close</Btn>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>WhatsApp-Konfiguration</div>
+            <Btn small onClick={() => { setSelectedClinic(null); setWaConfig(null); }}>Schließen</Btn>
           </div>
 
           {waLoading ? <Spin /> : (
@@ -1039,21 +1039,21 @@ function TabWhatsApp({ d, load }) {
               {waConfig?.whatsapp && (
                 <div style={{ ...S.grid3, marginBottom: 16 }}>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                    <div style={{ fontSize: 11, color: '#8888aa' }}>Token Set</div>
+                    <div style={{ fontSize: 11, color: '#8888aa' }}>Token gesetzt</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: waConfig.whatsapp.accessTokenSet ? S.green : S.red, marginTop: 4 }}>
-                      {waConfig.whatsapp.accessTokenSet ? 'Yes' : 'No'}
+                      {waConfig.whatsapp.accessTokenSet ? 'Ja' : 'Nein'}
                     </div>
                     {waConfig.whatsapp.accessTokenPreview && <div style={{ fontSize: 11, color: '#555', marginTop: 4, fontFamily: 'monospace' }}>{waConfig.whatsapp.accessTokenPreview}</div>}
                   </div>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                    <div style={{ fontSize: 11, color: '#8888aa' }}>Active</div>
+                    <div style={{ fontSize: 11, color: '#8888aa' }}>Aktiv</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: waConfig.whatsapp.isActive ? S.green : S.gray, marginTop: 4 }}>
-                      {waConfig.whatsapp.isActive ? 'Active' : 'Inactive'}
+                      {waConfig.whatsapp.isActive ? 'Aktiv' : 'Inaktiv'}
                     </div>
                   </div>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                    <div style={{ fontSize: 11, color: '#8888aa' }}>Last Webhook</div>
-                    <div style={{ fontSize: 14, color: '#ccc', marginTop: 4 }}>{waConfig.whatsapp.lastWebhookAt ? timeAgo(waConfig.whatsapp.lastWebhookAt) : 'Never'}</div>
+                    <div style={{ fontSize: 11, color: '#8888aa' }}>Letzter Webhook</div>
+                    <div style={{ fontSize: 14, color: '#ccc', marginTop: 4 }}>{waConfig.whatsapp.lastWebhookAt ? timeAgo(waConfig.whatsapp.lastWebhookAt) : 'Nie'}</div>
                   </div>
                 </div>
               )}
@@ -1070,16 +1070,16 @@ function TabWhatsApp({ d, load }) {
                 </div>
               </div>
               <div style={{ marginBottom: 16 }}>
-                <label style={labelStyle}>Access Token {waConfig?.whatsapp?.accessTokenSet && <span style={{ color: S.green, fontWeight: 400 }}>(currently set — leave blank to keep)</span>}</label>
+                <label style={labelStyle}>Access Token {waConfig?.whatsapp?.accessTokenSet && <span style={{ color: S.green, fontWeight: 400 }}>(aktuell gesetzt — leer lassen zum Beibehalten)</span>}</label>
                 <input value={form.accessToken} onChange={e => setForm(f => ({ ...f, accessToken: e.target.value }))} placeholder="EAAxxxxxxxxx..." type="password" style={inputStyle} />
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label style={labelStyle}>Webhook Verify Token</label>
-                <input value={form.webhookVerifyToken} onChange={e => setForm(f => ({ ...f, webhookVerifyToken: e.target.value }))} placeholder="Custom verify token for Meta webhook" style={inputStyle} />
+                <input value={form.webhookVerifyToken} onChange={e => setForm(f => ({ ...f, webhookVerifyToken: e.target.value }))} placeholder="Eigener Verify-Token für Meta-Webhook" style={inputStyle} />
               </div>
 
               <div style={{ display: 'flex', gap: 8 }}>
-                <Btn onClick={saveConfig} disabled={saving}>{saving ? 'Saving...' : 'Save & Activate'}</Btn>
+                <Btn onClick={saveConfig} disabled={saving}>{saving ? 'Speichern...' : 'Speichern & Aktivieren'}</Btn>
               </div>
             </>
           )}
@@ -1113,10 +1113,10 @@ function TabIntegrations({ d, load }) {
   };
 
   const handleDisconnect = async () => {
-    if (!selectedClinic || !confirm('Disconnect Google Calendar for this clinic?')) return;
+    if (!selectedClinic || !confirm('Google Calendar für diese Klinik trennen?')) return;
     try {
       await api.disconnectGoogle(selectedClinic);
-      setMsg({ type: 'ok', text: 'Google Calendar disconnected' });
+      setMsg({ type: 'ok', text: 'Google Calendar getrennt' });
       await selectClinic(selectedClinic);
     } catch (err) { setMsg({ type: 'err', text: err.message }); }
   };
@@ -1129,7 +1129,7 @@ function TabIntegrations({ d, load }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Integrations — Per Clinic</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Integrationen — Pro Klinik</h2>
 
       {msg && (
         <div style={{ ...S.card, borderLeft: `3px solid ${msg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
@@ -1138,9 +1138,9 @@ function TabIntegrations({ d, load }) {
       )}
 
       {/* Clinic selector */}
-      {!clinics ? <Spin /> : !clinics.clinics?.length ? <Empty text="No clinics onboarded yet" /> : (
+      {!clinics ? <Spin /> : !clinics.clinics?.length ? <Empty text="Noch keine Kliniken eingerichtet" /> : (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Select Clinic</div>
+          <div style={S.kpiLabel}>Klinik auswählen</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
             {clinics.clinics.map(c => (
               <button key={c.id} onClick={() => selectClinic(c.id)} style={{
@@ -1168,19 +1168,19 @@ function TabIntegrations({ d, load }) {
                       <div style={{ fontSize: 12, color: '#8888aa' }}>Termine automatisch synchronisieren</div>
                     </div>
                   </div>
-                  {googleStatus?.connected ? badge(S.green, 'Connected') : badge(S.gray, 'Not connected')}
+                  {googleStatus?.connected ? badge(S.green, 'Verbunden') : badge(S.gray, 'Nicht verbunden')}
                 </div>
 
                 {googleStatus?.connected ? (
                   <div>
                     <div style={S.grid3}>
                       <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                        <div style={{ fontSize: 11, color: '#8888aa' }}>Connected Since</div>
+                        <div style={{ fontSize: 11, color: '#8888aa' }}>Verbunden seit</div>
                         <div style={{ fontSize: 13, color: '#ccc', marginTop: 4 }}>{googleStatus.connectedAt ? timeAgo(googleStatus.connectedAt) : '-'}</div>
                       </div>
                       <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
-                        <div style={{ fontSize: 11, color: '#8888aa' }}>Last Used</div>
-                        <div style={{ fontSize: 13, color: '#ccc', marginTop: 4 }}>{googleStatus.lastUsed ? timeAgo(googleStatus.lastUsed) : 'Never'}</div>
+                        <div style={{ fontSize: 11, color: '#8888aa' }}>Zuletzt verwendet</div>
+                        <div style={{ fontSize: 13, color: '#ccc', marginTop: 4 }}>{googleStatus.lastUsed ? timeAgo(googleStatus.lastUsed) : 'Nie'}</div>
                       </div>
                       <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
                         <div style={{ fontSize: 11, color: '#8888aa' }}>Status</div>
@@ -1188,7 +1188,7 @@ function TabIntegrations({ d, load }) {
                       </div>
                     </div>
                     <div style={{ marginTop: 12 }}>
-                      <Btn small danger onClick={handleDisconnect}>Disconnect</Btn>
+                      <Btn small danger onClick={handleDisconnect}>Trennen</Btn>
                     </div>
                   </div>
                 ) : (
@@ -1199,7 +1199,7 @@ function TabIntegrations({ d, load }) {
                         <span style={{ fontSize: 12, color: '#8888aa' }}>Klinik-Admin wird zu Google weitergeleitet</span>
                       </div>
                     ) : (
-                      <div style={{ fontSize: 12, color: S.yellow }}>Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env</div>
+                      <div style={{ fontSize: 12, color: S.yellow }}>Google OAuth nicht konfiguriert. GOOGLE_CLIENT_ID und GOOGLE_CLIENT_SECRET in .env setzen</div>
                     )}
                   </div>
                 )}
@@ -1210,25 +1210,25 @@ function TabIntegrations({ d, load }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                   <span style={{ fontSize: 20 }}>📊</span>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>API Usage (Flowmatix-managed)</div>
-                    <div style={{ fontSize: 12, color: '#8888aa' }}>OpenAI, SMTP, n8n — globale Keys, Limits per Plan</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>API-Nutzung (Flowmatix-verwaltet)</div>
+                    <div style={{ fontSize: 12, color: '#8888aa' }}>OpenAI, SMTP, n8n — globale Keys, Limits pro Plan</div>
                   </div>
                 </div>
                 <div style={S.grid3}>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
                     <div style={{ fontSize: 11, color: '#8888aa' }}>OpenAI</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: S.green, marginTop: 4 }}>Flowmatix Key</div>
-                    <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Usage tracked per plan limits</div>
+                    <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Nutzung pro Plan-Limits erfasst</div>
                   </div>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
                     <div style={{ fontSize: 11, color: '#8888aa' }}>SMTP / E-Mail</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: S.green, marginTop: 4 }}>Flowmatix Key</div>
-                    <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Transactional emails</div>
+                    <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Transaktions-E-Mails</div>
                   </div>
                   <div style={{ background: '#1a1a2e', borderRadius: 8, padding: 12 }}>
                     <div style={{ fontSize: 11, color: '#8888aa' }}>n8n Workflows</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: S.green, marginTop: 4 }}>Flowmatix Key</div>
-                    <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Automation engine</div>
+                    <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>Automatisierungs-Engine</div>
                   </div>
                 </div>
               </div>
@@ -1252,26 +1252,26 @@ function TabAutomations({ d, load }) {
       await api.retryJob(id);
       await load('queueJobs', () => api.getQueueJobs({ limit: 20 }));
       await load('queueStats', api.getQueueStats);
-    } catch (err) { alert('Retry failed: ' + err.message); }
+    } catch (err) { alert('Wiederholung fehlgeschlagen: ' + err.message); }
   };
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Automations & Queues</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Automatisierungen & Warteschlangen</h2>
 
       {/* Queue overview */}
       {!stats ? <Spin /> : !stats.queues?.length ? (
-        <div style={S.card}><Empty text="No queue jobs yet. Jobs will appear when automations run." /></div>
+        <div style={S.card}><Empty text="Noch keine Queue-Jobs. Jobs erscheinen wenn Automatisierungen laufen." /></div>
       ) : (
         <div style={S.grid3}>
           {stats.queues.map(q => (
             <div key={q.queue_name} style={S.card}>
               <div style={{ fontSize: 13, color: '#fff', fontWeight: 700, marginBottom: 8 }}>{q.queue_name}</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {q.pending > 0 && badge(S.yellow, `${q.pending} pending`)}
-                {q.running > 0 && badge(S.accent, `${q.running} running`)}
-                {q.completed > 0 && badge(S.green, `${q.completed} done`)}
-                {q.failed > 0 && badge(S.red, `${q.failed} failed`)}
+                {q.pending > 0 && badge(S.yellow, `${q.pending} ausstehend`)}
+                {q.running > 0 && badge(S.accent, `${q.running} laufend`)}
+                {q.completed > 0 && badge(S.green, `${q.completed} fertig`)}
+                {q.failed > 0 && badge(S.red, `${q.failed} fehlgeschlagen`)}
                 {q.dead_letter > 0 && badge(S.red, `${q.dead_letter} DLQ`)}
               </div>
             </div>
@@ -1282,16 +1282,16 @@ function TabAutomations({ d, load }) {
       {/* n8n link */}
       <div style={{ ...S.card, borderLeft: `3px solid ${S.accent}` }}>
         <div style={{ fontSize: 13, color: S.accent, fontWeight: 600, marginBottom: 4 }}>n8n Workflow Engine</div>
-        <div style={{ fontSize: 12, color: '#8888aa' }}>Advanced workflow management available at <a href="https://n8n.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ color: S.accent }}>n8n.flowmatix.io</a></div>
+        <div style={{ fontSize: 12, color: '#8888aa' }}>Erweiterte Workflow-Verwaltung verfügbar unter <a href="https://n8n.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ color: S.accent }}>n8n.flowmatix.io</a></div>
       </div>
 
       {/* Recent jobs */}
       {jobs?.jobs?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Recent Jobs</div>
+          <div style={S.kpiLabel}>Letzte Jobs</div>
           <table style={{ ...S.table, marginTop: 8 }}>
             <thead><tr>
-              <th style={S.th}>Queue</th><th style={S.th}>Type</th><th style={S.th}>Status</th><th style={S.th}>Org</th><th style={S.th}>Created</th><th style={S.th}>Actions</th>
+              <th style={S.th}>Queue</th><th style={S.th}>Typ</th><th style={S.th}>Status</th><th style={S.th}>Org</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {jobs.jobs.map(j => (
@@ -1301,7 +1301,7 @@ function TabAutomations({ d, load }) {
                   <td style={S.td}>{statusBadge(j.status)}</td>
                   <td style={S.td}>{j.org_name || '-'}</td>
                   <td style={S.td}>{timeAgo(j.created_at)}</td>
-                  <td style={S.td}>{(j.status === 'failed' || j.status === 'dead_letter') && <Btn small onClick={() => handleRetry(j.id)}>Retry</Btn>}</td>
+                  <td style={S.td}>{(j.status === 'failed' || j.status === 'dead_letter') && <Btn small onClick={() => handleRetry(j.id)}>Wiederholen</Btn>}</td>
                 </tr>
               ))}
             </tbody>
@@ -1320,7 +1320,7 @@ function TabMonitoring({ d }) {
   const containers = d.infraContainers;
 
   if (!infra) return <Spin />;
-  if (infra.error) return <div style={S.card}><div style={{ color: S.red }}>Failed to load infrastructure data: {infra.error}</div></div>;
+  if (infra.error) return <div style={S.card}><div style={{ color: S.red }}>Infrastrukturdaten konnten nicht geladen werden: {infra.error}</div></div>;
 
   const cpuPct = infra.cpu?.usagePercent ?? 0;
   const memPct = infra.memory?.usagePercent ?? 0;
@@ -1328,23 +1328,23 @@ function TabMonitoring({ d }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Server Monitoring</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Serverüberwachung</h2>
 
       {/* Main gauges */}
       <div style={S.grid3}>
         <div style={S.card}>
-          <div style={S.kpiLabel}>CPU Usage</div>
+          <div style={S.kpiLabel}>CPU-Auslastung</div>
           <div style={{ ...S.kpi, color: pctColor(cpuPct) }}>{cpuPct.toFixed(1)}%</div>
           <ProgressBar pct={cpuPct} />
           {infra.load && <div style={{ fontSize: 11, color: '#8888aa', marginTop: 4 }}>Load: {infra.load.load1?.toFixed(2)} / {infra.load.load5?.toFixed(2)} / {infra.load.load15?.toFixed(2)}</div>}
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Memory</div>
+          <div style={S.kpiLabel}>Speicher</div>
           <div style={{ ...S.kpi, color: pctColor(memPct) }}>{fmtBytes(infra.memory?.usedBytes)}</div>
           <ProgressBar pct={memPct} label={`${fmtBytes(infra.memory?.usedBytes)} / ${fmtBytes(infra.memory?.totalBytes)}`} />
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Disk</div>
+          <div style={S.kpiLabel}>Festplatte</div>
           <div style={{ ...S.kpi, color: pctColor(diskPct) }}>{fmtBytes(infra.disk?.usedBytes)}</div>
           <ProgressBar pct={diskPct} label={`${fmtBytes(infra.disk?.usedBytes)} / ${fmtBytes(infra.disk?.totalBytes)}`} />
         </div>
@@ -1355,12 +1355,12 @@ function TabMonitoring({ d }) {
         <div style={S.card}>
           <div style={S.kpiLabel}>System</div>
           <div style={{ fontSize: 13, color: '#ccc', lineHeight: 2 }}>
-            <div>Uptime: <b style={{ color: '#fff' }}>{fmtSec(infra.uptimeSeconds || 0)}</b></div>
+            <div>Betriebszeit: <b style={{ color: '#fff' }}>{fmtSec(infra.uptimeSeconds || 0)}</b></div>
             <div>Load 1m/5m/15m: <b style={{ color: '#fff' }}>{infra.load?.load1?.toFixed(2)} / {infra.load?.load5?.toFixed(2)} / {infra.load?.load15?.toFixed(2)}</b></div>
           </div>
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Quick Links</div>
+          <div style={S.kpiLabel}>Schnellzugriff</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
             <a href="https://grafana.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ color: S.accent, fontSize: 13 }}>Grafana Dashboards</a>
             <a href="https://prometheus.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ color: S.accent, fontSize: 13 }}>Prometheus Metrics</a>
@@ -1372,10 +1372,10 @@ function TabMonitoring({ d }) {
       {/* Service Status */}
       {containers?.containers?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Service Status (Prometheus)</div>
+          <div style={S.kpiLabel}>Dienststatus (Prometheus)</div>
           <table style={{ ...S.table, marginTop: 8 }}>
             <thead><tr>
-              <th style={S.th}>Service</th><th style={S.th}>Status</th><th style={S.th}>Memory</th>
+              <th style={S.th}>Dienst</th><th style={S.th}>Status</th><th style={S.th}>Speicher</th>
             </tr></thead>
             <tbody>
               {containers.containers.map((c, i) => (
@@ -1403,26 +1403,26 @@ function TabIncidents({ d, load }) {
     try {
       await api.resolveIncident(id);
       await load('incidents', () => api.getIncidents({ limit: 50 }));
-    } catch (err) { alert('Failed: ' + err.message); }
+    } catch (err) { alert('Fehlgeschlagen: ' + err.message); }
   };
 
   const handleAcknowledge = async (id) => {
     try {
       await api.acknowledgeIncident(id);
       await load('incidents', () => api.getIncidents({ limit: 50 }));
-    } catch (err) { alert('Failed: ' + err.message); }
+    } catch (err) { alert('Fehlgeschlagen: ' + err.message); }
   };
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Incidents</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Vorfälle</h2>
       {!incidents ? <Spin /> : !incidents.incidents?.length ? (
-        <div style={S.card}><Empty text="No incidents. All systems operational." /></div>
+        <div style={S.card}><Empty text="Keine Vorfälle. Alle Systeme betriebsbereit." /></div>
       ) : (
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Severity</th><th style={S.th}>Title</th><th style={S.th}>Status</th><th style={S.th}>Created</th><th style={S.th}>Actions</th>
+              <th style={S.th}>Schweregrad</th><th style={S.th}>Titel</th><th style={S.th}>Status</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {incidents.incidents.map(inc => (
@@ -1438,7 +1438,7 @@ function TabIncidents({ d, load }) {
                   <td style={S.td}>
                     <div style={{ display: 'flex', gap: 4 }}>
                       {inc.status === 'open' && <Btn small onClick={() => handleAcknowledge(inc.id)}>ACK</Btn>}
-                      {inc.status !== 'resolved' && !inc.resolved_at && <Btn small onClick={() => handleResolve(inc.id)}>Resolve</Btn>}
+                      {inc.status !== 'resolved' && !inc.resolved_at && <Btn small onClick={() => handleResolve(inc.id)}>Lösen</Btn>}
                     </div>
                   </td>
                 </tr>
@@ -1467,25 +1467,25 @@ function TabLogs({ d, load }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Platform Logs</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Plattform-Logs</h2>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         <select value={source} onChange={e => setSource(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }}>
-          <option value="">All Sources</option>
+          <option value="">Alle Quellen</option>
           <option value="audit">Audit</option>
           <option value="webhook">Webhook</option>
           <option value="provisioning">Provisioning</option>
         </select>
-        <Btn onClick={doFilter}>Filter</Btn>
+        <Btn onClick={doFilter}>Filtern</Btn>
       </div>
 
       {!logData ? <Spin /> : !logData.entries?.length ? (
-        <div style={S.card}><Empty text="No log entries yet" /></div>
+        <div style={S.card}><Empty text="Noch keine Log-Einträge" /></div>
       ) : (
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Time</th><th style={S.th}>Source</th><th style={S.th}>Actor</th><th style={S.th}>Event</th><th style={S.th}>Resource</th><th style={S.th}>Details</th>
+              <th style={S.th}>Zeit</th><th style={S.th}>Quelle</th><th style={S.th}>Akteur</th><th style={S.th}>Ereignis</th><th style={S.th}>Ressource</th><th style={S.th}>Details</th>
             </tr></thead>
             <tbody>
               {logData.entries.map(e => (
@@ -1502,14 +1502,14 @@ function TabLogs({ d, load }) {
           </table>
           {logData.pagination && (
             <div style={{ textAlign: 'center', padding: 12, fontSize: 12, color: '#666' }}>
-              Page {logData.pagination.page} of {logData.pagination.pages} ({logData.pagination.total} entries)
+              Seite {logData.pagination.page} von {logData.pagination.pages} ({logData.pagination.total} Einträge)
             </div>
           )}
         </div>
       )}
 
       <div style={{ ...S.card, borderLeft: `3px solid ${S.accent}` }}>
-        <div style={{ fontSize: 12, color: '#8888aa' }}>Detailed request logs and worker logs available in <a href="https://grafana.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ color: S.accent }}>Grafana / Loki</a></div>
+        <div style={{ fontSize: 12, color: '#8888aa' }}>Detaillierte Request- und Worker-Logs verfügbar in <a href="https://grafana.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ color: S.accent }}>Grafana / Loki</a></div>
       </div>
     </>
   );
@@ -1541,27 +1541,27 @@ function TabApiKeys({ d, load }) {
   };
 
   const handleRevoke = async (id, name) => {
-    if (!confirm(`Revoke API key "${name}"?`)) return;
+    if (!confirm(`API-Schlüssel "${name}" wirklich widerrufen?`)) return;
     try {
       await api.revokeApiKey(id);
-      setActionMsg({ type: 'ok', text: `Key "${name}" revoked` });
+      setActionMsg({ type: 'ok', text: `Schlüssel "${name}" widerrufen` });
       await refresh();
     } catch (err) { setActionMsg({ type: 'err', text: err.message }); }
   };
 
   const handleRotate = async (id, name) => {
-    if (!confirm(`Rotate API key "${name}"? The old key will be revoked.`)) return;
+    if (!confirm(`API-Schlüssel "${name}" rotieren? Der alte Schlüssel wird widerrufen.`)) return;
     try {
       const res = await api.rotateApiKey(id);
       setCreatedKey(res.apiKey);
-      setActionMsg({ type: 'ok', text: `Key "${name}" rotated` });
+      setActionMsg({ type: 'ok', text: `Schlüssel "${name}" rotiert` });
       await refresh();
     } catch (err) { setActionMsg({ type: 'err', text: err.message }); }
   };
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>API Keys & Secrets</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>API-Schlüssel & Geheimnisse</h2>
 
       {actionMsg && (
         <div style={{ ...S.card, borderLeft: `3px solid ${actionMsg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
@@ -1571,42 +1571,42 @@ function TabApiKeys({ d, load }) {
 
       {createdKey && (
         <div style={{ ...S.card, borderLeft: `3px solid ${S.yellow}`, marginBottom: 12 }}>
-          <div style={{ fontSize: 13, color: S.yellow, fontWeight: 700, marginBottom: 8 }}>New API Key Created — Copy it now!</div>
+          <div style={{ fontSize: 13, color: S.yellow, fontWeight: 700, marginBottom: 8 }}>Neuer API-Schlüssel erstellt — Jetzt kopieren!</div>
           <code style={{ fontSize: 13, color: '#fff', background: '#1a1a2e', padding: '8px 12px', borderRadius: 6, display: 'block', wordBreak: 'break-all' }}>{createdKey.key}</code>
           <div style={{ fontSize: 11, color: S.red, marginTop: 6 }}>{createdKey.warning}</div>
           <div style={{ marginTop: 8 }}>
-            <Btn small onClick={() => { navigator.clipboard?.writeText(createdKey.key); }}>Copy Key</Btn>
-            <button onClick={() => setCreatedKey(null)} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#666', fontSize: 11, cursor: 'pointer' }}>Dismiss</button>
+            <Btn small onClick={() => { navigator.clipboard?.writeText(createdKey.key); }}>Schlüssel kopieren</Btn>
+            <button onClick={() => setCreatedKey(null)} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#666', fontSize: 11, cursor: 'pointer' }}>Schließen</button>
           </div>
         </div>
       )}
 
       <div style={{ marginBottom: 16 }}>
         {!showCreate ? (
-          <Btn onClick={() => setShowCreate(true)}>+ Create API Key</Btn>
+          <Btn onClick={() => setShowCreate(true)}>+ API-Schlüssel erstellen</Btn>
         ) : (
           <div style={{ ...S.card, display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Key Name</div>
+              <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Schlüsselname</div>
               <input value={newKeyName} onChange={e => setNewKeyName(e.target.value)} placeholder="e.g. n8n-production" style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Expires in (days)</div>
+              <div style={{ fontSize: 11, color: '#8888aa', marginBottom: 4 }}>Läuft ab in (Tage)</div>
               <input value={newKeyExpiry} onChange={e => setNewKeyExpiry(e.target.value)} placeholder="90" type="number" style={{ width: 80, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }} />
             </div>
-            <Btn onClick={handleCreate}>Create</Btn>
-            <button onClick={() => setShowCreate(false)} style={{ background: 'none', border: 'none', color: '#666', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+            <Btn onClick={handleCreate}>Erstellen</Btn>
+            <button onClick={() => setShowCreate(false)} style={{ background: 'none', border: 'none', color: '#666', fontSize: 12, cursor: 'pointer' }}>Abbrechen</button>
           </div>
         )}
       </div>
 
       {!keys ? <Spin /> : !keys.apiKeys?.length ? (
-        <div style={S.card}><Empty text="No API keys created yet" /></div>
+        <div style={S.card}><Empty text="Noch keine API-Schlüssel erstellt" /></div>
       ) : (
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Name</th><th style={S.th}>Prefix</th><th style={S.th}>Scopes</th><th style={S.th}>Org</th><th style={S.th}>Last Used</th><th style={S.th}>Status</th><th style={S.th}>Actions</th>
+              <th style={S.th}>Name</th><th style={S.th}>Präfix</th><th style={S.th}>Bereiche</th><th style={S.th}>Org</th><th style={S.th}>Zuletzt verwendet</th><th style={S.th}>Status</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {keys.apiKeys.map(k => (
@@ -1615,13 +1615,13 @@ function TabApiKeys({ d, load }) {
                   <td style={S.td}><code style={{ fontSize: 12, color: S.accent }}>{k.key_prefix}...</code></td>
                   <td style={S.td}>{(k.scopes || []).join(', ') || '-'}</td>
                   <td style={S.td}>{k.org_name || '-'}</td>
-                  <td style={S.td}>{k.last_used_at ? timeAgo(k.last_used_at) : 'Never'}</td>
-                  <td style={S.td}>{k.revoked_at ? badge(S.red, 'Revoked') : k.expires_at && new Date(k.expires_at) < new Date() ? badge(S.yellow, 'Expired') : badge(S.green, 'Active')}</td>
+                  <td style={S.td}>{k.last_used_at ? timeAgo(k.last_used_at) : 'Nie'}</td>
+                  <td style={S.td}>{k.revoked_at ? badge(S.red, 'Widerrufen') : k.expires_at && new Date(k.expires_at) < new Date() ? badge(S.yellow, 'Abgelaufen') : badge(S.green, 'Aktiv')}</td>
                   <td style={S.td}>
                     {!k.revoked_at && (
                       <div style={{ display: 'flex', gap: 4 }}>
-                        <Btn small onClick={() => handleRotate(k.id, k.name)}>Rotate</Btn>
-                        <Btn small danger onClick={() => handleRevoke(k.id, k.name)}>Revoke</Btn>
+                        <Btn small onClick={() => handleRotate(k.id, k.name)}>Rotieren</Btn>
+                        <Btn small danger onClick={() => handleRevoke(k.id, k.name)}>Widerrufen</Btn>
                       </div>
                     )}
                   </td>
@@ -1653,17 +1653,17 @@ function TabBilling({ d, load }) {
   };
 
   const handleAutoSuspend = async () => {
-    if (!confirm('Auto-suspend all clinics overdue > 14 days?')) return;
+    if (!confirm('Alle Kliniken mit > 14 Tagen Zahlungsverzug automatisch sperren?')) return;
     try {
       const res = await api.autoSuspendOverdue(14);
-      setActionMsg({ type: 'ok', text: `${res.count} clinic(s) suspended` });
+      setActionMsg({ type: 'ok', text: `${res.count} Klinik(en) gesperrt` });
       await load('overdue', api.getOverdueSubscriptions);
     } catch (err) { setActionMsg({ type: 'err', text: err.message }); }
   };
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Billing & Finance</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Abrechnung & Finanzen</h2>
 
       {actionMsg && (
         <div style={{ ...S.card, borderLeft: `3px solid ${actionMsg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
@@ -1674,15 +1674,15 @@ function TabBilling({ d, load }) {
       {/* KPIs */}
       <div style={S.grid3}>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Monthly Recurring Revenue</div>
+          <div style={S.kpiLabel}>Monatlich wiederkehrender Umsatz</div>
           <div style={S.kpi}>{fmtEur(rev?.mrr)}</div>
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Active Subscriptions</div>
+          <div style={S.kpiLabel}>Aktive Abonnements</div>
           <div style={S.kpi}>{subs?.pagination?.total ?? 0}</div>
         </div>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Overdue</div>
+          <div style={S.kpiLabel}>Überfällig</div>
           <div style={{ ...S.kpi, color: (overdue?.overdue?.length || 0) > 0 ? S.red : S.green }}>{overdue?.overdue?.length || 0}</div>
         </div>
       </div>
@@ -1692,14 +1692,14 @@ function TabBilling({ d, load }) {
         <div style={S.kpiLabel}>DATEV Export</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', marginTop: 8 }}>
           <div>
-            <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>From</div>
+            <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>Von</div>
             <input type="date" value={datevFrom} onChange={e => setDatevFrom(e.target.value)} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 12 }} />
           </div>
           <div>
-            <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>To</div>
+            <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>Bis</div>
             <input type="date" value={datevTo} onChange={e => setDatevTo(e.target.value)} style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 12 }} />
           </div>
-          <Btn onClick={handleDatevExport}>Download CSV</Btn>
+          <Btn onClick={handleDatevExport}>CSV herunterladen</Btn>
         </div>
       </div>
 
@@ -1707,11 +1707,11 @@ function TabBilling({ d, load }) {
       {overdue?.overdue?.length > 0 && (
         <div style={S.card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <div style={S.kpiLabel}>Overdue Subscriptions</div>
-            <Btn small danger onClick={handleAutoSuspend}>Auto-Suspend (14d+)</Btn>
+            <div style={S.kpiLabel}>Überfällige Abonnements</div>
+            <Btn small danger onClick={handleAutoSuspend}>Auto-Sperre (14T+)</Btn>
           </div>
           <table style={S.table}>
-            <thead><tr><th style={S.th}>Clinic</th><th style={S.th}>Plan</th><th style={S.th}>Days Overdue</th><th style={S.th}>Status</th></tr></thead>
+            <thead><tr><th style={S.th}>Klinik</th><th style={S.th}>Plan</th><th style={S.th}>Tage überfällig</th><th style={S.th}>Status</th></tr></thead>
             <tbody>
               {overdue.overdue.map(o => (
                 <tr key={o.id}>
@@ -1729,7 +1729,7 @@ function TabBilling({ d, load }) {
       {/* Subscription by status */}
       {rev?.countByStatus?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Subscriptions by Status</div>
+          <div style={S.kpiLabel}>Abonnements nach Status</div>
           <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
             {rev.countByStatus.map(s => (
               <div key={s.status}>{badge(s.status === 'active' ? S.green : s.status === 'canceled' ? S.red : S.yellow, `${s.count} ${s.status}`)}</div>
@@ -1741,17 +1741,17 @@ function TabBilling({ d, load }) {
       {/* Plans */}
       {plans?.plans?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Subscription Plans</div>
+          <div style={S.kpiLabel}>Abonnement-Pläne</div>
           <div style={{ ...S.grid3, marginTop: 12 }}>
             {plans.plans.map(p => (
               <div key={p.id} style={{ background: '#1a1a2e', borderRadius: 8, padding: 16, border: '1px solid #333366' }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{p.name}</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: S.accent, margin: '8px 0' }}>{fmtEur(p.price_monthly)}<span style={{ fontSize: 12, color: '#666' }}>/mo</span></div>
                 <div style={{ fontSize: 11, color: '#888', lineHeight: 1.8 }}>
-                  <div>{p.patient_limit} patients</div>
-                  <div>{(p.monthly_message_limit || 0).toLocaleString()} msgs/mo</div>
-                  <div>{p.max_languages} languages</div>
-                  <div>{p.max_workflows} workflows</div>
+                  <div>{p.patient_limit} Patienten</div>
+                  <div>{(p.monthly_message_limit || 0).toLocaleString()} Nachr./Mon.</div>
+                  <div>{p.max_languages} Sprachen</div>
+                  <div>{p.max_workflows} Workflows</div>
                 </div>
               </div>
             ))}
@@ -1762,10 +1762,10 @@ function TabBilling({ d, load }) {
       {/* Subscription list */}
       {subs?.subscriptions?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Subscriptions</div>
+          <div style={S.kpiLabel}>Abonnements</div>
           <table style={{ ...S.table, marginTop: 8 }}>
             <thead><tr>
-              <th style={S.th}>Clinic</th><th style={S.th}>Plan</th><th style={S.th}>Status</th><th style={S.th}>Started</th>
+              <th style={S.th}>Klinik</th><th style={S.th}>Plan</th><th style={S.th}>Status</th><th style={S.th}>Gestartet</th>
             </tr></thead>
             <tbody>
               {subs.subscriptions.map(s => (
@@ -1784,9 +1784,9 @@ function TabBilling({ d, load }) {
       {/* Recent billing events */}
       {rev?.recentBillingEvents?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Recent Billing Events</div>
+          <div style={S.kpiLabel}>Letzte Abrechnungsereignisse</div>
           <table style={{ ...S.table, marginTop: 8 }}>
-            <thead><tr><th style={S.th}>Type</th><th style={S.th}>Amount</th><th style={S.th}>Date</th></tr></thead>
+            <thead><tr><th style={S.th}>Typ</th><th style={S.th}>Betrag</th><th style={S.th}>Datum</th></tr></thead>
             <tbody>
               {rev.recentBillingEvents.map(e => (
                 <tr key={e.id}><td style={S.td}>{e.event_type}</td><td style={S.td}>{fmtEur(e.amount)}</td><td style={S.td}>{timeAgo(e.created_at)}</td></tr>
@@ -1808,24 +1808,24 @@ function TabSecurity({ d, load }) {
   const keys = d.apiKeys;
 
   const handleRevoke = async (id) => {
-    if (!confirm('Revoke this session?')) return;
+    if (!confirm('Diese Sitzung widerrufen?')) return;
     try {
       await api.revokeSession(id);
       await load('sessions', api.getSessions);
-    } catch (err) { alert('Failed: ' + err.message); }
+    } catch (err) { alert('Fehlgeschlagen: ' + err.message); }
   };
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Security & Compliance</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Sicherheit & Compliance</h2>
 
       {/* Active sessions */}
       <div style={S.card}>
-        <div style={S.kpiLabel}>Active Sessions</div>
-        {!sessions ? <Spin /> : !sessions.sessions?.length ? <Empty text="No active sessions" /> : (
+        <div style={S.kpiLabel}>Aktive Sitzungen</div>
+        {!sessions ? <Spin /> : !sessions.sessions?.length ? <Empty text="Keine aktiven Sitzungen" /> : (
           <table style={{ ...S.table, marginTop: 8 }}>
             <thead><tr>
-              <th style={S.th}>User</th><th style={S.th}>Role</th><th style={S.th}>IP</th><th style={S.th}>Last Active</th><th style={S.th}>Actions</th>
+              <th style={S.th}>Benutzer</th><th style={S.th}>Rolle</th><th style={S.th}>IP</th><th style={S.th}>Zuletzt aktiv</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {sessions.sessions.map(s => (
@@ -1834,7 +1834,7 @@ function TabSecurity({ d, load }) {
                   <td style={S.td}>{statusBadge(s.role)}</td>
                   <td style={S.td}><code style={{ fontSize: 11 }}>{s.ip_address}</code></td>
                   <td style={S.td}>{s.created_at ? timeAgo(s.created_at) : '-'}</td>
-                  <td style={S.td}><Btn small danger onClick={() => handleRevoke(s.id)}>Revoke</Btn></td>
+                  <td style={S.td}><Btn small danger onClick={() => handleRevoke(s.id)}>Widerrufen</Btn></td>
                 </tr>
               ))}
             </tbody>
@@ -1844,18 +1844,18 @@ function TabSecurity({ d, load }) {
 
       {/* RBAC */}
       <div style={S.card}>
-        <div style={S.kpiLabel}>RBAC Permission Matrix</div>
+        <div style={S.kpiLabel}>RBAC Berechtigungsmatrix</div>
         {!rbac ? <Spin /> : (
           <table style={{ ...S.table, marginTop: 8 }}>
             <thead><tr>
-              <th style={S.th}>Endpoint</th><th style={S.th}>Method</th><th style={S.th}>Allowed Roles</th>
+              <th style={S.th}>Endpunkt</th><th style={S.th}>Methode</th><th style={S.th}>Erlaubte Rollen</th>
             </tr></thead>
             <tbody>
               {rbac.permissions?.map((p, i) => (
                 <tr key={i}>
                   <td style={S.td}><code style={{ fontSize: 11, color: S.accent }}>{p.endpoint_pattern}</code></td>
                   <td style={S.td}>{p.http_method}</td>
-                  <td style={S.td}>{(p.allowed_roles || []).length === 0 ? <span style={{ color: '#666' }}>public</span> : p.allowed_roles.map(r => <span key={r} style={{ marginRight: 4 }}>{badge(S.accent, r)}</span>)}</td>
+                  <td style={S.td}>{(p.allowed_roles || []).length === 0 ? <span style={{ color: '#666' }}>öffentlich</span> : p.allowed_roles.map(r => <span key={r} style={{ marginRight: 4 }}>{badge(S.accent, r)}</span>)}</td>
                 </tr>
               ))}
             </tbody>
@@ -1866,20 +1866,20 @@ function TabSecurity({ d, load }) {
       {/* API Keys overview */}
       {keys?.apiKeys?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>API Keys ({keys.apiKeys.length})</div>
-          <div style={{ fontSize: 12, color: '#8888aa', marginTop: 4 }}>Manage in API & Secrets tab</div>
+          <div style={S.kpiLabel}>API-Schlüssel ({keys.apiKeys.length})</div>
+          <div style={{ fontSize: 12, color: '#8888aa', marginTop: 4 }}>Verwalten im Tab API-Schlüssel & Geheimnisse</div>
         </div>
       )}
 
       {/* Data retention */}
       <div style={S.card}>
-        <div style={S.kpiLabel}>Data Retention & Compliance</div>
+        <div style={S.kpiLabel}>Datenspeicherung & Compliance</div>
         <div style={{ fontSize: 13, color: '#ccc', lineHeight: 2, marginTop: 8 }}>
-          <div>Audit Logs: <b style={{ color: '#fff' }}>90 days</b></div>
-          <div>Webhook Events: <b style={{ color: '#fff' }}>30 days</b></div>
-          <div>Backups: <b style={{ color: '#fff' }}>7 daily / 4 weekly / 6 monthly</b></div>
-          <div>Session Tokens: <b style={{ color: '#fff' }}>7 days (JWT refresh)</b></div>
-          <div>GDPR: <b style={{ color: '#fff' }}>Data request handling via admin panel</b></div>
+          <div>Audit-Logs: <b style={{ color: '#fff' }}>90 Tage</b></div>
+          <div>Webhook-Ereignisse: <b style={{ color: '#fff' }}>30 Tage</b></div>
+          <div>Backups: <b style={{ color: '#fff' }}>7 täglich / 4 wöchentlich / 6 monatlich</b></div>
+          <div>Session-Tokens: <b style={{ color: '#fff' }}>7 Tage (JWT Refresh)</b></div>
+          <div>DSGVO: <b style={{ color: '#fff' }}>Datenanfragen über Admin-Panel</b></div>
         </div>
       </div>
     </>
@@ -1903,21 +1903,21 @@ function TabInfrastructure({ d, load }) {
 
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Infrastructure</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Infrastruktur</h2>
 
       {/* Server metrics */}
       {infra && (
         <div style={S.grid3}>
           <div style={S.card}>
             <div style={S.kpiLabel}>CPU</div>
-            <ProgressBar pct={infra.cpu?.usagePercent ?? 0} label="CPU Usage" />
+            <ProgressBar pct={infra.cpu?.usagePercent ?? 0} label="CPU-Auslastung" />
           </div>
           <div style={S.card}>
-            <div style={S.kpiLabel}>Memory</div>
+            <div style={S.kpiLabel}>Speicher</div>
             <ProgressBar pct={infra.memory?.usagePercent ?? 0} label={`${fmtBytes(infra.memory?.usedBytes)} / ${fmtBytes(infra.memory?.totalBytes)}`} />
           </div>
           <div style={S.card}>
-            <div style={S.kpiLabel}>Disk</div>
+            <div style={S.kpiLabel}>Festplatte</div>
             <ProgressBar pct={infra.disk?.usagePercent ?? 0} label={`${fmtBytes(infra.disk?.usedBytes)} / ${fmtBytes(infra.disk?.totalBytes)}`} />
           </div>
         </div>
@@ -1925,17 +1925,17 @@ function TabInfrastructure({ d, load }) {
 
       {/* Database health */}
       <div style={S.card}>
-        <div style={S.kpiLabel}>Database Health</div>
+        <div style={S.kpiLabel}>Datenbank-Zustand</div>
         {!db ? <Spin /> : (
           <div style={{ marginTop: 8 }}>
             <div style={S.grid3}>
-              <div><div style={S.kpiLabel}>DB Size</div><div style={S.kpiSm}>{fmtBytes(db.databaseSize)}</div></div>
-              <div><div style={S.kpiLabel}>Active Connections</div><div style={S.kpiSm}>{db.activeConnections}</div></div>
-              <div><div style={S.kpiLabel}>Tables</div><div style={S.kpiSm}>{db.topTables?.length || 0}+</div></div>
+              <div><div style={S.kpiLabel}>DB-Größe</div><div style={S.kpiSm}>{fmtBytes(db.databaseSize)}</div></div>
+              <div><div style={S.kpiLabel}>Aktive Verbindungen</div><div style={S.kpiSm}>{db.activeConnections}</div></div>
+              <div><div style={S.kpiLabel}>Tabellen</div><div style={S.kpiSm}>{db.topTables?.length || 0}+</div></div>
             </div>
             {db.topTables?.length > 0 && (
               <table style={{ ...S.table, marginTop: 12 }}>
-                <thead><tr><th style={S.th}>Table</th><th style={S.th}>Size</th></tr></thead>
+                <thead><tr><th style={S.th}>Tabelle</th><th style={S.th}>Größe</th></tr></thead>
                 <tbody>
                   {db.topTables.map(t => (
                     <tr key={t.name}><td style={S.td}>{t.name}</td><td style={S.td}>{fmtBytes(t.sizeBytes)}</td></tr>
@@ -1950,7 +1950,7 @@ function TabInfrastructure({ d, load }) {
       {/* Service Status */}
       {containers?.containers?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Services</div>
+          <div style={S.kpiLabel}>Dienste</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
             {containers.containers.map((c, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#1a1a2e', borderRadius: 8 }}>
@@ -1965,9 +1965,9 @@ function TabInfrastructure({ d, load }) {
       {/* Backups */}
       <div style={S.card}>
         <div style={S.kpiLabel}>Backups</div>
-        {!backups ? <Spin /> : !backups.backups?.length ? <Empty text="No backup records. Configure automated backups." /> : (
+        {!backups ? <Spin /> : !backups.backups?.length ? <Empty text="Keine Backup-Einträge. Automatische Backups konfigurieren." /> : (
           <table style={{ ...S.table, marginTop: 8 }}>
-            <thead><tr><th style={S.th}>Type</th><th style={S.th}>Status</th><th style={S.th}>Size</th><th style={S.th}>Duration</th><th style={S.th}>Date</th></tr></thead>
+            <thead><tr><th style={S.th}>Typ</th><th style={S.th}>Status</th><th style={S.th}>Größe</th><th style={S.th}>Dauer</th><th style={S.th}>Datum</th></tr></thead>
             <tbody>
               {backups.backups.map(b => (
                 <tr key={b.id}><td style={S.td}>{b.backup_type}</td><td style={S.td}>{statusBadge(b.status)}</td><td style={S.td}>{fmtBytes(b.file_size_bytes)}</td><td style={S.td}>{b.duration_seconds}s</td><td style={S.td}>{timeAgo(b.created_at)}</td></tr>
@@ -1977,7 +1977,7 @@ function TabInfrastructure({ d, load }) {
         )}
         {backups?.restoreDrills?.length > 0 && (
           <div style={{ marginTop: 12 }}>
-            <div style={S.kpiLabel}>Restore Drills</div>
+            <div style={S.kpiLabel}>Wiederherstellungstests</div>
             {backups.restoreDrills.map(dr => (
               <div key={dr.id} style={{ padding: '8px 0', borderBottom: '1px solid #1e1e3e', fontSize: 13, color: '#ccc' }}>
                 {statusBadge(dr.status)} — {timeAgo(dr.created_at)}
@@ -1989,10 +1989,10 @@ function TabInfrastructure({ d, load }) {
 
       {/* Deployments */}
       <div style={S.card}>
-        <div style={S.kpiLabel}>Recent Deployments</div>
-        {!deployments ? <Spin /> : !deployments.deployments?.length ? <Empty text="No deployment records yet" /> : (
+        <div style={S.kpiLabel}>Letzte Deployments</div>
+        {!deployments ? <Spin /> : !deployments.deployments?.length ? <Empty text="Noch keine Deployment-Einträge" /> : (
           <table style={{ ...S.table, marginTop: 8 }}>
-            <thead><tr><th style={S.th}>Service</th><th style={S.th}>Version</th><th style={S.th}>Status</th><th style={S.th}>By</th><th style={S.th}>Date</th></tr></thead>
+            <thead><tr><th style={S.th}>Dienst</th><th style={S.th}>Version</th><th style={S.th}>Status</th><th style={S.th}>Von</th><th style={S.th}>Datum</th></tr></thead>
             <tbody>
               {deployments.deployments.map(dep => (
                 <tr key={dep.id}><td style={S.td}>{dep.service}</td><td style={S.td}><code style={{ fontSize: 11, color: S.accent }}>{dep.version}</code></td><td style={S.td}>{statusBadge(dep.status)}</td><td style={S.td}>{dep.deployed_by || '-'}</td><td style={S.td}>{timeAgo(dep.created_at)}</td></tr>
@@ -2011,11 +2011,11 @@ function TabInfrastructure({ d, load }) {
 function TabSupport({ d }) {
   return (
     <>
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Support Toolkit</h2>
+      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Support-Werkzeuge</h2>
 
       <div style={S.grid2}>
         <div style={S.card}>
-          <div style={S.kpiLabel}>Quick Diagnostics</div>
+          <div style={S.kpiLabel}>Schnelldiagnose</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
             <a href="https://grafana.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ padding: '10px 16px', background: '#1a1a2e', borderRadius: 8, color: S.accent, fontSize: 13, textDecoration: 'none', border: '1px solid #333366' }}>Grafana Dashboards</a>
             <a href="https://prometheus.flowmatix.io" target="_blank" rel="noopener noreferrer" style={{ padding: '10px 16px', background: '#1a1a2e', borderRadius: 8, color: S.accent, fontSize: 13, textDecoration: 'none', border: '1px solid #333366' }}>Prometheus Metrics</a>
@@ -2025,17 +2025,17 @@ function TabSupport({ d }) {
         </div>
 
         <div style={S.card}>
-          <div style={S.kpiLabel}>Incident Templates</div>
+          <div style={S.kpiLabel}>Vorfall-Vorlagen</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
             {[
-              { title: 'Service Degradation', text: 'We are currently investigating degraded performance on [service]. Updates will follow.' },
-              { title: 'Planned Maintenance', text: 'Scheduled maintenance on [date] from [time] to [time] UTC. Brief service interruption expected.' },
-              { title: 'Incident Resolved', text: 'The incident affecting [service] has been resolved. All systems are operational.' },
+              { title: 'Dienststörung', text: 'Wir untersuchen derzeit eine Leistungsbeeinträchtigung bei [Dienst]. Updates folgen.' },
+              { title: 'Geplante Wartung', text: 'Geplante Wartung am [Datum] von [Uhrzeit] bis [Uhrzeit] UTC. Kurze Dienstunterbrechung möglich.' },
+              { title: 'Vorfall behoben', text: 'Der Vorfall bei [Dienst] wurde behoben. Alle Systeme sind betriebsbereit.' },
             ].map((t, i) => (
               <div key={i} style={{ padding: '10px 16px', background: '#1a1a2e', borderRadius: 8, border: '1px solid #333366' }}>
                 <div style={{ fontSize: 13, color: '#fff', fontWeight: 600 }}>{t.title}</div>
                 <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>{t.text}</div>
-                <button onClick={() => navigator.clipboard?.writeText(t.text)} style={{ marginTop: 6, background: 'none', border: 'none', color: S.accent, fontSize: 11, cursor: 'pointer' }}>Copy to clipboard</button>
+                <button onClick={() => navigator.clipboard?.writeText(t.text)} style={{ marginTop: 6, background: 'none', border: 'none', color: S.accent, fontSize: 11, cursor: 'pointer' }}>In Zwischenablage kopieren</button>
               </div>
             ))}
           </div>
@@ -2045,9 +2045,9 @@ function TabSupport({ d }) {
       {/* Clinic health summary */}
       {d.clinics?.clinics?.length > 0 && (
         <div style={S.card}>
-          <div style={S.kpiLabel}>Clinic Health Summary</div>
+          <div style={S.kpiLabel}>Klinik-Gesundheitsübersicht</div>
           <table style={{ ...S.table, marginTop: 8 }}>
-            <thead><tr><th style={S.th}>Clinic</th><th style={S.th}>Status</th><th style={S.th}>Provisioning</th><th style={S.th}>Created</th></tr></thead>
+            <thead><tr><th style={S.th}>Klinik</th><th style={S.th}>Status</th><th style={S.th}>Bereitstellung</th><th style={S.th}>Erstellt</th></tr></thead>
             <tbody>
               {d.clinics.clinics.map(c => (
                 <tr key={c.id}><td style={S.td}>{c.name}</td><td style={S.td}>{statusBadge(c.is_active ? 'active' : 'inactive')}</td><td style={S.td}>{statusBadge(c.provisioning_status || 'pending')}</td><td style={S.td}>{timeAgo(c.created_at)}</td></tr>
