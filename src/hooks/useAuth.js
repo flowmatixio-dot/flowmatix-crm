@@ -99,6 +99,11 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
           fmApi.setTokens(access, refresh);
           if (userData) sessionStorage.setItem('fm_api_user', userData);
           sessionStorage.setItem('fm_login_at', String(Date.now()));
+          // Set CRM language from signup
+          const lang = params.get('lang');
+          if (lang && ['de', 'en', 'tr'].includes(lang)) {
+            localStorage.setItem('fm_lang', lang);
+          }
         }
       } catch (e) { console.warn('[trial-auth] Failed to parse:', e); }
       // Clean URL hash

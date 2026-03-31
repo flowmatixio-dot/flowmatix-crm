@@ -582,6 +582,35 @@ export async function getStripePortalUrl() {
   });
 }
 
+// Aliases used by SubscriptionView and MainLayout
+export const openBillingPortal = getStripePortalUrl;
+
+export async function getStripeInvoices() {
+  return apiFetch('/api/v1/billing/invoices');
+}
+
+// ── Workspace State ─────────────────────────────────────
+
+export async function getWorkspaceState() {
+  return apiFetch('/api/v1/clinic/workspace/state');
+}
+
+export async function setWorkspaceState(state) {
+  return apiFetch('/api/v1/clinic/workspace/state', {
+    method: 'PUT',
+    body: JSON.stringify({ state }),
+  });
+}
+
+// ── Trial Subscription (reuses billing/subscribe) ───────
+
+export async function startTrialActivation(plan = 'pro', billingCycle = 'monthly') {
+  return apiFetch('/api/v1/billing/subscribe', {
+    method: 'POST',
+    body: JSON.stringify({ plan, billingCycle }),
+  });
+}
+
 // ── Agent Config ─────────────────────────────────────────
 
 export async function getAgentConfig(orgId) {
