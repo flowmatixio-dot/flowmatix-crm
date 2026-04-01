@@ -3,12 +3,40 @@ import * as fmApi from '../../../api/client.js';
 
 export function useActions() {
   const [clinics, setClinics] = useState([]);
+  const [waActivations, setWaActivations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     try {
-      const res = await fmApi.apiFetch('/api/v1/ops/clinic-actions');
-      if (res?.clinics) setClinics(res.clinics);
+      const [actionsRes, waRes] = await Promise.all([
+        fmApi.apiFetch('/api/v1/ops/clinic-actions').catch(() => null),
+        fmApi.apiFetch('/api/v1/ops/clinic/whatsapp-activations').catch(() => null),
+      ]);
+
+      const clinicList = Array.isArray(actionsRes?.clinics) ? actionsRes.clinics : [];
+      const activations = Array.isArray(waRes?.activations) ? waRes.activations : [];
+
+      // Merge WA activation data into clinic records
+      if (activations.length > 0) {
+        const activationMap = new Map();
+        activations.forEach(a => {
+          if (a.org_id) activationMap.set(a.org_id, a);
+        });
+
+        clinicList.forEach(c => {
+          const activation = activationMap.get(c.id);
+          if (activation) {
+            c._waActivation = activation;
+            // If clinic has no required_action but has a pending WA activation, flag it
+            if (c.required_action === 'NONE' && activation.status === 'pending') {
+              c.required_action = 'CONNECT_WHATSAPP';
+            }
+          }
+        });
+      }
+
+      setClinics(clinicList);
+      setWaActivations(activations);
     } catch {} finally { setLoading(false); }
   }, []);
 
@@ -18,5 +46,5 @@ export function useActions() {
   const totalMrr = clinics.reduce((sum, c) => sum + (c.mrr || 0), 0);
   const liveCount = clinics.filter(c => c.required_action === 'NONE').length;
 
-  return { clinics, loading, reload: load, actionRequired, totalMrr, liveCount };
+  return { clinics, waActivations, loading, reload: load, actionRequired, totalMrr, liveCount };
 }

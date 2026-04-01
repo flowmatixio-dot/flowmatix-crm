@@ -1,84 +1,180 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
+import DataTable from '../shared/DataTable.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
+
+const PLATFORM_COSTS = [
+  { name: 'Hetzner Server (CX32)', cost: 18 },
+  { name: 'Cloudflare Pro', cost: 0 },
+  { name: 'Meta (WhatsApp Business API)', cost: 0 },
+  { name: '360dialog', cost: 0 },
+  { name: 'Anthropic (Claude AI)', cost: 12 },
+  { name: 'Porkbun Domain', cost: 1 },
+];
 
 export default function BillingView({ actions }) {
   const [revenue, setRevenue] = useState(null);
   const [subs, setSubs] = useState([]);
+  const [overdue, setOverdue] = useState([]);
+  const [billingEvents, setBillingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     Promise.all([
-      fmApi.getRevenue?.().catch(() => null),
-      fmApi.getSubscriptions?.().catch(() => null),
-    ]).then(([r, s]) => { setRevenue(r); setSubs(s?.subscriptions || []); setLoading(false); });
+      fmApi.getRevenue().catch(() => null),
+      fmApi.getSubscriptions().catch(() => null),
+      fmApi.apiFetch('/api/v1/ops/billing/overdue').catch(() => null),
+    ]).then(([r, s, o]) => {
+      setRevenue(r);
+      setSubs(Array.isArray(s?.subscriptions) ? s.subscriptions : []);
+      setBillingEvents(Array.isArray(r?.recentBillingEvents) ? r.recentBillingEvents : []);
+      setOverdue(Array.isArray(o?.overdue) ? o.overdue : []);
+      setLoading(false);
+    });
   }, []);
 
   const { clinics = [], totalMrr = 0 } = actions || {};
   const mrr = safeNum(revenue?.mrr);
-  const fmt = n => `€${(safeNum(n) / 100).toLocaleString('de-DE')}`;
+  const fmtCents = n => `EUR ${(safeNum(n) / 100).toLocaleString('de-DE')}`;
+  const fmtEur = n => `EUR ${safeNum(n).toLocaleString('de-DE')}`;
   const countByStatus = (revenue?.countByStatus && typeof revenue.countByStatus === 'object' && !Array.isArray(revenue.countByStatus)) ? revenue.countByStatus : {};
 
-  // Platform costs (static for now)
-  const PLATFORM_COSTS = [
-    { name: 'Hetzner Server', cost: 18 },
-    { name: 'Cloudflare Pro', cost: 0 },
-    { name: 'Meta (WhatsApp API)', cost: 0 },
-    { name: '360dialog', cost: 0 },
-    { name: 'Anthropic (Claude AI)', cost: 12 },
-    { name: 'Porkbun Domain', cost: 1 },
-  ];
   const totalCosts = PLATFORM_COSTS.reduce((s, c) => s + c.cost, 0);
   const profit = (mrr / 100) - totalCosts;
+
+  const handleDatevExport = async () => {
+    setExporting(true);
+    try {
+      const from = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+      const to = new Date().toISOString().slice(0, 10);
+      await fmApi.downloadDatevExport(from, to);
+    } catch {} finally { setExporting(false); }
+  };
+
+  const subColumns = [
+    { key: 'name', label: 'Clinic', render: (v, row) => (
+      <div>
+        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(v || row.org_name)}</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{safeStr(row.email)}</div>
+      </div>
+    )},
+    { key: 'plan_name', label: 'Plan', render: v => <span style={{ fontSize: 12, fontWeight: 600 }}>{safeStr(v, '---')}</span> },
+    { key: 'subscription_status', label: 'Status', render: v => <StatusBadge status={safeStr(v, 'unknown')} /> },
+    { key: 'mrr', label: 'MRR', render: v => {
+      const n = safeNum(v);
+      return <span style={{ fontSize: 12, fontWeight: 700, color: n > 0 ? '#10b981' : 'var(--text-muted)' }}>
+        {n > 0 ? `EUR ${n.toLocaleString('de-DE')}` : 'EUR 0'}
+      </span>;
+    }},
+    { key: 'billing_interval', label: 'Interval', render: v => <span style={{ fontSize: 12 }}>{safeStr(v, 'monthly')}</span> },
+    { key: 'trial_end', label: 'Trial End', render: v => v ? new Date(v).toLocaleDateString('de-DE') : '---' },
+  ];
 
   if (loading) return <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading...</div>;
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 20px' }}>Billing & Finance</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Billing & Finance</h1>
+        <button onClick={handleDatevExport} disabled={exporting}
+          style={{ background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 13, fontWeight: 700, cursor: exporting ? 'wait' : 'pointer', opacity: exporting ? 0.6 : 1 }}>
+          {exporting ? 'Exporting...' : 'DATEV Export'}
+        </button>
+      </div>
 
+      {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
-        <StatCard label="Monthly Revenue (MRR)" value={fmt(mrr)} color="green" sub={`${safeNum(countByStatus.active)} paid · ${safeNum(countByStatus.trialing)} trial`} />
-        <StatCard label="Monthly Costs" value={`€${totalCosts}`} color="red" sub={`${PLATFORM_COSTS.length} services`} />
-        <StatCard label="Profit" value={`€${profit.toFixed(0)}`} color={profit >= 0 ? 'green' : 'red'} sub={profit < 0 ? 'Negative margin' : 'Positive margin'} />
-        <StatCard label="Overdue" value={safeNum(countByStatus.past_due)} color={safeNum(countByStatus.past_due) > 0 ? 'red' : 'green'} sub="All current" />
+        <StatCard label="Monthly Revenue (MRR)" value={fmtCents(mrr)} color="green" sub={`${safeNum(countByStatus.active)} paid / ${safeNum(countByStatus.trialing)} trial`} />
+        <StatCard label="Monthly Costs" value={`EUR ${totalCosts}`} color="red" sub={`${PLATFORM_COSTS.length} services`} />
+        <StatCard label="Profit" value={`EUR ${profit.toFixed(0)}`} color={profit >= 0 ? 'green' : 'red'} sub={profit < 0 ? 'Negative margin' : 'Positive margin'} />
+        <StatCard label="Overdue" value={overdue.length || safeNum(countByStatus.past_due)} color={(overdue.length || safeNum(countByStatus.past_due)) > 0 ? 'red' : 'green'} sub={overdue.length > 0 ? 'Needs attention' : 'All current'} />
+      </div>
+
+      {/* Overdue Alert */}
+      {overdue.length > 0 && (
+        <div style={{ background: '#ef444415', border: '1px solid #ef444440', borderRadius: 10, padding: 16, marginBottom: 20 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', margin: '0 0 10px' }}>Overdue Payments ({overdue.length})</h3>
+          {overdue.map((o, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: i < overdue.length - 1 ? '1px solid rgba(239,68,68,0.15)' : 'none', fontSize: 13 }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{safeStr(o.org_name || o.name)}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{safeStr(o.plan_name, '---')}</span>
+              <span style={{ color: '#ef4444', fontWeight: 700 }}>EUR {safeNum(o.amount_due || o.mrr).toLocaleString('de-DE')}</span>
+              {o.days_overdue && <span style={{ fontSize: 11, color: '#ef4444' }}>{safeNum(o.days_overdue)}d overdue</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Customer Subscriptions */}
+      <h2 style={sectionH}>Customer Subscriptions</h2>
+      <div style={{ marginBottom: 28 }}>
+        <DataTable
+          columns={subColumns}
+          data={clinics.length > 0 ? clinics : subs}
+          searchable
+          searchKeys={['name', 'email', 'plan_name', 'org_name']}
+          emptyText="No subscriptions"
+        />
       </div>
 
       {/* Platform Costs */}
       <details style={{ marginBottom: 28 }}>
         <summary style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: 8 }}>
-          Platform Costs — €{totalCosts}/mo
+          Platform Costs -- EUR {totalCosts}/mo
         </summary>
         <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
           {PLATFORM_COSTS.map((c, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 13 }}>
               <span style={{ color: 'var(--text-secondary)' }}>{c.name}</span>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>€{c.cost}</span>
+              <span style={{ fontWeight: 600, color: c.cost > 0 ? 'var(--text-primary)' : 'var(--text-muted)' }}>EUR {c.cost}</span>
             </div>
           ))}
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', fontSize: 13, fontWeight: 700, background: 'rgba(255,255,255,0.03)' }}>
+            <span style={{ color: 'var(--text-primary)' }}>Total</span>
+            <span style={{ color: '#ef4444' }}>EUR {totalCosts}/mo</span>
+          </div>
         </div>
       </details>
 
-      {/* Customer Subscriptions */}
-      <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 }}>Customer Subscriptions</h2>
-      <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
-        {clinics.map(c => (
-          <div key={c.id} style={{ display: 'flex', alignItems: 'center', padding: '12px 18px', borderBottom: '1px solid rgba(255,255,255,0.04)', gap: 14 }}>
-            <span style={{ width: 8, height: 8, borderRadius: 99, background: c.subscription_status === 'active' ? '#10b981' : c.subscription_status === 'trialing' ? '#eab308' : '#6b7280' }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(c.name)}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{safeStr(c.plan_name, 'No plan')}</div>
-            </div>
-            <StatusBadge status={safeStr(c.subscription_status, 'unknown')} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: safeNum(c.mrr) > 0 ? '#10b981' : 'var(--text-muted)', minWidth: 70, textAlign: 'right' }}>
-              {safeNum(c.mrr) > 0 ? `€${safeNum(c.mrr).toLocaleString('de-DE')}` : '€0'}
-            </span>
+      {/* Recent Billing Events */}
+      {billingEvents.length > 0 && (
+        <>
+          <h2 style={sectionH}>Recent Billing Events</h2>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
+            {billingEvents.slice(0, 15).map((ev, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12 }}>
+                <span style={{ color: 'var(--text-muted)', width: 140, flexShrink: 0 }}>
+                  {ev.created_at ? new Date(ev.created_at).toLocaleString('de-DE') : '---'}
+                </span>
+                <span style={{ color: eventColor(ev.type), fontWeight: 600, width: 120, flexShrink: 0 }}>
+                  {safeStr(ev.type, '---')}
+                </span>
+                <span style={{ color: 'var(--text-secondary)', flex: 1 }}>
+                  {safeStr(ev.org_name || ev.description, '---')}
+                </span>
+                {ev.amount !== undefined && (
+                  <span style={{ fontWeight: 700, color: '#10b981', flexShrink: 0 }}>
+                    EUR {(safeNum(ev.amount) / 100).toLocaleString('de-DE')}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-        {clinics.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>No subscriptions</div>}
-      </div>
+        </>
+      )}
     </div>
   );
+}
+
+const sectionH = { fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 };
+
+function eventColor(type) {
+  if (typeof type !== 'string') return '#6b7280';
+  if (type.includes('failed') || type.includes('overdue')) return '#ef4444';
+  if (type.includes('succeeded') || type.includes('paid')) return '#10b981';
+  if (type.includes('created') || type.includes('updated')) return '#3b82f6';
+  return '#eab308';
 }

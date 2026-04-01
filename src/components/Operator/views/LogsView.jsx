@@ -1,59 +1,173 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
+
+const SOURCES = [
+  { key: '', label: 'All' },
+  { key: 'audit', label: 'Audit' },
+  { key: 'webhook', label: 'Webhook' },
+  { key: 'provisioning', label: 'Provisioning' },
+];
+
+const SOURCE_COLORS = {
+  audit: '#3b82f6',
+  webhook: '#a78bfa',
+  provisioning: '#eab308',
+  system: '#10b981',
+  error: '#ef4444',
+};
 
 export default function LogsView() {
   const [logs, setLogs] = useState([]);
   const [source, setSource] = useState('');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [expandedRow, setExpandedRow] = useState(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     setLoading(true);
-    fmApi.getUnifiedLogs?.({ page, limit: 50, source: source || undefined })
-      .then(res => { setLogs(res?.entries || []); setTotal(res?.pagination?.total || 0); setLoading(false); })
-      .catch(() => setLoading(false));
+    fmApi.getUnifiedLogs({ page, limit: 50, source: source || undefined })
+      .then(res => {
+        setLogs(Array.isArray(res?.entries) ? res.entries : []);
+        setTotal(res?.pagination?.total || 0);
+        setLoading(false);
+      })
+      .catch(() => { setLogs([]); setLoading(false); });
   }, [page, source]);
 
-  const SOURCES = ['', 'audit', 'webhook', 'provisioning'];
+  useEffect(() => { load(); }, [load]);
+
+  // Client-side search filter
+  const filtered = search
+    ? logs.filter(l => {
+        const q = search.toLowerCase();
+        const action = typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : '';
+        const orgName = typeof l.org_name === 'string' ? l.org_name : '';
+        const details = typeof l.details === 'string' ? l.details : typeof l.details === 'object' ? JSON.stringify(l.details) : '';
+        return action.toLowerCase().includes(q) || orgName.toLowerCase().includes(q) || details.toLowerCase().includes(q);
+      })
+    : logs;
+
+  const totalPages = Math.ceil(total / 50) || 1;
+
+  const handleExport = () => {
+    const data = JSON.stringify(filtered, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `operator-logs-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const getSourceColor = (src) => {
+    if (typeof src !== 'string') return '#6b7280';
+    return SOURCE_COLORS[src.toLowerCase()] || '#6b7280';
+  };
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Logs</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {SOURCES.map(s => (
-            <button key={s} onClick={() => { setSource(s); setPage(1); }}
-              style={{ background: source === s ? '#ff8a2a' : 'var(--bg-card)', color: source === s ? '#fff' : 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
-              {s || 'All'}
+            <button key={s.key} onClick={() => { setSource(s.key); setPage(1); }}
+              style={{ background: source === s.key ? '#ff8a2a' : 'var(--bg-card)', color: source === s.key ? '#fff' : 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              {s.label}
             </button>
           ))}
+          <button onClick={handleExport} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+            Export JSON
+          </button>
         </div>
       </div>
 
-      {loading ? <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading...</div> : (
+      {/* Search */}
+      <div style={{ marginBottom: 14 }}>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Filter logs..."
+          style={{ background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', color: 'var(--text-primary)', fontSize: 13, width: 320, outline: 'none' }}
+        />
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading...</div>
+      ) : (
         <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
           <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
-            {logs.map((l, i) => (
-              <div key={i} style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12 }}>
-                <span style={{ color: 'var(--text-muted)', flexShrink: 0, width: 140 }}>{l.created_at ? new Date(l.created_at).toLocaleString('de-DE') : ''}</span>
-                <span style={{ color: (typeof l.source === 'string' && l.source === 'webhook') ? '#a78bfa' : (typeof l.source === 'string' && l.source === 'audit') ? '#3b82f6' : '#eab308', fontWeight: 600, width: 80, flexShrink: 0 }}>{typeof l.source === 'string' ? l.source : '—'}</span>
-                <span style={{ color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : ''} {typeof l.org_name === 'string' ? `[${l.org_name}]` : ''} {l.details && typeof l.details === 'object' ? JSON.stringify(l.details).slice(0, 120) : typeof l.details === 'string' ? l.details.slice(0, 120) : ''}
-                </span>
+            {filtered.map((l, i) => {
+              const isExpanded = expandedRow === i;
+              const srcStr = typeof l.source === 'string' ? l.source : '---';
+              const action = typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : '';
+              const orgName = typeof l.org_name === 'string' ? l.org_name : '';
+              const hasDetails = l.details && (typeof l.details === 'object' || (typeof l.details === 'string' && l.details.length > 0));
+              const detailStr = typeof l.details === 'object' ? JSON.stringify(l.details, null, 2) : typeof l.details === 'string' ? l.details : '';
+
+              return (
+                <div key={i}>
+                  <div
+                    onClick={() => hasDetails ? setExpandedRow(isExpanded ? null : i) : null}
+                    style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12, cursor: hasDetails ? 'pointer' : 'default', transition: 'background 0.15s' }}
+                    onMouseEnter={e => { if (hasDetails) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <span style={{ color: 'var(--text-muted)', flexShrink: 0, width: 140 }}>
+                      {l.created_at ? new Date(l.created_at).toLocaleString('de-DE') : ''}
+                    </span>
+                    <span style={{ color: getSourceColor(srcStr), fontWeight: 600, width: 90, flexShrink: 0 }}>
+                      {srcStr}
+                    </span>
+                    <span style={{ color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {action} {orgName ? `[${orgName}]` : ''} {!isExpanded && detailStr ? detailStr.slice(0, 120) : ''}
+                    </span>
+                    {hasDetails && (
+                      <span style={{ color: 'var(--text-muted)', flexShrink: 0, fontSize: 10 }}>{isExpanded ? 'collapse' : 'expand'}</span>
+                    )}
+                  </div>
+                  {isExpanded && detailStr && (
+                    <div style={{ padding: '8px 16px 12px 242px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                      <pre style={{ margin: 0, fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-all', maxHeight: 300, overflow: 'auto' }}>
+                        {detailStr}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+                {search ? 'No logs match your filter' : 'No logs found'}
               </div>
-            ))}
-            {logs.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>No logs found</div>}
+            )}
           </div>
+
+          {/* Pagination */}
           {total > 50 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 12, padding: 12, borderTop: '1px solid var(--border)' }}>
-              <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} style={{ background: 'var(--bg-hover)', color: 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: page > 1 ? 'pointer' : 'default', opacity: page > 1 ? 1 : 0.4 }}>Prev</button>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)', alignSelf: 'center' }}>Page {page} / {Math.ceil(total / 50)}</span>
-              <button disabled={page * 50 >= total} onClick={() => setPage(p => p + 1)} style={{ background: 'var(--bg-hover)', color: 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: page * 50 < total ? 'pointer' : 'default', opacity: page * 50 < total ? 1 : 0.4 }}>Next</button>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, padding: 12, borderTop: '1px solid var(--border)' }}>
+              <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
+                style={pageBtn(page > 1)}>Prev</button>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Page {page} / {totalPages}</span>
+              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}
+                style={pageBtn(page < totalPages)}>Next</button>
             </div>
           )}
         </div>
       )}
+
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, textAlign: 'right' }}>
+        {filtered.length} entries shown{search ? ' (filtered)' : ''} / {total} total
+      </div>
     </div>
   );
+}
+
+function pageBtn(enabled) {
+  return { background: 'var(--bg-hover, var(--bg-card))', color: 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: enabled ? 'pointer' : 'default', opacity: enabled ? 1 : 0.4 };
 }

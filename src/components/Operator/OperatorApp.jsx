@@ -31,6 +31,7 @@ const VIEWS = {
 
 export default function OperatorApp() {
   const [tab, setTab] = useState('overview');
+  const [selectedClinic, setSelectedClinic] = useState(null);
   const eventState = useEvents();
   const actionState = useActions();
 
@@ -42,9 +43,22 @@ export default function OperatorApp() {
     incidents: eventState.events.filter(e => e.type === 'ERROR_OCCURRED' && !e.resolved).length || 0,
   };
 
+  // When switching tabs, clear selected clinic
+  const handleTabChange = (newTab) => {
+    setSelectedClinic(null);
+    setTab(newTab);
+  };
+
+  // Build props for the active view
+  const viewProps = { events: eventState, actions: actionState };
+  if (tab === 'clinics') {
+    viewProps.selectedClinic = selectedClinic;
+    viewProps.onSelectClinic = setSelectedClinic;
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-app)', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", color: 'var(--text-primary)', overflow: 'hidden' }}>
-      <OperatorSidebar activeTab={tab} onTabChange={setTab} badges={badges} />
+      <OperatorSidebar activeTab={tab} onTabChange={handleTabChange} badges={badges} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <AlertBar
           events={eventState.events}
@@ -53,7 +67,7 @@ export default function OperatorApp() {
           connected={eventState.connected}
         />
         <div style={{ flex: 1, overflow: 'auto', padding: 24 }}>
-          <View events={eventState} actions={actionState} />
+          <View {...viewProps} />
         </div>
       </div>
     </div>
