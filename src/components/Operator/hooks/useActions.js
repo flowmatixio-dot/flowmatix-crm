@@ -91,8 +91,14 @@ export function useActions() {
 function computeAction(c) {
   const ws = c.workspace_state || '';
   const wa = c.whatsapp_connected || c.whatsapp_active;
+  const waSetup = c.wa_setup_status || 'not_started';
   const sub = c.subscription_status || '';
 
+  if (waSetup === 'failed') return 'FIX_ERROR';
+  if (ws === 'pending_setup' && waSetup === 'not_started') return 'START_SETUP';
+  if (ws === 'pending_setup' && waSetup === 'link_sent') return 'CONNECT_WHATSAPP';
+  if (ws === 'pending_setup' && waSetup === 'otp_pending') return 'VERIFY_OTP';
+  if (ws === 'pending_setup' && waSetup === 'verified') return 'ACTIVATE';
   if (ws === 'demo' && sub !== 'active') return 'START_SETUP';
   if ((ws === 'live_test' || ws === 'activation_pending') && !wa) return 'WAIT_FOR_NUMBER';
   if (ws === 'active' && sub === 'active') return 'NONE';

@@ -10,8 +10,11 @@ const STATE_CONFIG = {
   VERIFYING:         { label: 'Verifying',        bg: '#a78bfa20', color: '#a78bfa', dot: '#a78bfa' },
   LIVE:              { label: 'Live',              bg: '#10b98120', color: '#10b981', dot: '#10b981' },
   NONE:              { label: 'Live',              bg: '#10b98120', color: '#10b981', dot: '#10b981' },
+  ACTIVATE:          { label: 'Ready to Activate', bg: '#10b98120', color: '#10b981', dot: '#10b981' },
   FIX_ERROR:         { label: 'Error',             bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
   ERROR:             { label: 'Error',             bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
+  // workspace states
+  pending_setup:     { label: 'Pending Setup',     bg: '#f9731620', color: '#f97316', dot: '#f97316' },
   // subscription statuses
   active:            { label: 'Active',            bg: '#10b98120', color: '#10b981', dot: '#10b981' },
   trialing:          { label: 'Trial',             bg: '#eab30820', color: '#eab308', dot: '#eab308' },

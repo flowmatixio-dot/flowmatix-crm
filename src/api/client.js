@@ -1625,3 +1625,5 @@ export async function getWebsiteStats(orgId) {
 export const getOperatorEvents = (params = {}) => apiFetch(`/api/v1/ops/operator-events?${new URLSearchParams(params)}`);
 export const resolveOperatorEvent = (id) => apiFetch(`/api/v1/ops/operator-events/${id}/resolve`, { method: 'POST' });
 export const getClinicActions = () => apiFetch('/api/v1/ops/clinic-actions');
+export const activateClinic = (orgId) => apiFetch(`/api/v1/ops/clinic-actions/${orgId}/activate`, { method: 'POST' });
+export const updateWaSetupStatus = (orgId, status) => apiFetch(`/api/v1/ops/clinic-actions/${orgId}/wa-status`, { method: 'POST', body: JSON.stringify({ status }) });

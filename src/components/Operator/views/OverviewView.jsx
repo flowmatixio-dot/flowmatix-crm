@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import ActionCard from '../shared/ActionCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
+import WaOnboardingModal from '../shared/WaOnboardingModal.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
 export default function OverviewView({ events, actions }) {
   const [stats, setStats] = useState(null);
   const [waActivations, setWaActivations] = useState([]);
+  const [onboardingClinic, setOnboardingClinic] = useState(null);
 
   const load = useCallback(() => {
     fmApi.getPlatformStats().then(setStats).catch(() => {});
@@ -147,17 +149,9 @@ export default function OverviewView({ events, actions }) {
                       <StatusBadge status={safeStr(c.required_action, 'NONE')} />
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                    {(c.required_action === 'START_SETUP' || c.required_action === 'WAIT_FOR_NUMBER') && (
-                      <button onClick={() => handleWaAction(c.id, 'start')} style={waBtn('#3b82f6')}>Start Setup</button>
-                    )}
-                    {c.required_action === 'VERIFY_OTP' && (
-                      <button onClick={() => handleWaAction(c.id, 'retry')} style={waBtn('#f97316')}>Verify OTP</button>
-                    )}
-                    {(c.required_action === 'CONNECT_WHATSAPP' || c.required_action === 'FIX_ERROR') && (
-                      <button onClick={() => handleWaAction(c.id, 'force')} style={waBtn('#10b981')}>Force Connect</button>
-                    )}
-                  </div>
+                  <button onClick={() => setOnboardingClinic(c)} style={waBtn('#ff8a2a')}>
+                    Continue Setup
+                  </button>
                 </div>
               ))}
             </div>
@@ -180,6 +174,15 @@ export default function OverviewView({ events, actions }) {
           </div>
         </div>
       </div>
+
+      {/* WA Onboarding Modal */}
+      {onboardingClinic && (
+        <WaOnboardingModal
+          clinic={onboardingClinic}
+          onClose={() => setOnboardingClinic(null)}
+          onComplete={() => { setOnboardingClinic(null); load(); actions?.reload?.(); }}
+        />
+      )}
     </div>
   );
 }

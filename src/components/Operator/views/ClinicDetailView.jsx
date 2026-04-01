@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
+import WaOnboardingModal from '../shared/WaOnboardingModal.jsx';
 import { safe, safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
@@ -8,6 +9,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const [detail, setDetail] = useState(null);
   const [waLogEntries, setWaLogEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showWaModal, setShowWaModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState(null);
 
@@ -125,8 +127,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           </div>
           {d.wa_error && <div style={row}><span style={lbl}>Error</span><span style={{ color: '#ef4444', fontSize: 12 }}>{safeStr(d.wa_error)}</span></div>}
           <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-            <button onClick={() => handleAction('wa-start')} disabled={actionLoading === 'wa-start'} style={actionBtn('#3b82f6')}>Start Setup</button>
-            <button onClick={() => handleAction('wa-retry')} disabled={actionLoading === 'wa-retry'} style={actionBtn('#f97316')}>Retry</button>
+            <button onClick={() => setShowWaModal(true)} style={actionBtn('#ff8a2a')}>WA Onboarding Wizard</button>
             <button onClick={() => handleAction('wa-force')} disabled={actionLoading === 'wa-force'} style={actionBtn('#10b981')}>Force Connect</button>
             <button onClick={() => handleAction('wa-reset')} disabled={actionLoading === 'wa-reset'} style={actionBtn('#ef4444')}>Reset WA</button>
           </div>
@@ -197,6 +198,15 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           </div>
         )}
       </div>
+
+      {/* WA Onboarding Modal */}
+      {showWaModal && (
+        <WaOnboardingModal
+          clinic={{ ...clinic, ...(detail || {}), id: clinic?.id }}
+          onClose={() => setShowWaModal(false)}
+          onComplete={() => { setShowWaModal(false); loadDetail(); onRefresh?.(); }}
+        />
+      )}
     </div>
   );
 }
