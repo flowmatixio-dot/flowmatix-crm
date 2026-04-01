@@ -44,9 +44,11 @@ export default function MonitoringView({ actions }) {
   // Use clinics from actions prop (preferred) or local fetch (fallback)
   const clinics = (actions?.clinics?.length > 0) ? actions.clinics : (localClinics || []);
 
-  const cpuVal = infra?.cpu;
-  const memVal = infra?.memory;
-  const diskVal = infra?.disk;
+  // CPU: { pct, load1, load5, load15 }
+  const cpu = infra?.cpu || {};
+  // Memory/Disk: { pct, usedGB, totalGB, freeGB }
+  const mem = infra?.memory || {};
+  const disk = infra?.disk || {};
   const uptimeVal = infra?.uptimeSeconds;
   const containers = infra?.containers || [];
 
@@ -65,6 +67,7 @@ export default function MonitoringView({ actions }) {
   };
 
   const fmtPct = (v) => v !== null && v !== undefined && typeof v === 'number' ? `${v.toFixed(1)}%` : '—';
+  const fmtGB = (v) => v !== null && v !== undefined && typeof v === 'number' ? `${v.toFixed(1)} GB` : '—';
 
   if (loading) return <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading monitoring data...</div>;
 
@@ -91,9 +94,30 @@ export default function MonitoringView({ actions }) {
       {/* System Stats */}
       <h2 style={sectionH}>System</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
-        <StatCard label="CPU" value={fmtPct(cpuVal)} color={cpuVal !== null && cpuVal > 80 ? 'red' : cpuVal !== null && cpuVal > 60 ? 'orange' : 'green'} />
-        <StatCard label="Memory" value={fmtPct(memVal)} color={memVal !== null && memVal > 80 ? 'red' : memVal !== null && memVal > 60 ? 'orange' : 'green'} />
-        <StatCard label="Disk" value={fmtPct(diskVal)} color={diskVal !== null && diskVal > 85 ? 'red' : diskVal !== null && diskVal > 70 ? 'orange' : 'green'} />
+        {/* CPU */}
+        <MetricCard
+          label="CPU"
+          pct={cpu.pct}
+          color={cpu.pct > 80 ? '#ef4444' : cpu.pct > 60 ? '#f97316' : '#10b981'}
+          detail={cpu.load1 != null ? `Load: ${Number(cpu.load1).toFixed(2)} / ${Number(cpu.load5).toFixed(2)} / ${Number(cpu.load15).toFixed(2)}` : 'Current usage'}
+        />
+        {/* Memory */}
+        <MetricCard
+          label="Memory"
+          pct={mem.pct}
+          color={mem.pct > 80 ? '#ef4444' : mem.pct > 60 ? '#f97316' : '#10b981'}
+          detail={mem.usedGB != null && mem.totalGB != null ? `${fmtGB(mem.usedGB)} / ${fmtGB(mem.totalGB)} used` : null}
+          detail2={mem.freeGB != null ? `${fmtGB(mem.freeGB)} free` : null}
+        />
+        {/* Disk */}
+        <MetricCard
+          label="Disk"
+          pct={disk.pct}
+          color={disk.pct > 85 ? '#ef4444' : disk.pct > 70 ? '#f97316' : '#10b981'}
+          detail={disk.usedGB != null && disk.totalGB != null ? `${fmtGB(disk.usedGB)} / ${fmtGB(disk.totalGB)} used` : null}
+          detail2={disk.freeGB != null ? `${fmtGB(disk.freeGB)} free` : null}
+        />
+        {/* Uptime */}
         <StatCard label="Uptime" value={formatUptime(uptimeVal)} color="blue" />
       </div>
 
@@ -185,6 +209,20 @@ export default function MonitoringView({ actions }) {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+function MetricCard({ label, pct, color, detail, detail2 }) {
+  const hasPct = pct !== null && pct !== undefined && typeof pct === 'number';
+  return (
+    <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '20px 24px', borderTop: `3px solid ${color || '#3b82f6'}`, minWidth: 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.2, color: color || '#3b82f6', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+        {hasPct ? `${pct.toFixed(1)}%` : '—'}
+      </div>
+      {detail && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{detail}</div>}
+      {detail2 && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{detail2}</div>}
     </div>
   );
 }

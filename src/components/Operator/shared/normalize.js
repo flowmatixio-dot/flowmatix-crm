@@ -15,14 +15,46 @@ export function extractPct(val) {
   return null;
 }
 
+// Format bytes to human-readable GB/MB
+export function formatBytes(bytes) {
+  if (typeof bytes !== 'number' || !bytes) return null;
+  if (bytes > 1e9) return `${(bytes / 1e9).toFixed(1)} GB`;
+  if (bytes > 1e6) return `${(bytes / 1e6).toFixed(0)} MB`;
+  if (bytes > 1e3) return `${(bytes / 1e3).toFixed(0)} KB`;
+  return `${bytes} B`;
+}
+
+// Extract capacity details from a metric object (memory/disk)
+function extractCapacity(val) {
+  if (!val || typeof val !== 'object') return { pct: extractPct(val), used: null, total: null, free: null };
+  const pct = extractPct(val);
+  const total = val.totalBytes || val.total_bytes || val.total_gb ? (val.total_gb || null) : null;
+  const used = val.usedBytes || val.used_bytes || val.used_gb ? (val.used_gb || null) : null;
+  const free = val.availableBytes || val.available_bytes || val.free_bytes || val.free_gb ? (val.free_gb || null) : null;
+  // If we have bytes, convert to GB
+  const totalGB = val.totalBytes ? val.totalBytes / 1e9 : val.total_gb || (total ? total / 1e9 : null);
+  const usedGB = val.usedBytes ? val.usedBytes / 1e9 : val.used_gb || (used ? used / 1e9 : null);
+  const freeGB = val.availableBytes ? val.availableBytes / 1e9 : val.free_gb || (free ? free / 1e9 : null);
+  return { pct, usedGB, totalGB, freeGB };
+}
+
 // Normalize infrastructure response
 export function normalizeInfra(res) {
-  if (!res || typeof res !== 'object') return { cpu: null, memory: null, disk: null, uptimeSeconds: null, containers: [] };
+  if (!res || typeof res !== 'object') return { cpu: null, memory: null, disk: null, uptimeSeconds: null, load: null, containers: [] };
   const root = res.data || res;
+
+  const cpuObj = root.cpu;
+  const cpu = {
+    pct: extractPct(cpuObj),
+    load1: root.load?.load1 ?? cpuObj?.load_1m ?? cpuObj?.load1 ?? null,
+    load5: root.load?.load5 ?? cpuObj?.load_5m ?? cpuObj?.load5 ?? null,
+    load15: root.load?.load15 ?? cpuObj?.load_15m ?? cpuObj?.load15 ?? null,
+  };
+
   return {
-    cpu: extractPct(root.cpu),
-    memory: extractPct(root.memory),
-    disk: extractPct(root.disk),
+    cpu,
+    memory: extractCapacity(root.memory),
+    disk: extractCapacity(root.disk),
     uptimeSeconds: typeof root.uptimeSeconds === 'number' ? root.uptimeSeconds : typeof root.uptime === 'number' ? root.uptime : null,
     load: root.load || null,
     containers: normalizeContainers(root.containers),
