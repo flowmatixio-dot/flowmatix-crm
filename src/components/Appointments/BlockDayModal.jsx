@@ -6,23 +6,34 @@ function tFb(t, key, fallback) {
 }
 
 export default function BlockDayModal({ doctors, blockedDays = [], onSave, onDelete, onClose, t }) {
-  const [date, setDate] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [reason, setReason] = useState("");
   const [doctorId, setDoctorId] = useState("");
 
   const handleDelete = async (id) => {
     await onDelete(id);
-    setDate("");
+    setDateFrom("");
+    setDateTo("");
     setReason("");
   };
 
   const [saving, setSaving] = useState(false);
   const handleSave = async () => {
-    if (!date) { onClose(); return; }
+    if (!dateFrom) { onClose(); return; }
     setSaving(true);
     try {
-      await onSave({ date, reason: reason || "Blocked", doctorId: doctorId || null });
-      setDate("");
+      // Generate all dates in range
+      const start = new Date(dateFrom + "T00:00:00");
+      const end = dateTo ? new Date(dateTo + "T00:00:00") : start;
+      const current = new Date(start);
+      while (current <= end) {
+        const d = current.toISOString().slice(0, 10);
+        await onSave({ date: d, reason: reason || "Blocked", doctorId: doctorId || null });
+        current.setDate(current.getDate() + 1);
+      }
+      setDateFrom("");
+      setDateTo("");
       setReason("");
       setDoctorId("");
       onClose();
@@ -79,8 +90,16 @@ export default function BlockDayModal({ doctors, blockedDays = [], onSave, onDel
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <label style={labelStyle}>{tFb(t, "cal_block_date", "Datum")}</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div>
+              <label style={labelStyle}>{tFb(t, "cal_block_from", "Von")}</label>
+              <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); if (!dateTo) setDateTo(e.target.value); }} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>{tFb(t, "cal_block_to", "Bis")}</label>
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} min={dateFrom} style={inputStyle} />
+            </div>
+          </div>
         </div>
 
         <div style={{ marginBottom: 14 }}>
@@ -102,7 +121,7 @@ export default function BlockDayModal({ doctors, blockedDays = [], onSave, onDel
           <button onClick={onClose} style={{ padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)" }}>
             {tFb(t, "close", "Schließen")}
           </button>
-          {date && (
+          {dateFrom && (
             <button onClick={handleSave} disabled={saving} style={{ padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444", opacity: saving ? 0.5 : 1 }}>
               {saving ? "..." : tFb(t, "cal_block_save", "Blockieren")}
             </button>

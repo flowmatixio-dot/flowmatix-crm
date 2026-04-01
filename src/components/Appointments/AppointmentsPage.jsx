@@ -1189,7 +1189,7 @@ function DetailCell({ label, value, valueColor, bold, children }) {
 /* ─── Calendar CSS ─── */
 const calendarStyles = `
 .fm-weekend { border: 1.5px solid rgba(255,80,80,0.2) !important; background: transparent !important; }
-.fm-weekend .fc-daygrid-day-number { color: rgba(255,80,80,0.35) !important; }
+.fm-weekend .fc-daygrid-day-number { color: rgba(255,80,80,0.6) !important; }
 .fm-blocked-day { border: 2px solid rgba(239,68,68,0.4) !important; background: rgba(239,68,68,0.02) !important; }
 .fm-blocked-day .fc-daygrid-day-number { color: rgba(239,68,68,0.5) !important; }
 .fm-full-day { background: rgba(255,255,255,0.01) !important; opacity: 0.7; }
