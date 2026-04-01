@@ -269,6 +269,9 @@ export default function App() {
 
       let stage=l.stage;
 
+      // 0. Resolved patients stay archived — never re-enter pipeline
+      if(l.conversation_state==="resolved"&&stage!=="done"){stage=l.stage==="archived"?"archived":"cancelled";}
+
       // 1. Appointment completed/done → stage "done" (ID-first, name-fallback)
       if((completedApptIds.has(l.id)||completedApptNames.has(ln))&&stage!=="done"&&stage!=="cancelled"){stage="done";}
 
@@ -528,7 +531,7 @@ export default function App() {
             }
             fmApi.getPatient(d.patientId).then(res => {
               const p = res?.patient || res;
-              if (p) setLeads(prev => {
+              if (p && p.conversation_state !== 'resolved') setLeads(prev => {
                 const exists = prev.some(l => l.id === d.patientId);
                 if (exists) return prev.map(l => l.id === d.patientId ? { ...l, ...p } : l);
                 return [p, ...prev];
@@ -595,7 +598,7 @@ export default function App() {
           let changed=false;
           // Add new patients that aren't in the list yet
           const existingIds=new Set(prev.map(l=>l.id));
-          const newPats=pats.filter(p=>!existingIds.has(p.id)&&!p.is_demo);
+          const newPats=pats.filter(p=>!existingIds.has(p.id)&&!p.is_demo&&p.conversation_state!=='resolved');
           if(newPats.length>0)changed=true;
           const next=[...newPats,...prev].map(l=>{
             if(l.is_demo)return l;
@@ -610,6 +613,7 @@ export default function App() {
             if(diff){
               const cs=updates.convStatus||'ai_active';
               const s=p.metadata?.stage||p.case_status||p.caseStatus||'new';
+              if(p.conversation_state==='resolved'||s==='archived'||s==='storniert'){updates.stage=s==='archived'?'archived':'cancelled';changed=true;return updates;}
               const hasP=updates.photos||(updates.photoUrls||[]).length>0||updates.photosReceived>0;
               const hasR=!!updates.reviewData;
               if(['termin_bestaetigt','termin_reserviert','termin_gebucht','booked'].includes(s))updates.stage='booked';

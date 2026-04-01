@@ -13,7 +13,8 @@ export default function ArchiveView() {
     const sixMonthsAgo = Date.now() - 180 * 24 * 60 * 60 * 1000;
     return myLeads.filter(lead => {
       const lastActive = new Date(lead.lastAiInteraction || lead.updatedAt || lead.createdAt || 0).getTime();
-      return lead.stage === "cancelled" || lead.stage === "archived" || lead.metadata?.cancelled || lead.archived || (lead.convStatus === "cancelled" && lead.conversation_state === "resolved");
+      const archiveStages = ["cancelled", "archived", "storniert", "abgeschlossen", "canceled"];
+      return archiveStages.includes(lead.stage) || lead.metadata?.cancelled || lead.archived || lead.conversation_state === "resolved";
     }).sort((a, b) => {
       const tA = new Date(a.lastAiInteraction || a.createdAt || 0).getTime();
       const tB = new Date(b.lastAiInteraction || b.createdAt || 0).getTime();

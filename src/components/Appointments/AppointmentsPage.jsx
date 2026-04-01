@@ -175,9 +175,12 @@ export default function AppointmentsPage() {
     return appts;
   }, [myAppts, myLeads, isDoctor, myDoctorName]);
 
+  const ACTIVE_STATUSES = ['pending','confirmed','booked','reserved','awaiting_deposit'];
+  const activeAppts = useMemo(() => enrichedAppts.filter(a => ACTIVE_STATUSES.includes(a.status)), [enrichedAppts]);
+
   const allEvents = useMemo(
-    () => mapAllEvents(enrichedAppts, blockedDays, doctors),
-    [enrichedAppts, blockedDays, doctors]
+    () => mapAllEvents(activeAppts, blockedDays, doctors),
+    [activeAppts, blockedDays, doctors]
   );
 
   const {
@@ -198,7 +201,7 @@ export default function AppointmentsPage() {
     });
   }, [rawFilteredEvents, searchQuery]);
 
-  const dayStats = useMemo(() => getDayStats(myAppts), [myAppts]);
+  const dayStats = useMemo(() => getDayStats(activeAppts), [activeAppts]);
 
   const [currentView, setCurrentView] = useState(calView || "month");
   const [currentDate, setCurrentDate] = useState(isDemoMode() ? getDemoDate() : (calDate || (myAppts.length > 0 ? new Date(myAppts[0].scheduledAt || myAppts[0].date || getNow()) : getNow())));
@@ -308,14 +311,14 @@ export default function AppointmentsPage() {
 
   const handleArchive = useCallback(async (id) => {
     try {
-      await fmApi.deleteAppointment(id);
+      await updateAppt(id, { archived: true });
       showT(tFb(t, "cal_archived", "Ins Archiv verschoben"));
       setDrawerAppt(null);
       useAppointmentStore.getState().fetchAppointments();
     } catch {
       showT("Fehler");
     }
-  }, [showT, t]);
+  }, [showT, t, updateAppt]);
 
   const handleSaveAppt = useCallback(async (data) => {
     const res = await fmApi.createAppointment(data);
@@ -398,7 +401,7 @@ export default function AppointmentsPage() {
     const viewDate = currentDate || getNow();
     const month = viewDate.getMonth();
     const year = viewDate.getFullYear();
-    const monthAppts = myAppts.filter(a => {
+    const monthAppts = activeAppts.filter(a => {
       if (!a.date) return false;
       const d = new Date(a.date);
       return d.getMonth() === month && d.getFullYear() === year;
@@ -412,18 +415,18 @@ export default function AppointmentsPage() {
     const confirmed = monthAppts.filter(a => a.status === "confirmed").length;
     const pending = monthAppts.filter(a => a.status === "pending" || a.status === "reserved").length;
     return { totalCount, totalGrafts, totalRevenue, confirmed, pending };
-  }, [myAppts, currentDate]);
+  }, [activeAppts, currentDate]);
 
   // Revenue per day for month cells
   const dayRevenue = useMemo(() => {
     const map = {};
-    myAppts.forEach(a => {
+    activeAppts.forEach(a => {
       if (!a.date) return;
       const rev = a.price ? Number(a.price) : (TREAT_REVENUE[a.treatment] || 0);
       map[a.date] = (map[a.date] || 0) + rev;
     });
     return map;
-  }, [myAppts]);
+  }, [activeAppts]);
 
   const dayCellContent = useCallback((arg) => {
     // Use local date to avoid UTC timezone shift
@@ -670,7 +673,7 @@ export default function AppointmentsPage() {
             const dateStr = `${arg.date.getFullYear()}-${String(arg.date.getMonth()+1).padStart(2,"0")}-${String(arg.date.getDate()).padStart(2,"0")}`;
             const isBlocked = blockedDays.some(bd => (bd.date || bd.blocked_date || '').slice(0, 10) === dateStr);
             if (isBlocked) return ["fm-blocked-day"];
-            const dayApptCount = enrichedAppts.filter(a => a.date === dateStr).length;
+            const dayApptCount = activeAppts.filter(a => a.date === dateStr).length;
             if (dayApptCount === 0 && arg.date >= new Date(getNow().setHours(0,0,0,0))) return ["fm-free-day"];
             if (dayApptCount >= 4) return ["fm-full-day"];
             return [];
