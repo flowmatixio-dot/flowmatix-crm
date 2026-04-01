@@ -89,18 +89,26 @@ export default function AppointmentsPage() {
   } = useApp();
   const isDoctor = userRole === "doctor";
 
-  // Determine closed days from clinic working hours
+  // Closed days from clinic working hours
+  const [clinicHours, setClinicHours] = useState(null);
+  useEffect(() => {
+    fmApi.apiFetch('/api/v1/clinic/settings').then(res => {
+      try {
+        const raw = res?.hours || res?.clinic?.hours;
+        const wh = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (wh && typeof wh === 'object') setClinicHours(wh);
+      } catch {}
+    }).catch(() => {});
+  }, []);
   const closedDays = useMemo(() => {
-    const wh = clinic?.working_hours || clinic?.workingHours || clinic?.aiConfig?.working_hours || {};
+    if (!clinicHours) return [0, 6]; // default SA+SO
     const dayMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-    const closed = new Set();
+    const closed = [];
     for (const [key, dow] of Object.entries(dayMap)) {
-      if (!wh[key]) closed.add(dow);
+      if (!clinicHours[key]) closed.push(dow);
     }
-    // Default: if no working hours configured, close sat+sun
-    if (Object.keys(wh).filter(k => k !== 'timezone').length === 0) { closed.add(0); closed.add(6); }
     return closed;
-  }, [clinic]);
+  }, [clinicHours]);
 
   const calRef = useRef(null);
   const [doctors, setDoctors] = useState([]);
@@ -441,46 +449,38 @@ export default function AppointmentsPage() {
     return map;
   }, [activeAppts]);
 
-  const dayCellContent = useCallback((arg) => {
-    // Use local date to avoid UTC timezone shift
+  const dayCellDidMount = useCallback((arg) => {
     const dd = arg.date;
     const dateStr = `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, "0")}-${String(dd.getDate()).padStart(2, "0")}`;
     const stats = dayStats[dateStr];
-    const rev = dayRevenue[dateStr];
+    const el = arg.el;
+    // Color weekend day numbers
+    if (closedDays.includes(dd.getDay())) {
+      const numEl = el.querySelector('.fc-daygrid-day-number');
+      if (numEl) numEl.style.color = 'rgba(255,80,80,0.6)';
+    }
+    // Add OP badge
+    if (stats && stats.ops > 0) {
+      const top = el.querySelector('.fc-daygrid-day-top');
+      if (top && !top.querySelector('.fm-op-badge')) {
+        const isBusy = stats.ops >= 4;
+        const badge = document.createElement('span');
+        badge.className = 'fm-op-badge';
+        badge.style.cssText = `font-size:9px;font-weight:700;letter-spacing:0.02em;border-radius:4px;padding:1px 5px;color:${isBusy ? '#ef4444' : stats.ops >= 3 ? '#f59e0b' : 'rgba(167,177,195,0.6)'};background:${isBusy ? 'rgba(239,68,68,0.1)' : stats.ops >= 3 ? 'rgba(245,158,11,0.08)' : 'transparent'}`;
+        badge.textContent = `${stats.ops} OP`;
+        top.prepend(badge);
+      }
+    }
+    // Today highlight
     const now = getNow();
     const isToday = dateStr === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-    const isBusy = stats && stats.ops >= 4;
-    return (
-      <>
-        {/* OP badge — will be placed left by CSS flex on .fc-daygrid-day-top */}
-        {stats && stats.ops > 0 && (
-          <span className="fm-op-badge" style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: "0.02em",
-            color: isBusy ? "#ef4444" : stats.ops >= 3 ? "#f59e0b" : "rgba(167,177,195,0.6)",
-            background: isBusy ? "rgba(239,68,68,0.1)" : stats.ops >= 3 ? "rgba(245,158,11,0.08)" : "transparent",
-            borderRadius: 4, padding: "1px 5px",
-            display: "inline-flex", alignItems: "center", gap: 3,
-            order: 1,
-          }}>
-            {isBusy && <span style={{ fontSize: 8 }}>●</span>}
-            {stats.ops} OP
-          </span>
-        )}
-        {/* Day number */}
-        <span style={{
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          width: isToday ? 26 : "auto", height: isToday ? 26 : "auto",
-          borderRadius: isToday ? "50%" : 0,
-          background: isToday ? "#4cc9ff" : "transparent",
-          color: isToday ? "#0a0e17" : closedDays.has(dd.getDay()) ? "rgba(255,80,80,0.6)" : "rgba(232,238,252,0.9)",
-          fontWeight: isToday ? 800 : 600,
-          fontSize: 12,
-        }}>
-          {arg.dayNumberText}
-        </span>
-      </>
-    );
-  }, [dayStats, dayRevenue, closedDays]);
+    if (isToday) {
+      const numEl = el.querySelector('.fc-daygrid-day-number');
+      if (numEl) {
+        numEl.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#4cc9ff;color:#0a0e17;font-weight:800;font-size:12px';
+      }
+    }
+  }, [dayStats, closedDays]);
 
   return (
     <div style={{ padding: "24px 28px", }}>
@@ -667,6 +667,7 @@ export default function AppointmentsPage() {
           events={filteredEvents}
           locale="de"
           firstDay={1}
+          hiddenDays={closedDays}
           height="auto"
           editable={true}
           droppable={true}
@@ -679,10 +680,9 @@ export default function AppointmentsPage() {
           nowIndicator={true}
           now={isDemoMode() ? getDemoDate() : undefined}
           dayMaxEvents={3}
-          businessHours={{ daysOfWeek: [0,1,2,3,4,5,6].filter(d => !closedDays.has(d)), startTime: "08:00", endTime: "18:00" }}
+          businessHours={{ daysOfWeek: [0,1,2,3,4,5,6].filter(d => !closedDays.includes(d)), startTime: "08:00", endTime: "18:00" }}
           dayCellClassNames={(arg) => {
-            const dow = arg.date.getDay();
-            if (closedDays.has(dow)) return ["fm-weekend"];
+            // Closed days are hidden via hiddenDays prop
             const dateStr = `${arg.date.getFullYear()}-${String(arg.date.getMonth()+1).padStart(2,"0")}-${String(arg.date.getDate()).padStart(2,"0")}`;
             const isBlocked = blockedDays.some(bd => (bd.date || bd.blocked_date || '').slice(0, 10) === dateStr);
             if (isBlocked) return ["fm-blocked-day"];
@@ -707,7 +707,7 @@ export default function AppointmentsPage() {
           eventMouseLeave={handleEventMouseLeave}
           datesSet={handleDatesSet}
           eventContent={renderEventContent}
-          dayCellContent={currentView === "month" ? dayCellContent : undefined}
+          dayCellDidMount={currentView === "month" ? dayCellDidMount : undefined}
         />
       </div>
 
