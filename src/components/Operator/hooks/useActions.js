@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as fmApi from '../../../api/client.js';
+import { normalizeClinics } from '../shared/normalize.js';
 
 export function useActions() {
   const [clinics, setClinics] = useState([]);
@@ -19,9 +20,8 @@ export function useActions() {
         // Fallback: use the proven getPlatformClinics endpoint
         try {
           const fallbackRes = await fmApi.getPlatformClinics();
-          const raw = Array.isArray(fallbackRes?.clinics) ? fallbackRes.clinics
-            : Array.isArray(fallbackRes?.data) ? fallbackRes.data
-            : Array.isArray(fallbackRes) ? fallbackRes : [];
+          if (import.meta.env.DEV) console.log('useActions fallback RAW:', fallbackRes);
+          const raw = normalizeClinics(fallbackRes);
           // Add computed fields that clinic-actions would provide
           clinicList = raw.map(c => ({
             ...c,
