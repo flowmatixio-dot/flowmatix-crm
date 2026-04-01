@@ -89,6 +89,19 @@ export default function AppointmentsPage() {
   } = useApp();
   const isDoctor = userRole === "doctor";
 
+  // Determine closed days from clinic working hours
+  const closedDays = useMemo(() => {
+    const wh = clinic?.working_hours || clinic?.workingHours || clinic?.aiConfig?.working_hours || {};
+    const dayMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+    const closed = new Set();
+    for (const [key, dow] of Object.entries(dayMap)) {
+      if (!wh[key]) closed.add(dow);
+    }
+    // Default: if no working hours configured, close sat+sun
+    if (Object.keys(wh).filter(k => k !== 'timezone').length === 0) { closed.add(0); closed.add(6); }
+    return closed;
+  }, [clinic]);
+
   const calRef = useRef(null);
   const [doctors, setDoctors] = useState([]);
   const [blockedDays, setBlockedDays] = useState([]);
@@ -459,7 +472,7 @@ export default function AppointmentsPage() {
           width: isToday ? 26 : "auto", height: isToday ? 26 : "auto",
           borderRadius: isToday ? "50%" : 0,
           background: isToday ? "#4cc9ff" : "transparent",
-          color: isToday ? "#0a0e17" : "inherit",
+          color: isToday ? "#0a0e17" : closedDays.has(dd.getDay()) ? "rgba(255,80,80,0.6)" : "rgba(232,238,252,0.9)",
           fontWeight: isToday ? 800 : 600,
           fontSize: 12,
         }}>
@@ -467,7 +480,7 @@ export default function AppointmentsPage() {
         </span>
       </>
     );
-  }, [dayStats, dayRevenue]);
+  }, [dayStats, dayRevenue, closedDays]);
 
   return (
     <div style={{ padding: "24px 28px", }}>
@@ -666,10 +679,10 @@ export default function AppointmentsPage() {
           nowIndicator={true}
           now={isDemoMode() ? getDemoDate() : undefined}
           dayMaxEvents={3}
-          businessHours={{ daysOfWeek: [1, 2, 3, 4, 5], startTime: "08:00", endTime: "18:00" }}
+          businessHours={{ daysOfWeek: [0,1,2,3,4,5,6].filter(d => !closedDays.has(d)), startTime: "08:00", endTime: "18:00" }}
           dayCellClassNames={(arg) => {
             const dow = arg.date.getDay();
-            if (dow === 0 || dow === 6) return ["fm-weekend"];
+            if (closedDays.has(dow)) return ["fm-weekend"];
             const dateStr = `${arg.date.getFullYear()}-${String(arg.date.getMonth()+1).padStart(2,"0")}-${String(arg.date.getDate()).padStart(2,"0")}`;
             const isBlocked = blockedDays.some(bd => (bd.date || bd.blocked_date || '').slice(0, 10) === dateStr);
             if (isBlocked) return ["fm-blocked-day"];
