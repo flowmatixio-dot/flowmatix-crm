@@ -987,6 +987,13 @@ export async function updateAppointment(id, data) {
   });
 }
 
+export async function rescheduleAppointment(id, data) {
+  return apiFetch(`/api/v1/crm/appointments/${id}/reschedule`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function deleteAppointment(id) {
   return apiFetch(`/api/v1/crm/appointments/${id}`, { method: 'DELETE' });
 }

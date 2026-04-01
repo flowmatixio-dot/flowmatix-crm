@@ -115,9 +115,12 @@ export default function MainLayout() {
     if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
     if (showTrialReviewPopup) return;
     const realReview = myLeads.find(l => l.is_demo !== true && l.isDemo !== true && !l.demo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
-    if (realReview) {
+    if (realReview && trialReviewShownRef.current !== realReview.id) {
+      const shownIds = JSON.parse(localStorage.getItem('fm_trial_review_shown') || '[]');
+      if (shownIds.includes(realReview.id)) return;
       setTimeout(() => {
         trialReviewShownRef.current = realReview.id;
+        localStorage.setItem('fm_trial_review_shown', JSON.stringify([...shownIds, realReview.id]));
         setTrialReviewPatient(realReview);
         setShowTrialReviewPopup(true);
       }, 10000);
@@ -879,7 +882,7 @@ export default function MainLayout() {
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {ti.session.messagesCount}/25 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
+                    {ti.session.messagesCount}/50 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
                   </div>
                 )}
               </div>

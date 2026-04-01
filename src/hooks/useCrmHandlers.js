@@ -1,5 +1,6 @@
 import * as fmApi from "../api/client";
 import { isDemoMode } from "../utils/demoTime";
+import { useAppointmentStore } from "../stores/appointmentStore";
 
 export function useCrmHandlers({
   leads, setLeads, msgs, setMsgs, appts, setAppts,
@@ -146,12 +147,29 @@ export function useCrmHandlers({
     logAction("conversation_resolved", chat?.name || "Unknown", "Marked as resolved");
   };
 
-  /* Reschedule appointment */
-  const doReschedule = () => {
+  /* Reschedule appointment — creates new appointment, marks old as rescheduled */
+  const doReschedule = async () => {
     if (!rescheduleAppt || !rescheduleDate || !rescheduleTime) return;
-    setAppts(p => p.map(a => a.id === rescheduleAppt ? { ...a, date: rescheduleDate, time: rescheduleTime } : a));
-    showT(`Rescheduled to ${rescheduleDate} ${rescheduleTime}`);
-    browserNotify("Appointment Rescheduled", `${rescheduleDate} at ${rescheduleTime}`);
+    try {
+      const res = await fmApi.rescheduleAppointment(rescheduleAppt, { date: rescheduleDate, time: rescheduleTime });
+      if (res?.success) {
+        // Mark old appointment as rescheduled in local state
+        setAppts(p => p.map(a => a.id === rescheduleAppt ? { ...a, status: 'rescheduled' } : a));
+        // Add new appointment to local state
+        if (res.newAppointment) {
+          setAppts(p => [...p, { ...p.find(a => a.id === rescheduleAppt), ...res.newAppointment, id: res.newAppointment.id, date: rescheduleDate, time: rescheduleTime, status: res.newAppointment.status, source: 'reschedule', rescheduled_from: rescheduleAppt }]);
+        }
+        // Refresh full list from server
+        setTimeout(() => useAppointmentStore?.getState?.()?.fetchAppointments?.(), 500);
+        const confirmMsg = res.needsConfirmation ? ' (needs confirmation)' : '';
+        showT(`Rescheduled to ${rescheduleDate} ${rescheduleTime}${confirmMsg}`);
+        browserNotify("Appointment Rescheduled", `${rescheduleDate} at ${rescheduleTime}`);
+      } else {
+        showT(res?.error || 'Reschedule failed', 'error');
+      }
+    } catch (e) {
+      showT('Reschedule failed', 'error');
+    }
     setRescheduleAppt(null); setRescheduleDate(""); setRescheduleTime("");
   };
 

@@ -8,6 +8,7 @@ import listPlugin from "@fullcalendar/list";
 
 import { useApp } from "../../context/AppContext";
 import { APPT_C } from "../../data/constants";
+import { useAppointmentStore } from "../../stores/appointmentStore";
 import { mapAllEvents, getDayStats } from "./calendarMappers";
 import { useCalendarFilters } from "./useCalendarFilters";
 import DoctorFilter from "./DoctorFilter";
@@ -128,6 +129,14 @@ export default function AppointmentsPage() {
       const arr = Array.isArray(data) ? data : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
       setBlockedDays(arr);
     }).catch(() => {});
+  }, []);
+
+  // Auto-refresh appointments every 15s as WebSocket fallback
+  useEffect(() => {
+    const { fetchAppointments } = useAppointmentStore.getState();
+    fetchAppointments();
+    const iv = setInterval(() => fetchAppointments(), 15000);
+    return () => clearInterval(iv);
   }, []);
 
   // Enrich appointments with patient data from pipeline

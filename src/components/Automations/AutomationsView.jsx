@@ -172,6 +172,8 @@ export default function AutomationsView() {
             { name: t("tpl_aftercare") || "Nachsorge", desc: t("tpl_aftercare_desc") || "Nach Behandlung — Pflegeanweisungen", icon: "💊", cat: "aftercare", tplKey: "fm_aftercare_followup" },
             { name: t("tpl_review_request") || "Bewertungsanfrage", desc: t("tpl_review_request_desc") || "Nach Nachsorge — Google Maps Bewertung", icon: "⭐", cat: "aftercare", tplKey: "fm_review_request" },
             { name: t("tpl_reactivation") || "Reaktivierung", desc: t("tpl_reactivation_desc") || "24h-Fenster abgelaufen — Gespräch fortsetzen", icon: "📨", cat: "reactivation", tplKey: "fm_reactivation_v2" },
+            { name: t("tpl_appointment_rescheduled") || "Termin verschoben", desc: t("tpl_appointment_rescheduled_desc") || "Nach Terminverschiebung — alter und neuer Termin", icon: "🔄", cat: "booking", tplKey: "fm_appointment_rescheduled" },
+            { name: t("tpl_short_notice_change") || "Kurzfristige Änderung", desc: t("tpl_short_notice_change_desc") || "Terminänderung < 48h — Klinik muss bestätigen", icon: "⚠️", cat: "booking", tplKey: "fm_short_notice_change" },
           ].map(tpl => (
             <div key={tpl.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
