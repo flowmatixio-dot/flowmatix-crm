@@ -466,9 +466,9 @@ export default function AppointmentsPage() {
         const isBusy = stats.ops >= 4;
         const badge = document.createElement('span');
         badge.className = 'fm-op-badge';
-        badge.style.cssText = `font-size:9px;font-weight:700;letter-spacing:0.02em;border-radius:4px;padding:1px 5px;color:${isBusy ? '#ef4444' : stats.ops >= 3 ? '#f59e0b' : 'rgba(167,177,195,0.6)'};background:${isBusy ? 'rgba(239,68,68,0.1)' : stats.ops >= 3 ? 'rgba(245,158,11,0.08)' : 'transparent'}`;
+        badge.style.cssText = `font-size:9px;font-weight:700;letter-spacing:0.02em;border-radius:4px;padding:1px 5px;margin-left:auto;color:${isBusy ? '#ef4444' : stats.ops >= 3 ? '#f59e0b' : 'rgba(167,177,195,0.6)'};background:${isBusy ? 'rgba(239,68,68,0.1)' : stats.ops >= 3 ? 'rgba(245,158,11,0.08)' : 'transparent'}`;
         badge.textContent = `${stats.ops} OP`;
-        top.prepend(badge);
+        top.appendChild(badge);
       }
     }
     // Today highlight
@@ -1204,6 +1204,7 @@ function DetailCell({ label, value, valueColor, bold, children }) {
 const calendarStyles = `
 .fm-closed-day { border: 1.5px solid rgba(255,80,80,0.2) !important; background: transparent !important; }
 .fm-closed-day .fc-daygrid-day-number { color: rgba(255,80,80,0.5) !important; }
+.fm-calendar-wrap .fc .fc-daygrid-day-top { flex-direction: row !important; justify-content: space-between !important; align-items: center; }
 .fm-blocked-day { border: 2px solid rgba(239,68,68,0.4) !important; background: rgba(239,68,68,0.02) !important; }
 .fm-blocked-day .fc-daygrid-day-number { color: rgba(239,68,68,0.5) !important; }
 .fm-full-day { background: rgba(255,255,255,0.01) !important; opacity: 0.7; }
