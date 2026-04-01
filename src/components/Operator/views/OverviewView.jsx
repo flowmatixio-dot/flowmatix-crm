@@ -2,62 +2,59 @@ import React, { useState, useEffect } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import ActionCard from '../shared/ActionCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
+import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
 export default function OverviewView({ events, actions }) {
   const [stats, setStats] = useState(null);
-  const [overview, setOverview] = useState(null);
 
   useEffect(() => {
     fmApi.getPlatformStats?.().then(setStats).catch(() => {});
-    fmApi.getPlatformOverview?.().then(setOverview).catch(() => {});
   }, []);
 
   const { actionRequired = [], totalMrr = 0, liveCount = 0, clinics = [] } = actions || {};
-  const evts = events?.events || [];
+  const evts = Array.isArray(events?.events) ? events.events : [];
   const unresolvedEvents = evts.filter(e => !e.resolved);
 
   const fmt = (n) => typeof n === 'number' ? n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }) : '—';
+  const msgToday = safeNum(stats?.messagesToday);
+  const autoRate = safeNum(stats?.automationSuccessRate);
 
   return (
     <div>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 20px' }}>Control Center</h1>
 
-      {/* KPI Strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
-        <StatCard label="Monthly Revenue" value={fmt(totalMrr)} color="green" icon="💰" sub={`${liveCount} active`} />
-        <StatCard label="Active Clinics" value={liveCount} color="blue" icon="🏥" sub={`${clinics.length} total`} />
-        <StatCard label="Actions Required" value={actionRequired.length} color={actionRequired.length > 0 ? 'red' : 'green'} icon="🎯" sub={actionRequired.length > 0 ? 'needs attention' : 'all good'} />
-        <StatCard label="Messages Today" value={stats?.messagesToday || 0} color="purple" icon="💬" sub={stats?.automationSuccessRate ? `${stats.automationSuccessRate}% auto` : ''} />
+        <StatCard label="Monthly Revenue" value={fmt(totalMrr)} color="green" icon="💰" sub={`${safeNum(liveCount)} active`} />
+        <StatCard label="Active Clinics" value={safeNum(liveCount)} color="blue" icon="🏥" sub={`${safeNum(clinics.length)} total`} />
+        <StatCard label="Actions Required" value={safeNum(actionRequired.length)} color={actionRequired.length > 0 ? 'red' : 'green'} icon="🎯" sub={actionRequired.length > 0 ? 'needs attention' : 'all good'} />
+        <StatCard label="Messages Today" value={msgToday} color="purple" icon="💬" sub={autoRate ? `${autoRate}% auto` : ''} />
       </div>
 
-      {/* Action Feed */}
       <div style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: actionRequired.length > 0 ? '#ef4444' : '#10b981', marginBottom: 12 }}>
           {actionRequired.length > 0 ? `● ${actionRequired.length} Actions Required` : '● No Actions Required'}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {/* Events first (highest priority) */}
           {unresolvedEvents.slice(0, 5).map(ev => (
             <ActionCard
               key={ev.id}
-              type={ev.type}
-              priority={ev.priority}
-              clinicName={ev.org_name}
-              detail={ev.payload?.email || ev.payload?.error || ev.type.replace(/_/g, ' ').toLowerCase()}
+              type={safeStr(ev.type, 'UNKNOWN')}
+              priority={safeStr(ev.priority, 'medium')}
+              clinicName={safeStr(ev.org_name, 'System')}
+              detail={safeStr(ev.payload?.email || ev.payload?.error || (typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : ''), '')}
               timestamp={ev.created_at}
               cta={ev.type === 'NEW_CUSTOMER' ? 'Setup' : ev.type === 'OTP_RECEIVED' ? 'Verify' : ev.type === 'PAYMENT_FAILED' ? 'View' : 'Open'}
-              onResolve={() => events.resolveEvent(ev.id)}
+              onResolve={() => events?.resolveEvent?.(ev.id)}
             />
           ))}
-          {/* Clinic actions */}
           {actionRequired.slice(0, 10).map(c => (
             <ActionCard
               key={c.id}
-              type={c.required_action}
+              type={safeStr(c.required_action, 'START_SETUP')}
               priority={c.required_action === 'FIX_ERROR' ? 'critical' : c.required_action === 'VERIFY_OTP' ? 'high' : 'medium'}
-              clinicName={c.name}
-              detail={`${c.plan_name || 'No plan'} · Readiness: ${c.readiness_score}%`}
+              clinicName={safeStr(c.name)}
+              detail={`${safeStr(c.plan_name, 'No plan')} · Readiness: ${safeNum(c.readiness_score)}%`}
             />
           ))}
           {actionRequired.length === 0 && unresolvedEvents.length === 0 && (
@@ -68,7 +65,6 @@ export default function OverviewView({ events, actions }) {
         </div>
       </div>
 
-      {/* WhatsApp Status Block */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
         <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 20 }}>
           <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: 0.8 }}>WhatsApp Status</h3>
@@ -76,8 +72,8 @@ export default function OverviewView({ events, actions }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {clinics.filter(c => c.required_action !== 'NONE').map(c => (
                 <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
-                  <span style={{ fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{c.name}</span>
-                  <StatusBadge status={c.required_action} />
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{safeStr(c.name)}</span>
+                  <StatusBadge status={safeStr(c.required_action, 'NONE')} />
                 </div>
               ))}
               {clinics.filter(c => c.required_action !== 'NONE').length === 0 && (
@@ -87,7 +83,6 @@ export default function OverviewView({ events, actions }) {
           )}
         </div>
 
-        {/* Live Activity */}
         <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 20 }}>
           <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: 0.8 }}>Recent Activity</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -95,7 +90,7 @@ export default function OverviewView({ events, actions }) {
               <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
                 <span style={{ width: 6, height: 6, borderRadius: 99, background: ev.resolved ? '#6b7280' : ev.priority === 'critical' ? '#ef4444' : '#eab308', flexShrink: 0 }} />
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {ev.org_name || 'System'} — {ev.type.replace(/_/g, ' ').toLowerCase()}
+                  {safeStr(ev.org_name, 'System')} — {typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : '—'}
                 </span>
                 <span style={{ color: 'var(--text-muted)', fontSize: 10, flexShrink: 0 }}>{timeAgo(ev.created_at)}</span>
               </div>
@@ -109,7 +104,9 @@ export default function OverviewView({ events, actions }) {
 }
 
 function timeAgo(ts) {
+  if (!ts) return '—';
   const d = Date.now() - new Date(ts).getTime();
+  if (isNaN(d)) return '—';
   if (d < 60000) return 'now';
   if (d < 3600000) return `${Math.floor(d / 60000)}m`;
   if (d < 86400000) return `${Math.floor(d / 3600000)}h`;

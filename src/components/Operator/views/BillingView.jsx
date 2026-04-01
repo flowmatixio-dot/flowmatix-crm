@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
+import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
 export default function BillingView({ actions }) {
@@ -16,9 +17,9 @@ export default function BillingView({ actions }) {
   }, []);
 
   const { clinics = [], totalMrr = 0 } = actions || {};
-  const mrr = revenue?.mrr || 0;
-  const fmt = n => `€${(n / 100).toLocaleString('de-DE')}`;
-  const countByStatus = revenue?.countByStatus || {};
+  const mrr = safeNum(revenue?.mrr);
+  const fmt = n => `€${(safeNum(n) / 100).toLocaleString('de-DE')}`;
+  const countByStatus = (revenue?.countByStatus && typeof revenue.countByStatus === 'object' && !Array.isArray(revenue.countByStatus)) ? revenue.countByStatus : {};
 
   // Platform costs (static for now)
   const PLATFORM_COSTS = [
@@ -39,10 +40,10 @@ export default function BillingView({ actions }) {
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 20px' }}>Billing & Finance</h1>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
-        <StatCard label="Monthly Revenue (MRR)" value={fmt(mrr)} color="green" sub={`${countByStatus.active || 0} paid · ${countByStatus.trialing || 0} trial`} />
+        <StatCard label="Monthly Revenue (MRR)" value={fmt(mrr)} color="green" sub={`${safeNum(countByStatus.active)} paid · ${safeNum(countByStatus.trialing)} trial`} />
         <StatCard label="Monthly Costs" value={`€${totalCosts}`} color="red" sub={`${PLATFORM_COSTS.length} services`} />
         <StatCard label="Profit" value={`€${profit.toFixed(0)}`} color={profit >= 0 ? 'green' : 'red'} sub={profit < 0 ? 'Negative margin' : 'Positive margin'} />
-        <StatCard label="Overdue" value={countByStatus.past_due || 0} color={countByStatus.past_due > 0 ? 'red' : 'green'} sub="All current" />
+        <StatCard label="Overdue" value={safeNum(countByStatus.past_due)} color={safeNum(countByStatus.past_due) > 0 ? 'red' : 'green'} sub="All current" />
       </div>
 
       {/* Platform Costs */}
@@ -67,12 +68,12 @@ export default function BillingView({ actions }) {
           <div key={c.id} style={{ display: 'flex', alignItems: 'center', padding: '12px 18px', borderBottom: '1px solid rgba(255,255,255,0.04)', gap: 14 }}>
             <span style={{ width: 8, height: 8, borderRadius: 99, background: c.subscription_status === 'active' ? '#10b981' : c.subscription_status === 'trialing' ? '#eab308' : '#6b7280' }} />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{c.name}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.plan_name || 'No plan'}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(c.name)}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{safeStr(c.plan_name, 'No plan')}</div>
             </div>
-            <StatusBadge status={c.subscription_status || 'unknown'} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: c.mrr > 0 ? '#10b981' : 'var(--text-muted)', minWidth: 70, textAlign: 'right' }}>
-              {c.mrr > 0 ? `€${c.mrr.toLocaleString('de-DE')}` : '€0'}
+            <StatusBadge status={safeStr(c.subscription_status, 'unknown')} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: safeNum(c.mrr) > 0 ? '#10b981' : 'var(--text-muted)', minWidth: 70, textAlign: 'right' }}>
+              {safeNum(c.mrr) > 0 ? `€${safeNum(c.mrr).toLocaleString('de-DE')}` : '€0'}
             </span>
           </div>
         ))}

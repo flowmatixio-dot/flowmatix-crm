@@ -37,9 +37,9 @@ export default function LogsView() {
             {logs.map((l, i) => (
               <div key={i} style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12 }}>
                 <span style={{ color: 'var(--text-muted)', flexShrink: 0, width: 140 }}>{l.created_at ? new Date(l.created_at).toLocaleString('de-DE') : ''}</span>
-                <span style={{ color: l.source === 'webhook' ? '#a78bfa' : l.source === 'audit' ? '#3b82f6' : '#eab308', fontWeight: 600, width: 80, flexShrink: 0 }}>{l.source || '—'}</span>
+                <span style={{ color: (typeof l.source === 'string' && l.source === 'webhook') ? '#a78bfa' : (typeof l.source === 'string' && l.source === 'audit') ? '#3b82f6' : '#eab308', fontWeight: 600, width: 80, flexShrink: 0 }}>{typeof l.source === 'string' ? l.source : '—'}</span>
                 <span style={{ color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {l.action || l.type || ''} {l.org_name ? `[${l.org_name}]` : ''} {l.details ? JSON.stringify(l.details).slice(0, 120) : ''}
+                  {typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : ''} {typeof l.org_name === 'string' ? `[${l.org_name}]` : ''} {l.details && typeof l.details === 'object' ? JSON.stringify(l.details).slice(0, 120) : typeof l.details === 'string' ? l.details.slice(0, 120) : ''}
                 </span>
               </div>
             ))}

@@ -59,9 +59,11 @@ export default function DataTable({ columns, data, onRowClick, emptyText = 'No d
               <tr key={row.id || i} onClick={() => onRowClick?.(row)} style={{ cursor: onRowClick ? 'pointer' : 'default', transition: 'background 0.15s' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                {columns.map(col => (
-                  <td key={col.key} style={tdStyle}>{col.render ? col.render(row[col.key], row) : row[col.key] ?? '—'}</td>
-                ))}
+                {columns.map(col => {
+                  const val = row[col.key];
+                  const safeDefault = val === null || val === undefined ? '—' : typeof val === 'object' ? JSON.stringify(val) : val;
+                  return <td key={col.key} style={tdStyle}>{col.render ? col.render(val, row) : safeDefault}</td>;
+                })}
               </tr>
             ))}
           </tbody>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../shared/DataTable.jsx';
 import PriorityDot from '../shared/PriorityDot.jsx';
+import { safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
 const SEVERITY_MAP = { critical: 'critical', warning: 'high', info: 'medium' };
@@ -25,13 +26,14 @@ export default function IncidentsView() {
     { key: 'severity', label: '', width: 30, render: v => <PriorityDot priority={SEVERITY_MAP[v] || 'medium'} /> },
     { key: 'title', label: 'Incident', render: (v, row) => (
       <div>
-        <div style={{ fontWeight: 700 }}>{v}</div>
-        {row.description && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{row.description}</div>}
+        <div style={{ fontWeight: 700 }}>{safeStr(v)}</div>
+        {row.description && typeof row.description === 'string' && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{row.description}</div>}
       </div>
     )},
-    { key: 'severity', label: 'Severity', render: v => (
-      <span style={{ fontSize: 11, fontWeight: 700, color: v === 'critical' ? '#ef4444' : v === 'warning' ? '#f97316' : '#3b82f6', textTransform: 'uppercase' }}>{v}</span>
-    )},
+    { key: 'severity', label: 'Severity', render: v => {
+      const s = safeStr(v, 'info');
+      return <span style={{ fontSize: 11, fontWeight: 700, color: s === 'critical' ? '#ef4444' : s === 'warning' ? '#f97316' : '#3b82f6', textTransform: 'uppercase' }}>{s}</span>;
+    }},
     { key: 'created_at', label: 'When', render: v => v ? new Date(v).toLocaleString('de-DE') : '—' },
     ...(tab === 'open' ? [{ key: 'id', label: '', sortable: false, render: (v) => (
       <button onClick={() => resolve(v)} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Resolve</button>

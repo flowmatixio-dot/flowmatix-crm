@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
+import { safeNum, safeStr } from '../shared/safe.js';
 
 const PIPELINE_COLS = [
   { id: 'new', label: 'New', color: '#3b82f6', filter: c => c.workspace_state === 'demo' && c.subscription_status !== 'active' },
@@ -63,20 +64,24 @@ export default function TrialsView({ actions }) {
               <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: col.color }}>{col.label}</span>
               <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{col.items.length}</span>
             </div>
-            {col.items.map(c => (
-              <div key={c.id} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '10px 12px' }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{c.name}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>{c.plan_name || 'No plan'}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    {c.trial_end ? `${Math.max(0, Math.ceil((new Date(c.trial_end) - Date.now()) / 86400000))}d left` : '—'}
-                  </span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: c.readiness_score === 100 ? '#10b981' : '#eab308' }}>
-                    {c.readiness_score}%
-                  </span>
+            {col.items.map(c => {
+              const rs = safeNum(c.readiness_score);
+              const daysLeft = c.trial_end ? Math.max(0, Math.ceil((new Date(c.trial_end) - Date.now()) / 86400000)) : null;
+              return (
+                <div key={c.id} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{safeStr(c.name)}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>{safeStr(c.plan_name, 'No plan')}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      {daysLeft !== null ? `${daysLeft}d left` : '—'}
+                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: rs === 100 ? '#10b981' : '#eab308' }}>
+                      {rs}%
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {col.items.length === 0 && (
               <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Empty</div>
             )}

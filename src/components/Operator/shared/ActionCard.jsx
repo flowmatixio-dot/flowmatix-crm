@@ -19,14 +19,18 @@ const ACTION_LABELS = {
 };
 
 export default function ActionCard({ type, priority = 'medium', clinicName, detail, timestamp, cta, onAction, onResolve }) {
-  const pc = PRIORITY_COLORS[priority] || PRIORITY_COLORS.medium;
-  const cfg = ACTION_LABELS[type] || { icon: '📋', label: type };
+  const safeType = typeof type === 'string' ? type : 'UNKNOWN';
+  const safePriority = typeof priority === 'string' ? priority : 'medium';
+  const pc = PRIORITY_COLORS[safePriority] || PRIORITY_COLORS.medium;
+  const cfg = ACTION_LABELS[safeType] || { icon: '📋', label: safeType };
+  const safeName = typeof clinicName === 'string' ? clinicName : 'System';
+  const safeDetail = typeof detail === 'string' ? detail : (typeof detail === 'object' ? JSON.stringify(detail) : String(cfg.label || ''));
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bg-card)', borderRadius: 10, padding: '14px 18px', borderLeft: `4px solid ${pc}` }}>
       <span style={{ fontSize: 22 }}>{cfg.icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{clinicName || 'System'}</div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{detail || cfg.label}</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{safeName}</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{safeDetail}</div>
         {timestamp && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{timeAgo(timestamp)}</div>}
       </div>
       <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
