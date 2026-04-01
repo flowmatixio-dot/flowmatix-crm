@@ -293,10 +293,11 @@ export default function AppointmentsPage() {
     setDrawerAppt(null);
   }, [updateAppt, showT]);
 
-  const handleCancel = useCallback((id) => {
-    updateAppt(id, { status: "cancelled" });
-    showT(t("appt_cancelled") || "Cancelled");
+  const handleCancel = useCallback(async (id) => {
+    await updateAppt(id, { status: "canceled" });
+    showT(t("appt_cancelled") || "Storniert");
     setDrawerAppt(null);
+    useAppointmentStore.getState().fetchAppointments();
   }, [updateAppt, showT]);
 
   const handleReschedule = useCallback((id, date, time) => {
@@ -305,19 +306,41 @@ export default function AppointmentsPage() {
     setDrawerAppt(null);
   }, [updateAppt, showT]);
 
+  const handleSaveAppt = useCallback(async (data) => {
+    const res = await fmApi.createAppointment(data);
+    if (res?.error) return res;
+    showT(tFb(t, "cal_appt_created", "Termin erstellt"));
+    setDrawerAppt(null);
+    useAppointmentStore.getState().fetchAppointments();
+    return res;
+  }, [showT, t]);
+
+  const reloadBlockedDays = useCallback(async () => {
+    const fresh = await fmApi.getBlockedDays();
+    const arr = Array.isArray(fresh) ? fresh : Array.isArray(fresh?.blockedDays) ? fresh.blockedDays : Array.isArray(fresh?.blocked_days) ? fresh.blocked_days : [];
+    setBlockedDays(arr);
+    return arr;
+  }, []);
+
   const handleBlockDaySave = useCallback(async (data) => {
     try {
       await fmApi.createBlockedDay(data);
-      // Reload all blocked days to ensure correct format
-      const fresh = await fmApi.getBlockedDays();
-      const arr = Array.isArray(fresh) ? fresh : Array.isArray(fresh?.blockedDays) ? fresh.blockedDays : Array.isArray(fresh?.blocked_days) ? fresh.blocked_days : [];
-      setBlockedDays(arr);
+      await reloadBlockedDays();
       showT(tFb(t, "cal_blocked_day", "Tag wurde geblockt"));
     } catch (e) {
-      showT(t("error_block_day") || "Fehler beim Blockieren");
+      showT((e?.message || t("error_block_day")) || "Fehler beim Blockieren");
     }
-    setShowBlockModal(false);
-  }, [showT, t]);
+  }, [showT, t, reloadBlockedDays]);
+
+  const handleBlockDayDelete = useCallback(async (id) => {
+    try {
+      await fmApi.deleteBlockedDay(id);
+      await reloadBlockedDays();
+      showT(tFb(t, "cal_unblocked", "Blockierung aufgehoben"));
+    } catch (e) {
+      showT("Fehler beim Aufheben");
+    }
+  }, [showT, t, reloadBlockedDays]);
 
   const handleDoctorSettingsSave = useCallback(async (settings) => {
     try {
@@ -634,7 +657,7 @@ export default function AppointmentsPage() {
             const dow = arg.date.getDay();
             if (dow === 0 || dow === 6) return ["fm-weekend"];
             const dateStr = `${arg.date.getFullYear()}-${String(arg.date.getMonth()+1).padStart(2,"0")}-${String(arg.date.getDate()).padStart(2,"0")}`;
-            const isBlocked = blockedDays.some(bd => bd.date === dateStr || bd.blocked_date === dateStr);
+            const isBlocked = blockedDays.some(bd => (bd.date || bd.blocked_date || '').slice(0, 10) === dateStr);
             if (isBlocked) return ["fm-blocked-day"];
             const dayApptCount = enrichedAppts.filter(a => a.date === dateStr).length;
             if (dayApptCount === 0 && arg.date >= new Date(getNow().setHours(0,0,0,0))) return ["fm-free-day"];
@@ -673,6 +696,9 @@ export default function AppointmentsPage() {
           onComplete={handleComplete}
           onCancel={handleCancel}
           onReschedule={handleReschedule}
+          onSave={handleSaveAppt}
+          doctors={doctors}
+          patients={myLeads}
           t={t}
         />
       )}
@@ -680,7 +706,9 @@ export default function AppointmentsPage() {
       {showBlockModal && (
         <BlockDayModal
           doctors={doctors}
+          blockedDays={blockedDays}
           onSave={handleBlockDaySave}
+          onDelete={handleBlockDayDelete}
           onClose={() => setShowBlockModal(false)}
           t={t}
         />

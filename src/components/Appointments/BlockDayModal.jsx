@@ -5,107 +5,108 @@ function tFb(t, key, fallback) {
   return (val && val !== key) ? val : fallback;
 }
 
-export default function BlockDayModal({ doctors, onSave, onClose, t }) {
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+export default function BlockDayModal({ doctors, blockedDays = [], onSave, onDelete, onClose, t }) {
+  const [date, setDate] = useState("");
   const [reason, setReason] = useState("");
   const [doctorId, setDoctorId] = useState("");
 
-  const handleSave = () => {
-    if (!date) return;
-    onSave({
-      date,
-      reason: reason || "Blocked",
-      doctorId: doctorId || null,
-    });
+  const handleDelete = async (id) => {
+    await onDelete(id);
+    setDate("");
+    setReason("");
   };
+
+  const [saving, setSaving] = useState(false);
+  const handleSave = async () => {
+    if (!date) { onClose(); return; }
+    setSaving(true);
+    try {
+      await onSave({ date, reason: reason || "Blocked", doctorId: doctorId || null });
+      setDate("");
+      setReason("");
+      setDoctorId("");
+      onClose();
+    } catch {}
+    setSaving(false);
+  };
+
+  const sorted = [...blockedDays].sort((a, b) => (a.blocked_date || a.date || "").localeCompare(b.blocked_date || b.date || ""));
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
-          zIndex: 9998, backdropFilter: "blur(4px)",
-        }}
-      />
-      {/* Modal */}
-      <div style={{
-        position: "fixed", top: "50%", left: "50%",
-        transform: "translate(-50%, -50%)",
-        background: "#141820", borderRadius: 18,
-        border: "1px solid rgba(255,255,255,0.1)",
-        padding: "24px 28px", width: 400, zIndex: 9999,
-        boxShadow: "0 24px 80px rgba(0,0,0,0.6)",
-      }}>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 9998, backdropFilter: "blur(4px)" }} />
+      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", background: "#141820", borderRadius: 18, border: "1px solid rgba(255,255,255,0.1)", padding: "24px 28px", width: 420, zIndex: 9999, boxShadow: "0 24px 80px rgba(0,0,0,0.6)", maxHeight: "80vh", overflowY: "auto" }}>
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 20px" }}>
-          {tFb(t, "cal_block_title", "Tage blocken")}
+          {tFb(t, "cal_block_title", "Tage blockieren")}
         </h2>
 
-        {/* Date */}
+        {/* Existing blocked days */}
+        {sorted.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", marginBottom: 8 }}>
+              {tFb(t, "cal_blocked_days", "Blockierte Tage")}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {sorted.map(bd => {
+                const d = (bd.blocked_date || bd.date || "").slice(0, 10);
+                const fmtDate = d ? new Date(d + "T00:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" }) : d;
+                return (
+                  <div key={bd.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.12)" }}>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#ef4444" }}>{fmtDate}</span>
+                      {bd.reason && bd.reason !== "Blocked" && (
+                        <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginLeft: 8 }}>{bd.reason}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleDelete(bd.id)}
+                      title={tFb(t, "cal_unblock", "Blockierung aufheben")}
+                      style={{ background: "none", border: "none", color: "rgba(239,68,68,0.5)", fontSize: 16, cursor: "pointer", padding: "2px 6px", lineHeight: 1 }}
+                    >✕</button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Divider */}
+        {sorted.length > 0 && <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 16 }} />}
+
+        {/* New block form */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", marginBottom: 8 }}>
+          {tFb(t, "cal_block_new", "Neuen Tag blockieren")}
+        </div>
+
         <div style={{ marginBottom: 14 }}>
           <label style={labelStyle}>{tFb(t, "cal_block_date", "Datum")}</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={inputStyle}
-          />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
         </div>
 
-        {/* Reason */}
         <div style={{ marginBottom: 14 }}>
           <label style={labelStyle}>{tFb(t, "cal_block_reason", "Grund")}</label>
-          <input
-            type="text"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder={tFb(t, "holiday_placeholder", "z.B. Feiertag, Urlaub...")}
-            style={inputStyle}
-          />
+          <input type="text" value={reason} onChange={(e) => setReason(e.target.value)} placeholder={tFb(t, "holiday_placeholder", "z.B. Feiertag, Urlaub...")} style={inputStyle} />
         </div>
 
-        {/* Doctor (optional) */}
         {doctors && doctors.length > 0 && (
           <div style={{ marginBottom: 20 }}>
             <label style={labelStyle}>{tFb(t, "doctor_optional", "Arzt (optional)")}</label>
-            <select
-              value={doctorId}
-              onChange={(e) => setDoctorId(e.target.value)}
-              style={{ ...inputStyle, cursor: "pointer" }}
-            >
+            <select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} style={{ ...inputStyle, cursor: "pointer" }}>
               <option value="">{tFb(t, "cal_all_doctors", "Alle")}</option>
-              {doctors.map((doc) => (
-                <option key={doc.id} value={doc.id}>{doc.name}</option>
-              ))}
+              {doctors.map((doc) => <option key={doc.id} value={doc.id}>{doc.name}</option>)}
             </select>
           </div>
         )}
 
-        {/* Buttons */}
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button
-            onClick={onClose}
-            style={{
-              padding: "10px 20px", borderRadius: 10, fontSize: 13,
-              fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-              color: "rgba(167,177,195,0.7)",
-            }}
-          >
-            {tFb(t, "cal_block_cancel", "Abbrechen")}
+          <button onClick={onClose} style={{ padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)" }}>
+            {tFb(t, "close", "Schließen")}
           </button>
-          <button
-            onClick={handleSave}
-            style={{
-              padding: "10px 20px", borderRadius: 10, fontSize: 13,
-              fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-              background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)",
-              color: "#ef4444",
-            }}
-          >
-            {tFb(t, "cal_block_save", "Speichern")}
-          </button>
+          {date && (
+            <button onClick={handleSave} disabled={saving} style={{ padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444", opacity: saving ? 0.5 : 1 }}>
+              {saving ? "..." : tFb(t, "cal_block_save", "Blockieren")}
+            </button>
+          )}
         </div>
       </div>
     </>
