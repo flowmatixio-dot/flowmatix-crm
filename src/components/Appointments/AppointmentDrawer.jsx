@@ -7,7 +7,7 @@ function tFb(t, key, fallback) {
   return (val && val !== key) ? val : fallback;
 }
 
-export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete, onCancel, onReschedule, onSave, doctors, patients, t }) {
+export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete, onCancel, onReschedule, onSave, onArchive, doctors, patients, t }) {
   // Create/Edit form state
   const [form, setForm] = useState({
     patientId: appt?.patientId || appt?.patient_id || "",
@@ -284,9 +284,14 @@ export default function AppointmentDrawer({ appt, onClose, onConfirm, onComplete
                     {tFb(t, "cal_complete", "Abschließen")}
                   </button>
                   <button onClick={() => onCancel(appt.id)} style={{ ...btnStyle, background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444" }}>
-                    {tFb(t, "cal_cancel", "Abbrechen")}
+                    {tFb(t, "cal_cancel", "Stornieren")}
                   </button>
                 </>
+              )}
+              {(appt.status === "canceled" || appt.status === "cancelled") && onArchive && (
+                <button onClick={() => onArchive(appt.id)} style={{ ...btnStyle, background: "rgba(107,114,128,0.15)", border: "1px solid rgba(107,114,128,0.3)", color: "#6b7280" }}>
+                  📦 {tFb(t, "cal_archive", "Ins Archiv verschieben")}
+                </button>
               )}
             </div>
           </>

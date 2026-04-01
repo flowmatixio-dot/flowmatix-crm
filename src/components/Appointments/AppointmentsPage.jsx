@@ -306,6 +306,17 @@ export default function AppointmentsPage() {
     setDrawerAppt(null);
   }, [updateAppt, showT]);
 
+  const handleArchive = useCallback(async (id) => {
+    try {
+      await fmApi.deleteAppointment(id);
+      showT(tFb(t, "cal_archived", "Ins Archiv verschoben"));
+      setDrawerAppt(null);
+      useAppointmentStore.getState().fetchAppointments();
+    } catch {
+      showT("Fehler");
+    }
+  }, [showT, t]);
+
   const handleSaveAppt = useCallback(async (data) => {
     const res = await fmApi.createAppointment(data);
     if (res?.error) return res;
@@ -697,6 +708,7 @@ export default function AppointmentsPage() {
           onCancel={handleCancel}
           onReschedule={handleReschedule}
           onSave={handleSaveAppt}
+          onArchive={handleArchive}
           doctors={doctors}
           patients={myLeads}
           t={t}

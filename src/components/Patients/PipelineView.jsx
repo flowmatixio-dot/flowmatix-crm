@@ -63,7 +63,7 @@ export default function PipelineView() {
   const cancelledLeads = myLeads.filter(l => l.stage === "cancelled");
 
   // Archive: only cancelled/storniert patients
-  const archivedLeads = myLeads.filter(l => l.stage === "cancelled" || l.metadata?.cancelled);
+  const archivedLeads = myLeads.filter(l => l.stage === "cancelled" || l.stage === "archived" || l.metadata?.cancelled);
 
   return (
     <div style={{ padding: "20px 32px", height: "100%", display: "flex", flexDirection: "column" }}>
@@ -115,7 +115,7 @@ export default function PipelineView() {
             }
             return l.stage;
           };
-          const items = myLeads.filter(l => effectiveStage(l) === col.id)
+          const items = myLeads.filter(l => l.stage !== "archived" && l.stage !== "cancelled" && effectiveStage(l) === col.id)
             .sort((a, b) => {
               // Handover patients always on top (most urgent)
               const aHO = a.convStatus === "human_takeover" ? 1 : 0;
