@@ -657,7 +657,7 @@ export default function AppointmentsPage() {
       <div className="fm-calendar-wrap" style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.04)" }}>
         <style>{calendarStyles}</style>
         <FullCalendar
-          key={`cal-${blockedDays.length}`}
+          key={`cal-${blockedDays.length}-${activeAppts.length}`}
           ref={calRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView={FC_VIEW_MAP[currentView] || "dayGridMonth"}
@@ -667,7 +667,7 @@ export default function AppointmentsPage() {
           events={filteredEvents}
           locale="de"
           firstDay={1}
-          hiddenDays={closedDays}
+          weekends={true}
           height="auto"
           editable={true}
           droppable={true}
@@ -682,7 +682,8 @@ export default function AppointmentsPage() {
           dayMaxEvents={3}
           businessHours={{ daysOfWeek: [0,1,2,3,4,5,6].filter(d => !closedDays.includes(d)), startTime: "08:00", endTime: "18:00" }}
           dayCellClassNames={(arg) => {
-            // Closed days are hidden via hiddenDays prop
+            const dow = arg.date.getDay();
+            if (closedDays.includes(dow)) return ["fm-closed-day"];
             const dateStr = `${arg.date.getFullYear()}-${String(arg.date.getMonth()+1).padStart(2,"0")}-${String(arg.date.getDate()).padStart(2,"0")}`;
             const isBlocked = blockedDays.some(bd => (bd.date || bd.blocked_date || '').slice(0, 10) === dateStr);
             if (isBlocked) return ["fm-blocked-day"];
@@ -1201,8 +1202,8 @@ function DetailCell({ label, value, valueColor, bold, children }) {
 
 /* ─── Calendar CSS ─── */
 const calendarStyles = `
-.fm-weekend { border: 1.5px solid rgba(255,80,80,0.2) !important; background: transparent !important; }
-.fm-weekend .fc-daygrid-day-number { color: rgba(255,80,80,0.6) !important; }
+.fm-closed-day { border: 1.5px solid rgba(255,80,80,0.2) !important; background: transparent !important; }
+.fm-closed-day .fc-daygrid-day-number { color: rgba(255,80,80,0.5) !important; }
 .fm-blocked-day { border: 2px solid rgba(239,68,68,0.4) !important; background: rgba(239,68,68,0.02) !important; }
 .fm-blocked-day .fc-daygrid-day-number { color: rgba(239,68,68,0.5) !important; }
 .fm-full-day { background: rgba(255,255,255,0.01) !important; opacity: 0.7; }
