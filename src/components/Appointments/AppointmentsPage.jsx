@@ -126,7 +126,7 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     fmApi.getBlockedDays().then((data) => {
-      const arr = Array.isArray(data) ? data : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
+      const arr = Array.isArray(data) ? data : Array.isArray(data?.blockedDays) ? data.blockedDays : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
       setBlockedDays(arr);
     }).catch(() => {});
   }, []);
@@ -307,11 +307,14 @@ export default function AppointmentsPage() {
 
   const handleBlockDaySave = useCallback(async (data) => {
     try {
-      const result = await fmApi.createBlockedDay(data);
-      setBlockedDays((prev) => [...prev, result]);
+      await fmApi.createBlockedDay(data);
+      // Reload all blocked days to ensure correct format
+      const fresh = await fmApi.getBlockedDays();
+      const arr = Array.isArray(fresh) ? fresh : Array.isArray(fresh?.blockedDays) ? fresh.blockedDays : Array.isArray(fresh?.blocked_days) ? fresh.blocked_days : [];
+      setBlockedDays(arr);
       showT(tFb(t, "cal_blocked_day", "Tag wurde geblockt"));
     } catch (e) {
-      showT(t("error_block_day"));
+      showT(t("error_block_day") || "Fehler beim Blockieren");
     }
     setShowBlockModal(false);
   }, [showT, t]);
@@ -604,6 +607,7 @@ export default function AppointmentsPage() {
       <div className="fm-calendar-wrap" style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.04)" }}>
         <style>{calendarStyles}</style>
         <FullCalendar
+          key={`cal-${blockedDays.length}`}
           ref={calRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView={FC_VIEW_MAP[currentView] || "dayGridMonth"}
