@@ -29,7 +29,7 @@ import AddonsView from "./src/components/Addons/AddonsView";
 import PatientPanel from "./src/components/Patients/PatientPanel";
 import RevenueView from "./src/components/Revenue/RevenueView";
 import ProductTour, { TourWelcomeModal } from "./src/components/Tour/ProductTour";
-import OperatorPanel from "./src/components/Operator/OperatorPanel";
+import OperatorApp from "./src/components/Operator/OperatorApp.jsx";
 import DashboardView from "./src/components/Dashboard/DashboardView";
 import InboxView from "./src/components/Inbox/InboxView";
 import AppointmentsView from "./src/components/Appointments/AppointmentsView";
@@ -1717,7 +1717,7 @@ export default function App() {
         {view==="support"&&<SupportView/>}
 
         {/* OPERATOR CONSOLE */}
-        {view==="operator"&&(isAdmin||isOperator)&&<OperatorPanel/>}
+        {view==="operator"&&(isAdmin||isOperator)&&<OperatorApp/>}
 
         </div></div>
     </div>

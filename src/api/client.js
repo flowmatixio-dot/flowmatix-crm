@@ -1620,3 +1620,8 @@ export async function createCheckoutSession(priceId, orgId) {
 export async function getWebsiteStats(orgId) {
   return apiFetch(`/api/v1/crm/website-stats?orgId=${encodeURIComponent(orgId)}`);
 }
+
+// ── Operator Event + Action System ─────────────────────
+export const getOperatorEvents = (params = {}) => apiFetch(`/api/v1/ops/operator-events?${new URLSearchParams(params)}`);
+export const resolveOperatorEvent = (id) => apiFetch(`/api/v1/ops/operator-events/${id}/resolve`, { method: 'POST' });
+export const getClinicActions = () => apiFetch('/api/v1/ops/clinic-actions');
