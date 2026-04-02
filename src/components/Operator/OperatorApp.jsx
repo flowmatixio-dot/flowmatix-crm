@@ -60,7 +60,7 @@ export default function OperatorApp() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', flex: 1 }}>
       <AlertBar
         events={eventState.events}
         criticalCount={eventState.criticalCount}
