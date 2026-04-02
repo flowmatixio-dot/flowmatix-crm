@@ -30,7 +30,10 @@ export default function IncidentsView() {
     }).catch(() => { setIncidents([]); setLoading(false); });
   }, [tab, sortBySeverity]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    // Auto-detect incidents on first load
+    fmApi.apiFetch('/api/v1/ops/incident-detector/run', { method: 'POST' }).catch(() => {}).finally(load);
+  }, [load]);
 
   const resolve = async (id) => {
     try { await fmApi.resolveIncidentV2(id); load(); } catch {}
@@ -128,6 +131,11 @@ export default function IncidentsView() {
               {t === 'open' ? 'Open' : 'History'}
             </button>
           ))}
+          <button onClick={async () => {
+            try { await fmApi.apiFetch('/api/v1/ops/incident-detector/run', { method: 'POST' }); load(); } catch {}
+          }} style={{ background: '#f9731618', border: '1px solid #f9731630', borderRadius: 6, padding: '6px 14px', color: '#f97316', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+            Detect Issues
+          </button>
           <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
             Refresh
           </button>
