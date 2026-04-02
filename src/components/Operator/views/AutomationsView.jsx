@@ -6,18 +6,33 @@ import * as fmApi from '../../../api/client.js';
 
 function classifyWorkflow(name) {
   const n = (name || '').toLowerCase();
-  if (n.includes('whatsapp') || n.includes('wa ') || n.includes('send router') || n.includes('inbound bridge')) return { type: 'core', label: 'Core', color: '#3b82f6', critical: true };
-  if (n.includes('booking') || n.includes('provisioning') || n.includes('clinic provision')) return { type: 'core', label: 'Core', color: '#3b82f6', critical: true };
-  if (n.includes('zahlung') || n.includes('payment') || n.includes('subscription') || n.includes('overdue')) return { type: 'revenue', label: 'Revenue', color: '#10b981', critical: true };
-  if (n.includes('reminder') || n.includes('aftercare') || n.includes('follow') || n.includes('nachverfolgung') || n.includes('no-show') || n.includes('flight')) return { type: 'ops', label: 'Ops', color: '#f97316', critical: false };
-  if (n.includes('error') || n.includes('metrics') || n.includes('platform')) return { type: 'ops', label: 'Ops', color: '#f97316', critical: false };
-  if (n.includes('telegram') || n.includes('demo') || n.includes('test') || n.includes('[partner]')) return { type: 'test', label: 'Test', color: '#6b7280', critical: false };
-  if (n.includes('staff') || n.includes('review') || n.includes('driver') || n.includes('willkommen')) return { type: 'support', label: 'Support', color: '#a78bfa', critical: false };
-  return { type: 'other', label: 'Other', color: '#6b7280', critical: false };
+  // CRITICAL = only WhatsApp, Booking, Payment flows
+  if (n.includes('whatsapp flow') || n.includes('send router') || n.includes('inbound bridge'))
+    return { type: 'core', label: 'CRITICAL CORE', color: '#ef4444', priority: 'high', critical: true };
+  if (n.includes('zahlung') || n.includes('payment') || n.includes('overdue'))
+    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true };
+  if (n.includes('subscription') || n.includes('expiry'))
+    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true };
+  // HIGH = provisioning, booking, error handler
+  if (n.includes('provisioning') || n.includes('booking'))
+    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false };
+  if (n.includes('error handler') || n.includes('global error'))
+    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false };
+  // MEDIUM = ops workflows
+  if (n.includes('reminder') || n.includes('aftercare') || n.includes('follow') || n.includes('nachverfolgung') || n.includes('no-show'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false };
+  if (n.includes('flight') || n.includes('metrics') || n.includes('platform') || n.includes('willkommen'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false };
+  if (n.includes('staff') || n.includes('review') || n.includes('driver'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false };
+  // LOW = test, demo, partner, telegram
+  if (n.includes('telegram') || n.includes('demo') || n.includes('test') || n.includes('[partner]'))
+    return { type: 'test', label: 'TEST', color: '#6b7280', priority: 'low', critical: false };
+  return { type: 'other', label: 'OTHER', color: '#6b7280', priority: 'low', critical: false };
 }
 
 const TYPE_ORDER = { core: 0, revenue: 1, ops: 2, support: 3, test: 4, other: 5 };
-const FILTERS = ['all', 'active', 'inactive', 'critical'];
+const FILTERS = ['all', 'active', 'inactive', 'high', 'revenue', 'core'];
 
 export default function AutomationsView() {
   const [queueStats, setQueueStats] = useState(null);
@@ -50,13 +65,18 @@ export default function AutomationsView() {
 
   const activeWf = workflows.filter(w => w.active === true);
   const inactiveWf = workflows.filter(w => w.active !== true);
+  // Alert only for truly critical (WhatsApp/Payment/Booking) inactive
   const criticalInactive = workflows.filter(w => w.critical && w.active !== true);
+  // High priority inactive (includes core flows)
+  const highInactive = workflows.filter(w => w.priority === 'high' && w.active !== true);
 
   const displayed = useMemo(() => {
     let list = showProduction ? workflows.filter(w => w.type !== 'test') : workflows;
     if (filter === 'active') list = list.filter(w => w.active === true);
     else if (filter === 'inactive') list = list.filter(w => w.active !== true);
-    else if (filter === 'critical') list = list.filter(w => w.critical);
+    else if (filter === 'high') list = list.filter(w => w.priority === 'high');
+    else if (filter === 'revenue') list = list.filter(w => w.type === 'revenue');
+    else if (filter === 'core') list = list.filter(w => w.type === 'core');
     return list;
   }, [workflows, filter, showProduction]);
 
@@ -160,13 +180,17 @@ export default function AutomationsView() {
 
 function WfCard({ w }) {
   const on = w.active === true;
+  const isHigh = w.priority === 'high';
+  const isLow = w.priority === 'low';
   const crit = w.critical && !on;
-  const bc = crit ? '#ef4444' : on ? '#10b98130' : 'rgba(255,255,255,0.04)';
+  const bc = crit ? '#ef4444' : (isHigh && on) ? '#10b98150' : on ? '#10b98120' : 'rgba(255,255,255,0.04)';
+  const shadow = crit ? '0 0 16px rgba(239,68,68,0.12)' : (isHigh && on) ? '0 0 10px rgba(16,185,129,0.08)' : 'none';
+  const opacity = isLow && !on ? 0.5 : 1;
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '14px 16px', border: `1px solid ${bc}`, boxShadow: crit ? '0 0 12px rgba(239,68,68,0.08)' : on ? '0 0 6px rgba(16,185,129,0.04)' : 'none' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '14px 16px', border: `1px solid ${bc}`, boxShadow: shadow, opacity, transition: 'all 0.12s' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3, flex: 1, marginRight: 8 }}>{safeStr(w.name)}</div>
-        <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: `${w.color || '#6b7280'}18`, color: w.color || '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{w.label || 'Other'}</span>
+        <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: `${w.color || '#6b7280'}18`, color: w.color || '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{w.label || 'OTHER'}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ width: 6, height: 6, borderRadius: 99, background: on ? '#10b981' : '#6b7280', boxShadow: on ? '0 0 6px #10b981' : 'none' }} />
