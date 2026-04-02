@@ -16,11 +16,9 @@ export default function IncidentsView() {
   const load = useCallback(() => {
     setLoading(true);
     // Fetch from both incident sources (incidents-v2 + incidents table)
-    const fn1 = tab === 'open' ? fmApi.getLiveIncidents : fmApi.getIncidentHistory;
-    const fn2 = tab === 'open'
-      ? fmApi.apiFetch('/api/v1/ops/incidents?status=open&limit=50')
-      : fmApi.apiFetch('/api/v1/ops/incidents?status=resolved&limit=50');
-    Promise.all([fn1().catch(() => null), fn2().catch(() => null)]).then(([r1, r2]) => {
+    const p1 = (tab === 'open' ? fmApi.getLiveIncidents() : fmApi.getIncidentHistory()).catch(() => null);
+    const p2 = fmApi.apiFetch(`/api/v1/ops/incidents?status=${tab === 'open' ? 'open' : 'resolved'}&limit=50`).catch(() => null);
+    Promise.all([p1, p2]).then(([r1, r2]) => {
       const list1 = Array.isArray(r1?.incidents) ? r1.incidents : [];
       const list2 = Array.isArray(r2?.incidents) ? r2.incidents : [];
       let items = [...list1, ...list2];

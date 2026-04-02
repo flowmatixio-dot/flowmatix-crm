@@ -46,8 +46,12 @@ export default function AnalyticsView() {
   const activeSubs = safeNum(countByStatus.active) || safeNum(bizRev?.active_subs);
   const trialSubs = safeNum(countByStatus.trialing) || safeNum(bizRev?.trial_subs);
   const visitorCount = period === '1' ? safeNum(visitors?.today?.visitors) : period === '7' ? safeNum(visitors?.week?.visitors) : safeNum(visitors?.month?.visitors);
-  const totalMsgs = safeNum(waPerf?.messages_30d);
+  const totalMsgs = safeNum(waPerf?.messages_30d) || daily.reduce((s, d) => s + safeNum(d.messages), 0);
   const totalLeads = safeNum(funnel?.leads);
+  // Derive bookings from daily metrics if biz endpoint unavailable
+  const bookingsToday = safeNum(bizRev?.bookings_today) || safeNum(daily.find(d => d.day && new Date(d.day).toDateString() === new Date().toDateString())?.appointments);
+  const bookings7d = safeNum(bizRev?.bookings_7d) || daily.slice(-7).reduce((s, d) => s + safeNum(d.appointments), 0);
+  const bookings30d = safeNum(bizRev?.bookings_30d) || daily.reduce((s, d) => s + safeNum(d.appointments), 0);
 
   // Marketing data
   const topPages = Array.isArray(visitors?.topPages) ? visitors.topPages : [];
@@ -75,7 +79,7 @@ export default function AnalyticsView() {
       {/* ═══ 1. TOP KPIs ═══ */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
         <StatCard label="MRR" value={fmtEur(mrr)} color="green" sub={`${activeSubs} active · ${trialSubs} trial`} />
-        <StatCard label="Bookings" value={noData(safeNum(bizRev?.bookings_30d))} color="orange" sub={`${noData(safeNum(bizRev?.bookings_today))} today`} />
+        <StatCard label="Bookings" value={bookings30d} color="orange" sub={`${bookingsToday} today`} />
         <StatCard label="Leads" value={noData(totalLeads)} color="purple" sub={`Last ${period}d`} />
         <StatCard label="Messages" value={noData(totalMsgs)} color="blue" sub={`${noData(safeNum(waPerf?.messages_today))} today`} />
       </div>
@@ -84,9 +88,9 @@ export default function AnalyticsView() {
       <SectionTitle>Business Overview</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 32 }}>
         {[
-          { l: 'Bookings Today', v: safeNum(bizRev?.bookings_today), c: '#f97316' },
-          { l: 'Bookings 7d', v: safeNum(bizRev?.bookings_7d), c: '#a78bfa' },
-          { l: 'Bookings 30d', v: safeNum(bizRev?.bookings_30d), c: '#3b82f6' },
+          { l: 'Bookings Today', v: bookingsToday, c: '#f97316' },
+          { l: 'Bookings 7d', v: bookings7d, c: '#a78bfa' },
+          { l: 'Bookings 30d', v: bookings30d, c: '#3b82f6' },
           { l: 'Active Subs', v: activeSubs, c: '#10b981' },
           { l: 'Trial Subs', v: trialSubs, c: '#eab308' },
           { l: 'MRR', v: fmtEur(mrr), c: '#10b981' },
@@ -149,10 +153,12 @@ export default function AnalyticsView() {
               const maxV = Math.max(1, ...daily.slice(-14).map(x => safeNum(x.messages || x.messages_sent || x.views || x.visitors, 1)));
               const val = safeNum(d.messages || d.messages_sent || d.views || d.visitors);
               const h = Math.max(4, (val / maxV) * 80);
+              const dateStr = typeof d.day === 'string' ? d.day.slice(5, 10) : '';
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                   <div style={{ fontSize: 8, color: 'var(--text-muted)' }}>{val}</div>
                   <div style={{ width: '100%', maxWidth: 20, height: h, background: '#3b82f6', borderRadius: '3px 3px 0 0', opacity: 0.7 }} />
+                  <div style={{ fontSize: 7, color: 'var(--text-muted)', marginTop: 2 }}>{dateStr}</div>
                 </div>
               );
             })}
