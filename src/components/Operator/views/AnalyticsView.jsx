@@ -4,6 +4,8 @@ import DataTable from '../shared/DataTable.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
+const bizFetch = (path) => fmApi.apiFetch(`/api/v1/ops/analytics-biz${path}`);
+
 export default function AnalyticsView() {
   const [period, setPeriod] = useState('30');
   const [metrics, setMetrics] = useState([]);
@@ -11,6 +13,10 @@ export default function AnalyticsView() {
   const [visitors, setVisitors] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [funnel, setFunnel] = useState(null);
+  const [waPerf, setWaPerf] = useState(null);
+  const [bizRev, setBizRev] = useState(null);
+  const [clinicRank, setClinicRank] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -18,15 +24,21 @@ export default function AnalyticsView() {
     Promise.all([
       fmApi.getPlatformMetrics(parseInt(period)).catch(() => null),
       fmApi.getRevenue().catch(() => null),
-      fmApi.getVisitorStats().catch(e => { console.warn('Visitor stats failed:', e); return null; }),
-    ]).then(([m, r, v]) => {
-      // DEV logging removed for security
+      fmApi.getVisitorStats().catch(() => null),
+      bizFetch(`/funnel?days=${period}`).catch(() => null),
+      bizFetch('/whatsapp').catch(() => null),
+      bizFetch('/revenue').catch(() => null),
+      bizFetch('/clinics').catch(() => null),
+    ]).then(([m, r, v, fn, wa, rev, cl]) => {
       setMetrics(Array.isArray(m?.metrics) ? m.metrics : []);
       setRevenue(r);
       setVisitors(v);
+      setFunnel(fn);
+      setWaPerf(wa);
+      setBizRev(rev);
+      setClinicRank(Array.isArray(cl?.clinics) ? cl.clinics : []);
       setLoading(false);
     }).catch(err => {
-      console.error('Analytics load failed:', err);
       setError(err?.message || 'Failed');
       setLoading(false);
     });
@@ -178,6 +190,63 @@ export default function AnalyticsView() {
             </div>
           </div>
 
+          {/* ══ BUSINESS ANALYTICS ══ */}
+
+          {/* Funnel */}
+          {funnel && <FunnelSection funnel={funnel} visitors={visitorCount} />}
+
+          {/* WhatsApp Performance */}
+          {waPerf && (
+            <div style={{ marginBottom: 28 }}>
+              <h2 style={sectionH}>WhatsApp Performance</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
+                {[
+                  { label: 'Today', value: safeNum(waPerf.messages_today), color: '#3b82f6' },
+                  { label: 'Last 7d', value: safeNum(waPerf.messages_7d), color: '#a78bfa' },
+                  { label: 'Last 30d', value: safeNum(waPerf.messages_30d), color: '#f97316' },
+                  { label: 'Active Convos', value: safeNum(waPerf.active_conversations), color: '#10b981' },
+                  { label: 'Failed', value: safeNum(waPerf.failed_messages), color: safeNum(waPerf.failed_messages) > 0 ? '#ef4444' : '#6b7280' },
+                ].map((m, i) => (
+                  <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '14px 16px', borderTop: `2px solid ${m.color}`, textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{m.value}</div>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: m.color, textTransform: 'uppercase', marginTop: 4 }}>{m.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Revenue & Bookings */}
+          {bizRev && (
+            <div style={{ marginBottom: 28 }}>
+              <h2 style={sectionH}>Revenue & Bookings</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                <StatCard label="Bookings Today" value={safeNum(bizRev.bookings_today)} color="orange" />
+                <StatCard label="Bookings 7d" value={safeNum(bizRev.bookings_7d)} color="purple" />
+                <StatCard label="Active Subs" value={safeNum(bizRev.active_subs)} color="green" sub={`${safeNum(bizRev.trial_subs)} trials`} />
+                <StatCard label="MRR" value={`€${(safeNum(bizRev.mrr_cents) / 100).toLocaleString('de-DE')}`} color="green" />
+              </div>
+            </div>
+          )}
+
+          {/* Clinic Performance Ranking */}
+          {clinicRank.length > 0 && (
+            <div style={{ marginBottom: 28 }}>
+              <h2 style={sectionH}>Clinic Performance</h2>
+              <DataTable
+                columns={[
+                  { key: 'name', label: 'Clinic', render: v => <span style={{ fontWeight: 700 }}>{safeStr(v)}</span> },
+                  { key: 'leads', label: 'Leads', render: v => safeNum(v) },
+                  { key: 'bookings', label: 'Bookings', render: v => safeNum(v) },
+                  { key: 'conversion', label: 'Conversion', render: v => <span style={{ color: safeNum(v) > 20 ? '#10b981' : safeNum(v) > 0 ? '#eab308' : 'var(--text-muted)' }}>{safeNum(v)}%</span> },
+                  { key: 'messages_30d', label: 'Messages 30d', render: v => safeNum(v) },
+                ]}
+                data={clinicRank}
+                emptyText="No clinic data"
+              />
+            </div>
+          )}
+
           {/* Subscriptions */}
           <h2 style={sectionH}>Subscriptions</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
@@ -193,6 +262,61 @@ export default function AnalyticsView() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function FunnelSection({ funnel, visitors }) {
+  const steps = [
+    { label: 'Visitors', value: visitors || 0, color: '#6b7280' },
+    { label: 'Leads', value: parseInt(funnel.leads) || 0, color: '#3b82f6' },
+    { label: 'WhatsApp Started', value: parseInt(funnel.wa_started) || 0, color: '#a78bfa' },
+    { label: 'Intake Done', value: parseInt(funnel.intake_completed) || 0, color: '#f97316' },
+    { label: 'Photos Received', value: parseInt(funnel.photos_received) || 0, color: '#eab308' },
+    { label: 'Quotes', value: parseInt(funnel.quotes_generated) || 0, color: '#10b981' },
+    { label: 'Bookings', value: parseInt(funnel.bookings_created) || 0, color: '#10b981' },
+    { label: 'Confirmed', value: parseInt(funnel.bookings_confirmed) || 0, color: '#10b981' },
+  ];
+
+  const maxVal = Math.max(1, ...steps.map(s => s.value));
+  let worstDrop = { from: '', to: '', pct: 0 };
+  for (let i = 1; i < steps.length; i++) {
+    if (steps[i - 1].value > 0) {
+      const dropPct = Math.round((1 - steps[i].value / steps[i - 1].value) * 100);
+      if (dropPct > worstDrop.pct) worstDrop = { from: steps[i - 1].label, to: steps[i].label, pct: dropPct };
+    }
+  }
+
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 }}>
+        Conversion Funnel
+      </h2>
+      {worstDrop.pct > 50 && (
+        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 12, background: '#f9731612', border: '1px solid #f9731630', fontSize: 12, color: '#f97316', fontWeight: 600 }}>
+          Biggest drop: {worstDrop.from} → {worstDrop.to} ({worstDrop.pct}% lost)
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {steps.map((s, i) => {
+          const prev = i > 0 ? steps[i - 1].value : null;
+          const convPct = prev && prev > 0 ? Math.round((s.value / prev) * 100) : null;
+          const barWidth = maxVal > 0 ? Math.max(2, (s.value / maxVal) * 100) : 2;
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ width: 120, fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'right', flexShrink: 0 }}>{s.label}</span>
+              <div style={{ flex: 1, height: 24, borderRadius: 4, background: 'rgba(255,255,255,0.03)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${barWidth}%`, background: s.color, borderRadius: 4, display: 'flex', alignItems: 'center', paddingLeft: 8, minWidth: 40 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#fff' }}>{s.value}</span>
+                </div>
+              </div>
+              {convPct !== null && (
+                <span style={{ width: 50, fontSize: 11, fontWeight: 700, color: convPct > 50 ? '#10b981' : convPct > 20 ? '#eab308' : '#ef4444', textAlign: 'right', flexShrink: 0 }}>{convPct}%</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
