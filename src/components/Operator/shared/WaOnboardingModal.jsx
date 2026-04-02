@@ -63,8 +63,8 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
   const currentStepIdx = STEPS.findIndex(s => s.id === step);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
-      <div style={{ background: 'var(--bg-card, #1a2235)', borderRadius: 16, padding: 32, width: 520, maxHeight: '90vh', overflow: 'auto', border: '1px solid rgba(255,255,255,0.08)' }} onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
+      <div style={{ background: '#131c2e', borderRadius: 16, padding: 32, width: 520, maxHeight: '90vh', overflow: 'auto', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 24px 48px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
