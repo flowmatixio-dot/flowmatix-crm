@@ -87,6 +87,7 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try { await fmApi.logout(); } catch {}
     fmApi.clearTokens();
+    sessionStorage.removeItem('fm_impersonating');
     set({
       user: null,
       loginEmail: '',
@@ -101,12 +102,50 @@ export const useAuthStore = create((set, get) => ({
    * Restore session on page load — checks API tokens.
    */
   restoreSession: async () => {
+    // ── Impersonation: accept token from URL ──
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const impToken = params.get('impersonate_token');
+      if (impToken) {
+        // Set the impersonation token as the session token
+        fmApi.setTokens(impToken, null);
+        sessionStorage.setItem('fm_impersonating', 'true');
+        // Clean URL
+        const url = new URL(window.location);
+        url.searchParams.delete('impersonate_token');
+        window.history.replaceState({}, '', url.pathname + url.search);
+        // Fetch user info with the impersonation token
+        try {
+          const me = await fmApi.getMe();
+          if (me?.user || me?.email) {
+            const u = me.user || me;
+            set({
+              user: {
+                email: u.email,
+                role: u.role || 'clinic_admin',
+                clinicId: u.organizationId || u.org_id || null,
+                name: u.name || u.email?.split('@')[0] || 'Operator',
+                apiUser: true,
+                apiRole: u.role || 'clinic_admin',
+                orgId: u.organizationId || u.org_id,
+                impersonating: true,
+              },
+              authLoading: false,
+            });
+            return;
+          }
+        } catch { fmApi.clearTokens(); sessionStorage.removeItem('fm_impersonating'); }
+      }
+    } catch {}
+
+    // ── Normal session restore ──
     if (fmApi.isAuthenticated()) {
       const stored = sessionStorage.getItem('fm_api_user');
       if (stored) {
         try {
           const u = JSON.parse(stored);
           const isOp = u.role === 'platform_owner' || u.role === 'admin';
+          const isImpersonating = sessionStorage.getItem('fm_impersonating') === 'true';
           set({
             user: {
               email: u.email,
@@ -116,6 +155,7 @@ export const useAuthStore = create((set, get) => ({
               apiUser: true,
               apiRole: u.role,
               orgId: u.organizationId,
+              impersonating: isImpersonating,
             },
             authLoading: false,
           });
