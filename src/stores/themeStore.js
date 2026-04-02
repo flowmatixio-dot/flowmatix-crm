@@ -39,7 +39,7 @@ export const useThemeStore = create(
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   // Update body background for instant paint
-  document.body.style.background = theme === 'light' ? '#F8FAFC' : '#0f1623';
+  document.body.style.background = theme === 'light' ? '#F8FAFC' : '#0b1220';
 }
 
 /** Initialize theme before React renders (call from index.html or main.jsx) */

@@ -102,7 +102,7 @@ export default function MonitoringView({ actions }) {
 
   if (loading) return <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading...</div>;
 
-  const statusColors = { green: '#10b981', yellow: '#eab308', red: '#ef4444' };
+  const statusColors = { green: '#22c55e', yellow: '#ffcf40', red: '#ef4444' };
   const sc = statusColors[globalStatus.status];
 
   return (
@@ -120,8 +120,8 @@ export default function MonitoringView({ actions }) {
             ))}
           </div>
         )}
-        <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto', transition: 'all 0.15s' }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+        <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto', transition: 'all 0.15s', fontFamily: 'inherit' }}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-active)'}
           onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}>
           Refresh
         </button>
@@ -136,9 +136,9 @@ export default function MonitoringView({ actions }) {
           const gcOk = c.google_connected === true;
           const wf = safeNum(c.active_workflows);
           const hasError = c.has_recent_error || c.required_action === 'FIX_ERROR';
-          const borderColor = health > 80 ? '#10b981' : health >= 50 ? '#eab308' : '#ef4444';
+          const borderColor = health > 80 ? '#22c55e' : health >= 50 ? '#ffcf40' : '#ef4444';
           return (
-            <div key={c.id} style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '16px 18px', borderLeft: `3px solid ${borderColor}` }}>
+            <div key={c.id} style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', borderLeft: `3px solid ${borderColor}` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(c.name)}</span>
                 <span style={{ fontSize: 18, fontWeight: 800, color: borderColor }}>{health}%</span>
@@ -161,7 +161,7 @@ export default function MonitoringView({ actions }) {
         <MetricCard label="CPU" pct={cpuPct} detail={infra?.load ? `Load: ${Number(infra.load.load1 || 0).toFixed(2)} / ${Number(infra.load.load5 || 0).toFixed(2)}` : null} />
         <MetricCard label="Memory" pct={memPct} detail={mem?.usedGB != null ? `${fmtGB(mem.usedGB)} / ${fmtGB(mem.totalGB)}` : null} sub={mem?.freeGB != null ? `${fmtGB(mem.freeGB)} free` : null} />
         <MetricCard label="Disk" pct={diskPct} detail={disk?.usedGB != null ? `${fmtGB(disk.usedGB)} / ${fmtGB(disk.totalGB)}` : null} sub={disk?.freeGB != null ? `${fmtGB(disk.freeGB)} free` : null} />
-        <MetricCard label="Uptime" value={formatUptime(uptimeVal)} color="#3b82f6" />
+        <MetricCard label="Uptime" value={formatUptime(uptimeVal)} color="#5ee0ff" />
       </div>
 
       {/* Containers */}
@@ -170,9 +170,9 @@ export default function MonitoringView({ actions }) {
         {containers.map((c, i) => {
           const on = c.status === 'running';
           return (
-            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', borderLeft: `3px solid ${on ? '#10b981' : '#ef4444'}` }}>
+            <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', borderLeft: `3px solid ${on ? '#22c55e' : '#ef4444'}` }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
-              <div style={{ fontSize: 11, color: on ? '#10b981' : '#ef4444', marginTop: 3 }}>{on ? 'Running' : c.status}</div>
+              <div style={{ fontSize: 11, color: on ? '#22c55e' : '#ef4444', marginTop: 3 }}>{on ? 'Running' : c.status}</div>
               {c.memory && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{c.memory}</div>}
             </div>
           );
@@ -193,7 +193,7 @@ export default function MonitoringView({ actions }) {
               const retries = safeNum(q.retries_last_hour);
               // Status: RED if failed>5 or pending>200 or oldest>120s, YELLOW if pending>50 or retries>0
               const status = (f > 5 || p > 200 || oldest > 120) ? 'red' : (p > 50 || retries > 0 || f > 0) ? 'yellow' : 'green';
-              const sc = { red: '#ef4444', yellow: '#eab308', green: '#10b981' }[status];
+              const sc = { red: '#ef4444', yellow: '#ffcf40', green: '#22c55e' }[status];
               return (
                 <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', borderLeft: `3px solid ${sc}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -204,39 +204,39 @@ export default function MonitoringView({ actions }) {
                     <span>{p} pending</span>
                     <span style={{ color: f > 0 ? '#ef4444' : 'inherit', fontWeight: f > 0 ? 700 : 400 }}>{f} failed</span>
                     {d > 0 && <span>{d} delayed</span>}
-                    {tpm > 0 && <span style={{ color: '#10b981' }}>{tpm}/min</span>}
-                    {oldest > 0 && <span style={{ color: oldest > 60 ? '#f97316' : 'inherit' }}>oldest: {oldest}s</span>}
+                    {tpm > 0 && <span style={{ color: '#22c55e' }}>{tpm}/min</span>}
+                    {oldest > 0 && <span style={{ color: oldest > 60 ? '#ff8c2a' : 'inherit' }}>oldest: {oldest}s</span>}
                   </div>
                 </div>
               );
             })}
-            {queues.length === 0 && <div style={{ color: '#10b981', fontSize: 13, padding: 10 }}>All queues clear — no backlog</div>}
+            {queues.length === 0 && <div style={{ color: '#22c55e', fontSize: 13, padding: 10 }}>All queues clear — no backlog</div>}
           </div>
         </div>
 
         {/* Backup + Database */}
         <div>
           <h2 style={secH}>Backup, Database & Storage</h2>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 16, borderLeft: `3px solid ${backupOk ? '#10b981' : '#f97316'}`, marginBottom: 10 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', borderLeft: `3px solid ${backupOk ? '#22c55e' : '#ff8c2a'}`, marginBottom: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Backup</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: backupOk ? '#10b981' : '#f97316', background: backupOk ? '#10b98115' : '#f9731615', padding: '2px 8px', borderRadius: 4 }}>{backupOk ? 'OK' : 'Check'}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: backupOk ? '#22c55e' : '#ff8c2a', background: backupOk ? '#22c55e15' : '#ff8c2a15', padding: '2px 8px', borderRadius: 4 }}>{backupOk ? 'OK' : 'Check'}</span>
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
               Last: {backup?.lastBackupAt ? new Date(backup.lastBackupAt).toLocaleString('de-DE') : '—'} ({backupAge != null ? (backupAge < 1 ? 'just now' : `${Math.floor(backupAge)}h ago`) : '—'})
             </div>
             {backup?.lastBackupSize && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Size: {(backup.lastBackupSize / 1e6).toFixed(0)} MB</div>}
           </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px' }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Database</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
               <span style={{ color: 'var(--text-muted)' }}>Size</span><span style={{ color: 'var(--text-primary)' }}>{dbSize}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-              <span style={{ color: 'var(--text-muted)' }}>Connections</span><span style={{ color: dbConns > 50 ? '#f97316' : 'var(--text-primary)' }}>{dbConns}</span>
+              <span style={{ color: 'var(--text-muted)' }}>Connections</span><span style={{ color: dbConns > 50 ? '#ff8c2a' : 'var(--text-primary)' }}>{dbConns}</span>
             </div>
             {topTables.length > 0 && (
-              <div style={{ marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 8 }}>
+              <div style={{ marginTop: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 8 }}>
                 {topTables.slice(0, 5).map((t, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '2px 0', color: 'var(--text-muted)' }}>
                     <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{safeStr(t.name || t.table_name || t.relname)}</span>
@@ -258,12 +258,12 @@ export default function MonitoringView({ actions }) {
           <h2 style={secH}>Business Metrics</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
             {[
-              { label: 'Total Clinics', value: safeNum(bizMetrics.total_clinics), color: '#3b82f6' },
-              { label: 'Active', value: safeNum(bizMetrics.active_clinics), color: '#10b981' },
-              { label: 'Trial', value: safeNum(bizMetrics.trial_clinics), color: '#eab308' },
+              { label: 'Total Clinics', value: safeNum(bizMetrics.total_clinics), color: '#5ee0ff' },
+              { label: 'Active', value: safeNum(bizMetrics.active_clinics), color: '#22c55e' },
+              { label: 'Trial', value: safeNum(bizMetrics.trial_clinics), color: '#ffcf40' },
               { label: 'Conversion', value: `${safeNum(bizMetrics.conversion_rate)}%`, color: '#a78bfa' },
-              { label: 'Bookings Today', value: safeNum(bizMetrics.bookings_today), color: '#f97316' },
-              { label: 'Messages Today', value: safeNum(bizMetrics.messages_today), color: '#3b82f6' },
+              { label: 'Bookings Today', value: safeNum(bizMetrics.bookings_today), color: '#ff8c2a' },
+              { label: 'Messages Today', value: safeNum(bizMetrics.messages_today), color: '#5ee0ff' },
             ].map((m, i) => (
               <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '12px 14px', borderTop: `2px solid ${m.color}`, textAlign: 'center' }}>
                 <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{m.value}</div>
@@ -276,7 +276,7 @@ export default function MonitoringView({ actions }) {
 
       {/* Integration Status */}
       <h2 style={secH}>Integration Status</h2>
-      <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>{['Clinic', 'WhatsApp', 'Google Cal', 'Automations', 'Health'].map(h => <th key={h} style={th}>{h}</th>)}</tr>
@@ -290,10 +290,10 @@ export default function MonitoringView({ actions }) {
               return (
                 <tr key={c.id}>
                   <td style={td}><span style={{ fontWeight: 600 }}>{safeStr(clinicField(c, 'name'))}</span></td>
-                  <td style={td}><span style={{ color: waOk ? '#10b981' : '#ef4444', fontSize: 12, fontWeight: 600 }}>{waOk ? '● OK' : '● Missing'}</span></td>
-                  <td style={td}><span style={{ color: gcOk ? '#10b981' : '#6b7280', fontSize: 12, fontWeight: 600 }}>{gcOk ? '● OK' : '○ —'}</span></td>
-                  <td style={td}><span style={{ fontSize: 12, color: wf > 0 ? '#10b981' : '#6b7280' }}>{wf} active</span></td>
-                  <td style={td}><span style={{ fontSize: 12, fontWeight: 700, color: rd > 80 ? '#10b981' : rd >= 50 ? '#eab308' : '#ef4444' }}>{rd}%</span></td>
+                  <td style={td}><span style={{ color: waOk ? '#22c55e' : '#ef4444', fontSize: 12, fontWeight: 600 }}>{waOk ? '● OK' : '● Missing'}</span></td>
+                  <td style={td}><span style={{ color: gcOk ? '#22c55e' : '#8899b0', fontSize: 12, fontWeight: 600 }}>{gcOk ? '● OK' : '○ —'}</span></td>
+                  <td style={td}><span style={{ fontSize: 12, color: wf > 0 ? '#22c55e' : '#8899b0' }}>{wf} active</span></td>
+                  <td style={td}><span style={{ fontSize: 12, fontWeight: 700, color: rd > 80 ? '#22c55e' : rd >= 50 ? '#ffcf40' : '#ef4444' }}>{rd}%</span></td>
                 </tr>
               );
             })}
@@ -307,16 +307,16 @@ export default function MonitoringView({ actions }) {
 function HealthLine({ label, ok, detail }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-      <span style={{ width: 6, height: 6, borderRadius: 99, background: ok ? '#10b981' : '#ef4444', flexShrink: 0 }} />
+      <span style={{ width: 6, height: 6, borderRadius: 99, background: ok ? '#22c55e' : '#ef4444', flexShrink: 0 }} />
       <span style={{ color: 'var(--text-muted)', width: 80 }}>{label}</span>
-      <span style={{ color: ok ? '#10b981' : '#ef4444', fontWeight: 600 }}>{detail}</span>
+      <span style={{ color: ok ? '#22c55e' : '#ef4444', fontWeight: 600 }}>{detail}</span>
     </div>
   );
 }
 
 function MetricCard({ label, pct, detail, sub, value, color }) {
   const hasPct = pct != null && typeof pct === 'number';
-  const c = color || (hasPct ? (pct > 80 ? '#ef4444' : pct > 60 ? '#f97316' : '#10b981') : '#3b82f6');
+  const c = color || (hasPct ? (pct > 80 ? '#ef4444' : pct > 60 ? '#ff8c2a' : '#22c55e') : '#5ee0ff');
   return (
     <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '18px 22px', borderTop: `3px solid ${c}` }}>
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: c, marginBottom: 6 }}>{label}</div>
@@ -331,7 +331,7 @@ function R2Card({ r2 }) {
   const totalGB = r2.totalSize ? (r2.totalSize / 1e9).toFixed(2) : 0;
   const limitGB = 10; // R2 free tier = 10GB
   const pct = totalGB > 0 ? Math.min(100, (totalGB / limitGB) * 100) : 0;
-  const color = pct > 85 ? '#ef4444' : pct > 70 ? '#eab308' : '#10b981';
+  const color = pct > 85 ? '#ef4444' : pct > 70 ? '#ffcf40' : '#22c55e';
   const isCritical = pct > 85;
   const isWarning = pct > 70;
 
@@ -345,11 +345,11 @@ function R2Card({ r2 }) {
         </div>
       )}
       {isWarning && !isCritical && (
-        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 10, background: '#eab30812', border: '1px solid #eab30830' }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: '#eab308' }}>Storage usage above 70%</span>
+        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 10, background: '#ffcf4012', border: '1px solid #ffcf4030' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#ffcf40' }}>Storage usage above 70%</span>
         </div>
       )}
-      <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 16, borderLeft: `3px solid ${color}` }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', borderLeft: `3px solid ${color}` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Cloudflare R2</span>
           <span style={{ fontSize: 11, fontWeight: 700, color, background: `${color}15`, padding: '2px 8px', borderRadius: 4 }}>
@@ -357,7 +357,7 @@ function R2Card({ r2 }) {
           </span>
         </div>
         {/* Usage bar */}
-        <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', marginBottom: 10 }}>
+        <div style={{ height: 6, borderRadius: 3, background: 'var(--progress-track)', marginBottom: 10 }}>
           <div style={{ height: '100%', borderRadius: 3, background: color, width: `${pct}%`, transition: 'width 0.3s' }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
@@ -379,5 +379,5 @@ function R2Card({ r2 }) {
 }
 
 const secH = { fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 };
-const th = { padding: '10px 14px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', textAlign: 'left' };
-const td = { padding: '10px 14px', fontSize: 13, borderBottom: '1px solid rgba(255,255,255,0.04)' };
+const th = { padding: '12px 16px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-muted)', borderBottom: '1px solid var(--border-default)', textAlign: 'left' };
+const td = { padding: '10px 14px', fontSize: 13, borderBottom: '1px solid var(--border-subtle)' };

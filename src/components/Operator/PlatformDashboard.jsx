@@ -14,7 +14,7 @@ const S = {
   kpi: { fontSize: 28, fontWeight: 800, color: '#fff' },
   kpiLabel: { fontSize: 11, color: '#8888aa', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
   green: '#22c55e',
-  yellow: '#eab308',
+  yellow: '#ffcf40',
   red: '#ef4444',
   accent: '#00B4D8',
 };

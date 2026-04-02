@@ -10,18 +10,18 @@ import { timeAgo } from "../../utils/helpers";
 
 const ACTIVITY_META = {
   patient_created:     { icon: "\u{1F464}", color: "#4cc9ff", label: "New Patient" },
-  booking_created:     { icon: "\u{1F4C5}", color: "#a78bfa", label: "Booking Created" },
+  booking_created:     { icon: "\u{1F4C5}", color: "#c4a6ff", label: "Booking Created" },
   review_request:      { icon: "⚕️", color: "#ff8a2a", label: "Review Request" },
-  automation_run:      { icon: "⚡",       color: "#eab308", label: "Automation" },
+  automation_run:      { icon: "⚡",       color: "#ffcf40", label: "Automation" },
   message_received:    { icon: "\u{1F4AC}", color: "#25D366", label: "Message" },
-  message_sent:        { icon: "\u{1F4E4}", color: "#6b7280", label: "Outbound" },
-  invoice_created:     { icon: "\u{1F4B0}", color: "#10b981", label: "Invoice" },
-  payment_received:    { icon: "\u{1F4B3}", color: "#10b981", label: "Payment" },
+  message_sent:        { icon: "\u{1F4E4}", color: "#8899b0", label: "Outbound" },
+  invoice_created:     { icon: "\u{1F4B0}", color: "#22c55e", label: "Invoice" },
+  payment_received:    { icon: "\u{1F4B3}", color: "#22c55e", label: "Payment" },
   bot_handover:        { icon: "\u{1F514}", color: "#ff8a2a", label: "Bot Handover" },
   clinic_created:      { icon: "\u{1F3E5}", color: "#00B4D8", label: "New Clinic" },
   whatsapp_connected:  { icon: "\u{1F4AC}", color: "#25D366", label: "WhatsApp Connected" },
-  user_login:          { icon: "\u{1F511}", color: "#6b7280", label: "Login" },
-  default:             { icon: "⚙️", color: "#6b7280", label: "Event" },
+  user_login:          { icon: "\u{1F511}", color: "#8899b0", label: "Login" },
+  default:             { icon: "⚙️", color: "#8899b0", label: "Event" },
 };
 
 function getMeta(type) {
@@ -72,8 +72,8 @@ export default function PlatformActivityFeed({ limit = 50 }) {
               gap: 10,
               padding: "8px 12px",
               borderRadius: 8,
-              background: "rgba(255,255,255,0.02)",
-              border: "1px solid rgba(255,255,255,0.04)",
+              background: "var(--bg-section)",
+              border: "1px solid var(--border-subtle)",
             }}
           >
             <span style={{

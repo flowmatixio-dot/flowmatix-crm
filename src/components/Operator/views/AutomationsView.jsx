@@ -20,39 +20,39 @@ function classifyWorkflow(name, isActive) {
 
   // ── CORE (should be active in production) ──
   if (n.includes('provisioning'))
-    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false, requiredForProd: true, trigger: 'event-based', hint: 'Provisions new clinics after signup' };
+    return { type: 'core', label: 'CORE FLOW', color: '#5ee0ff', priority: 'high', critical: false, requiredForProd: true, trigger: 'event-based', hint: 'Provisions new clinics after signup' };
   if (n.includes('error handler') || n.includes('global error'))
-    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false, requiredForProd: true, trigger: 'automatic', hint: 'Catches and alerts on system errors' };
+    return { type: 'core', label: 'CORE FLOW', color: '#5ee0ff', priority: 'high', critical: false, requiredForProd: true, trigger: 'automatic', hint: 'Catches and alerts on system errors' };
   if (n.includes('metrics') || n.includes('platform'))
-    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false, requiredForProd: true, trigger: 'scheduled', hint: 'Platform health metrics every 5min' };
+    return { type: 'core', label: 'CORE FLOW', color: '#5ee0ff', priority: 'high', critical: false, requiredForProd: true, trigger: 'scheduled', hint: 'Platform health metrics every 5min' };
 
   // ── OPS (optional, activate per plan) ──
   if (n.includes('reminder') || n.includes('no-show'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'scheduled', hint: 'Standby — activates per clinic plan (Ops+)' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'scheduled', hint: 'Standby — activates per clinic plan (Ops+)' };
   if (n.includes('aftercare'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Runs only after treatment completion' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Runs only after treatment completion' };
   if (n.includes('follow') || n.includes('nachverfolgung') || n.includes('stale'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'scheduled', hint: 'Standby — follow-up for inactive conversations' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'scheduled', hint: 'Standby — follow-up for inactive conversations' };
   if (n.includes('flight'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Flight ticket processing (Ops+)' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Flight ticket processing (Ops+)' };
   if (n.includes('driver'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Driver pickup notifications (Ops+)' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Driver pickup notifications (Ops+)' };
   if (n.includes('review'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Post-treatment patient reviews' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Post-treatment patient reviews' };
   if (n.includes('staff') || n.includes('willkommen'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Staff/patient notification flows' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Staff/patient notification flows' };
 
   // ── TEST / DRAFT (never production) ──
   if (n.includes('telegram') && n.includes('test'))
-    return { type: 'test', label: 'DRAFT', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'manual', hint: 'E2E test flow — not for production' };
+    return { type: 'test', label: 'DRAFT', color: '#8899b0', priority: 'low', critical: false, requiredForProd: false, trigger: 'manual', hint: 'E2E test flow — not for production' };
   if (n.includes('demo'))
-    return { type: 'test', label: 'DRAFT', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'manual', hint: 'Demo/testing only' };
+    return { type: 'test', label: 'DRAFT', color: '#8899b0', priority: 'low', critical: false, requiredForProd: false, trigger: 'manual', hint: 'Demo/testing only' };
   if (n.includes('[partner]'))
-    return { type: 'test', label: 'ARCHIVED', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'automatic', hint: 'Partner template — archived' };
+    return { type: 'test', label: 'ARCHIVED', color: '#8899b0', priority: 'low', critical: false, requiredForProd: false, trigger: 'automatic', hint: 'Partner template — archived' };
   if (n.includes('telegram'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: true, trigger: 'automatic', hint: 'Telegram bridge for notifications' };
+    return { type: 'ops', label: 'OPS', color: '#ff8c2a', priority: 'medium', critical: false, requiredForProd: true, trigger: 'automatic', hint: 'Telegram bridge for notifications' };
 
-  return { type: 'other', label: 'OTHER', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'unknown', hint: '' };
+  return { type: 'other', label: 'OTHER', color: '#8899b0', priority: 'low', critical: false, requiredForProd: false, trigger: 'unknown', hint: '' };
 }
 
 // Derive semantic status from n8n active flag + classification
@@ -66,10 +66,10 @@ function deriveStatus(w) {
 }
 
 const STATUS_CONFIG = {
-  active:   { label: 'Active',   color: '#10b981', dot: '#10b981' },
-  standby:  { label: 'Standby',  color: '#eab308', dot: '#eab308' },
-  disabled: { label: 'Disabled', color: '#6b7280', dot: '#6b7280' },
-  draft:    { label: 'Draft',    color: '#a78bfa', dot: '#a78bfa' },
+  active:   { label: 'Active',   color: '#22c55e', dot: '#22c55e' },
+  standby:  { label: 'Standby',  color: '#ffcf40', dot: '#ffcf40' },
+  disabled: { label: 'Disabled', color: '#8899b0', dot: '#8899b0' },
+  draft:    { label: 'Draft',    color: '#c4a6ff', dot: '#c4a6ff' },
   broken:   { label: 'Broken',   color: '#ef4444', dot: '#ef4444' },
   archived: { label: 'Archived', color: '#4b5563', dot: '#4b5563' },
 };
@@ -132,7 +132,7 @@ export default function AutomationsView() {
     { key: 'queue_name', label: 'Queue', render: v => <span style={{ fontSize: 12 }}>{safeStr(v)}</span> },
     { key: 'job_name', label: 'Job', render: v => safeStr(v) },
     { key: 'error_message', label: 'Error', render: v => <span style={{ fontSize: 11, color: '#ef4444', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{safeStr(v, 'Unknown')}</span> },
-    { key: 'id', label: '', sortable: false, render: v => <button onClick={() => retryJob(v)} style={{ background: '#f97316', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Retry</button> },
+    { key: 'id', label: '', sortable: false, render: v => <button onClick={() => retryJob(v)} style={{ background: '#ff8c2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>Retry</button> },
   ];
 
   if (loading) return <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading...</div>;
@@ -140,19 +140,19 @@ export default function AutomationsView() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Automations</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>Automations</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{activeWf.length} active / {workflows.length} total</span>
           <button onClick={() => setShowProduction(!showProduction)}
-            style={{ background: showProduction ? '#10b98118' : 'var(--bg-card)', border: `1px solid ${showProduction ? '#10b98130' : 'var(--border)'}`, borderRadius: 6, padding: '5px 12px', color: showProduction ? '#10b981' : 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+            style={{ background: showProduction ? 'var(--success-subtle)' : 'var(--bg-card)', border: `1px solid ${showProduction ? 'var(--success-muted)' : 'var(--border-default)'}`, borderRadius: 8, padding: '6px 14px', color: showProduction ? 'var(--success)' : 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
             {showProduction ? 'Production' : 'All'}
           </button>
-          <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 12px', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Refresh</button>
+          <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Refresh</button>
         </div>
       </div>
 
       {criticalInactive.length > 0 && (
-        <div style={{ padding: '10px 16px', borderRadius: 10, marginBottom: 16, background: '#ef444412', border: '1px solid #ef444430', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ padding: '12px 20px', borderRadius: 14, marginBottom: 16, background: '#ef444412', border: '1px solid #ef444430', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: '#ef4444', boxShadow: '0 0 8px #ef4444', animation: 'fmPulse 2s infinite' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>
             {criticalInactive.length} critical inactive: {criticalInactive.map(w => safeStr(w.name).replace('Flowmatix — ', '')).join(', ')}
@@ -170,7 +170,7 @@ export default function AutomationsView() {
       <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
         {FILTERS.map(f => (
           <button key={f} onClick={() => setFilter(f)}
-            style={{ background: filter === f ? '#ff8a2a' : 'var(--bg-card)', color: filter === f ? '#fff' : 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '5px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
+            style={{ background: filter === f ? 'var(--brand)' : 'var(--bg-card)', color: filter === f ? '#fff' : 'var(--text-secondary)', border: filter === f ? 'none' : '1px solid var(--border-subtle)', borderRadius: 8, padding: '5px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize', fontFamily: 'inherit', transition: 'all 0.15s' }}>
             {f}
           </button>
         ))}
@@ -184,7 +184,7 @@ export default function AutomationsView() {
       {/* Non-active (collapsed) */}
       {displayed.some(w => w.status !== 'active') && (
         <>
-          <button onClick={() => setShowInactive(!showInactive)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 10, padding: 0 }}>
+          <button onClick={() => setShowInactive(!showInactive)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 10, padding: 0, fontFamily: 'inherit' }}>
             {showInactive ? '▾' : '▸'} Standby / Disabled / Draft ({displayed.filter(w => w.status !== 'active').length})
           </button>
           {showInactive && (
@@ -202,7 +202,7 @@ export default function AutomationsView() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8, marginBottom: 20 }}>
             {queues.map((q, i) => {
               const f = safeNum(q.failed); const p = safeNum(q.pending);
-              const c = f > 0 ? '#ef4444' : p > 10 ? '#f97316' : '#10b981';
+              const c = f > 0 ? '#ef4444' : p > 10 ? '#ff8c2a' : '#22c55e';
               return (
                 <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '12px 14px', borderLeft: `3px solid ${c}` }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{safeStr(q.queue_name || q.name)}</div>
@@ -230,21 +230,21 @@ function WfCard({ w }) {
   const isActive = w.status === 'active';
   const isLow = w.priority === 'low';
   const isHigh = w.priority === 'high';
-  const bc = isBroken ? '#ef4444' : (isHigh && isActive) ? '#10b98140' : isActive ? '#10b98120' : 'rgba(255,255,255,0.04)';
+  const bc = isBroken ? '#ef4444' : (isHigh && isActive) ? '#22c55e40' : isActive ? '#22c55e20' : 'var(--bg-hover)';
   const shadow = isBroken ? '0 0 16px rgba(239,68,68,0.12)' : (isHigh && isActive) ? '0 0 10px rgba(16,185,129,0.06)' : 'none';
   const opacity = (isLow && !isActive) ? 0.45 : 1;
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '14px 16px', border: `1px solid ${bc}`, boxShadow: shadow, opacity, transition: 'all 0.12s' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 18px', border: `1px solid ${bc}`, boxShadow: shadow, opacity, transition: 'all 0.12s' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3, flex: 1, marginRight: 8 }}>{safeStr(w.name)}</div>
-        <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: `${w.color || '#6b7280'}18`, color: w.color || '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{w.label || 'OTHER'}</span>
+        <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: `${w.color || '#8899b0'}18`, color: w.color || '#8899b0', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{w.label || 'OTHER'}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ width: 6, height: 6, borderRadius: 99, background: st.dot, boxShadow: isActive ? `0 0 6px ${st.dot}` : 'none' }} />
         <span style={{ fontSize: 11, color: st.color, fontWeight: 600 }}>{st.label}</span>
         {w.trigger && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{TRIGGER_ICONS[w.trigger] || ''}</span>}
         {w.critical && !isActive && <span style={{ fontSize: 9, fontWeight: 700, color: '#ef4444', background: '#ef444415', padding: '1px 6px', borderRadius: 3 }}>CRITICAL</span>}
-        {w.critical && isActive && <span style={{ fontSize: 9, fontWeight: 700, color: '#10b981', background: '#10b98115', padding: '1px 6px', borderRadius: 3 }}>PROTECTED</span>}
+        {w.critical && isActive && <span style={{ fontSize: 9, fontWeight: 700, color: '#22c55e', background: '#22c55e15', padding: '1px 6px', borderRadius: 3 }}>PROTECTED</span>}
         {w.updatedAt && <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>{safeStr(w.updatedAt, '').slice(0, 10)}</span>}
       </div>
       {w.hint && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.3 }}>{w.hint}</div>}

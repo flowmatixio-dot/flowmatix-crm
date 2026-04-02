@@ -27,9 +27,6 @@ export default function DataTable({ columns, data, onRowClick, emptyText = 'No d
     else { setSortCol(key); setSortDir('asc'); }
   };
 
-  const thStyle = { padding: '10px 14px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', textAlign: 'left', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' };
-  const tdStyle = { padding: '12px 14px', fontSize: 13, color: 'var(--text-primary)', borderBottom: '1px solid var(--border-subtle, rgba(255,255,255,0.04))' };
-
   return (
     <div>
       {searchable && (
@@ -37,16 +34,38 @@ export default function DataTable({ columns, data, onRowClick, emptyText = 'No d
           <input
             value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search..."
-            style={{ background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', color: 'var(--text-primary)', fontSize: 13, width: 280, outline: 'none' }}
+            style={{
+              background: 'var(--bg-input)', border: '1px solid var(--border-default)',
+              borderRadius: 10, padding: '9px 16px', color: 'var(--text-primary)',
+              fontSize: 13, width: 300, outline: 'none', fontFamily: 'inherit',
+              transition: 'border-color 0.15s',
+            }}
+            onFocus={e => e.target.style.borderColor = 'var(--border-input-focus)'}
+            onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
           />
         </div>
       )}
-      <div style={{ overflowX: 'auto', borderRadius: 10, background: 'var(--bg-card)' }}>
+      <div style={{
+        overflowX: 'auto', borderRadius: 14,
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
+      }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
               {columns.map(col => (
-                <th key={col.key} style={{ ...thStyle, width: col.width }} onClick={() => col.sortable !== false && toggleSort(col.key)}>
+                <th key={col.key}
+                  onClick={() => col.sortable !== false && toggleSort(col.key)}
+                  style={{
+                    padding: '12px 16px', fontSize: 10, fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: 1,
+                    color: 'var(--text-muted)',
+                    borderBottom: '1px solid var(--border-default)',
+                    textAlign: 'left',
+                    cursor: col.sortable !== false ? 'pointer' : 'default',
+                    userSelect: 'none', whiteSpace: 'nowrap',
+                    width: col.width,
+                  }}>
                   {col.label} {sortCol === col.key && (sortDir === 'asc' ? '↑' : '↓')}
                 </th>
               ))}
@@ -54,22 +73,43 @@ export default function DataTable({ columns, data, onRowClick, emptyText = 'No d
           </thead>
           <tbody>
             {sorted.length === 0 ? (
-              <tr><td colSpan={columns.length} style={{ ...tdStyle, textAlign: 'center', color: 'var(--text-muted)', padding: 40 }}>{emptyText}</td></tr>
+              <tr>
+                <td colSpan={columns.length} style={{
+                  padding: 48, textAlign: 'center', color: 'var(--text-muted)',
+                  fontSize: 13,
+                }}>
+                  {emptyText}
+                </td>
+              </tr>
             ) : sorted.map((row, i) => (
-              <tr key={row.id || i} onClick={() => onRowClick?.(row)} style={{ cursor: onRowClick ? 'pointer' : 'default', transition: 'background 0.15s' }}
+              <tr key={row.id || i}
+                onClick={() => onRowClick?.(row)}
+                style={{ cursor: onRowClick ? 'pointer' : 'default', transition: 'background 0.15s' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 {columns.map(col => {
                   const val = row[col.key];
                   const safeDefault = val === null || val === undefined ? '—' : typeof val === 'object' ? JSON.stringify(val) : val;
-                  return <td key={col.key} style={tdStyle}>{col.render ? col.render(val, row) : safeDefault}</td>;
+                  return (
+                    <td key={col.key} style={{
+                      padding: '12px 16px', fontSize: 13,
+                      color: 'var(--text-primary)',
+                      borderBottom: '1px solid var(--border-subtle)',
+                    }}>
+                      {col.render ? col.render(val, row) : safeDefault}
+                    </td>
+                  );
                 })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {sorted.length > 0 && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, textAlign: 'right' }}>{sorted.length} items</div>}
+      {sorted.length > 0 && (
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, textAlign: 'right' }}>
+          {sorted.length} items
+        </div>
+      )}
     </div>
   );
 }

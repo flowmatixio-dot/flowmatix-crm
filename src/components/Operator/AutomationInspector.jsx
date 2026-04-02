@@ -12,7 +12,7 @@ const S = {
   card: { background: '#23234a', borderRadius: 12, padding: 20, marginBottom: 16 },
   kpiLabel: { fontSize: 11, color: '#8888aa', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
   green: '#22c55e',
-  yellow: '#eab308',
+  yellow: '#ffcf40',
   red: '#ef4444',
   accent: '#00B4D8',
 };
@@ -41,7 +41,7 @@ export default function AutomationInspector({ queueStats, recentJobs }) {
               const rateColor = successRate >= 95 ? S.green : successRate >= 80 ? S.yellow : S.red;
 
               return (
-                <div key={q.queue_name} style={{ padding: 14, borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <div key={q.queue_name} style={{ padding: 14, borderRadius: 10, background: "var(--bg-section)", border: "1px solid var(--border-default)" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{q.queue_name}</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     <div>
@@ -79,7 +79,7 @@ export default function AutomationInspector({ queueStats, recentJobs }) {
                   : S.yellow;
 
                 return (
-                  <div key={j.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 10px", borderRadius: 6, background: "rgba(255,255,255,0.02)" }}>
+                  <div key={j.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 10px", borderRadius: 6, background: "var(--bg-section)" }}>
                     <span style={{ width: 6, height: 6, borderRadius: 3, background: statusColor, flexShrink: 0 }} />
                     <span style={{ fontSize: 12, color: "#ccc", flex: 1 }}>{j.job_type || j.queue_name}</span>
                     <span style={{ fontSize: 11, color: "#888" }}>{j.org_name || ""}</span>

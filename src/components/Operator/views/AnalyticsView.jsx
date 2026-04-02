@@ -71,7 +71,7 @@ export default function AnalyticsView() {
         <div style={{ display: 'flex', gap: 6 }}>
           {[{ v: '1', l: 'Today' }, { v: '7', l: 'Week' }, { v: '30', l: 'Month' }].map(p => (
             <button key={p.v} onClick={() => setPeriod(p.v)}
-              style={{ background: period === p.v ? '#ff8a2a' : 'var(--bg-card)', color: period === p.v ? '#fff' : 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ background: period === p.v ? 'var(--brand)' : 'var(--bg-card)', color: period === p.v ? '#fff' : 'var(--text-secondary)', border: period === p.v ? 'none' : '1px solid var(--border-subtle)', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
               {p.l}
             </button>
           ))}
@@ -90,12 +90,12 @@ export default function AnalyticsView() {
       <SectionTitle>Business Overview</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 32 }}>
         {[
-          { l: 'Purchases Today', v: safeNum(purchasesToday?.new_clinics), c: '#f97316' },
-          { l: `Purchases ${period}d`, v: purchasesInPeriod, c: '#a78bfa' },
-          { l: `Messages ${period}d`, v: messagesInPeriod, c: '#3b82f6' },
-          { l: 'Active Subs', v: activeSubs, c: '#10b981' },
-          { l: 'Trial Subs', v: trialSubs, c: '#eab308' },
-          { l: 'MRR', v: fmtEur(mrr), c: '#10b981' },
+          { l: 'Purchases Today', v: safeNum(purchasesToday?.new_clinics), c: '#ff8c2a' },
+          { l: `Purchases ${period}d`, v: purchasesInPeriod, c: '#c4a6ff' },
+          { l: `Messages ${period}d`, v: messagesInPeriod, c: '#5ee0ff' },
+          { l: 'Active Subs', v: activeSubs, c: '#22c55e' },
+          { l: 'Trial Subs', v: trialSubs, c: '#ffcf40' },
+          { l: 'MRR', v: fmtEur(mrr), c: '#22c55e' },
         ].map((m, i) => (
           <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '14px 12px', borderTop: `2px solid ${m.c}`, textAlign: 'center' }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>{noData(m.v)}</div>
@@ -112,11 +112,11 @@ export default function AnalyticsView() {
       {waPerf ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 32 }}>
           {[
-            { l: 'Messages Today', v: safeNum(waPerf.messages_today), c: '#3b82f6' },
-            { l: 'Messages 7d', v: safeNum(waPerf.messages_7d), c: '#a78bfa' },
-            { l: 'Messages 30d', v: safeNum(waPerf.messages_30d), c: '#f97316' },
-            { l: 'Active Convos', v: safeNum(waPerf.active_conversations), c: '#10b981' },
-            { l: 'Failed', v: safeNum(waPerf.failed_messages), c: safeNum(waPerf.failed_messages) > 0 ? '#ef4444' : '#6b7280' },
+            { l: 'Messages Today', v: safeNum(waPerf.messages_today), c: '#5ee0ff' },
+            { l: 'Messages 7d', v: safeNum(waPerf.messages_7d), c: '#c4a6ff' },
+            { l: 'Messages 30d', v: safeNum(waPerf.messages_30d), c: '#ff8c2a' },
+            { l: 'Active Convos', v: safeNum(waPerf.active_conversations), c: '#22c55e' },
+            { l: 'Failed', v: safeNum(waPerf.failed_messages), c: safeNum(waPerf.failed_messages) > 0 ? '#ef4444' : '#8899b0' },
           ].map((m, i) => (
             <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '14px 16px', borderTop: `2px solid ${m.c}`, textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{noData(m.v)}</div>
@@ -125,7 +125,7 @@ export default function AnalyticsView() {
           ))}
         </div>
       ) : (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 20, marginBottom: 32, textAlign: 'center', color: 'var(--text-muted)' }}>No WhatsApp data</div>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '22px 24px', border: '1px solid var(--border-subtle)', marginBottom: 32, textAlign: 'center', color: 'var(--text-muted)' }}>No WhatsApp data</div>
       )}
 
       {/* ═══ 5. CLINIC PERFORMANCE ═══ */}
@@ -136,8 +136,8 @@ export default function AnalyticsView() {
             columns={[
               { key: 'name', label: 'Clinic', render: v => <span style={{ fontWeight: 700, fontSize: 13 }}>{safeStr(v)}</span> },
               { key: 'leads', label: 'Leads', render: v => noData(safeNum(v)) },
-              { key: 'bookings', label: 'Bookings', render: v => <span style={{ fontWeight: 700, color: safeNum(v) > 0 ? '#10b981' : 'var(--text-muted)' }}>{noData(safeNum(v))}</span> },
-              { key: 'conversion', label: 'Conversion', render: v => { const n = safeNum(v); return <span style={{ fontWeight: 700, color: n > 20 ? '#10b981' : n > 0 ? '#eab308' : 'var(--text-muted)' }}>{n > 0 ? `${n}%` : 'No data'}</span>; }},
+              { key: 'bookings', label: 'Bookings', render: v => <span style={{ fontWeight: 700, color: safeNum(v) > 0 ? '#22c55e' : 'var(--text-muted)' }}>{noData(safeNum(v))}</span> },
+              { key: 'conversion', label: 'Conversion', render: v => { const n = safeNum(v); return <span style={{ fontWeight: 700, color: n > 20 ? '#22c55e' : n > 0 ? '#ffcf40' : 'var(--text-muted)' }}>{n > 0 ? `${n}%` : 'No data'}</span>; }},
               { key: 'messages_30d', label: 'Messages', render: v => noData(safeNum(v)) },
             ]}
             data={clinicRank}
@@ -148,7 +148,7 @@ export default function AnalyticsView() {
 
       {/* ═══ 6. DAILY ACTIVITY ═══ */}
       <SectionTitle>Daily Messages</SectionTitle>
-      <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 20, marginBottom: 28 }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '22px 24px', border: '1px solid var(--border-subtle)', marginBottom: 28 }}>
         {daily.length > 0 ? (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 100 }}>
             {daily.slice(-14).map((d, i) => {
@@ -159,7 +159,7 @@ export default function AnalyticsView() {
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                   <div style={{ fontSize: 8, color: 'var(--text-muted)' }}>{val}</div>
-                  <div style={{ width: '100%', maxWidth: 20, height: h, background: '#3b82f6', borderRadius: '3px 3px 0 0', opacity: 0.7 }} />
+                  <div style={{ width: '100%', maxWidth: 20, height: h, background: '#5ee0ff', borderRadius: '3px 3px 0 0', opacity: 0.7 }} />
                   <div style={{ fontSize: 7, color: 'var(--text-muted)', marginTop: 2 }}>{dateStr}</div>
                 </div>
               );
@@ -197,7 +197,7 @@ export default function AnalyticsView() {
         </div>
         <div>
           <SectionTitle sub="Marketing">Languages</SectionTitle>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 16 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)' }}>
             {languages.length === 0 ? <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 16 }}>No data</div> : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {languages.slice(0, 8).map((l, i) => {
@@ -208,8 +208,8 @@ export default function AnalyticsView() {
                   return (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', width: 50 }}>{name}</span>
-                      <div style={{ flex: 1, height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }}>
-                        <div style={{ width: `${pct}%`, height: '100%', borderRadius: 3, background: '#3b82f6' }} />
+                      <div style={{ flex: 1, height: 5, borderRadius: 3, background: 'var(--progress-track)' }}>
+                        <div style={{ width: `${pct}%`, height: '100%', borderRadius: 3, background: '#5ee0ff' }} />
                       </div>
                       <span style={{ fontSize: 10, color: 'var(--text-muted)', width: 40, textAlign: 'right' }}>{pct}%</span>
                     </div>
@@ -229,7 +229,7 @@ function SectionTitle({ children, sub }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
       <h2 style={{ fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-primary)', margin: 0 }}>{children}</h2>
-      {sub && <span style={{ fontSize: 9, fontWeight: 700, color: '#6b7280', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>{sub}</span>}
+      {sub && <span style={{ fontSize: 9, fontWeight: 700, color: '#8899b0', background: 'var(--bg-hover)', padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>{sub}</span>}
     </div>
   );
 }
@@ -237,13 +237,13 @@ function SectionTitle({ children, sub }) {
 // ── Funnel ──
 function FunnelSection({ funnel, visitors }) {
   const steps = [
-    { label: 'Visitors', value: visitors || 0, color: '#6b7280' },
-    { label: 'Leads', value: parseInt(funnel.leads) || 0, color: '#3b82f6' },
-    { label: 'WhatsApp', value: parseInt(funnel.wa_started) || 0, color: '#a78bfa' },
-    { label: 'Intake', value: parseInt(funnel.intake_completed) || 0, color: '#f97316' },
-    { label: 'Photos', value: parseInt(funnel.photos_received) || 0, color: '#eab308' },
-    { label: 'Quotes', value: parseInt(funnel.quotes_generated) || 0, color: '#10b981' },
-    { label: 'Bookings', value: parseInt(funnel.bookings_created) || 0, color: '#10b981' },
+    { label: 'Visitors', value: visitors || 0, color: '#8899b0' },
+    { label: 'Leads', value: parseInt(funnel.leads) || 0, color: '#5ee0ff' },
+    { label: 'WhatsApp', value: parseInt(funnel.wa_started) || 0, color: '#c4a6ff' },
+    { label: 'Intake', value: parseInt(funnel.intake_completed) || 0, color: '#ff8c2a' },
+    { label: 'Photos', value: parseInt(funnel.photos_received) || 0, color: '#ffcf40' },
+    { label: 'Quotes', value: parseInt(funnel.quotes_generated) || 0, color: '#22c55e' },
+    { label: 'Bookings', value: parseInt(funnel.bookings_created) || 0, color: '#22c55e' },
   ];
 
   const max = Math.max(1, ...steps.map(s => s.value));
@@ -259,7 +259,7 @@ function FunnelSection({ funnel, visitors }) {
     <div style={{ marginBottom: 32 }}>
       <SectionTitle>Patient Funnel</SectionTitle>
       {worst.pct > 50 && (
-        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 12, background: '#f9731610', border: '1px solid #f9731625', fontSize: 12, color: '#f97316', fontWeight: 600 }}>
+        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 12, background: '#ff8c2a10', border: '1px solid #ff8c2a25', fontSize: 12, color: '#ff8c2a', fontWeight: 600 }}>
           Biggest drop: {worst.from} → {worst.to} ({worst.pct}% lost)
         </div>
       )}
@@ -271,12 +271,12 @@ function FunnelSection({ funnel, visitors }) {
           return (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{ width: 80, fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'right', flexShrink: 0 }}>{s.label}</span>
-              <div style={{ flex: 1, height: 28, borderRadius: 6, background: 'rgba(255,255,255,0.025)', overflow: 'hidden' }}>
+              <div style={{ flex: 1, height: 28, borderRadius: 6, background: 'var(--bg-section)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${w}%`, background: `${s.color}cc`, borderRadius: 6, display: 'flex', alignItems: 'center', paddingLeft: 10, minWidth: 50 }}>
                   <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>{s.value}</span>
                 </div>
               </div>
-              <span style={{ width: 45, fontSize: 11, fontWeight: 700, color: conv === null ? 'transparent' : conv > 50 ? '#10b981' : conv > 20 ? '#eab308' : '#ef4444', textAlign: 'right', flexShrink: 0 }}>
+              <span style={{ width: 45, fontSize: 11, fontWeight: 700, color: conv === null ? 'transparent' : conv > 50 ? '#22c55e' : conv > 20 ? '#ffcf40' : '#ef4444', textAlign: 'right', flexShrink: 0 }}>
                 {conv !== null ? `${conv}%` : ''}
               </span>
             </div>

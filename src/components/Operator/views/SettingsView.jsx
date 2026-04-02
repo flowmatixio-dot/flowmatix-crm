@@ -83,7 +83,7 @@ export default function SettingsView() {
   return (
     <div>
       <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 24px' }}>Settings</h1>
-      {msg && <div style={{ padding: '10px 16px', borderRadius: 8, marginBottom: 16, background: msg.type === 'ok' ? '#10b98120' : '#ef444420', color: msg.type === 'ok' ? '#10b981' : '#ef4444', fontSize: 13, fontWeight: 600 }}>{msg.text}</div>}
+      {msg && <div style={{ padding: '10px 16px', borderRadius: 8, marginBottom: 16, background: msg.type === 'ok' ? '#22c55e20' : '#ef444420', color: msg.type === 'ok' ? '#22c55e' : '#ef4444', fontSize: 13, fontWeight: 600 }}>{msg.text}</div>}
 
       {/* ═══ 1. SECURITY — Sessions ═══ */}
       <SectionTitle>Security</SectionTitle>
@@ -113,8 +113,8 @@ export default function SettingsView() {
           <button onClick={createKey} style={primaryBtn}>Create Key</button>
         </div>
         {createdKey && (
-          <div style={{ padding: '10px 16px', borderRadius: 8, marginBottom: 12, background: '#10b98115', border: '1px solid #10b98140' }}>
-            <div style={{ fontSize: 11, color: '#10b981', fontWeight: 700, marginBottom: 4 }}>Copy now (shown only once):</div>
+          <div style={{ padding: '10px 16px', borderRadius: 8, marginBottom: 12, background: '#22c55e15', border: '1px solid #22c55e40' }}>
+            <div style={{ fontSize: 11, color: '#22c55e', fontWeight: 700, marginBottom: 4 }}>Copy now (shown only once):</div>
             <code style={{ fontSize: 12, color: 'var(--text-primary)', fontFamily: 'monospace', wordBreak: 'break-all' }}>{createdKey}</code>
           </div>
         )}
@@ -124,7 +124,7 @@ export default function SettingsView() {
               <div key={k.id || i} style={row}>
                 <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{safeStr(k.name)}</span>
                 <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)' }}>{safeStr(k.key_preview, '***')}</span>
-                <span style={{ fontSize: 11, color: k.revoked_at ? '#ef4444' : '#10b981', fontWeight: 600 }}>{k.revoked_at ? 'Revoked' : 'Active'}</span>
+                <span style={{ fontSize: 11, color: k.revoked_at ? '#ef4444' : '#22c55e', fontWeight: 600 }}>{k.revoked_at ? 'Revoked' : 'Active'}</span>
                 <span style={meta}>{k.created_at ? new Date(k.created_at).toLocaleDateString('de-DE') : ''}</span>
                 {!k.revoked_at && <button onClick={() => revokeKey(k.id)} style={dangerBtn}>Revoke</button>}
               </div>
@@ -139,9 +139,9 @@ export default function SettingsView() {
         <h3 style={subH}>Alert Rules</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
           {ALERT_RULES.map(rule => (
-            <div key={rule.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+            <div key={rule.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flex: 1 }}>
-                <input type="checkbox" checked={alertToggles[rule.key] !== false} onChange={e => setAlertToggles(prev => ({ ...prev, [rule.key]: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#ff8a2a' }} />
+                <input type="checkbox" checked={alertToggles[rule.key] !== false} onChange={e => setAlertToggles(prev => ({ ...prev, [rule.key]: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--brand)' }} />
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{rule.label}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{rule.desc}</div>
@@ -167,7 +167,7 @@ export default function SettingsView() {
           </div>
           <div>
             <label style={labelStyle}>Retry on Failure</label>
-            <div style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>Enabled (via circuit breaker)</div>
+            <div style={{ fontSize: 13, color: '#22c55e', fontWeight: 600 }}>Enabled (via circuit breaker)</div>
           </div>
           <div>
             <label style={labelStyle}>Cost per Response</label>
@@ -199,7 +199,7 @@ export default function SettingsView() {
                 <label style={labelStyle}>{key.replace(/_/g, ' ')}</label>
                 {typeof value === 'boolean' ? (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={value} onChange={e => handleSettingChange(key, e.target.checked)} style={{ width: 16, height: 16, accentColor: '#ff8a2a' }} />
+                    <input type="checkbox" checked={value} onChange={e => handleSettingChange(key, e.target.checked)} style={{ width: 16, height: 16, accentColor: 'var(--brand)' }} />
                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{value ? 'Enabled' : 'Disabled'}</span>
                   </label>
                 ) : typeof value === 'number' ? (
@@ -220,15 +220,15 @@ export default function SettingsView() {
 }
 
 function SectionTitle({ children }) {
-  return <h2 style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: 'var(--text-muted)', margin: '28px 0 12px', paddingBottom: 8, borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{children}</h2>;
+  return <h2 style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.5, color: 'var(--text-muted)', margin: '28px 0 12px', paddingBottom: 8, borderBottom: '1px solid var(--border-subtle)' }}>{children}</h2>;
 }
 function Muted({ children }) { return <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{children}</div>; }
 
-const card = { background: 'var(--bg-card)', borderRadius: 10, padding: 20, marginBottom: 12 };
+const card = { background: 'var(--bg-card)', borderRadius: 14, padding: '22px 24px', marginBottom: 14, border: '1px solid var(--border-subtle)' };
 const subH = { fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 14px' };
-const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8 };
+const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', background: 'var(--bg-card)', borderRadius: 8 };
 const meta = { fontSize: 11, color: 'var(--text-muted)' };
 const labelStyle = { fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--text-muted)', marginBottom: 6, display: 'block' };
-const inputStyle = { background: 'var(--bg-input, rgba(255,255,255,0.06))', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', color: 'var(--text-primary)', fontSize: 13, width: '100%', outline: 'none', boxSizing: 'border-box' };
-const primaryBtn = { background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer' };
-const dangerBtn = { background: '#ef444420', color: '#ef4444', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 600, cursor: 'pointer' };
+const inputStyle = { background: 'var(--bg-input)', border: '1px solid var(--border-default)', borderRadius: 10, padding: '9px 16px', color: 'var(--text-primary)', fontSize: 13, width: '100%', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' };
+const primaryBtn = { background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.15s' };
+const dangerBtn = { background: 'var(--error-subtle)', color: 'var(--error)', border: '1px solid var(--error-muted)', borderRadius: 8, padding: '5px 12px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' };

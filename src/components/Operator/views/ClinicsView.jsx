@@ -12,15 +12,15 @@ const ACTION_PRIORITY = {
 
 // Smart CTA per action
 const SMART_CTA = {
-  TRIAL: { label: 'Trial', color: '#eab308' },
-  WA_PENDING: { label: 'WA Pending', color: '#f97316' },
+  TRIAL: { label: 'Trial', color: '#ffcf40' },
+  WA_PENDING: { label: 'WA Pending', color: '#ff8c2a' },
   FIX_ERROR: { label: 'Fix Error', color: '#ef4444' },
-  VERIFY_OTP: { label: 'Verify OTP', color: '#f97316' },
-  CONNECT_WHATSAPP: { label: 'Connect WhatsApp', color: '#eab308' },
-  START_SETUP: { label: 'Continue Setup', color: '#3b82f6' },
-  WAIT_FOR_NUMBER: { label: 'Waiting...', color: '#6b7280' },
-  ACTIVATE: { label: 'Activate', color: '#10b981' },
-  NONE: { label: 'Open CRM', color: '#a78bfa' },
+  VERIFY_OTP: { label: 'Verify OTP', color: '#ff8c2a' },
+  CONNECT_WHATSAPP: { label: 'Connect WhatsApp', color: '#ffcf40' },
+  START_SETUP: { label: 'Continue Setup', color: '#5ee0ff' },
+  WAIT_FOR_NUMBER: { label: 'Waiting...', color: '#8899b0' },
+  ACTIVATE: { label: 'Activate', color: '#22c55e' },
+  NONE: { label: 'Open CRM', color: '#c4a6ff' },
 };
 
 // Row accent color by priority
@@ -69,23 +69,23 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
     <div>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Clinics</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>Clinics</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{sorted.length} clinics</span>
           {brokenCount > 0 && (
             <button onClick={() => setShowBrokenOnly(!showBrokenOnly)}
-              style={{ background: showBrokenOnly ? '#ef444420' : 'var(--bg-card)', border: `1px solid ${showBrokenOnly ? '#ef444440' : 'var(--border)'}`, borderRadius: 8, padding: '6px 14px', color: showBrokenOnly ? '#ef4444' : 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ background: showBrokenOnly ? '#ef444420' : 'var(--bg-card)', border: `1px solid ${showBrokenOnly ? '#ef444440' : 'var(--border-default)'}`, borderRadius: 8, padding: '6px 14px', color: showBrokenOnly ? '#ef4444' : 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
               {showBrokenOnly ? 'Show All' : `Issues (${brokenCount})`}
             </button>
           )}
-          <button onClick={reload} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Refresh</button>
+          <button onClick={reload} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>Refresh</button>
         </div>
       </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading clinics...</div>
       ) : sorted.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)', background: 'var(--bg-card)', borderRadius: 12 }}>No clinics found</div>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)', background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-subtle)' }}>No clinics found</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {/* Table Header */}
@@ -108,7 +108,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
             return (
               <div key={c.id} onClick={() => onSelectClinic?.(c)}
                 style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.2fr 1.2fr 1fr 1fr 1.2fr', gap: 12, padding: '14px 16px', background: accent, borderRadius: 10, cursor: 'pointer', transition: 'all 0.12s', border: isCritical ? '1px solid rgba(239,68,68,0.15)' : '1px solid transparent' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.transform = 'translateX(2px)'; }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-hover)'; e.currentTarget.style.transform = 'translateX(2px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = accent; e.currentTarget.style.transform = ''; }}>
 
                 {/* Clinic */}
@@ -129,7 +129,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
 
                 {/* WhatsApp */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: waOk ? '#10b981' : '#ef4444' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: waOk ? 'var(--success)' : 'var(--error)' }}>
                     {waOk ? '● Connected' : '● Not connected'}
                   </span>
                 </div>
@@ -137,13 +137,13 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
                 {/* Health */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, position: 'relative' }}
                   onMouseEnter={() => setHealthTooltip(c.id)} onMouseLeave={() => setHealthTooltip(null)}>
-                  <div style={{ width: 40, height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }}>
-                    <div style={{ height: '100%', borderRadius: 3, width: `${health}%`, background: health > 80 ? '#10b981' : health >= 50 ? '#eab308' : '#ef4444' }} />
+                  <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--progress-track)' }}>
+                    <div style={{ height: '100%', borderRadius: 3, width: `${health}%`, background: health > 80 ? 'var(--success)' : health >= 50 ? 'var(--warning)' : 'var(--error)' }} />
                   </div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: health > 80 ? '#10b981' : health >= 50 ? '#eab308' : '#ef4444' }}>{health}%</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: health > 80 ? 'var(--success)' : health >= 50 ? 'var(--warning)' : 'var(--error)' }}>{health}%</span>
                   {healthTooltip === c.id && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 6, padding: '10px 14px', background: '#1a2235', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, zIndex: 50, fontSize: 11, lineHeight: 1.8, whiteSpace: 'nowrap', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
-                      <div style={{ color: waOk ? '#10b981' : '#ef4444' }}>WhatsApp: {waOk ? 'Connected' : 'Missing (-40)'}</div>
+                    <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 6, padding: '10px 14px', background: 'var(--bg-card-solid)', border: '1px solid var(--border-strong)', borderRadius: 8, zIndex: 50, fontSize: 11, lineHeight: 1.8, whiteSpace: 'nowrap', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                      <div style={{ color: waOk ? 'var(--success)' : 'var(--error)' }}>WhatsApp: {waOk ? 'Connected' : 'Missing (-40)'}</div>
                       <div style={{ color: c.google_connected ? '#10b981' : '#6b7280' }}>Google Cal: {c.google_connected ? 'Connected' : 'Missing (-10)'}</div>
                       <div style={{ color: safeNum(c.active_workflows) > 0 ? '#10b981' : '#6b7280' }}>Automations: {safeNum(c.active_workflows) > 0 ? 'Active' : 'None (-10)'}</div>
                       <div style={{ color: c.has_recent_error ? '#ef4444' : '#10b981' }}>Errors: {c.has_recent_error ? 'Yes (-20)' : 'None'}</div>
@@ -165,7 +165,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
                     if (action === 'NONE') handleAction(e, c.id, 'impersonate');
                     else onSelectClinic?.(c);
                   }}
-                    style={{ background: `${cta.color}18`, color: cta.color, border: `1px solid ${cta.color}30`, borderRadius: 6, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all 0.12s', whiteSpace: 'nowrap' }}
+                    style={{ background: `${cta.color}18`, color: cta.color, border: `1px solid ${cta.color}30`, borderRadius: 8, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap', fontFamily: 'inherit' }}
                     onMouseEnter={e => e.currentTarget.style.background = `${cta.color}30`}
                     onMouseLeave={e => e.currentTarget.style.background = `${cta.color}18`}>
                     {cta.label}

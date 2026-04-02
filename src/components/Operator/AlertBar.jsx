@@ -27,9 +27,9 @@ export default function AlertBar({ events = [], criticalCount = 0, unresolvedCou
 
   if (totalAlerts === 0) {
     return (
-      <div style={{ background: 'linear-gradient(90deg, #10b98120, #10b98108)', borderBottom: '1px solid #10b98130', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ width: 8, height: 8, borderRadius: 99, background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>All systems operational</span>
+      <div style={{ background: 'linear-gradient(90deg, #22c55e20, #22c55e08)', borderBottom: '1px solid #22c55e30', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ width: 8, height: 8, borderRadius: 99, background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>All systems operational</span>
         <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 'auto' }}>{connected ? '● Live' : ''}</span>
       </div>
     );
@@ -37,10 +37,10 @@ export default function AlertBar({ events = [], criticalCount = 0, unresolvedCou
 
   const hasCritical = criticalCount > 0;
   const hasBackupIssue = !!backupAlert;
-  const barColor = hasCritical ? '#ef4444' : (hasBackupIssue ? '#f97316' : '#eab308');
+  const barColor = hasCritical ? '#ef4444' : (hasBackupIssue ? '#ff8c2a' : '#ffcf40');
   const bgGrad = hasCritical
     ? 'linear-gradient(90deg, #ef444420, #ef444408)'
-    : hasBackupIssue ? 'linear-gradient(90deg, #f9731620, #f9731608)' : 'linear-gradient(90deg, #eab30820, #eab30808)';
+    : hasBackupIssue ? 'linear-gradient(90deg, #ff8c2a20, #ff8c2a08)' : 'linear-gradient(90deg, #ffcf4020, #ffcf4008)';
 
   const topEvents = events.filter(e => !e.resolved).slice(0, 3);
 
@@ -54,7 +54,7 @@ export default function AlertBar({ events = [], criticalCount = 0, unresolvedCou
       </span>
       <div style={{ display: 'flex', gap: 12, flex: 1, overflow: 'hidden' }}>
         {backupAlert && (
-          <span style={{ fontSize: 11, color: '#f97316', whiteSpace: 'nowrap', fontWeight: 600 }}>
+          <span style={{ fontSize: 11, color: '#ff8c2a', whiteSpace: 'nowrap', fontWeight: 600 }}>
             Backup: {backupAlert}
           </span>
         )}

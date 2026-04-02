@@ -10,10 +10,10 @@ const SOURCES = [
 ];
 
 const SOURCE_COLORS = {
-  audit: '#3b82f6',
-  webhook: '#a78bfa',
-  provisioning: '#eab308',
-  system: '#10b981',
+  audit: '#5ee0ff',
+  webhook: '#c4a6ff',
+  provisioning: '#ffcf40',
+  system: '#22c55e',
   error: '#ef4444',
 };
 
@@ -66,22 +66,22 @@ export default function LogsView() {
   };
 
   const getSourceColor = (src) => {
-    if (typeof src !== 'string') return '#6b7280';
-    return SOURCE_COLORS[src.toLowerCase()] || '#6b7280';
+    if (typeof src !== 'string') return '#8899b0';
+    return SOURCE_COLORS[src.toLowerCase()] || '#8899b0';
   };
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Logs</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>Logs</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {SOURCES.map(s => (
             <button key={s.key} onClick={() => { setSource(s.key); setPage(1); }}
-              style={{ background: source === s.key ? '#ff8a2a' : 'var(--bg-card)', color: source === s.key ? '#fff' : 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ background: source === s.key ? 'var(--brand)' : 'var(--bg-card)', color: source === s.key ? '#fff' : 'var(--text-secondary)', border: source === s.key ? 'none' : '1px solid var(--border-subtle)', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
               {s.label}
             </button>
           ))}
-          <button onClick={handleExport} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={handleExport} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
             Export JSON
           </button>
         </div>
@@ -93,14 +93,14 @@ export default function LogsView() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Filter logs..."
-          style={{ background: 'var(--bg-input, var(--bg-card))', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', color: 'var(--text-primary)', fontSize: 13, width: 320, outline: 'none' }}
+          style={{ background: 'var(--bg-input)', border: '1px solid var(--border-default)', borderRadius: 10, padding: '9px 16px', color: 'var(--text-primary)', fontSize: 13, width: 320, outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.15s' }}
         />
       </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading...</div>
       ) : (
-        <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
           <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
             {filtered.map((l, i) => {
               const isExpanded = expandedRow === i;
@@ -115,8 +115,8 @@ export default function LogsView() {
                 <div key={i}>
                   <div
                     onClick={() => hasDetails ? setExpandedRow(isExpanded ? null : i) : null}
-                    style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12, cursor: hasDetails ? 'pointer' : 'default', transition: 'background 0.15s' }}
-                    onMouseEnter={e => { if (hasDetails) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                    style={{ padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)', fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12, cursor: hasDetails ? 'pointer' : 'default', transition: 'background 0.15s' }}
+                    onMouseEnter={e => { if (hasDetails) e.currentTarget.style.background = 'var(--bg-card)'; }}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
                     <span style={{ color: 'var(--text-muted)', flexShrink: 0, width: 140 }}>
@@ -133,7 +133,7 @@ export default function LogsView() {
                     )}
                   </div>
                   {isExpanded && detailStr && (
-                    <div style={{ padding: '8px 16px 12px 242px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ padding: '8px 16px 12px 242px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border-subtle)' }}>
                       <pre style={{ margin: 0, fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-all', maxHeight: 300, overflow: 'auto' }}>
                         {detailStr}
                       </pre>
@@ -151,7 +151,7 @@ export default function LogsView() {
 
           {/* Pagination */}
           {total > 50 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, padding: 12, borderTop: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, padding: 12, borderTop: '1px solid var(--border-default)' }}>
               <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
                 style={pageBtn(page > 1)}>Prev</button>
               <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Page {page} / {totalPages}</span>
@@ -170,5 +170,5 @@ export default function LogsView() {
 }
 
 function pageBtn(enabled) {
-  return { background: 'var(--bg-hover, var(--bg-card))', color: 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: enabled ? 'pointer' : 'default', opacity: enabled ? 1 : 0.4 };
+  return { background: 'var(--bg-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 600, cursor: enabled ? 'pointer' : 'default', opacity: enabled ? 1 : 0.4, fontFamily: 'inherit', transition: 'all 0.15s' };
 }

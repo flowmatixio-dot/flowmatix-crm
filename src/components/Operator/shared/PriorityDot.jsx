@@ -1,6 +1,6 @@
 import React from 'react';
 
-const COLORS = { critical: '#ef4444', high: '#f97316', medium: '#eab308', low: '#6b7280' };
+const COLORS = { critical: '#ef4444', high: '#ff8c2a', medium: '#ffcf40', low: '#8899b0' };
 
 export default function PriorityDot({ priority = 'medium', size = 8 }) {
   const c = COLORS[priority] || COLORS.medium;

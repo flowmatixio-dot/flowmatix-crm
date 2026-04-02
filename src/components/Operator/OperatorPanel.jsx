@@ -19,9 +19,9 @@ const S = {
   td: { padding: '10px 12px', borderBottom: '1px solid #1e1e3e', color: '#ccc' },
   accent: '#00B4D8',
   green: '#22c55e',
-  yellow: '#eab308',
+  yellow: '#ffcf40',
   red: '#ef4444',
-  gray: '#6b7280',
+  gray: '#8899b0',
 };
 
 const badge = (color, text) => (
@@ -395,7 +395,7 @@ function TabApplications({ d, load }) {
   };
 
   const planBadge = (plan) => {
-    const colors = { core: S.accent, pro: S.green, operations: '#a855f7', enterprise: '#eab308' };
+    const colors = { core: S.accent, pro: S.green, operations: '#a855f7', enterprise: '#ffcf40' };
     const labels = { core: 'Core €690', pro: 'Pro €990', operations: 'Ops €1.490', enterprise: 'Enterprise €2.500+' };
     return badge(colors[plan] || S.gray, labels[plan] || plan);
   };
@@ -411,7 +411,7 @@ function TabApplications({ d, load }) {
         <div style={S.grid4}>
           <div style={S.card}>
             <div style={S.kpiLabel}>Ausstehend</div>
-            <div style={{ ...S.kpi, color: stats.pending > 0 ? '#fbbf24' : '#fff' }}>{stats.pending}</div>
+            <div style={{ ...S.kpi, color: stats.pending > 0 ? '#ffcf40' : '#fff' }}>{stats.pending}</div>
           </div>
           <div style={S.card}>
             <div style={S.kpiLabel}>Angenommen</div>
@@ -449,7 +449,7 @@ function TabApplications({ d, load }) {
       {!apps ? <Spin /> : !apps.applications?.length ? <Empty text="Keine Bewerbungen" /> : (
         <div>
           {apps.applications.map(app => (
-            <div key={app.id} style={{ ...S.card, borderLeft: `3px solid ${app.status === 'pending' ? '#fbbf24' : app.status === 'approved' ? S.green : S.gray}` }}>
+            <div key={app.id} style={{ ...S.card, borderLeft: `3px solid ${app.status === 'pending' ? '#ffcf40' : app.status === 'approved' ? S.green : S.gray}` }}>
               {/* Header row */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }} onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}>
                 <div>
@@ -558,12 +558,12 @@ const OUTREACH_TEMPLATES = {
 };
 
 const OUTREACH_STATUSES = [
-  { key: 'not_contacted', label: 'Nicht kontaktiert', color: '#6b7280' },
-  { key: 'message_1', label: 'Nachricht 1', color: '#3b82f6' },
+  { key: 'not_contacted', label: 'Nicht kontaktiert', color: '#8899b0' },
+  { key: 'message_1', label: 'Nachricht 1', color: '#5ee0ff' },
   { key: 'follow_up_1', label: 'Follow-up 1', color: '#8b5cf6' },
   { key: 'follow_up_2', label: 'Follow-up 2', color: '#a855f7' },
-  { key: 'replied', label: 'Geantwortet', color: '#eab308' },
-  { key: 'demo_scheduled', label: 'Demo', color: '#f97316' },
+  { key: 'replied', label: 'Geantwortet', color: '#ffcf40' },
+  { key: 'demo_scheduled', label: 'Demo', color: '#ff8c2a' },
   { key: 'won', label: 'Gewonnen', color: '#22c55e' },
   { key: 'lost', label: 'Verloren', color: '#ef4444' },
 ];
@@ -864,10 +864,10 @@ function TabClinics({ d, load }) {
 
   const waStateBadge = (state) => {
     const map = {
-      'requested': { label: '📱 Nummer eingereicht', color: '#fbbf24' },
-      'awaiting_otp': { label: '🟡 Warte auf OTP', color: '#fbbf24' },
-      'active': { label: '🟢 Verbunden', color: '#10b981' },
-      'connected': { label: '🟢 Verbunden', color: '#10b981' },
+      'requested': { label: '📱 Nummer eingereicht', color: '#ffcf40' },
+      'awaiting_otp': { label: '🟡 Warte auf OTP', color: '#ffcf40' },
+      'active': { label: '🟢 Verbunden', color: '#22c55e' },
+      'connected': { label: '🟢 Verbunden', color: '#22c55e' },
       'not_connected': { label: '⚪ Nicht verbunden', color: '#666' },
       'failed': { label: '🔴 Fehler', color: '#ef4444' },
     };
@@ -924,8 +924,8 @@ function TabClinics({ d, load }) {
 
       {/* WhatsApp Requests Alert */}
       {waStatus && waStatus.filter(w => w.onboarding_state === 'requested').length > 0 && (
-        <div style={{ ...S.card, borderLeft: '3px solid #fbbf24', marginBottom: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#fbbf24', marginBottom: 8 }}>📱 WhatsApp-Anfragen</div>
+        <div style={{ ...S.card, borderLeft: '3px solid #ffcf40', marginBottom: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#ffcf40', marginBottom: 8 }}>📱 WhatsApp-Anfragen</div>
           {waStatus.filter(w => w.onboarding_state === 'requested').map(w => (
             <div key={w.organization_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #1e1e3e' }}>
               <div>

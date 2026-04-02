@@ -14,7 +14,7 @@ const S = {
   kpiLabel: { fontSize: 11, color: '#8888aa', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   accent: '#00B4D8',
   green: '#22c55e',
-  yellow: '#eab308',
+  yellow: '#ffcf40',
   red: '#ef4444',
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 },
   th: { textAlign: 'left', padding: '10px 12px', borderBottom: '1px solid #333366', color: '#8888aa', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 },
@@ -166,7 +166,7 @@ export default function SupportCenter() {
                       {c.health.emoji} {c.healthScore}
                     </span>
                   </td>
-                  <td style={S.td}>{badge(c.is_active ? S.green : "#6b7280", c.is_active ? "active" : "inactive")}</td>
+                  <td style={S.td}>{badge(c.is_active ? S.green : "#8899b0", c.is_active ? "active" : "inactive")}</td>
                   <td style={S.td}>{badge(c.provisioning_status === "completed" ? S.green : S.yellow, c.provisioning_status || "pending")}</td>
                   <td style={S.td}>{c.created_at ? timeAgo(c.created_at) : "-"}</td>
                   <td style={S.td}>

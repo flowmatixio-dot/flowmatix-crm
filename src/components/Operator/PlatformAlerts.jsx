@@ -10,7 +10,7 @@ import { timeAgo } from "../../utils/helpers";
 
 const SEVERITY_STYLE = {
   critical: { color: "#ef4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)", icon: "\u{1F6A8}" },
-  warning:  { color: "#eab308", bg: "rgba(234,179,8,0.08)",  border: "rgba(234,179,8,0.2)",  icon: "⚠️" },
+  warning:  { color: "#ffcf40", bg: "rgba(234,179,8,0.08)",  border: "rgba(234,179,8,0.2)",  icon: "⚠️" },
   info:     { color: "#00B4D8", bg: "rgba(0,180,216,0.08)",   border: "rgba(0,180,216,0.2)",   icon: "ℹ️" },
 };
 

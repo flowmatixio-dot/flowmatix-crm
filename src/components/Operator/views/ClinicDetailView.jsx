@@ -64,9 +64,9 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
     finally { setActionLoading(null); }
   };
 
-  const card = { background: 'var(--bg-card)', borderRadius: 12, padding: 20, marginBottom: 16 };
+  const card = { background: 'var(--bg-card)', borderRadius: 14, padding: '22px 24px', marginBottom: 16, border: '1px solid var(--border-subtle)' };
   const sectionTitle = { fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'var(--text-secondary)', margin: '0 0 14px' };
-  const row = { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 13 };
+  const row = { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: 13 };
   const lbl = { color: 'var(--text-muted)' };
   const val = { color: 'var(--text-primary)', fontWeight: 600 };
 
@@ -89,15 +89,15 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
     <div>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-        <button onClick={onClose} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={onClose} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
           Back
         </button>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0, flex: 1 }}>{safeStr(d.name || clinic?.name)}</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em', flex: 1 }}>{safeStr(d.name || clinic?.name)}</h1>
         <StatusBadge status={waStatus} size="lg" />
       </div>
 
       {msg && (
-        <div style={{ padding: '10px 16px', borderRadius: 8, marginBottom: 16, background: msg.type === 'ok' ? '#10b98120' : '#ef444420', color: msg.type === 'ok' ? '#10b981' : '#ef4444', fontSize: 13, fontWeight: 600 }}>
+        <div style={{ padding: '10px 16px', borderRadius: 8, marginBottom: 16, background: msg.type === 'ok' ? '#22c55e20' : '#ef444420', color: msg.type === 'ok' ? '#22c55e' : '#ef4444', fontSize: 13, fontWeight: 600 }}>
           {msg.text}
         </div>
       )}
@@ -133,14 +133,14 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           <div style={row}><span style={lbl}>Phone</span><span style={val}>{waPhone}</span></div>
           <div style={row}>
             <span style={lbl}>Connected</span>
-            <span style={{ color: waActive ? '#10b981' : '#ef4444', fontWeight: 700, fontSize: 13 }}>
+            <span style={{ color: waActive ? '#22c55e' : '#ef4444', fontWeight: 700, fontSize: 13 }}>
               {waActive ? 'Yes' : 'No'}
             </span>
           </div>
           {d.wa_error && <div style={row}><span style={lbl}>Error</span><span style={{ color: '#ef4444', fontSize: 12 }}>{safeStr(d.wa_error)}</span></div>}
           <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-            <button onClick={() => setShowWaModal(true)} style={actionBtn('#ff8a2a')}>WA Onboarding Wizard</button>
-            <button onClick={() => handleAction('wa-force')} disabled={actionLoading === 'wa-force'} style={actionBtn('#10b981')}>Force Connect</button>
+            <button onClick={() => setShowWaModal(true)} style={actionBtn('#ff8a2a')}>Setup WhatsApp</button>
+            <button onClick={() => handleAction('wa-force')} disabled={actionLoading === 'wa-force'} style={actionBtn('#22c55e')}>Force Connect</button>
             <button onClick={() => handleAction('wa-reset')} disabled={actionLoading === 'wa-reset'} style={actionBtn('#ef4444')}>Reset WA</button>
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           <h3 style={sectionTitle}>Integrations</h3>
           <div style={row}>
             <span style={lbl}>Google Calendar</span>
-            <span style={{ color: gcOk ? '#10b981' : '#6b7280', fontWeight: 700, fontSize: 13 }}>
+            <span style={{ color: gcOk ? '#22c55e' : '#8899b0', fontWeight: 700, fontSize: 13 }}>
               {gcOk ? 'Connected' : 'Not connected'}
             </span>
           </div>
@@ -163,7 +163,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           </div>
           <div style={row}>
             <span style={lbl}>Readiness Score</span>
-            <span style={{ fontWeight: 700, fontSize: 13, color: readiness === 100 ? '#10b981' : readiness >= 50 ? '#eab308' : '#ef4444' }}>{readiness}%</span>
+            <span style={{ fontWeight: 700, fontSize: 13, color: readiness === 100 ? '#22c55e' : readiness >= 50 ? '#ffcf40' : '#ef4444' }}>{readiness}%</span>
           </div>
         </div>
 
@@ -181,14 +181,14 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
               ) : (
                 <>
                   <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>{approved.length} approved</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#eab308' }}>{pending.length} pending</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>{approved.length} approved</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#ffcf40' }}>{pending.length} pending</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: '#ef4444' }}>{rejected.length} rejected</span>
                   </div>
                   {tpl.slice(0, 8).map((t, i) => (
                     <div key={i} style={{ ...row, padding: '6px 0' }}>
                       <span style={{ color: 'var(--text-primary)', fontSize: 12 }}>{safeStr(t.name || t.template_name)}</span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: t.status === 'approved' || t.status === 'APPROVED' ? '#10b981' : t.status === 'rejected' || t.status === 'REJECTED' ? '#ef4444' : '#eab308' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: t.status === 'approved' || t.status === 'APPROVED' ? '#22c55e' : t.status === 'rejected' || t.status === 'REJECTED' ? '#ef4444' : '#ffcf40' }}>
                         {safeStr(t.status)} {t.language ? `(${safeStr(t.language)})` : ''}
                       </span>
                     </div>
@@ -212,7 +212,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
                 <div style={row}><span style={lbl}>Total Patients</span><span style={val}>{patients}</span></div>
                 <div style={row}><span style={lbl}>Appointments</span><span style={val}>{appointments}</span></div>
                 <div style={row}><span style={lbl}>Messages</span><span style={val}>{messages}</span></div>
-                <div style={row}><span style={lbl}>Conversion Rate</span><span style={{ fontWeight: 700, fontSize: 13, color: convRate > 20 ? '#10b981' : convRate > 0 ? '#eab308' : 'var(--text-muted)' }}>{convRate}%</span></div>
+                <div style={row}><span style={lbl}>Conversion Rate</span><span style={{ fontWeight: 700, fontSize: 13, color: convRate > 20 ? '#22c55e' : convRate > 0 ? '#ffcf40' : 'var(--text-muted)' }}>{convRate}%</span></div>
               </>
             );
           })()}
@@ -223,7 +223,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           <h3 style={sectionTitle}>Actions</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button onClick={() => handleAction('impersonate')} disabled={actionLoading === 'impersonate'}
-              style={{ ...bigBtn('#a78bfa'), opacity: actionLoading === 'impersonate' ? 0.6 : 1 }}>
+              style={{ ...bigBtn('#c4a6ff'), opacity: actionLoading === 'impersonate' ? 0.6 : 1 }}>
               Impersonate Clinic
             </button>
             {ws !== 'suspended' ? (
@@ -233,7 +233,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
               </button>
             ) : (
               <button onClick={() => handleAction('resume')} disabled={actionLoading === 'resume'}
-                style={{ ...bigBtn('#10b981'), opacity: actionLoading === 'resume' ? 0.6 : 1 }}>
+                style={{ ...bigBtn('#22c55e'), opacity: actionLoading === 'resume' ? 0.6 : 1 }}>
                 Resume Clinic
               </button>
             )}
@@ -249,7 +249,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
         ) : (
           <div style={{ maxHeight: 300, overflow: 'auto' }}>
             {waLogEntries.map((log, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12, fontFamily: 'monospace' }}>
+              <div key={i} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: 12, fontFamily: 'monospace' }}>
                 <span style={{ color: 'var(--text-muted)', flexShrink: 0, width: 140 }}>
                   {log.created_at ? new Date(log.created_at).toLocaleString('de-DE') : log.timestamp ? new Date(log.timestamp).toLocaleString('de-DE') : '---'}
                 </span>
@@ -278,11 +278,11 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
 }
 
 function actionBtn(bg) {
-  return { background: bg, color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' };
+  return { background: bg, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', transition: 'opacity 0.15s' };
 }
 
 function bigBtn(bg) {
-  return { background: bg, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center' };
+  return { background: bg, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center', fontFamily: 'inherit', transition: 'opacity 0.15s' };
 }
 
 // Force React import for fragments
@@ -293,8 +293,8 @@ function WaProfileCard({ profile, submittedAt }) {
   const p = typeof profile === 'string' ? (() => { try { return JSON.parse(profile); } catch { return null; } })() : profile;
   if (!p) return null;
 
-  const card = { background: 'var(--bg-card)', borderRadius: 12, padding: 20, marginBottom: 16 };
-  const row = { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 13 };
+  const card = { background: 'var(--bg-card)', borderRadius: 14, padding: '22px 24px', marginBottom: 16, border: '1px solid var(--border-subtle)' };
+  const row = { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: 13 };
   const lbl = { color: 'var(--text-muted)' };
   const val = { color: 'var(--text-primary)', fontWeight: 600 };
 
@@ -320,10 +320,10 @@ function WaProfileCard({ profile, submittedAt }) {
       <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
         {p.logoUrl && (
           <div style={{ textAlign: 'center' }}>
-            <img src={p.logoUrl} alt="Logo" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+            <img src={p.logoUrl} alt="Logo" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border-strong)' }} />
             <div style={{ marginTop: 6 }}>
               <button onClick={() => downloadImage(p.logoUrl, 'wa-profile-photo.jpg')}
-                style={{ background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                style={{ background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.15s' }}>
                 Download Profilbild
               </button>
             </div>
@@ -331,10 +331,10 @@ function WaProfileCard({ profile, submittedAt }) {
         )}
         {p.bannerUrl && (
           <div style={{ textAlign: 'center' }}>
-            <img src={p.bannerUrl} alt="Banner" style={{ width: 120, height: 72, borderRadius: 8, objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+            <img src={p.bannerUrl} alt="Banner" style={{ width: 120, height: 72, borderRadius: 8, objectFit: 'cover', border: '2px solid var(--border-strong)' }} />
             <div style={{ marginTop: 6 }}>
               <button onClick={() => downloadImage(p.bannerUrl, 'wa-banner.jpg')}
-                style={{ background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                style={{ background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.15s' }}>
                 Download Banner
               </button>
             </div>
@@ -355,7 +355,7 @@ function WaProfileCard({ profile, submittedAt }) {
       {/* 360dialog Button */}
       <div style={{ marginTop: 14 }}>
         <a href="https://hub.360dialog.com/dashboard/partner/pipes" target="_blank" rel="noopener noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', fontFamily: 'inherit', transition: 'opacity 0.15s' }}>
           360dialog öffnen →
         </a>
       </div>
@@ -366,7 +366,7 @@ function WaProfileCard({ profile, submittedAt }) {
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>Öffnungszeiten</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {hours.map((h, i) => (
-              <span key={i} style={{ fontSize: 11, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.04)', borderRadius: 4, padding: '3px 8px' }}>
+              <span key={i} style={{ fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-hover)', borderRadius: 4, padding: '3px 8px' }}>
                 {dayNames[h.day_of_week] || h.day_of_week} {fmtTime(h.open_time)}–{fmtTime(h.close_time)}
               </span>
             ))}
@@ -380,9 +380,9 @@ function WaProfileCard({ profile, submittedAt }) {
 function logColor(level) {
   const l = typeof level === 'string' ? level.toLowerCase() : '';
   if (l === 'error' || l === 'critical') return '#ef4444';
-  if (l === 'warning' || l === 'warn') return '#f97316';
-  if (l === 'success' || l === 'ok') return '#10b981';
-  return '#3b82f6';
+  if (l === 'warning' || l === 'warn') return '#ff8c2a';
+  if (l === 'success' || l === 'ok') return '#22c55e';
+  return '#5ee0ff';
 }
 
 function ClinicTimeline({ ws, waStatus, waActive, subStatus, templates = [] }) {
@@ -404,17 +404,17 @@ function ClinicTimeline({ ws, waStatus, waActive, subStatus, templates = [] }) {
         {steps.map((step, i) => {
           const isDone = step.done;
           const isCurrent = i === currentIdx + 1;
-          const color = isDone ? '#10b981' : isCurrent ? '#ff8a2a' : 'rgba(255,255,255,0.12)';
+          const color = isDone ? '#22c55e' : isCurrent ? '#ff8a2a' : 'var(--border-hover)';
           return (
             <React.Fragment key={step.id}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minWidth: 0, flex: '0 0 auto' }}>
-                <div style={{ width: 24, height: 24, borderRadius: 99, background: isDone ? '#10b98120' : isCurrent ? '#ff8a2a20' : 'rgba(255,255,255,0.04)', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color }}>
+                <div style={{ width: 24, height: 24, borderRadius: 99, background: isDone ? '#22c55e20' : isCurrent ? '#ff8a2a20' : 'var(--bg-hover)', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color }}>
                   {isDone ? '✓' : i + 1}
                 </div>
-                <span style={{ fontSize: 10, fontWeight: isDone || isCurrent ? 700 : 500, color: isDone ? '#10b981' : isCurrent ? '#ff8a2a' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>{step.label}</span>
+                <span style={{ fontSize: 10, fontWeight: isDone || isCurrent ? 700 : 500, color: isDone ? '#22c55e' : isCurrent ? '#ff8a2a' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>{step.label}</span>
               </div>
               {i < steps.length - 1 && (
-                <div style={{ flex: 1, height: 2, background: isDone ? '#10b981' : 'rgba(255,255,255,0.06)', margin: '0 8px', marginBottom: 20 }} />
+                <div style={{ flex: 1, height: 2, background: isDone ? '#22c55e' : 'var(--border-default)', margin: '0 8px', marginBottom: 20 }} />
               )}
             </React.Fragment>
           );

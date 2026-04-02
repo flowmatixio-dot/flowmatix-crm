@@ -48,7 +48,7 @@ export function computeHealthScore(clinic) {
 
 export function healthLabel(score) {
   if (score >= 80) return { emoji: "\u{1F7E2}", text: "Healthy", color: "#22c55e" };
-  if (score >= 40) return { emoji: "\u{1F7E1}", text: "Warning", color: "#eab308" };
+  if (score >= 40) return { emoji: "\u{1F7E1}", text: "Warning", color: "#ffcf40" };
   return { emoji: "\u{1F534}", text: "Critical", color: "#ef4444" };
 }
 

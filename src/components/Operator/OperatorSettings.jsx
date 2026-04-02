@@ -11,8 +11,8 @@ const red = "#ef4444";
 const S = {
   wrapper: { display: "flex", gap: 0, minHeight: "calc(100vh - 140px)" },
   sidebar: {
-    width: 220, flexShrink: 0, background: "rgba(255,255,255,0.02)",
-    borderRadius: "12px 0 0 12px", border: "1px solid rgba(255,255,255,0.04)",
+    width: 220, flexShrink: 0, background: "var(--bg-section)",
+    borderRadius: "12px 0 0 12px", border: "1px solid var(--bg-input)",
     padding: "16px 0", position: "sticky", top: 80, alignSelf: "flex-start",
   },
   sidebarLabel: {
@@ -37,32 +37,32 @@ const S = {
   },
   card: {
     background: "#162032", borderRadius: 12, padding: 24, marginBottom: 16,
-    border: "1px solid rgba(255,255,255,0.04)",
+    border: "1px solid var(--bg-input)",
   },
   cardTitle: {
     fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 16,
   },
   fieldRow: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
-    padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.04)",
+    padding: "14px 0", borderBottom: "1px solid var(--bg-input)",
   },
   fieldLabel: { fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.85)" },
   fieldDesc: { fontSize: 11, color: "rgba(167,177,195,0.4)", marginTop: 2 },
   input: {
     width: 280, padding: "9px 14px", borderRadius: 10,
-    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+    background: "var(--bg-input)", border: "1px solid var(--border-input)",
     color: "#fff", fontFamily: "inherit", fontSize: 13, outline: "none",
     transition: "border-color .2s",
   },
   select: {
     width: 280, padding: "9px 14px", borderRadius: 10,
-    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+    background: "var(--bg-input)", border: "1px solid var(--border-input)",
     color: "#fff", fontFamily: "inherit", fontSize: 13, outline: "none",
     cursor: "pointer", appearance: "none",
   },
   btn: (primary) => ({
     padding: "10px 24px", borderRadius: 10, border: "none",
-    background: primary ? accent : "rgba(255,255,255,0.06)",
+    background: primary ? accent : "var(--border-default)",
     color: primary ? "#0f1623" : "rgba(167,177,195,0.7)",
     fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
     transition: "all .2s",
@@ -132,7 +132,7 @@ function SettingsToggle({ label, desc, value, onChange }) {
         onClick={() => onChange(!value)}
         style={{
           width: 44, height: 24, borderRadius: 12, cursor: "pointer",
-          background: value ? accent : "rgba(255,255,255,0.08)",
+          background: value ? accent : "var(--border-input)",
           transition: "background .2s", position: "relative", flexShrink: 0,
         }}
       >

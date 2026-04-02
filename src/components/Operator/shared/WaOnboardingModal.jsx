@@ -64,7 +64,7 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
-      <div style={{ background: '#131c2e', borderRadius: 16, padding: 32, width: 520, maxHeight: '90vh', overflow: 'auto', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 24px 48px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: 'var(--bg-modal)', borderRadius: 16, padding: 32, width: 520, maxHeight: '90vh', overflow: 'auto', border: '1px solid var(--border-strong)', boxShadow: '0 24px 48px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
@@ -79,11 +79,11 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
           {STEPS.map((s, i) => {
             const isActive = s.id === step;
             const isDone = i < currentStepIdx;
-            const color = isDone ? '#10b981' : isActive ? '#ff8a2a' : 'rgba(255,255,255,0.1)';
+            const color = isDone ? '#22c55e' : isActive ? '#ff8a2a' : 'var(--border-strong)';
             return (
               <div key={s.id} style={{ flex: 1 }}>
                 <div style={{ height: 4, borderRadius: 2, background: color, transition: 'background 0.3s' }} />
-                <div style={{ fontSize: 10, color: isActive ? '#ff8a2a' : isDone ? '#10b981' : 'var(--text-muted)', marginTop: 6, fontWeight: isActive ? 700 : 500 }}>
+                <div style={{ fontSize: 10, color: isActive ? '#ff8a2a' : isDone ? '#22c55e' : 'var(--text-muted)', marginTop: 6, fontWeight: isActive ? 700 : 500 }}>
                   {s.label}
                 </div>
               </div>
@@ -93,10 +93,10 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
 
         {/* Status Messages */}
         {error && <div style={{ padding: '10px 14px', borderRadius: 8, marginBottom: 16, background: '#ef444420', color: '#ef4444', fontSize: 13, fontWeight: 600 }}>{error}</div>}
-        {success && <div style={{ padding: '10px 14px', borderRadius: 8, marginBottom: 16, background: '#10b98120', color: '#10b981', fontSize: 13, fontWeight: 600 }}>{success}</div>}
+        {success && <div style={{ padding: '10px 14px', borderRadius: 8, marginBottom: 16, background: '#22c55e20', color: '#22c55e', fontSize: 13, fontWeight: 600 }}>{success}</div>}
 
         {/* Step Content */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 20, marginBottom: 20 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 20, marginBottom: 20 }}>
           {step === 'start' && (
             <>
               <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>Start WhatsApp Setup</h3>
@@ -131,12 +131,12 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
 
           {step === 'activate' && (
             <>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#10b981', margin: '0 0 8px' }}>WhatsApp Connected!</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#22c55e', margin: '0 0 8px' }}>WhatsApp Connected!</h3>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 16px', lineHeight: 1.6 }}>
                 WhatsApp is verified and connected. Click below to activate the clinic and make it fully live.
               </p>
               <button onClick={() => handleAction('activate')} disabled={loading}
-                style={{ ...btnPrimary, background: '#10b981', opacity: loading ? 0.6 : 1 }}>
+                style={{ ...btnPrimary, background: '#22c55e', opacity: loading ? 0.6 : 1 }}>
                 {loading ? 'Activating...' : 'Activate Clinic → Go Live'}
               </button>
             </>
@@ -200,11 +200,11 @@ function OtpStep({ orgId, loading, onVerify, onRetry }) {
       </p>
 
       {/* OTP Code Display */}
-      <div style={{ padding: 16, background: otpCode ? '#10b98112' : 'rgba(255,255,255,0.03)', borderRadius: 10, border: `1px solid ${otpCode ? '#10b98130' : 'rgba(255,255,255,0.06)'}`, marginBottom: 16, textAlign: 'center' }}>
+      <div style={{ padding: 16, background: otpCode ? '#22c55e12' : 'var(--bg-card)', borderRadius: 10, border: `1px solid ${otpCode ? '#22c55e30' : 'var(--border-default)'}`, marginBottom: 16, textAlign: 'center' }}>
         {otpCode ? (
           <>
-            <div style={{ fontSize: 11, color: '#10b981', fontWeight: 700, marginBottom: 6 }}>OTP CODE RECEIVED FROM CUSTOMER</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#10b981', letterSpacing: 8, fontFamily: 'monospace' }}>{otpCode}</div>
+            <div style={{ fontSize: 11, color: '#22c55e', fontWeight: 700, marginBottom: 6 }}>OTP CODE RECEIVED FROM CUSTOMER</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#22c55e', letterSpacing: 8, fontFamily: 'monospace' }}>{otpCode}</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>Enter this code in 360dialog to verify the number</div>
           </>
         ) : (
@@ -222,11 +222,11 @@ function OtpStep({ orgId, loading, onVerify, onRetry }) {
 
       <div style={{ display: 'flex', gap: 8 }}>
         <button onClick={onVerify} disabled={loading}
-          style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}>
+          style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}>
           {loading ? 'Verifying...' : 'OTP Verified in 360dialog → Connect'}
         </button>
         <button onClick={onRetry} disabled={loading}
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+          style={{ background: 'var(--border-default)', color: 'var(--text-secondary)', border: '1px solid var(--border-input)', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           Retry
         </button>
       </div>
@@ -235,4 +235,4 @@ function OtpStep({ orgId, loading, onVerify, onRetry }) {
 }
 
 const btnPrimary = { background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer' };
-const btnSecondary = { background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' };
+const btnSecondary = { background: 'var(--border-default)', color: 'var(--text-secondary)', border: '1px solid var(--border-input)', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' };

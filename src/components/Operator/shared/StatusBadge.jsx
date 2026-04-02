@@ -1,38 +1,50 @@
 import React from 'react';
 
 const STATE_CONFIG = {
-  TRIAL:             { label: 'Trial',            bg: '#eab30820', color: '#eab308', dot: '#eab308' },
-  WA_PENDING:        { label: 'WA Pending',       bg: '#f9731620', color: '#f97316', dot: '#f97316' },
-  NEW:               { label: 'New',              bg: '#3b82f620', color: '#3b82f6', dot: '#3b82f6' },
-  START_SETUP:       { label: 'Setup',            bg: '#3b82f620', color: '#3b82f6', dot: '#3b82f6' },
-  WAIT_FOR_NUMBER:   { label: 'Waiting Number',   bg: '#eab30820', color: '#eab308', dot: '#eab308' },
-  WAITING_OTP:       { label: 'OTP Pending',      bg: '#f9731620', color: '#f97316', dot: '#f97316' },
-  VERIFY_OTP:        { label: 'Verify OTP',       bg: '#f9731620', color: '#f97316', dot: '#f97316' },
-  CONNECT_WHATSAPP:  { label: 'Connect WA',       bg: '#eab30820', color: '#eab308', dot: '#eab308' },
-  VERIFYING:         { label: 'Verifying',        bg: '#a78bfa20', color: '#a78bfa', dot: '#a78bfa' },
-  LIVE:              { label: 'Live',              bg: '#10b98120', color: '#10b981', dot: '#10b981' },
-  NONE:              { label: 'Live',              bg: '#10b98120', color: '#10b981', dot: '#10b981' },
-  ACTIVATE:          { label: 'Ready to Activate', bg: '#10b98120', color: '#10b981', dot: '#10b981' },
-  FIX_ERROR:         { label: 'Error',             bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
-  ERROR:             { label: 'Error',             bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
-  BOT_NO_RESPONSE:   { label: 'Bot Silent',        bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
-  BOT_ERROR:         { label: 'Bot Error',         bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
+  TRIAL:             { label: 'Trial',            color: 'var(--warning)' },
+  WA_PENDING:        { label: 'WA Pending',       color: 'var(--brand)' },
+  NEW:               { label: 'New',              color: 'var(--info)' },
+  START_SETUP:       { label: 'Setup',            color: 'var(--info)' },
+  WAIT_FOR_NUMBER:   { label: 'Waiting Number',   color: 'var(--warning)' },
+  WAITING_OTP:       { label: 'OTP Pending',      color: 'var(--brand)' },
+  VERIFY_OTP:        { label: 'Verify OTP',       color: 'var(--brand)' },
+  CONNECT_WHATSAPP:  { label: 'Connect WA',       color: 'var(--warning)' },
+  VERIFYING:         { label: 'Verifying',        color: '#c4a6ff' },
+  LIVE:              { label: 'Live',             color: 'var(--success)' },
+  NONE:              { label: 'Live',             color: 'var(--success)' },
+  ACTIVATE:          { label: 'Ready to Activate', color: 'var(--success)' },
+  FIX_ERROR:         { label: 'Error',            color: 'var(--error)' },
+  ERROR:             { label: 'Error',            color: 'var(--error)' },
+  BOT_NO_RESPONSE:   { label: 'Bot Silent',       color: 'var(--error)' },
+  BOT_ERROR:         { label: 'Bot Error',        color: 'var(--error)' },
   // workspace states
-  pending_setup:     { label: 'Pending Setup',     bg: '#f9731620', color: '#f97316', dot: '#f97316' },
+  pending_setup:     { label: 'Pending Setup',    color: 'var(--brand)' },
   // subscription statuses
-  active:            { label: 'Active',            bg: '#10b98120', color: '#10b981', dot: '#10b981' },
-  trialing:          { label: 'Trial',             bg: '#eab30820', color: '#eab308', dot: '#eab308' },
-  past_due:          { label: 'Past Due',          bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
-  canceled:          { label: 'Canceled',          bg: '#6b728020', color: '#6b7280', dot: '#6b7280' },
+  active:            { label: 'Active',           color: 'var(--success)' },
+  trialing:          { label: 'Trial',            color: 'var(--warning)' },
+  past_due:          { label: 'Past Due',         color: 'var(--error)' },
+  canceled:          { label: 'Canceled',         color: 'var(--text-muted)' },
 };
 
 export default function StatusBadge({ status, size = 'sm' }) {
-  const cfg = STATE_CONFIG[status] || { label: status || '—', bg: '#6b728020', color: '#6b7280', dot: '#6b7280' };
+  const cfg = STATE_CONFIG[status] || { label: status || '—', color: 'var(--text-muted)' };
   const fontSize = size === 'lg' ? 13 : 11;
   const pad = size === 'lg' ? '5px 12px' : '3px 10px';
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: cfg.bg, color: cfg.color, fontSize, fontWeight: 700, padding: pad, borderRadius: 6, whiteSpace: 'nowrap' }}>
-      <span style={{ width: 6, height: 6, borderRadius: 99, background: cfg.dot, boxShadow: `0 0 6px ${cfg.dot}` }} />
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      background: 'var(--bg-active)',
+      color: cfg.color,
+      fontSize, fontWeight: 700,
+      padding: pad, borderRadius: 6,
+      whiteSpace: 'nowrap',
+      border: '1px solid var(--border-subtle)',
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: 99,
+        background: cfg.color,
+        boxShadow: `0 0 8px ${cfg.color === 'var(--error)' ? 'rgba(255,92,92,0.5)' : cfg.color === 'var(--success)' ? 'rgba(45,252,180,0.4)' : 'transparent'}`,
+      }} />
       {cfg.label}
     </span>
   );

@@ -26,6 +26,7 @@ import RevenueView from "./Revenue/RevenueView";
 import ProductTour, { TourWelcomeModal } from "./Tour/ProductTour";
 import AISupportWidget from "./AISupport/AISupportWidget";
 import OperatorPanel from "./Operator/OperatorPanel";
+import ThemeToggle from "./Theme/ThemeToggle";
 import DashboardView from "./Dashboard/DashboardView";
 import InboxView from "./Inbox/InboxView";
 import AppointmentsPage from "./Appointments/AppointmentsPage";
@@ -464,8 +465,8 @@ export default function MainLayout() {
       );
     })()}
 
-    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "#0f1623", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "rgba(232,238,252,0.96)", overflow: "hidden", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
-      {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "#162032", border: "1px solid rgba(16,185,129,0.2)", color: "#10b981", fontWeight: 700, fontSize: 14, boxShadow: "0 4px 12px rgba(0,0,0,0.3)" }}>✓ {toast}</div>}
+    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "var(--bg-app)", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "var(--text-primary)", overflow: "hidden", transition: "background .25s ease, color .25s ease", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
+      {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "var(--bg-card-solid)", border: "1px solid var(--success-muted)", color: "var(--success)", fontWeight: 700, fontSize: 14, boxShadow: "var(--shadow-md)" }}>✓ {toast}</div>}
 
       {/* ── Doctor: New Task Popup (global, any view) ── */}
       {doctorAlert && (
@@ -685,22 +686,22 @@ export default function MainLayout() {
           );
         })()}
         {/* ═══ TOP BAR — Redesigned ═══ */}
-        <div style={{ height: 52, minHeight: 52, borderBottom: "1px solid rgba(255,255,255,0.04)", background: "#0f1623", display: "flex", alignItems: "center", padding: "0 24px", gap: 0, flexShrink: 0, minWidth: 0, position: "relative", zIndex: 100 }}>
+        <div className="fm-topbar" style={{ height: 52, minHeight: 52, borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-topbar)", display: "flex", alignItems: "center", padding: "0 24px", gap: 0, flexShrink: 0, minWidth: 0, position: "relative", zIndex: 100, transition: "background .25s ease, border-color .25s ease" }}>
 
           {/* ── LEFT: Global Search (hidden for doctor) ── */}
           <div style={{ flex: "0 0 340px", position: "relative" }}>
-            {!isOperator && effectiveRole !== "doctor" && <><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }} onFocus={(e) => { setSearchOpen(true); e.target.style.borderColor = "rgba(76,201,255,0.15)"; }} onBlur={(e) => { setTimeout(() => setSearchOpen(false), 200); e.target.style.borderColor = "rgba(255,255,255,0.04)"; }} placeholder={t("search_placeholder") || `Search... (${navigator.platform?.includes("Mac") ? "⌘" : "Ctrl"}+K)`} style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 8, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.95)", fontFamily: "inherit", fontSize: 12, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }} />
-            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "rgba(167,177,195,0.6)" }}>🔍</span></>}
-            {searchOpen && searchResults.length > 0 && <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", maxHeight: 320, overflowY: "auto", marginTop: 4, borderRadius: 10, background: "#162032", border: "1px solid rgba(255,255,255,0.08)", zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
-              <div style={{ padding: "6px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)" }}>{searchResults.length} Ergebnisse</span><span style={{ fontSize: 9, color: "rgba(167,177,195,0.6)" }}>ESC</span></div>
-              {searchResults.map((r, i) => <div key={i} style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.03)", display: "flex", gap: 8, alignItems: "center" }} onMouseDown={() => {
+            {!isOperator && effectiveRole !== "doctor" && <><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }} onFocus={(e) => { setSearchOpen(true); e.target.style.borderColor = "var(--border-input-focus)"; }} onBlur={(e) => { setTimeout(() => setSearchOpen(false), 200); e.target.style.borderColor = "var(--border-subtle)"; }} placeholder={t("search_placeholder") || `Search... (${navigator.platform?.includes("Mac") ? "⌘" : "Ctrl"}+K)`} style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 8, background: "var(--bg-input)", border: "1px solid var(--border-subtle)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 12, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }} />
+            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--text-muted)" }}>🔍</span></>}
+            {searchOpen && searchResults.length > 0 && <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", maxHeight: 320, overflowY: "auto", marginTop: 4, borderRadius: 10, background: "var(--bg-card-solid)", border: "1px solid var(--border-strong)", zIndex: 100, boxShadow: "var(--shadow-lg)" }}>
+              <div style={{ padding: "6px 12px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)" }}>{searchResults.length} Ergebnisse</span><span style={{ fontSize: 9, color: "var(--text-faint)" }}>ESC</span></div>
+              {searchResults.map((r, i) => <div key={i} style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: 8, alignItems: "center" }} onMouseDown={() => {
                 if (r.type === "lead") setSelLead(r.id);
                 else if (r.type === "appt") setSelAppt(r.id);
                 else if (r.type === "chat") { setView("inbox"); setSelChat(r.data); }
                 setSearchQuery(""); setSearchOpen(false);
-              }} onMouseEnter={e => e.currentTarget.style.background = "rgba(76,201,255,0.04)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+              }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-hover)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                 <span style={{ fontSize: 14 }}>{r.icon}</span>
-                <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 12 }}>{r.label}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)" }}>{r.sub}</div></div>
+                <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 12 }}>{r.label}</div><div style={{ fontSize: 10, color: "var(--text-muted)" }}>{r.sub}</div></div>
               </div>)}
             </div>}
           </div>
@@ -713,7 +714,7 @@ export default function MainLayout() {
               { label: ({de:"Neue Leads",en:"New Leads",tr:"Yeni Leadler"}[lang]||"Neue Leads"), value: myLeads.filter(l => l.stage === "new").length, color: "#4cc9ff", icon: "👤", view: "pipeline" },
             ].map((k, i) => <div key={i} onClick={() => setView(k.view)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 6, cursor: "pointer", background: "transparent", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = `${k.color}08`} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
               <span style={{ fontSize: 14, fontWeight: 800, color: k.color, letterSpacing: "-0.02em" }}>{k.value}</span>
-              <span style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 600 }}>{k.label}</span>
+              <span style={{ fontSize: 10, color: "var(--text-secondary)", fontWeight: 600 }}>{k.label}</span>
             </div>)}
             {/* Operator badges */}
             {!IS_CLIENT_MODE && isOperator && <>
@@ -735,17 +736,17 @@ export default function MainLayout() {
               const limit = clinic.patient_limit || (PLAN_LIMITS[clinic.plan] || PLAN_LIMITS.core).patients || 1000;
               const pct = Math.round((myLeads.length / limit) * 100);
               return <div onClick={() => setView("subscription")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, cursor: "pointer" }} title={`${myLeads.length} / ${limit} Patienten`}>
-                <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                  <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "#ef4444" : pct > 50 ? "#f59e0b" : "rgba(167,177,195,0.65)", transition: "width 0.3s" }} />
+                <div style={{ width: 40, height: 4, borderRadius: 2, background: "var(--progress-track)", overflow: "hidden" }}>
+                  <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "var(--error)" : pct > 50 ? "var(--warning)" : "var(--text-muted)", transition: "width 0.3s" }} />
                 </div>
-                <span style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
+                <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
               </div>;
             })()}
 
             {/* System status */}
             {IS_CLIENT_MODE && <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 8px" }} title="System Online">
-              <span style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981", boxShadow: "0 0 6px rgba(16,185,129,0.4)" }} />
-              <span style={{ fontSize: 9, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>Online</span>
+              <span style={{ width: 6, height: 6, borderRadius: 99, background: "var(--success)", boxShadow: "var(--shadow-glow-success)" }} />
+              <span style={{ fontSize: 9, color: "var(--text-muted)", fontWeight: 600 }}>Online</span>
             </div>}
 
             {/* Demo/Live toggle */}
@@ -753,41 +754,43 @@ export default function MainLayout() {
 
             {/* Notification bell (hidden for doctor) */}
             {IS_CLIENT_MODE && effectiveRole !== "doctor" && <div style={{ position: "relative" }}>
-              <button data-notif-bell onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markNotifsRead(); }} style={{ width: 32, height: 32, borderRadius: 8, background: notifOpen ? "rgba(76,201,255,0.06)" : "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.6)", position: "relative", transition: "all .15s" }}>🔔
+              <button data-notif-bell onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markNotifsRead(); }} style={{ width: 32, height: 32, borderRadius: 8, background: notifOpen ? "var(--info-subtle)" : "transparent", border: "1px solid var(--border-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--text-muted)", position: "relative", transition: "all .15s" }}>🔔
                 {unreadNotifs > 0 && <span style={{ position: "absolute", top: -2, right: -2, width: 14, height: 14, borderRadius: 99, background: "#ff8a2a", color: "#fff", fontSize: 8, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadNotifs}</span>}
               </button>
-              {notifOpen && <div data-notif-panel style={{ position: "absolute", top: "100%", right: 0, width: 360, maxHeight: 400, overflowY: "auto", marginTop: 6, borderRadius: 12, background: "#141820", border: "1px solid rgba(255,255,255,0.06)", zIndex: 9000, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-                <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", fontWeight: 700, fontSize: 13 }}>{t("notif_title")}</div>
-                {myNotifs.length === 0 && <div style={{ padding: 20, textAlign: "center", color: "rgba(167,177,195,0.7)", fontSize: 12 }}>{t("no_notifications")}</div>}
-                {myNotifs.map(n => <div key={n.id} style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.03)", display: "flex", gap: 8, alignItems: "flex-start", background: n.read ? "transparent" : "rgba(76,201,255,0.02)" }}>
+              {notifOpen && <div data-notif-panel style={{ position: "absolute", top: "100%", right: 0, width: 360, maxHeight: 400, overflowY: "auto", marginTop: 6, borderRadius: 12, background: "var(--bg-modal)", border: "1px solid var(--border-default)", zIndex: 9000, boxShadow: "var(--shadow-xl)" }}>
+                <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", fontWeight: 700, fontSize: 13 }}>{t("notif_title")}</div>
+                {myNotifs.length === 0 && <div style={{ padding: 20, textAlign: "center", color: "var(--text-secondary)", fontSize: 12 }}>{t("no_notifications")}</div>}
+                {myNotifs.map(n => <div key={n.id} style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: 8, alignItems: "flex-start", background: n.read ? "transparent" : "var(--info-subtle)" }}>
                   <div style={{ width: 24, height: 24, borderRadius: 6, background: `${NOTIF_COLORS[n.type] || "rgba(167,177,195,0.1)"}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0 }}>{NOTIF_ICONS[n.type] || "🔔"}</div>
-                  <div><div style={{ fontSize: 12, lineHeight: 1.4, color: n.read ? "rgba(167,177,195,0.7)" : "rgba(232,238,252,0.85)" }}>{n.text}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 2 }}>{timeAgo(n.time)}</div></div>
+                  <div><div style={{ fontSize: 12, lineHeight: 1.4, color: n.read ? "var(--text-secondary)" : "var(--text-primary)" }}>{n.text}</div><div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{timeAgo(n.time)}</div></div>
                 </div>)}
               </div>}
             </div>}
 
             {/* Clock (operator only) */}
-            {isOperator && <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(212,175,55,0.5)", fontFamily: "monospace", fontVariantNumeric: "tabular-nums" }}>{clockNow.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}</span>}
+            {isOperator && <span style={{ fontSize: 12, fontWeight: 600, color: "var(--gold-text)", fontFamily: "monospace", fontVariantNumeric: "tabular-nums" }}>{clockNow.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}</span>}
+            {/* Theme toggle (operator only) */}
+            {isOperator && <ThemeToggle />}
             {/* User menu (gear icon trigger) */}
             {(() => {
               const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
               return <div style={{ position: "relative" }} data-gear-menu>
-                <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.6)" }}>
+                <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid var(--border-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--text-muted)" }}>
                   ⚙️
                 </button>
-                <div style={{ display: "none", position: "absolute", top: 38, right: 0, minWidth: 180, background: "#141820", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: 6, zIndex: 200, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-                  <div style={{ padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 4 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(232,238,252,0.85)" }}>{user.name}</div>
-                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
+                <div style={{ display: "none", position: "absolute", top: 38, right: 0, minWidth: 180, background: "var(--bg-modal)", border: "1px solid var(--border-default)", borderRadius: 10, padding: 6, zIndex: 200, boxShadow: "var(--shadow-xl)" }}>
+                  <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-subtle)", marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)" }}>{user.name}</div>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
                   </div>
-                  {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
-                  <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
+                  {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
+                  <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
                   {/* Language picker inside menu */}
                   <div style={{ padding: "4px 12px", display: "flex", gap: 4 }}>
-                    {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "rgba(76,201,255,0.1)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
+                    {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "var(--info-subtle)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
                   </div>
-                  <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "4px 0" }} />
-                  <button onClick={handleLogout} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(239,68,68,0.5)", textAlign: "left", fontFamily: "inherit" }}>↗ {t("sign_out")}</button>
+                  <div style={{ height: 1, background: "var(--border-subtle)", margin: "4px 0" }} />
+                  <button onClick={handleLogout} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--error-text)", textAlign: "left", fontFamily: "inherit" }}>↗ {t("sign_out")}</button>
                 </div>
               </div>;
             })()}
@@ -798,27 +801,27 @@ export default function MainLayout() {
 
         {/* Password Change Modal */}
         {showPwModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPwModal(false)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#1a2236', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 380, maxWidth: '90vw' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'var(--overlay-heavy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPwModal(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-modal)', border: '1px solid var(--border-default)', borderRadius: 16, padding: 28, width: 380, maxWidth: '90vw' }}>
               <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
-                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
-                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
+                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
-                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
+                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               </div>
-              {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', color: pwToast.type === 'error' ? '#ef4444' : '#10b981', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
+              {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'var(--error-subtle)' : 'var(--success-subtle)', color: pwToast.type === 'error' ? 'var(--error)' : 'var(--success)', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-                <button onClick={() => setShowPwModal(false)} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.7)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
-                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'rgba(255,138,42,0.3)' : 'rgba(255,138,42,0.9)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
+                <button onClick={() => setShowPwModal(false)} style={{ background: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
+                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'var(--brand-muted)' : 'var(--brand)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
               </div>
             </div>
           </div>

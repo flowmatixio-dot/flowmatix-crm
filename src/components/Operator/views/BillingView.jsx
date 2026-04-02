@@ -65,7 +65,7 @@ export default function BillingView({ actions }) {
     { key: 'subscription_status', label: 'Status', render: v => <StatusBadge status={safeStr(v, 'unknown')} /> },
     { key: 'mrr', label: 'MRR', render: v => {
       const n = safeNum(v);
-      return <span style={{ fontSize: 12, fontWeight: 700, color: n > 0 ? '#10b981' : 'var(--text-muted)' }}>
+      return <span style={{ fontSize: 12, fontWeight: 700, color: n > 0 ? '#22c55e' : 'var(--text-muted)' }}>
         {n > 0 ? `EUR ${n.toLocaleString('de-DE')}` : 'EUR 0'}
       </span>;
     }},
@@ -78,9 +78,9 @@ export default function BillingView({ actions }) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Billing & Finance</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>Billing & Finance</h1>
         <button onClick={handleDatevExport} disabled={exporting}
-          style={{ background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 13, fontWeight: 700, cursor: exporting ? 'wait' : 'pointer', opacity: exporting ? 0.6 : 1 }}>
+          style={{ background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 13, fontWeight: 700, cursor: exporting ? 'wait' : 'pointer', opacity: exporting ? 0.6 : 1, fontFamily: 'inherit', transition: 'all 0.15s' }}>
           {exporting ? 'Exporting...' : 'DATEV Export'}
         </button>
       </div>
@@ -95,7 +95,7 @@ export default function BillingView({ actions }) {
 
       {/* Overdue Alert */}
       {overdue.length > 0 && (
-        <div style={{ background: '#ef444415', border: '1px solid #ef444440', borderRadius: 10, padding: 16, marginBottom: 20 }}>
+        <div style={{ background: '#ef444415', border: '1px solid #ef444440', borderRadius: 14, padding: '18px 20px', marginBottom: 20 }}>
           <h3 style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', margin: '0 0 10px' }}>Overdue Payments ({overdue.length})</h3>
           {overdue.map((o, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0', borderBottom: i < overdue.length - 1 ? '1px solid rgba(239,68,68,0.15)' : 'none', fontSize: 13 }}>
@@ -125,14 +125,14 @@ export default function BillingView({ actions }) {
         <summary style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: 8 }}>
           Platform Costs -- EUR {totalCosts}/mo
         </summary>
-        <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
           {PLATFORM_COSTS.map((c, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 13 }}>
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)', fontSize: 13 }}>
               <span style={{ color: 'var(--text-secondary)' }}>{c.name}</span>
               <span style={{ fontWeight: 600, color: c.cost > 0 ? 'var(--text-primary)' : 'var(--text-muted)' }}>EUR {c.cost}</span>
             </div>
           ))}
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', fontSize: 13, fontWeight: 700, background: 'rgba(255,255,255,0.03)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', fontSize: 13, fontWeight: 700, background: 'var(--bg-card)' }}>
             <span style={{ color: 'var(--text-primary)' }}>Total</span>
             <span style={{ color: '#ef4444' }}>EUR {totalCosts}/mo</span>
           </div>
@@ -143,9 +143,9 @@ export default function BillingView({ actions }) {
       {billingEvents.length > 0 && (
         <>
           <h2 style={sectionH}>Recent Billing Events</h2>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 10, overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
             {billingEvents.slice(0, 15).map((ev, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 12 }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)', fontSize: 12 }}>
                 <span style={{ color: 'var(--text-muted)', width: 140, flexShrink: 0 }}>
                   {ev.created_at ? new Date(ev.created_at).toLocaleString('de-DE') : '---'}
                 </span>
@@ -156,7 +156,7 @@ export default function BillingView({ actions }) {
                   {safeStr(ev.org_name || ev.description, '---')}
                 </span>
                 {ev.amount !== undefined && (
-                  <span style={{ fontWeight: 700, color: '#10b981', flexShrink: 0 }}>
+                  <span style={{ fontWeight: 700, color: '#22c55e', flexShrink: 0 }}>
                     EUR {(safeNum(ev.amount) / 100).toLocaleString('de-DE')}
                   </span>
                 )}
@@ -169,12 +169,12 @@ export default function BillingView({ actions }) {
   );
 }
 
-const sectionH = { fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 };
+const sectionH = { fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: 'var(--text-muted)', marginBottom: 14 };
 
 function eventColor(type) {
-  if (typeof type !== 'string') return '#6b7280';
+  if (typeof type !== 'string') return '#8899b0';
   if (type.includes('failed') || type.includes('overdue')) return '#ef4444';
-  if (type.includes('succeeded') || type.includes('paid')) return '#10b981';
-  if (type.includes('created') || type.includes('updated')) return '#3b82f6';
-  return '#eab308';
+  if (type.includes('succeeded') || type.includes('paid')) return '#22c55e';
+  if (type.includes('created') || type.includes('updated')) return '#5ee0ff';
+  return '#ffcf40';
 }

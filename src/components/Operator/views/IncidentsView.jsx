@@ -81,21 +81,21 @@ export default function IncidentsView() {
     )},
     { key: 'severity', label: 'Severity', render: v => {
       const s = safeStr(v, 'info');
-      const colors = { critical: '#ef4444', warning: '#f97316', info: '#3b82f6' };
-      return <span style={{ fontSize: 11, fontWeight: 700, color: colors[s] || '#3b82f6', textTransform: 'uppercase' }}>{s}</span>;
+      const colors = { critical: '#ef4444', warning: '#ff8c2a', info: '#5ee0ff' };
+      return <span style={{ fontSize: 11, fontWeight: 700, color: colors[s] || '#5ee0ff', textTransform: 'uppercase' }}>{s}</span>;
     }},
     { key: 'created_at', label: 'When', render: v => v ? new Date(v).toLocaleString('de-DE') : '---' },
     { key: 'acknowledged', label: 'Ack', width: 50, render: (v) => (
-      <span style={{ fontSize: 11, fontWeight: 600, color: v ? '#10b981' : '#6b7280' }}>{v ? 'Yes' : 'No'}</span>
+      <span style={{ fontSize: 11, fontWeight: 600, color: v ? '#22c55e' : '#8899b0' }}>{v ? 'Yes' : 'No'}</span>
     )},
     { key: 'id', label: '', sortable: false, width: 180, render: (v, row) => (
       <div style={{ display: 'flex', gap: 6 }}>
         {!row.acknowledged && (
-          <button onClick={() => acknowledge(v)} style={{ background: '#eab308', color: '#000', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+          <button onClick={() => acknowledge(v)} style={{ background: '#ffcf40', color: '#000', border: 'none', borderRadius: 8, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.15s' }}>
             Acknowledge
           </button>
         )}
-        <button onClick={() => resolve(v)} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+        <button onClick={() => resolve(v)} style={{ background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.15s' }}>
           Resolve
         </button>
       </div>
@@ -114,8 +114,8 @@ export default function IncidentsView() {
     )},
     { key: 'severity', label: 'Severity', render: v => {
       const s = safeStr(v, 'info');
-      const colors = { critical: '#ef4444', warning: '#f97316', info: '#3b82f6' };
-      return <span style={{ fontSize: 11, fontWeight: 700, color: colors[s] || '#3b82f6', textTransform: 'uppercase' }}>{s}</span>;
+      const colors = { critical: '#ef4444', warning: '#ff8c2a', info: '#5ee0ff' };
+      return <span style={{ fontSize: 11, fontWeight: 700, color: colors[s] || '#5ee0ff', textTransform: 'uppercase' }}>{s}</span>;
     }},
     { key: 'created_at', label: 'Created', render: v => v ? new Date(v).toLocaleString('de-DE') : '---' },
     { key: 'resolved_at', label: 'Resolved', render: v => v ? new Date(v).toLocaleString('de-DE') : '---' },
@@ -131,9 +131,9 @@ export default function IncidentsView() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Incidents</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>Incidents</h1>
           {tab === 'open' && incidents.length > 0 && (
-            <span style={{ background: criticalCount > 0 ? '#ef444420' : '#eab30820', color: criticalCount > 0 ? '#ef4444' : '#eab308', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6 }}>
+            <span style={{ background: criticalCount > 0 ? '#ef444420' : '#ffcf4020', color: criticalCount > 0 ? '#ef4444' : '#ffcf40', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6 }}>
               {incidents.length} open{criticalCount > 0 ? ` (${criticalCount} critical)` : ''}
             </span>
           )}
@@ -141,16 +141,16 @@ export default function IncidentsView() {
         <div style={{ display: 'flex', gap: 8 }}>
           {['open', 'history'].map(t => (
             <button key={t} onClick={() => setTab(t)}
-              style={{ background: tab === t ? '#ff8a2a' : 'var(--bg-card)', color: tab === t ? '#fff' : 'var(--text-secondary)', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
+              style={{ background: tab === t ? 'var(--brand)' : 'var(--bg-card)', color: tab === t ? '#fff' : 'var(--text-secondary)', border: tab === t ? 'none' : '1px solid var(--border-subtle)', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize', fontFamily: 'inherit', transition: 'all 0.15s' }}>
               {t === 'open' ? 'Open' : 'History'}
             </button>
           ))}
           <button onClick={async () => {
             try { await fmApi.apiFetch('/api/v1/ops/incident-detector/run', { method: 'POST' }); load(); } catch {}
-          }} style={{ background: '#f9731618', border: '1px solid #f9731630', borderRadius: 6, padding: '6px 14px', color: '#f97316', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          }} style={{ background: 'var(--warning-subtle)', border: '1px solid var(--warning-muted)', borderRadius: 8, padding: '6px 14px', color: 'var(--warning)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
             Detect Issues
           </button>
-          <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
             Refresh
           </button>
         </div>
