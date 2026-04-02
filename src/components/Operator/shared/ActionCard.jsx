@@ -22,6 +22,7 @@ const ACTION_LABELS = {
   BOT_ERROR:           { icon: '🤖', label: 'Bot error' },
   WHATSAPP_SEND_FAILED:{ icon: '❌', label: 'WhatsApp send failed' },
   QUEUE_STUCK:         { icon: '⏳', label: 'Queue stuck' },
+  PROFILE_SUBMITTED:   { icon: '📋', label: 'WA-Profil eingereicht — bei 360dialog einpflegen' },
 };
 
 export default function ActionCard({ type, priority = 'medium', clinicName, detail, timestamp, cta, onAction, onResolve }) {

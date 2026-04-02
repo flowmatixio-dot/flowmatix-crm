@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as fmApi from '../../api/client.js';
 
-export default function AlertBar({ events = [], criticalCount = 0, unresolvedCount = 0, connected = false }) {
+export default function AlertBar({ events = [], criticalCount = 0, unresolvedCount = 0, connected = false, onEventClick, onDismiss }) {
   const [backupAlert, setBackupAlert] = useState(null);
 
   // Check backup status periodically
@@ -59,8 +59,11 @@ export default function AlertBar({ events = [], criticalCount = 0, unresolvedCou
           </span>
         )}
         {topEvents.map(ev => (
-          <span key={ev.id} style={{ fontSize: 11, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {ev.org_name || 'System'}: {typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : ''}
+          <span key={ev.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span onClick={() => onEventClick?.(ev)} style={{ fontSize: 11, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', cursor: ev.organization_id ? 'pointer' : 'default', borderBottom: ev.organization_id ? '1px dashed rgba(255,255,255,0.2)' : 'none' }}>
+              {ev.org_name || 'System'}: {typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : ''}
+            </span>
+            <span onClick={(e) => { e.stopPropagation(); onDismiss?.(ev.id); }} style={{ fontSize: 10, color: 'var(--text-muted)', cursor: 'pointer', opacity: 0.6, fontWeight: 600 }} title="Dismiss">✕</span>
           </span>
         ))}
       </div>

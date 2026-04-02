@@ -76,7 +76,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const ws = safeStr(d.workspace_state || clinic?.workspace_state, '---');
   const subStatus = safeStr(d.subscription_status || clinic?.subscription_status, '---');
   // Status: use required_action from clinic-actions, but override if WA not connected
-  const rawAction = safeStr(clinic?.required_action || d.required_action, 'NONE');
+  const rawAction = safeStr(d.required_action || clinic?.required_action, 'NONE');
   const waPhone = safeStr(d.phone_number || d.wa_phone || d.organization?.metadata?.wa_phone || clinic?.wa_phone || clinic?.metadata?.wa_phone || clinic?.whatsapp_phone_id, '---');
   const waSetupStatus = safeStr(d.wa_setup_status || clinic?.wa_setup_status, 'not_started');
   const waActive = (d.whatsapp_connected === true || clinic?.whatsapp_connected === true) && waSetupStatus !== 'not_started';
@@ -111,7 +111,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
       </div>
 
       {/* Clinic Lifecycle Timeline */}
-      <ClinicTimeline ws={ws} waStatus={waStatus} waActive={waActive} subStatus={subStatus} />
+      <ClinicTimeline ws={ws} waStatus={waStatus} waActive={waActive} subStatus={subStatus} templates={d._templates || []} />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {/* Overview Section */}
@@ -144,6 +144,9 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
             <button onClick={() => handleAction('wa-reset')} disabled={actionLoading === 'wa-reset'} style={actionBtn('#ef4444')}>Reset WA</button>
           </div>
         </div>
+
+        {/* WA Business Profile (submitted by customer) */}
+        <WaProfileCard profile={d.wa_profile_request || clinic?.wa_profile_request} submittedAt={d.wa_profile_request_at || clinic?.wa_profile_request_at} />
 
         {/* Integrations Section */}
         <div style={card}>
@@ -285,6 +288,95 @@ function bigBtn(bg) {
 // Force React import for fragments
 const _React = React;
 
+function WaProfileCard({ profile, submittedAt }) {
+  if (!profile) return null;
+  const p = typeof profile === 'string' ? (() => { try { return JSON.parse(profile); } catch { return null; } })() : profile;
+  if (!p) return null;
+
+  const card = { background: 'var(--bg-card)', borderRadius: 12, padding: 20, marginBottom: 16 };
+  const row = { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 13 };
+  const lbl = { color: 'var(--text-muted)' };
+  const val = { color: 'var(--text-primary)', fontWeight: 600 };
+
+  const downloadImage = (dataUrl, filename) => {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = filename;
+    a.click();
+  };
+
+  const hours = p.businessHours?.business_hours;
+  const dayNames = { MONDAY: 'Mo', TUESDAY: 'Di', WEDNESDAY: 'Mi', THURSDAY: 'Do', FRIDAY: 'Fr', SATURDAY: 'Sa', SUNDAY: 'So' };
+  const fmtTime = (t) => t ? `${t.slice(0,2)}:${t.slice(2)}` : '';
+
+  return (
+    <div style={{ ...card, border: '1px solid rgba(255,138,42,0.2)', background: 'rgba(255,138,42,0.03)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#ff8a2a', margin: 0 }}>WA Business Profile (Eingereicht)</h3>
+        {submittedAt && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{new Date(submittedAt).toLocaleString('de-DE')}</span>}
+      </div>
+
+      {/* Images */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+        {p.logoUrl && (
+          <div style={{ textAlign: 'center' }}>
+            <img src={p.logoUrl} alt="Logo" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+            <div style={{ marginTop: 6 }}>
+              <button onClick={() => downloadImage(p.logoUrl, 'wa-profile-photo.jpg')}
+                style={{ background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                Download Profilbild
+              </button>
+            </div>
+          </div>
+        )}
+        {p.bannerUrl && (
+          <div style={{ textAlign: 'center' }}>
+            <img src={p.bannerUrl} alt="Banner" style={{ width: 120, height: 72, borderRadius: 8, objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+            <div style={{ marginTop: 6 }}>
+              <button onClick={() => downloadImage(p.bannerUrl, 'wa-banner.jpg')}
+                style={{ background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                Download Banner
+              </button>
+            </div>
+          </div>
+        )}
+        {!p.logoUrl && !p.bannerUrl && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Keine Bilder eingereicht</span>}
+      </div>
+
+      {/* Profile Data */}
+      {p.botName && <div style={row}><span style={lbl}>Bot Name</span><span style={val}>{p.botName}</span></div>}
+      {p.about && <div style={row}><span style={lbl}>About / Status</span><span style={val}>{p.about}</span></div>}
+      {p.description && p.description !== p.about && <div style={row}><span style={lbl}>Description</span><span style={val}>{p.description}</span></div>}
+      {p.address && <div style={row}><span style={lbl}>Address</span><span style={val}>{p.address}</span></div>}
+      {p.email && <div style={row}><span style={lbl}>Email</span><span style={val}>{p.email}</span></div>}
+      {p.websites?.length > 0 && <div style={row}><span style={lbl}>Website</span><span style={val}>{p.websites.join(', ')}</span></div>}
+      {p.vertical && <div style={row}><span style={lbl}>Category</span><span style={val}>{{ HEALTH: 'Gesundheit / Medizin', BEAUTY: 'Schönheit / Kosmetik', MEDICAL: 'Medizin / Gesundheit', OTHER: 'Sonstiges' }[p.vertical] || p.vertical}</span></div>}
+
+      {/* 360dialog Button */}
+      <div style={{ marginTop: 14 }}>
+        <a href="https://hub.360dialog.com/dashboard/partner/pipes" target="_blank" rel="noopener noreferrer"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
+          360dialog öffnen →
+        </a>
+      </div>
+
+      {/* Business Hours */}
+      {hours?.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>Öffnungszeiten</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {hours.map((h, i) => (
+              <span key={i} style={{ fontSize: 11, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.04)', borderRadius: 4, padding: '3px 8px' }}>
+                {dayNames[h.day_of_week] || h.day_of_week} {fmtTime(h.open_time)}–{fmtTime(h.close_time)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function logColor(level) {
   const l = typeof level === 'string' ? level.toLowerCase() : '';
   if (l === 'error' || l === 'critical') return '#ef4444';
@@ -293,7 +385,7 @@ function logColor(level) {
   return '#3b82f6';
 }
 
-function ClinicTimeline({ ws, waStatus, waActive, subStatus }) {
+function ClinicTimeline({ ws, waStatus, waActive, subStatus, templates = [] }) {
   const hasPurchased = subStatus === 'active' || subStatus === 'trialing';
   const setupStarted = ws !== 'demo' && ws !== '---';
   const waConnected = waActive && waStatus !== 'not_started' && waStatus !== '---' && waStatus !== 'Setup';
@@ -301,7 +393,7 @@ function ClinicTimeline({ ws, waStatus, waActive, subStatus }) {
     { id: 'purchased', label: hasPurchased ? 'Purchased' : 'Trial', done: hasPurchased },
     { id: 'setup', label: 'Setup Started', done: setupStarted },
     { id: 'wa_connected', label: 'WhatsApp Connected', done: waConnected },
-    { id: 'templates', label: 'Templates Ready', done: waConnected && ws === 'active' },
+    { id: 'templates', label: 'Templates Ready', done: templates.some(t => t.status === 'approved' || t.status === 'APPROVED') },
     { id: 'live', label: 'Live', done: ws === 'active' && subStatus === 'active' && waConnected },
   ];
   const currentIdx = steps.findLastIndex(s => s.done);

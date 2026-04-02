@@ -143,15 +143,21 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
           )}
         </div>
 
-        {/* Reset option */}
+        {/* 360dialog + Reset */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
             Current WA status: <strong>{waStatus}</strong>
           </span>
-          <button onClick={() => handleAction('reset')} disabled={loading}
-            style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: 11, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
-            Reset WA Config
-          </button>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <a href="https://hub.360dialog.com/dashboard/partner/pipes" target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 11, fontWeight: 700, color: '#ff8a2a', textDecoration: 'underline', cursor: 'pointer' }}>
+              360dialog öffnen
+            </a>
+            <button onClick={() => handleAction('reset')} disabled={loading}
+              style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: 11, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+              Reset WA Config
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -51,6 +51,7 @@ export default function OverviewView({ events, actions, navigateTo }) {
         : ev.type === 'OTP_RECEIVED' ? 'Verify'
         : ev.type === 'PAYMENT_FAILED' ? 'View'
         : 'Open',
+      onAction: ev.organization_id ? () => navigateTo?.('clinics', { id: ev.organization_id, name: ev.org_name }) : undefined,
       onResolve: () => events?.resolveEvent?.(ev.id),
     });
   });

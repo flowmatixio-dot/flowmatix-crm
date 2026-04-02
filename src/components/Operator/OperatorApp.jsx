@@ -68,6 +68,8 @@ export default function OperatorApp() {
         criticalCount={eventState.criticalCount}
         unresolvedCount={eventState.unresolvedCount}
         connected={eventState.connected}
+        onEventClick={(ev) => { if (ev.organization_id) navigateTo('clinics', { id: ev.organization_id, name: ev.org_name }); }}
+        onDismiss={(id) => eventState.resolveEvent(id)}
       />
       <div style={{ flex: 1, overflowY: 'auto', padding: 24, paddingBottom: 80 }}>
         <View {...viewProps} />
