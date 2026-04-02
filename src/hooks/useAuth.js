@@ -159,9 +159,9 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       const u = me.user || me;
       const isOp = u.role === "platform_owner" || u.role === "admin";
       const orgId = (IS_CLIENT_MODE || !isOp) ? (u.organizationId || u.organization_id || null) : null;
-      const isImpersonating = sessionStorage.getItem('fm_impersonation') === 'true';
-      setUser({ email: u.email, role: u.role, clinicId: orgId, name: u.name || u.email.split("@")[0], apiUser: true, apiRole: u.role, orgId: u.organizationId || u.organization_id, impersonating: isImpersonating });
-      if (isOp && !IS_CLIENT_MODE && !isImpersonating) setView("operator");
+      const _isImp = sessionStorage.getItem('fm_impersonation') === 'true';
+      setUser({ email: u.email, role: u.role, clinicId: orgId, name: u.name || u.email.split("@")[0], apiUser: true, apiRole: u.role, orgId: u.organizationId || u.organization_id });
+      if (isOp && !IS_CLIENT_MODE && !_isImp) setView("operator");
       if (orgId) {
         try {
           const res = await fmApi.getMyClinic();
