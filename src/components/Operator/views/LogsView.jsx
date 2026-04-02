@@ -43,10 +43,10 @@ export default function LogsView() {
   const filtered = search
     ? logs.filter(l => {
         const q = search.toLowerCase();
-        const action = typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : '';
-        const orgName = typeof l.org_name === 'string' ? l.org_name : '';
-        const details = typeof l.details === 'string' ? l.details : typeof l.details === 'object' ? JSON.stringify(l.details) : '';
-        return action.toLowerCase().includes(q) || orgName.toLowerCase().includes(q) || details.toLowerCase().includes(q);
+        const ev = (l.event_type || l.action || l.type || '').toLowerCase();
+        const actor = (l.actor || '').toLowerCase();
+        const det = (l.details_text || '').toLowerCase();
+        return ev.includes(q) || actor.includes(q) || det.includes(q);
       })
     : logs;
 
@@ -105,10 +105,11 @@ export default function LogsView() {
             {filtered.map((l, i) => {
               const isExpanded = expandedRow === i;
               const srcStr = typeof l.source === 'string' ? l.source : '---';
-              const action = typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : '';
-              const orgName = typeof l.org_name === 'string' ? l.org_name : '';
-              const hasDetails = l.details && (typeof l.details === 'object' || (typeof l.details === 'string' && l.details.length > 0));
-              const detailStr = typeof l.details === 'object' ? JSON.stringify(l.details, null, 2) : typeof l.details === 'string' ? l.details : '';
+              const action = typeof l.event_type === 'string' ? l.event_type : typeof l.action === 'string' ? l.action : typeof l.type === 'string' ? l.type : '';
+              const actor = typeof l.actor === 'string' ? l.actor : '';
+              const resType = typeof l.resource_type === 'string' ? l.resource_type : '';
+              const hasDetails = l.details_text && typeof l.details_text === 'string' && l.details_text.length > 1;
+              const detailStr = l.details_text || '';
 
               return (
                 <div key={i}>
@@ -125,7 +126,7 @@ export default function LogsView() {
                       {srcStr}
                     </span>
                     <span style={{ color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {action} {orgName ? `[${orgName}]` : ''} {!isExpanded && detailStr ? detailStr.slice(0, 120) : ''}
+                      {action}{resType ? ` → ${resType}` : ''}{actor ? ` by ${actor}` : ''} {!isExpanded && detailStr ? detailStr.slice(0, 100) : ''}
                     </span>
                     {hasDetails && (
                       <span style={{ color: 'var(--text-muted)', flexShrink: 0, fontSize: 10 }}>{isExpanded ? 'collapse' : 'expand'}</span>
