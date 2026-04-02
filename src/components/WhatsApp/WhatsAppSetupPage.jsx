@@ -24,6 +24,13 @@ export default function WhatsAppSetupPage() {
   const S = liveOb?.state || baseState;
   const liveData = liveOb || ob;
 
+  /* ── Always fetch real state on mount (context may be stale) ── */
+  useEffect(() => {
+    apiFetch("/api/v1/clinic/whatsapp/360/onboarding/state")
+      .then(d => { if (d?.onboarding) setLiveOb(d.onboarding); })
+      .catch(() => {});
+  }, []);
+
   /* ── Auto-poll during waiting states ── */
   const needsPoll = S === "requested" || S === "otp_submitted";
   const pollRef = useRef(null);
@@ -38,7 +45,6 @@ export default function WhatsAppSetupPage() {
         })
         .catch(() => {});
     };
-    poll();
     pollRef.current = setInterval(poll, 8000);
     return () => clearInterval(pollRef.current);
   }, [needsPoll, S]);
