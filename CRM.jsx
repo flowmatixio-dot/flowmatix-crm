@@ -1599,8 +1599,7 @@ export default function App() {
         {/* TOP BAR */}
         <div style={{height:56,minHeight:56,borderBottom:"1px solid rgba(255,255,255,0.06)",background:"#0f1623",display:"flex",alignItems:"center",padding:"0 28px",gap:14,flexShrink:0}}>
           <div style={{flex:1,position:"relative"}}>
-            {isOperator&&<><input id="opSearchQuery" name="opSearchQuery" value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);setSearchOpen(true);}} onFocus={()=>setSearchOpen(true)} onBlur={()=>setTimeout(()=>setSearchOpen(false),200)} placeholder="Search clinics, emails, phones..." style={{width:"100%",maxWidth:340,padding:"9px 14px 9px 36px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",color:"#fff",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box",transition:"border-color .2s"}}/>
-            <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,color:"rgba(167,177,195,0.3)"}}>🔍</span></>}
+            {isOperator&&<OperatorSearch setView={setView} setOpSubTab={setOpSubTab} />}
             {!isOperator&&<><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);setSearchOpen(true);}} onFocus={()=>setSearchOpen(true)} onBlur={()=>setTimeout(()=>setSearchOpen(false),200)} placeholder={`Search patients, appointments… (${navigator.platform?.includes("Mac")?"⌘":"Ctrl"}+K)`} style={{width:"100%",maxWidth:420,padding:"9px 14px 9px 36px",borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",color:"#fff",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box",transition:"border-color .2s"}}/>
             <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:14,color:"rgba(167,177,195,0.3)"}}>🔍</span></>}
             {searchOpen&&searchResults.length>0&&<div style={{position:"absolute",top:"100%",left:0,width:"100%",maxWidth:420,maxHeight:320,overflowY:"auto",marginTop:6,borderRadius:12,background:"#162032",border:"1px solid rgba(255,255,255,0.08)",zIndex:100,boxShadow:"0 8px 24px rgba(0,0,0,0.4)"}}>
@@ -1734,6 +1733,69 @@ export default function App() {
 }
 
 /* ═══ OPERATOR HEADER STATUS PILLS ═══ */
+/* ═══ OPERATOR CLINIC SEARCH ═══ */
+function OperatorSearch({ setView, setOpSubTab }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [clinicCache, setClinicCache] = useState([]);
+
+  // Load clinics once
+  useEffect(() => {
+    import("./src/api/client").then(fmApi => {
+      fmApi.getPlatformClinics({ limit: 100 }).then(res => {
+        const list = Array.isArray(res?.clinics) ? res.clinics : [];
+        setClinicCache(list);
+      }).catch(() => {});
+    });
+  }, []);
+
+  // Filter clinics by query
+  useEffect(() => {
+    if (!query || query.length < 1) { setResults([]); return; }
+    const q = query.toLowerCase();
+    const filtered = clinicCache.filter(c =>
+      (c.name || "").toLowerCase().includes(q) ||
+      (c.email || "").toLowerCase().includes(q) ||
+      (c.slug || "").toLowerCase().includes(q) ||
+      (c.plan_name || "").toLowerCase().includes(q) ||
+      (c.workspace_state || "").toLowerCase().includes(q)
+    ).slice(0, 8);
+    setResults(filtered);
+  }, [query, clinicCache]);
+
+  return (
+    <div style={{ position: "relative", width: "100%", maxWidth: 340 }}>
+      <input value={query} onChange={e => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 200)}
+        placeholder="Search clinics..."
+        style={{ width: "100%", padding: "9px 14px 9px 36px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "#fff", fontFamily: "inherit", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+      <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(167,177,195,0.3)" }}>🔍</span>
+      {open && results.length > 0 && (
+        <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", maxHeight: 320, overflowY: "auto", marginTop: 6, borderRadius: 12, background: "#162032", border: "1px solid rgba(255,255,255,0.08)", zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
+          <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.4)" }}>{results.length} clinics</span>
+            <span style={{ fontSize: 10, color: "rgba(167,177,195,0.3)" }}>ESC to close</span>
+          </div>
+          {results.map(c => (
+            <div key={c.id} style={{ padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", gap: 10, alignItems: "center" }}
+              onMouseDown={() => { setView("operator"); setOpSubTab("clinics"); setQuery(""); setOpen(false); }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(76,201,255,0.06)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+              <span style={{ fontSize: 16 }}>🏥</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 13 }}>{c.name || "—"}</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)" }}>{c.email || ""} · {c.plan_name || "No plan"} · {c.workspace_state || ""}</div>
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 600, color: c.workspace_state === "active" ? "#10b981" : "#eab308" }}>{c.workspace_state || ""}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function OperatorHeaderPills({ setView, setOpSubTab, totalActions }) {
   const [clock, setClock] = useState("");
   const [activeClinics, setActiveClinics] = useState(null);
