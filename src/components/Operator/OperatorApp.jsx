@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { AppContext } from '../../context/AppContext.jsx';
 import AlertBar from './AlertBar.jsx';
 import { useEvents } from './hooks/useEvents.js';
@@ -39,6 +39,13 @@ export default function OperatorApp() {
 
   const View = VIEWS[tab] || OverviewView;
 
+  // Navigation helper — lets any view switch tabs
+  const navigateTo = useCallback((targetTab, clinic) => {
+    if (clinic) setSelectedClinic(clinic);
+    else setSelectedClinic(null);
+    ctx?.setOpSubTab?.(targetTab);
+  }, [ctx]);
+
   // Clear selected clinic when tab changes
   const prevTabRef = React.useRef(tab);
   if (prevTabRef.current !== tab) {
@@ -46,7 +53,7 @@ export default function OperatorApp() {
     if (selectedClinic) setSelectedClinic(null);
   }
 
-  const viewProps = { events: eventState, actions: actionState };
+  const viewProps = { events: eventState, actions: actionState, navigateTo };
   if (tab === 'clinics') {
     viewProps.selectedClinic = selectedClinic;
     viewProps.onSelectClinic = setSelectedClinic;

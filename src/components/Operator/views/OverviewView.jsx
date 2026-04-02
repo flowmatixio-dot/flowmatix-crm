@@ -6,7 +6,7 @@ import WaOnboardingModal from '../shared/WaOnboardingModal.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
-export default function OverviewView({ events, actions }) {
+export default function OverviewView({ events, actions, navigateTo }) {
   const [stats, setStats] = useState(null);
   const [waActivations, setWaActivations] = useState([]);
   const [onboardingClinic, setOnboardingClinic] = useState(null);
@@ -61,7 +61,9 @@ export default function OverviewView({ events, actions }) {
       type: safeStr(c.required_action, 'START_SETUP'),
       priority: c.required_action === 'FIX_ERROR' ? 'critical' : c.required_action === 'VERIFY_OTP' ? 'high' : 'medium',
       clinicName: safeStr(c.name),
-      detail: `${safeStr(c.plan_name, 'No plan')} - Readiness: ${safeNum(c.readiness_score)}%`,
+      detail: `${safeStr(c.plan_name, 'No plan')} - Health: ${safeNum(c.readiness_score)}%`,
+      cta: 'Open Clinic',
+      onAction: () => navigateTo?.('clinics', c),
     });
   });
 
@@ -114,12 +116,12 @@ export default function OverviewView({ events, actions }) {
         </button>
       </div>
 
-      {/* KPI Strip */}
+      {/* KPI Strip — all clickable */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>
-        <StatCard label="Monthly Revenue" value={fmt(totalMrr)} color="green" icon="$" sub={`${safeNum(liveCount)} active`} />
-        <StatCard label="Active Clinics" value={safeNum(liveCount)} color="blue" sub={`${safeNum(clinics.length)} total`} />
+        <StatCard label="Monthly Revenue" value={fmt(totalMrr)} color="green" icon="$" sub={`${safeNum(liveCount)} active`} onClick={() => navigateTo?.('billing')} />
+        <StatCard label="Active Clinics" value={safeNum(liveCount)} color="blue" sub={`${safeNum(clinics.length)} total`} onClick={() => navigateTo?.('clinics')} />
         <StatCard label="Actions Required" value={safeNum(allActions.length)} color={allActions.length > 0 ? 'red' : 'green'} sub={allActions.length > 0 ? 'needs attention' : 'all good'} />
-        <StatCard label="Messages Today" value={msgToday} color="purple" sub={autoRate ? `${autoRate}% auto` : ''} />
+        <StatCard label="Messages Today" value={msgToday} color="purple" sub={autoRate ? `${autoRate}% auto` : ''} onClick={() => navigateTo?.('analytics')} />
       </div>
 
       {/* Action Feed */}
@@ -158,7 +160,9 @@ export default function OverviewView({ events, actions }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {waQueue.map(c => (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, padding: '8px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 8 }}>
+                <div key={c.id} onClick={() => navigateTo?.('clinics', c)} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, padding: '8px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, cursor: 'pointer', transition: 'background 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{safeStr(c.name)}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -178,10 +182,13 @@ export default function OverviewView({ events, actions }) {
           <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: 0.8 }}>Live Activity</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {evts.slice(0, 10).map(ev => (
-              <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
+              <div key={ev.id} onClick={() => ev.type === 'ERROR_OCCURRED' ? navigateTo?.('incidents') : navigateTo?.('logs')}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-secondary)', cursor: 'pointer', padding: '3px 6px', borderRadius: 6, transition: 'background 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <span style={{ width: 6, height: 6, borderRadius: 99, background: ev.resolved ? '#6b7280' : ev.priority === 'critical' ? '#ef4444' : '#eab308', flexShrink: 0 }} />
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {safeStr(ev.org_name, 'System')} -- {typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : '---'}
+                  {safeStr(ev.org_name, 'System')} — {typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : '—'}
                 </span>
                 <span style={{ color: 'var(--text-muted)', fontSize: 10, flexShrink: 0 }}>{timeAgo(ev.created_at)}</span>
               </div>
