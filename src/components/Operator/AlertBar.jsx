@@ -30,7 +30,7 @@ export default function AlertBar({ events = [], criticalCount = 0, unresolvedCou
       <div style={{ background: 'linear-gradient(90deg, #10b98120, #10b98108)', borderBottom: '1px solid #10b98130', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ width: 8, height: 8, borderRadius: 99, background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
         <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>All systems operational</span>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 'auto' }}>{connected ? '● Live' : '○ Polling'}</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 'auto' }}>{connected ? '● Live' : ''}</span>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export default function AlertBar({ events = [], criticalCount = 0, unresolvedCou
           </span>
         ))}
       </div>
-      <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>{connected ? '● Live' : '○ Polling'}</span>
+      <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>{connected ? '● Live' : ''}</span>
     </div>
   );
 }

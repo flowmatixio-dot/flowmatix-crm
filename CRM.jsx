@@ -1582,7 +1582,7 @@ export default function App() {
         <div style={{padding:sidebar?"20px 18px 16px":"20px 14px 16px",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>setSidebar(!sidebar)} title={sidebar?"Collapse sidebar":"Expand sidebar"}>
             <img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{width:sidebar?36:32,height:sidebar?36:32,borderRadius:10,objectFit:"cover",flexShrink:0,transition:"all .3s cubic-bezier(.4,0,.2,1)"}}/>
-            {sidebar&&<span style={{fontWeight:800,fontSize:16,letterSpacing:"0.06em",background:"linear-gradient(135deg,#fff 30%,rgba(76,201,255,0.85) 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",cursor:"default"}}>FLOWMATIX</span>}
+            {sidebar&&<span style={{fontWeight:800,fontSize:16,letterSpacing:"0.06em",background:"linear-gradient(135deg,#fff 30%,#ff8a2a 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",cursor:"default"}}>FLOWMATIX</span>}
           </div>
           {sidebar&&isAdmin&&!isOperator&&<div style={{marginTop:12}}><select id="adminClinic" name="adminClinic" value={adminClinic} onChange={e=>{setAdminClinic(e.target.value);setSelChat(null);setAiConfigData(null);}} style={{width:"100%",padding:"8px 10px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.06)",color:"#fff",fontFamily:"inherit",fontSize:12,outline:"none",cursor:"pointer",transition:"border-color .2s"}}>{clinics.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div>}
         </div>
@@ -1818,7 +1818,7 @@ function OperatorHeaderPills({ setView, setOpSubTab, totalActions }) {
         try {
           const res = await fmApi.getPlatformClinics({ limit: 100 });
           const list = Array.isArray(res?.clinics) ? res.clinics : [];
-          const active = list.filter(c => c.subscription_status === "active" || c.workspace_state === "active");
+          const active = list.filter(c => c.subscription_status === "active");
           setActiveClinics(active.length);
         } catch (e) { console.warn("[header] clinics failed:", e); }
         // Visitors
