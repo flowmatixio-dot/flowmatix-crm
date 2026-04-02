@@ -147,7 +147,7 @@ export default function AnalyticsView() {
       )}
 
       {/* ═══ 6. DAILY ACTIVITY ═══ */}
-      <SectionTitle sub="Marketing">Daily Website Activity</SectionTitle>
+      <SectionTitle>Daily Messages</SectionTitle>
       <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 20, marginBottom: 28 }}>
         {daily.length > 0 ? (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 100 }}>

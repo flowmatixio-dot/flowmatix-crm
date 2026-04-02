@@ -119,7 +119,11 @@ export default function MonitoringView({ actions }) {
             ))}
           </div>
         )}
-        <button onClick={load} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 6, padding: '4px 10px', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto' }}>Refresh</button>
+        <button onClick={() => { load(); }} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto', transition: 'all 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}>
+          Refresh
+        </button>
       </div>
 
       {/* Business Health */}
