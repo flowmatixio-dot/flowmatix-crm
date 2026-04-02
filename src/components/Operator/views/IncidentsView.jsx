@@ -36,10 +36,7 @@ export default function IncidentsView() {
     }).catch(() => { setIncidents([]); setLoading(false); });
   }, [tab, sortBySeverity]);
 
-  useEffect(() => {
-    // Auto-detect incidents on first load
-    fmApi.apiFetch('/api/v1/ops/incident-detector/run', { method: 'POST' }).catch(() => {}).finally(load);
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
   const resolve = async (id) => {
     try { await fmApi.resolveIncidentV2(id); load(); } catch {}
