@@ -7,6 +7,7 @@ import * as fmApi from '../../../api/client.js';
 export default function MonitoringView({ actions }) {
   const [infra, setInfra] = useState(null);
   const [db, setDb] = useState(null);
+  const [backup, setBackup] = useState(null);
   const [localClinics, setLocalClinics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +19,8 @@ export default function MonitoringView({ actions }) {
       fmApi.getInfrastructure().catch(e => { console.warn('Infra fetch failed:', e); return null; }),
       fmApi.getInfraDatabase?.().catch(() => null),
       fmApi.getPlatformClinics().catch(() => null),
-    ]).then(([infraRes, dbRes, clinicsRes]) => {
+      fmApi.getBackupStatus?.().catch(() => null),
+    ]).then(([infraRes, dbRes, clinicsRes, backupRes]) => {
       if (import.meta.env.DEV) {
         console.log('MONITORING RAW infra:', infraRes);
         console.log('MONITORING RAW db:', dbRes);
@@ -26,6 +28,7 @@ export default function MonitoringView({ actions }) {
       }
       setInfra(infraRes ? normalizeInfra(infraRes) : null);
       setDb(dbRes);
+      setBackup(backupRes);
       setLocalClinics(normalizeClinics(clinicsRes));
       setLoading(false);
     }).catch(err => {
@@ -172,6 +175,9 @@ export default function MonitoringView({ actions }) {
         </>
       )}
 
+      {/* Backups */}
+      <BackupSection backup={backup} />
+
       {/* Integration Status */}
       <h2 style={sectionH}>Integration Status ({clinics.length} clinics)</h2>
       {clinics.length === 0 ? (
@@ -224,6 +230,73 @@ function MetricCard({ label, pct, color, detail, detail2 }) {
       {detail && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{detail}</div>}
       {detail2 && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{detail2}</div>}
     </div>
+  );
+}
+
+function BackupSection({ backup }) {
+  if (!backup) return null;
+
+  const lastAt = backup.lastBackupAt ? new Date(backup.lastBackupAt) : null;
+  const hoursAgo = lastAt ? (Date.now() - lastAt.getTime()) / 3600000 : null;
+  const isOverdue = hoursAgo === null || hoursAgo > 25;
+  const isFailed = backup.error && !backup.lastBackupAt;
+  const statusColor = isFailed ? '#ef4444' : isOverdue ? '#f97316' : '#10b981';
+  const statusLabel = isFailed ? 'Failed' : isOverdue ? 'Overdue' : 'OK';
+  const sizeStr = backup.lastBackupSize ? `${(backup.lastBackupSize / 1e6).toFixed(1)} MB` : '—';
+
+  return (
+    <>
+      <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 }}>Backups</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 20, borderLeft: `3px solid ${statusColor}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Database Backup</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: `${statusColor}15`, padding: '2px 8px', borderRadius: 4 }}>{statusLabel}</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Last backup</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{lastAt ? lastAt.toLocaleString('de-DE') : '—'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Age</span>
+              <span style={{ color: hoursAgo && hoursAgo > 25 ? '#f97316' : 'var(--text-primary)', fontWeight: 600 }}>
+                {hoursAgo !== null ? (hoursAgo < 1 ? 'Just now' : hoursAgo < 24 ? `${Math.floor(hoursAgo)}h ago` : `${Math.floor(hoursAgo / 24)}d ${Math.floor(hoursAgo % 24)}h ago`) : '—'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Size</span>
+              <span style={{ color: 'var(--text-primary)' }}>{sizeStr}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Total backups</span>
+              <span style={{ color: 'var(--text-primary)' }}>{safeNum(backup.totalBackups)}</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>Schedule & Log</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Schedule</span>
+              <span style={{ color: 'var(--text-primary)' }}>{safeStr(backup.schedule, '—')}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Target</span>
+              <span style={{ color: 'var(--text-primary)' }}>Local + Server</span>
+            </div>
+          </div>
+          {backup.recentLog && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Recent Log</div>
+              <pre style={{ fontSize: 10, color: 'var(--text-secondary)', fontFamily: 'monospace', background: 'rgba(255,255,255,0.02)', borderRadius: 6, padding: 8, margin: 0, whiteSpace: 'pre-wrap', maxHeight: 80, overflow: 'auto' }}>
+                {safeStr(backup.recentLog)}
+              </pre>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
