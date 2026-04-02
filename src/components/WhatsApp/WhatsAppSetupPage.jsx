@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import { disconnectWhatsApp, apiFetch } from "../../api/client";
 
@@ -5,17 +6,42 @@ import { disconnectWhatsApp, apiFetch } from "../../api/client";
  * WhatsApp Setup Page — Manual Operator-Assisted Flow
  * States: not_connected → requested → awaiting_otp → otp_submitted → active
  * Number + OTP are stored in DB for operator to handle via Kontroll-CRM
+ * Auto-polls every 8s during waiting states so customer never needs to refresh.
  */
 export default function WhatsAppSetupPage() {
   const { clinic, activeClinicId, setClinics, showT, t, lang, workspaceState, demoMode } = useApp();
   const l = lang || localStorage.getItem("fm_lang") || "de";
   const n = clinic;
 
-  /* ── Onboarding state ── */
+  /* ── Onboarding state (from context) ── */
   const ob = n?.whatsapp_onboarding || {};
   const st = ob.state || "not_connected";
   const cs = n?.connection_status;
-  const S = (cs === "connected" && st === "not_connected") ? "active" : st;
+  const baseState = (cs === "connected" && st === "not_connected") ? "active" : st;
+
+  /* ── Live polling state — overrides baseState when server returns new state ── */
+  const [liveOb, setLiveOb] = useState(null);
+  const S = liveOb?.state || baseState;
+  const liveData = liveOb || ob;
+
+  /* ── Auto-poll during waiting states ── */
+  const needsPoll = S === "requested" || S === "otp_submitted";
+  const pollRef = useRef(null);
+
+  useEffect(() => {
+    if (!needsPoll) { clearInterval(pollRef.current); return; }
+    const poll = () => {
+      apiFetch("/api/v1/clinic/whatsapp/360/onboarding/state")
+        .then(d => {
+          const newState = d?.onboarding?.state;
+          if (newState && newState !== S) setLiveOb(d.onboarding);
+        })
+        .catch(() => {});
+    };
+    poll();
+    pollRef.current = setInterval(poll, 8000);
+    return () => clearInterval(pollRef.current);
+  }, [needsPoll, S]);
 
   /* ── Tri-language translations ── */
   const TX = {
@@ -145,7 +171,10 @@ export default function WhatsAppSetupPage() {
       body: body ? JSON.stringify(body) : undefined,
     }).catch((e) => ({ onboarding: { state: "failed", error_message: e.message } }));
 
-  const go = () => setTimeout(() => location.reload(), 400);
+  const go = (res) => {
+    if (res?.onboarding) setLiveOb(res.onboarding);
+    else setTimeout(() => location.reload(), 400);
+  };
 
   /* ══════════════════════════════════════════════ */
   /*  STATE: active                                 */
@@ -165,7 +194,7 @@ export default function WhatsAppSetupPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <div style={{ padding: "12px 14px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
               <div style={{ fontSize: 11, color: "rgba(232,238,252,0.35)", marginBottom: 3, textTransform: "uppercase" }}>{tx.phone_label}</div>
-              <div style={{ fontSize: 15, fontWeight: 600 }}>{ob.phone_number || n?.phone || "—"}</div>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>{liveData.phone_number || n?.phone || "—"}</div>
             </div>
             <div style={{ padding: "12px 14px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
               <div style={{ fontSize: 11, color: "rgba(232,238,252,0.35)", marginBottom: 3, textTransform: "uppercase" }}>{tx.status}</div>
@@ -181,12 +210,6 @@ export default function WhatsAppSetupPage() {
   /*  STATE: otp_submitted (waiting for operator)   */
   /* ══════════════════════════════════════════════ */
   if (S === "otp_submitted") {
-    // Poll every 10s to detect when operator sets active
-    setTimeout(() => {
-      apiFetch("/api/v1/clinic/whatsapp/360/onboarding/state")
-        .then(r => r.json())
-        .then(d => { if (d?.onboarding?.state && d.onboarding.state !== "otp_submitted") location.reload(); });
-    }, 10000);
     return (
       <div style={{ ...wrap, textAlign: "center" }}>
         <div>
@@ -215,7 +238,7 @@ export default function WhatsAppSetupPage() {
               <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{tx.otp_desc}</div>
             </div>
           </div>
-          {ob.error_message && <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, color: "#ef4444", fontSize: 13 }}>{ob.error_message}</div>}
+          {liveData.error_message && <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, color: "#ef4444", fontSize: 13 }}>{liveData.error_message}</div>}
           <input id="wa-otp" type="text" inputMode="numeric" maxLength={6} placeholder={tx.otp_hint} style={{ ...ip, fontSize: 24, letterSpacing: 8, fontWeight: 700 }} />
           <button id="wa-otp-btn" style={{ ...bt, background: "#10b981", color: "#fff", marginTop: 16 }} onClick={() => {
             const c = document.getElementById("wa-otp")?.value;
@@ -232,12 +255,6 @@ export default function WhatsAppSetupPage() {
   /*  STATE: requested (waiting for operator setup) */
   /* ══════════════════════════════════════════════ */
   if (S === "requested") {
-    // Poll every 10s to detect when operator triggers awaiting_otp
-    setTimeout(() => {
-      apiFetch("/api/v1/clinic/whatsapp/360/onboarding/state")
-        .then(r => r.json())
-        .then(d => { if (d?.onboarding?.state && d.onboarding.state !== "requested") location.reload(); });
-    }, 10000);
     return (
       <div style={{ ...wrap, textAlign: "center" }}>
         <div>
@@ -282,7 +299,7 @@ export default function WhatsAppSetupPage() {
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>⚠️</div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{tx.failed_title}</div>
-              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{ob.error_message || tx.failed_desc}</div>
+              <div style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", marginTop: 2 }}>{liveData.error_message || tx.failed_desc}</div>
             </div>
           </div>
           <button style={{ ...bt, background: "#10b981", color: "#fff" }} onClick={() => { api("retry").then(go); }}>{tx.retry}</button>
