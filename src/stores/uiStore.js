@@ -88,6 +88,7 @@ export const useUiStore = create(
       partialize: (state) => ({
         lang: state.lang,
         sidebar: state.sidebar,
+        opSubTab: state.opSubTab,
       }),
     }
   )
