@@ -75,7 +75,9 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const d = detail || clinic || {};
   const ws = safeStr(d.workspace_state || clinic?.workspace_state, '---');
   const subStatus = safeStr(d.subscription_status || clinic?.subscription_status, '---');
-  const waStatus = safeStr(d.wa_setup_status || d.whatsapp_status || clinic?.required_action, '---');
+  // Status: use required_action from clinic-actions, but override if WA not connected
+  const rawAction = safeStr(clinic?.required_action || d.required_action, 'NONE');
+  const waStatus = (rawAction === 'NONE' && !waActive) ? 'CONNECT_WHATSAPP' : rawAction;
   const waPhone = safeStr(d.phone_number || d.wa_phone, '---');
   const waSetupStatus = safeStr(d.wa_setup_status || clinic?.wa_setup_status, 'not_started');
   const waActive = (d.whatsapp_connected === true || clinic?.whatsapp_connected === true) && waSetupStatus !== 'not_started';
