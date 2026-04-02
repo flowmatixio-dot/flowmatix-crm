@@ -1,145 +1,179 @@
-import React, { useState } from 'react';
-import DataTable from '../shared/DataTable.jsx';
+import React, { useState, useMemo } from 'react';
 import StatusBadge from '../shared/StatusBadge.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 import ClinicDetailView from './ClinicDetailView.jsx';
 
-const READINESS_BAR = (score) => {
-  const s = safeNum(score);
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ width: 60, height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }}>
-        <div style={{ width: `${s}%`, height: '100%', borderRadius: 3, background: s === 100 ? '#10b981' : s >= 50 ? '#eab308' : '#ef4444', transition: 'width 0.3s' }} />
-      </div>
-      <span style={{ fontSize: 11, fontWeight: 600, color: s === 100 ? '#10b981' : 'var(--text-muted)' }}>{s}%</span>
-    </div>
-  );
+// Priority order for sorting — problems first
+const ACTION_PRIORITY = {
+  FIX_ERROR: 0, VERIFY_OTP: 1, CONNECT_WHATSAPP: 2, START_SETUP: 3,
+  WAIT_FOR_NUMBER: 4, ACTIVATE: 5, NONE: 6,
 };
 
-export default function ClinicsView({ actions, selectedClinic, onSelectClinic }) {
+// Smart CTA per action
+const SMART_CTA = {
+  FIX_ERROR: { label: 'Fix Error', color: '#ef4444' },
+  VERIFY_OTP: { label: 'Verify OTP', color: '#f97316' },
+  CONNECT_WHATSAPP: { label: 'Connect WhatsApp', color: '#eab308' },
+  START_SETUP: { label: 'Continue Setup', color: '#3b82f6' },
+  WAIT_FOR_NUMBER: { label: 'Waiting...', color: '#6b7280' },
+  ACTIVATE: { label: 'Activate', color: '#10b981' },
+  NONE: { label: 'Open CRM', color: '#a78bfa' },
+};
+
+// Row accent color by priority
+const ROW_ACCENT = {
+  FIX_ERROR: 'rgba(239,68,68,0.08)', VERIFY_OTP: 'rgba(249,115,22,0.06)',
+  CONNECT_WHATSAPP: 'rgba(234,179,8,0.04)', START_SETUP: 'rgba(59,130,246,0.04)',
+};
+
+export default function ClinicsView({ actions, selectedClinic, onSelectClinic, navigateTo }) {
   const { clinics = [], loading, reload } = actions || {};
-  const [hoveredRow, setHoveredRow] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [showBrokenOnly, setShowBrokenOnly] = useState(false);
+  const [healthTooltip, setHealthTooltip] = useState(null);
 
-  const filteredClinics = showBrokenOnly ? clinics.filter(c => c.required_action && c.required_action !== 'NONE') : clinics;
   const brokenCount = clinics.filter(c => c.required_action && c.required_action !== 'NONE').length;
 
-  const handleAction = async (orgId, action) => {
+  // Priority-sorted clinics
+  const sorted = useMemo(() => {
+    const list = showBrokenOnly ? clinics.filter(c => c.required_action && c.required_action !== 'NONE') : clinics;
+    return [...list].sort((a, b) => (ACTION_PRIORITY[a.required_action] ?? 6) - (ACTION_PRIORITY[b.required_action] ?? 6));
+  }, [clinics, showBrokenOnly]);
+
+  const handleAction = async (e, orgId, action) => {
+    e.stopPropagation();
     setActionLoading(`${orgId}-${action}`);
     try {
-      if (action === 'wa-start') await fmApi.waStart(orgId);
-      else if (action === 'wa-retry') await fmApi.waRetry(orgId);
-      else if (action === 'wa-force') await fmApi.waForceConnect(orgId);
-      else if (action === 'wa-reset') await fmApi.waReset(orgId);
-      else if (action === 'suspend') {
-        const reason = prompt('Suspend reason:');
-        if (reason) await fmApi.suspendClinic(orgId, reason);
-      }
-      else if (action === 'resume') await fmApi.resumeClinic(orgId);
-      else if (action === 'impersonate') {
+      if (action === 'impersonate') {
         const reason = prompt('Impersonation reason (min 5 chars):');
         if (reason && reason.length >= 5) {
           const res = await fmApi.impersonateClinic(orgId, reason);
           const token = res?.impersonation?.accessToken || res?.token;
-          if (token) {
-            // Store impersonation token in hash fragment (not query string — avoids server logs/referrer leaks)
-            const url = `https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`;
-            window.open(url, '_blank');
-          } else {
-            alert('Impersonation failed: ' + (res?.error || 'No token returned'));
-          }
+          if (token) window.open(`https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`, '_blank');
         }
-      }
+      } else if (action === 'wa-start') await fmApi.waStart(orgId);
+      else if (action === 'wa-retry') await fmApi.waRetry(orgId);
+      else if (action === 'wa-force') await fmApi.waForceConnect(orgId);
       reload?.();
     } catch {} finally { setActionLoading(null); }
   };
 
-  const columns = [
-    { key: 'name', label: 'Clinic', width: '18%', render: (v, row) => (
-      <div>
-        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(v)}</div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{safeStr(row.email)}</div>
-      </div>
-    )},
-    { key: 'plan_name', label: 'Plan', render: v => <span style={{ fontSize: 12, fontWeight: 600 }}>{safeStr(v, '---')}</span> },
-    { key: 'required_action', label: 'Status', render: v => <StatusBadge status={safeStr(v, 'NONE')} /> },
-    { key: 'whatsapp_connected', label: 'WhatsApp', render: (v, row) => (
-      <span style={{ fontSize: 12, color: v ? '#10b981' : '#ef4444', fontWeight: 600 }}>{v ? 'Connected' : 'Missing'}</span>
-    )},
-    { key: 'google_connected', label: 'Google Cal', render: v => (
-      <span style={{ fontSize: 12, color: v ? '#10b981' : '#6b7280', fontWeight: 600 }}>{v ? 'Connected' : '---'}</span>
-    )},
-    { key: 'readiness_score', label: 'Health', render: v => READINESS_BAR(v || 0) },
-    { key: 'patient_count', label: 'Patients', render: (v, row) => (
-      <span style={{ fontSize: 12 }}>{safeNum(v)} <span style={{ color: 'var(--text-muted)' }}>/ {safeNum(row.patient_limit) || 'inf'}</span></span>
-    )},
-    { key: 'mrr', label: 'MRR', render: v => {
-      const n = safeNum(v);
-      return <span style={{ fontSize: 12, fontWeight: 700, color: n > 0 ? '#10b981' : 'var(--text-muted)' }}>
-        {n > 0 ? `EUR ${n.toLocaleString('de-DE')}` : '---'}
-      </span>;
-    }},
-    { key: 'id', label: 'Actions', sortable: false, width: '12%', render: (v, row) => (
-      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-        {!row.whatsapp_connected && (
-          <button onClick={(e) => { e.stopPropagation(); handleAction(v, 'wa-start'); }} disabled={actionLoading === `${v}-wa-start`}
-            style={actionBtn('#3b82f6')}>WA Start</button>
-        )}
-        {row.required_action === 'FIX_ERROR' && (
-          <button onClick={(e) => { e.stopPropagation(); handleAction(v, 'wa-retry'); }} disabled={actionLoading === `${v}-wa-retry`}
-            style={actionBtn('#f97316')}>Retry</button>
-        )}
-        <button onClick={(e) => { e.stopPropagation(); handleAction(v, 'impersonate'); }}
-          style={actionBtn('#a78bfa')}>Login</button>
-      </div>
-    )},
-  ];
-
   if (selectedClinic) {
-    return (
-      <ClinicDetailView
-        clinic={selectedClinic}
-        onClose={() => onSelectClinic?.(null)}
-        onRefresh={() => { reload?.(); }}
-      />
-    );
+    return <ClinicDetailView clinic={selectedClinic} onClose={() => onSelectClinic?.(null)} onRefresh={reload} />;
   }
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Clinics</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{filteredClinics.length}{showBrokenOnly ? ` / ${clinics.length}` : ''} clinics</span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{sorted.length} clinics</span>
           {brokenCount > 0 && (
             <button onClick={() => setShowBrokenOnly(!showBrokenOnly)}
               style={{ background: showBrokenOnly ? '#ef444420' : 'var(--bg-card)', border: `1px solid ${showBrokenOnly ? '#ef444440' : 'var(--border)'}`, borderRadius: 8, padding: '6px 14px', color: showBrokenOnly ? '#ef4444' : 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
               {showBrokenOnly ? 'Show All' : `Issues (${brokenCount})`}
             </button>
           )}
-          <button onClick={reload} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-            Refresh
-          </button>
+          <button onClick={reload} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Refresh</button>
         </div>
       </div>
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading clinics...</div>
+      ) : sorted.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)', background: 'var(--bg-card)', borderRadius: 12 }}>No clinics found</div>
       ) : (
-        <DataTable
-          columns={columns}
-          data={filteredClinics}
-          searchable
-          searchKeys={['name', 'email', 'plan_name']}
-          emptyText="No clinics found"
-          onRowClick={(row) => onSelectClinic?.(row)}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {/* Table Header */}
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.2fr 1.2fr 1fr 1fr 1.2fr', gap: 12, padding: '8px 16px' }}>
+            {['Clinic', 'Plan', 'Status', 'WhatsApp', 'Health', 'Patients', 'Action'].map(h => (
+              <span key={h} style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-muted)' }}>{h}</span>
+            ))}
+          </div>
+
+          {/* Rows */}
+          {sorted.map(c => {
+            const action = c.required_action || 'NONE';
+            const cta = SMART_CTA[action] || SMART_CTA.NONE;
+            const accent = ROW_ACCENT[action] || 'transparent';
+            const health = safeNum(c.readiness_score);
+            const patients = safeNum(c.patient_count);
+            const waOk = c.whatsapp_connected === true;
+            const isCritical = action === 'FIX_ERROR';
+
+            return (
+              <div key={c.id} onClick={() => onSelectClinic?.(c)}
+                style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.2fr 1.2fr 1fr 1fr 1.2fr', gap: 12, padding: '14px 16px', background: accent, borderRadius: 10, cursor: 'pointer', transition: 'all 0.12s', border: isCritical ? '1px solid rgba(239,68,68,0.15)' : '1px solid transparent' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.transform = 'translateX(2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = accent; e.currentTarget.style.transform = ''; }}>
+
+                {/* Clinic */}
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>{safeStr(c.name)}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{safeStr(c.email)}</div>
+                </div>
+
+                {/* Plan */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>{safeStr(c.plan_name, '—')}</span>
+                </div>
+
+                {/* Status */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <StatusBadge status={action} />
+                </div>
+
+                {/* WhatsApp */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: waOk ? '#10b981' : '#ef4444' }}>
+                    {waOk ? '● Connected' : '● Not connected'}
+                  </span>
+                </div>
+
+                {/* Health */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, position: 'relative' }}
+                  onMouseEnter={() => setHealthTooltip(c.id)} onMouseLeave={() => setHealthTooltip(null)}>
+                  <div style={{ width: 40, height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }}>
+                    <div style={{ height: '100%', borderRadius: 3, width: `${health}%`, background: health > 80 ? '#10b981' : health >= 50 ? '#eab308' : '#ef4444' }} />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: health > 80 ? '#10b981' : health >= 50 ? '#eab308' : '#ef4444' }}>{health}%</span>
+                  {healthTooltip === c.id && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 6, padding: '10px 14px', background: '#1a2235', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, zIndex: 50, fontSize: 11, lineHeight: 1.8, whiteSpace: 'nowrap', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                      <div style={{ color: waOk ? '#10b981' : '#ef4444' }}>WhatsApp: {waOk ? 'Connected' : 'Missing (-40)'}</div>
+                      <div style={{ color: c.google_connected ? '#10b981' : '#6b7280' }}>Google Cal: {c.google_connected ? 'Connected' : 'Missing (-10)'}</div>
+                      <div style={{ color: safeNum(c.active_workflows) > 0 ? '#10b981' : '#6b7280' }}>Automations: {safeNum(c.active_workflows) > 0 ? 'Active' : 'None (-10)'}</div>
+                      <div style={{ color: c.has_recent_error ? '#ef4444' : '#10b981' }}>Errors: {c.has_recent_error ? 'Yes (-20)' : 'None'}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Patients */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {patients} {patients === 1 ? 'patient' : 'patients'}
+                  </span>
+                </div>
+
+                {/* Smart Action */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button onClick={e => {
+                    e.stopPropagation();
+                    if (action === 'NONE') handleAction(e, c.id, 'impersonate');
+                    else onSelectClinic?.(c);
+                  }}
+                    style={{ background: `${cta.color}18`, color: cta.color, border: `1px solid ${cta.color}30`, borderRadius: 6, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all 0.12s', whiteSpace: 'nowrap' }}
+                    onMouseEnter={e => e.currentTarget.style.background = `${cta.color}30`}
+                    onMouseLeave={e => e.currentTarget.style.background = `${cta.color}18`}>
+                    {cta.label}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
-}
-
-function actionBtn(bg) {
-  return { background: bg, color: '#fff', border: 'none', borderRadius: 5, padding: '3px 8px', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' };
 }
