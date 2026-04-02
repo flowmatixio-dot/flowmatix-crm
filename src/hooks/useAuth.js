@@ -114,22 +114,29 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     }
   }, []);
 
-  /* ═══ IMPERSONATION — handle #impersonate=... from operator console ═══ */
+  /* ═══ IMPERSONATION — handle #impersonate=TOKEN or ?impersonate_token=TOKEN ═══ */
   useEffect(() => {
+    let token = null;
+    // Method 1: Hash fragment (from operator CRM)
     const hash = window.location.hash;
     if (hash.startsWith('#impersonate=')) {
-      try {
-        const encoded = hash.replace('#impersonate=', '');
-        const decoded = atob(encoded);
-        const params = new URLSearchParams(decoded);
-        const access = params.get('access');
-        if (access) {
-          fmApi.setTokens(access, access);
-          sessionStorage.setItem('fm_impersonation', 'true');
-          sessionStorage.setItem('fm_login_at', String(Date.now()));
-          // Don't clean hash — banner needs it
-        }
-      } catch (e) { console.warn('[impersonate] Failed to parse:', e); }
+      token = decodeURIComponent(hash.replace('#impersonate=', ''));
+      // If it looks base64-encoded (old format), try to decode
+      if (token && !token.startsWith('eyJ')) {
+        try { const d = atob(token); const p = new URLSearchParams(d); token = p.get('access') || token; } catch {}
+      }
+    }
+    // Method 2: Query param
+    if (!token) {
+      const params = new URLSearchParams(window.location.search);
+      token = params.get('impersonate_token');
+    }
+    if (token) {
+      fmApi.setTokens(token, token);
+      sessionStorage.setItem('fm_impersonation', 'true');
+      sessionStorage.setItem('fm_login_at', String(Date.now()));
+      // Clean URL
+      window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
