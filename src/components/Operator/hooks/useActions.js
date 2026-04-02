@@ -86,7 +86,7 @@ export function useActions() {
 
 function computeAction(c) {
   const ws = c.workspace_state || '';
-  const wa = c.whatsapp_connected || c.whatsapp_active;
+  const wa = c.whatsapp_connected === true;
   const waSetup = c.wa_setup_status || 'not_started';
   const sub = c.subscription_status || '';
 
@@ -104,9 +104,9 @@ function computeAction(c) {
 
 function computeReadiness(c) {
   let score = 100;
-  if (!c.whatsapp_connected && !c.whatsapp_active) score -= 40;
+  if (c.whatsapp_connected !== true) score -= 40;
   if (!c.google_connected) score -= 10;
   if ((c.active_workflows || 0) === 0) score -= 10;
-  if (!c.whatsapp_connected && !c.whatsapp_active) score -= 10; // no templates
+  if (c.whatsapp_connected !== true) score -= 10; // no templates without WA
   return Math.max(0, score);
 }
