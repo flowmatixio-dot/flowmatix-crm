@@ -7,6 +7,7 @@ import * as fmApi from '../../../api/client.js';
 export default function MonitoringView({ actions }) {
   const [infra, setInfra] = useState(null);
   const [db, setDb] = useState(null);
+  const [bizMetrics, setBizMetrics] = useState(null);
   const [backup, setBackup] = useState(null);
   const [r2, setR2] = useState(null);
   const [queueStats, setQueueStats] = useState(null);
@@ -23,13 +24,15 @@ export default function MonitoringView({ actions }) {
       fmApi.getBackupStatus?.().catch(() => null),
       fmApi.getQueueStats?.().catch(() => null),
       fmApi.getR2Stats?.().catch(() => null),
-    ]).then(([infraRes, dbRes, clinicsRes, backupRes, queueRes, r2Res]) => {
+      fmApi.getBusinessMetrics?.().catch(() => null),
+    ]).then(([infraRes, dbRes, clinicsRes, backupRes, queueRes, r2Res, bizRes]) => {
       setInfra(infraRes ? normalizeInfra(infraRes) : null);
       setDb(dbRes);
       setLocalClinics(normalizeClinics(clinicsRes));
       setBackup(backupRes);
       setR2(r2Res);
       setQueueStats(queueRes);
+      setBizMetrics(bizRes);
       setLoading(false);
     }).catch(err => { setError(err?.message || 'Failed'); setLoading(false); });
   }, []);
@@ -65,11 +68,15 @@ export default function MonitoringView({ actions }) {
     if (cpuPct > 90) issues.push({ level: 'red', msg: `CPU at ${cpuPct?.toFixed(1)}%` });
     else if (cpuPct > 75) issues.push({ level: 'yellow', msg: `CPU at ${cpuPct?.toFixed(1)}%` });
     if (memPct > 90) issues.push({ level: 'red', msg: `Memory at ${memPct?.toFixed(1)}%` });
+    // Disk protection
+    const dp = typeof disk === 'number' ? disk : disk?.pct;
+    if (dp > 90) issues.push({ level: 'red', msg: `Disk at ${dp?.toFixed(1)}% — CRITICAL` });
+    else if (dp > 80) issues.push({ level: 'yellow', msg: `Disk at ${dp?.toFixed(1)}%` });
 
     const hasRed = issues.some(i => i.level === 'red');
     const hasYellow = issues.some(i => i.level === 'yellow');
     return { status: hasRed ? 'red' : hasYellow ? 'yellow' : 'green', issues };
-  }, [clinics, queues, backup, cpu, mem]);
+  }, [clinics, queues, backup, cpu, mem, disk]);
 
   const cpuPct = typeof cpu === 'number' ? cpu : cpu?.pct;
   const memPct = typeof mem === 'number' ? mem : mem?.pct;
@@ -172,12 +179,26 @@ export default function MonitoringView({ actions }) {
           <h2 style={secH}>Queue Health</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {queues.map((q, i) => {
-              const f = safeNum(q.failed), p = safeNum(q.pending);
-              const c = f > 0 ? '#ef4444' : p > 10 ? '#f97316' : '#10b981';
+              const f = safeNum(q.failed), p = safeNum(q.pending), d = safeNum(q.delayed);
+              const oldest = safeNum(q.oldest_pending_seconds);
+              const tpm = safeNum(q.throughput_per_min);
+              const retries = safeNum(q.retries_last_hour);
+              // Status: RED if failed>5 or pending>200 or oldest>120s, YELLOW if pending>50 or retries>0
+              const status = (f > 5 || p > 200 || oldest > 120) ? 'red' : (p > 50 || retries > 0 || f > 0) ? 'yellow' : 'green';
+              const sc = { red: '#ef4444', yellow: '#eab308', green: '#10b981' }[status];
               return (
-                <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', borderLeft: `3px solid ${c}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(q.name)}</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p} pending · <span style={{ color: f > 0 ? '#ef4444' : 'inherit', fontWeight: f > 0 ? 700 : 400 }}>{f} failed</span></span>
+                <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', borderLeft: `3px solid ${sc}` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{safeStr(q.name || q.queue_name)}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: sc, background: `${sc}15`, padding: '1px 6px', borderRadius: 3 }}>{status.toUpperCase()}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--text-muted)' }}>
+                    <span>{p} pending</span>
+                    <span style={{ color: f > 0 ? '#ef4444' : 'inherit', fontWeight: f > 0 ? 700 : 400 }}>{f} failed</span>
+                    {d > 0 && <span>{d} delayed</span>}
+                    {tpm > 0 && <span style={{ color: '#10b981' }}>{tpm}/min</span>}
+                    {oldest > 0 && <span style={{ color: oldest > 60 ? '#f97316' : 'inherit' }}>oldest: {oldest}s</span>}
+                  </div>
                 </div>
               );
             })}
@@ -222,6 +243,28 @@ export default function MonitoringView({ actions }) {
 
       {/* R2 Storage */}
       {r2 && r2.configured !== false && <R2Card r2={r2} />}
+
+      {/* Business Metrics */}
+      {bizMetrics && (
+        <div style={{ marginBottom: 24 }}>
+          <h2 style={secH}>Business Metrics</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
+            {[
+              { label: 'Total Clinics', value: safeNum(bizMetrics.total_clinics), color: '#3b82f6' },
+              { label: 'Active', value: safeNum(bizMetrics.active_clinics), color: '#10b981' },
+              { label: 'Trial', value: safeNum(bizMetrics.trial_clinics), color: '#eab308' },
+              { label: 'Conversion', value: `${safeNum(bizMetrics.conversion_rate)}%`, color: '#a78bfa' },
+              { label: 'Bookings Today', value: safeNum(bizMetrics.bookings_today), color: '#f97316' },
+              { label: 'Messages Today', value: safeNum(bizMetrics.messages_today), color: '#3b82f6' },
+            ].map((m, i) => (
+              <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '12px 14px', borderTop: `2px solid ${m.color}`, textAlign: 'center' }}>
+                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{m.value}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: m.color, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4 }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Integration Status */}
       <h2 style={secH}>Integration Status</h2>
