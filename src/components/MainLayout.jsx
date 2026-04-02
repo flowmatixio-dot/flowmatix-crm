@@ -827,7 +827,19 @@ export default function MainLayout() {
           </div>
         )}
 
-        {/* Impersonation: no visible UI — logging stays backend-only */}
+        {/* ── Impersonation Banner ── */}
+        {sessionStorage.getItem('fm_impersonation') === 'true' && (
+          <div style={{ padding: "8px 20px", background: "rgba(167,107,255,0.08)", borderBottom: "1px solid rgba(167,107,255,0.2)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 13 }}>{"👁"}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#a78bfa" }}>Operator-Impersonation aktiv</span>
+            </div>
+            <button onClick={() => { sessionStorage.removeItem('fm_impersonation'); import('../api/client').then(m => m.clearTokens()); window.close(); }}
+              style={{ padding: "4px 14px", background: "#a78bfa", border: "none", borderRadius: 8, color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+              Beenden
+            </button>
+          </div>
+        )}
 
         {/* ── Trial Countdown Banner ── */}
         {IS_CLIENT_MODE && trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (
