@@ -18,10 +18,12 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const loadDetail = useCallback(async () => {
     if (!orgId) return;
     try {
-      const [overview, logs] = await Promise.all([
+      const [overview, logs, templates] = await Promise.all([
         fmApi.getClinicOverview(orgId).catch(() => null),
         fmApi.waLogs(orgId).catch(() => null),
+        fmApi.apiFetch(`/api/v1/ops/clinic/${orgId}/templates`).catch(() => null),
       ]);
+      if (overview) overview._templates = Array.isArray(templates?.templates) ? templates.templates : [];
       setDetail(overview);
       setWaLogEntries(Array.isArray(logs?.logs) ? logs.logs : Array.isArray(logs) ? logs : []);
     } catch {} finally { setLoading(false); }
@@ -100,7 +102,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 20 }}>
         <StatCard label="Plan" value={safeStr(d.plan_name || clinic?.plan_name, 'No plan')} color="blue" />
         <StatCard label="Patients" value={safeNum(d.patient_count || clinic?.patient_count)} color="purple" />
-        <StatCard label="Readiness" value={`${readiness}%`} color={readiness === 100 ? 'green' : readiness >= 50 ? 'yellow' : 'red'} />
+        <StatCard label="Health" value={`${readiness}%`} color={readiness > 80 ? 'green' : readiness >= 50 ? 'yellow' : 'red'} />
         <StatCard label="MRR" value={`EUR ${safeNum(d.mrr || clinic?.mrr).toLocaleString('de-DE')}`} color="green" />
       </div>
 
@@ -153,6 +155,57 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
             <span style={lbl}>Readiness Score</span>
             <span style={{ fontWeight: 700, fontSize: 13, color: readiness === 100 ? '#10b981' : readiness >= 50 ? '#eab308' : '#ef4444' }}>{readiness}%</span>
           </div>
+        </div>
+
+        {/* Templates Section */}
+        {(() => {
+          const tpl = d._templates || [];
+          const approved = tpl.filter(t => t.status === 'approved' || t.status === 'APPROVED');
+          const pending = tpl.filter(t => t.status === 'pending' || t.status === 'PENDING');
+          const rejected = tpl.filter(t => t.status === 'rejected' || t.status === 'REJECTED');
+          return (
+            <div style={card}>
+              <h3 style={sectionTitle}>WhatsApp Templates</h3>
+              {tpl.length === 0 ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>No template data available</div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#10b981' }}>{approved.length} approved</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#eab308' }}>{pending.length} pending</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#ef4444' }}>{rejected.length} rejected</span>
+                  </div>
+                  {tpl.slice(0, 8).map((t, i) => (
+                    <div key={i} style={{ ...row, padding: '6px 0' }}>
+                      <span style={{ color: 'var(--text-primary)', fontSize: 12 }}>{safeStr(t.name || t.template_name)}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: t.status === 'approved' || t.status === 'APPROVED' ? '#10b981' : t.status === 'rejected' || t.status === 'REJECTED' ? '#ef4444' : '#eab308' }}>
+                        {safeStr(t.status)} {t.language ? `(${safeStr(t.language)})` : ''}
+                      </span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Conversion Metrics */}
+        <div style={card}>
+          <h3 style={sectionTitle}>Conversion Metrics</h3>
+          {(() => {
+            const patients = safeNum(d.patient_count || d.usage?.patients || clinic?.patient_count);
+            const appointments = safeNum(d.usage?.appointments || d.appointments_this_month);
+            const messages = safeNum(d.usage?.messages || d.messages_this_month);
+            const convRate = patients > 0 && appointments > 0 ? Math.round((appointments / patients) * 100) : 0;
+            return (
+              <>
+                <div style={row}><span style={lbl}>Total Patients</span><span style={val}>{patients}</span></div>
+                <div style={row}><span style={lbl}>Appointments</span><span style={val}>{appointments}</span></div>
+                <div style={row}><span style={lbl}>Messages</span><span style={val}>{messages}</span></div>
+                <div style={row}><span style={lbl}>Conversion Rate</span><span style={{ fontWeight: 700, fontSize: 13, color: convRate > 20 ? '#10b981' : convRate > 0 ? '#eab308' : 'var(--text-muted)' }}>{convRate}%</span></div>
+              </>
+            );
+          })()}
         </div>
 
         {/* Actions Section */}

@@ -189,7 +189,7 @@ export default function MonitoringView({ actions }) {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                {['Clinic', 'WhatsApp', 'Google Cal', 'Automations', 'Readiness'].map(h => (
+                {['Clinic', 'WhatsApp', 'Google Cal', 'Automations', 'Health'].map(h => (
                   <th key={h} style={th}>{h}</th>
                 ))}
               </tr>

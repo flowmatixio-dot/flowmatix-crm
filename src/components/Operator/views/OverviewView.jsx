@@ -96,7 +96,17 @@ export default function OverviewView({ events, actions }) {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 20px' }}>Control Center</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Control Center</h1>
+        <button onClick={async () => {
+          try {
+            const res = await fmApi.apiFetch('/api/v1/ops/clinic-actions/detect-stuck', { method: 'POST' });
+            if (res?.detected > 0) { load(); actions?.reload?.(); }
+          } catch {}
+        }} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+          Detect Stuck
+        </button>
+      </div>
 
       {/* KPI Strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}>

@@ -67,7 +67,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic })
     { key: 'google_connected', label: 'Google Cal', render: v => (
       <span style={{ fontSize: 12, color: v ? '#10b981' : '#6b7280', fontWeight: 600 }}>{v ? 'Connected' : '---'}</span>
     )},
-    { key: 'readiness_score', label: 'Readiness', render: v => READINESS_BAR(v || 0) },
+    { key: 'readiness_score', label: 'Health', render: v => READINESS_BAR(v || 0) },
     { key: 'patient_count', label: 'Patients', render: (v, row) => (
       <span style={{ fontSize: 12 }}>{safeNum(v)} <span style={{ color: 'var(--text-muted)' }}>/ {safeNum(row.patient_limit) || 'inf'}</span></span>
     )},

@@ -107,10 +107,10 @@ function computeAction(c) {
 }
 
 function computeReadiness(c) {
-  let score = 0;
-  if (c.whatsapp_connected || c.whatsapp_active) score += 25;
-  if (c.google_connected) score += 25;
-  if ((c.active_workflows || 0) > 0) score += 25;
-  if (c.whatsapp_connected || c.whatsapp_active) score += 25;
-  return score;
+  let score = 100;
+  if (!c.whatsapp_connected && !c.whatsapp_active) score -= 40;
+  if (!c.google_connected) score -= 10;
+  if ((c.active_workflows || 0) === 0) score -= 10;
+  if (!c.whatsapp_connected && !c.whatsapp_active) score -= 10; // no templates
+  return Math.max(0, score);
 }
