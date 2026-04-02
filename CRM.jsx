@@ -1578,7 +1578,7 @@ export default function App() {
       </div>;})()}
 
       {/* Sidebar */}
-      <div style={{width:sidebar?260:68,minWidth:sidebar?260:68,height:"100%",background:"#131c2e",borderRight:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",transition:"all .3s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
+      <div style={{width:sidebar?260:68,minWidth:sidebar?260:68,height:"100vh",maxHeight:"100vh",background:"#131c2e",borderRight:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",transition:"all .3s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
         <div style={{padding:sidebar?"20px 18px 16px":"20px 14px 16px",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>setSidebar(!sidebar)} title={sidebar?"Collapse sidebar":"Expand sidebar"}>
             <img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{width:sidebar?36:32,height:sidebar?36:32,borderRadius:10,objectFit:"cover",flexShrink:0,transition:"all .3s cubic-bezier(.4,0,.2,1)"}}/>

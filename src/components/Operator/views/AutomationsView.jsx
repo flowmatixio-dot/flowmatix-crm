@@ -243,7 +243,8 @@ function WfCard({ w }) {
         <span style={{ width: 6, height: 6, borderRadius: 99, background: st.dot, boxShadow: isActive ? `0 0 6px ${st.dot}` : 'none' }} />
         <span style={{ fontSize: 11, color: st.color, fontWeight: 600 }}>{st.label}</span>
         {w.trigger && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{TRIGGER_ICONS[w.trigger] || ''}</span>}
-        {w.critical && <span style={{ fontSize: 9, fontWeight: 700, color: '#ef4444', background: '#ef444415', padding: '1px 6px', borderRadius: 3 }}>CRITICAL</span>}
+        {w.critical && !isActive && <span style={{ fontSize: 9, fontWeight: 700, color: '#ef4444', background: '#ef444415', padding: '1px 6px', borderRadius: 3 }}>CRITICAL</span>}
+        {w.critical && isActive && <span style={{ fontSize: 9, fontWeight: 700, color: '#10b981', background: '#10b98115', padding: '1px 6px', borderRadius: 3 }}>PROTECTED</span>}
         {w.updatedAt && <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>{safeStr(w.updatedAt, '').slice(0, 10)}</span>}
       </div>
       {w.hint && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.3 }}>{w.hint}</div>}
