@@ -205,7 +205,7 @@ export default function AutomationsView() {
               const c = f > 0 ? '#ef4444' : p > 10 ? '#f97316' : '#10b981';
               return (
                 <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '12px 14px', borderLeft: `3px solid ${c}` }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{safeStr(q.name)}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{safeStr(q.queue_name || q.name)}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p} pending · <span style={{ color: f > 0 ? '#ef4444' : 'inherit' }}>{f} failed</span></div>
                 </div>
               );

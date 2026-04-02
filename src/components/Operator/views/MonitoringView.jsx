@@ -93,8 +93,9 @@ export default function MonitoringView({ actions }) {
   const backupAge = backup?.lastBackupAt ? (Date.now() - new Date(backup.lastBackupAt).getTime()) / 3600000 : null;
   const backupOk = backupAge !== null && backupAge < 25;
 
-  // DB
-  const dbSize = safeStr(db?.databaseSize, '—');
+  // DB — databaseSize comes as bytes integer, format to MB/GB
+  const dbSizeBytes = typeof db?.databaseSize === 'number' ? db.databaseSize : parseInt(db?.databaseSize) || 0;
+  const dbSize = dbSizeBytes > 1e9 ? `${(dbSizeBytes / 1e9).toFixed(1)} GB` : dbSizeBytes > 1e6 ? `${(dbSizeBytes / 1e6).toFixed(0)} MB` : dbSizeBytes > 0 ? `${(dbSizeBytes / 1e3).toFixed(0)} KB` : '—';
   const dbConns = safeNum(db?.activeConnections);
   const topTables = Array.isArray(db?.topTables) ? db.topTables : [];
 
@@ -233,8 +234,8 @@ export default function MonitoringView({ actions }) {
               <div style={{ marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 8 }}>
                 {topTables.slice(0, 5).map((t, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '2px 0', color: 'var(--text-muted)' }}>
-                    <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{safeStr(t.table_name || t.name)}</span>
-                    <span>{safeStr(t.size || t.total_size, '—')}</span>
+                    <span style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{safeStr(t.name || t.table_name || t.relname)}</span>
+                    <span>{typeof t.sizeBytes === 'number' ? (t.sizeBytes > 1e6 ? `${(t.sizeBytes / 1e6).toFixed(1)} MB` : `${(t.sizeBytes / 1e3).toFixed(0)} KB`) : safeStr(t.size || t.total_size, '—')}</span>
                   </div>
                 ))}
               </div>
