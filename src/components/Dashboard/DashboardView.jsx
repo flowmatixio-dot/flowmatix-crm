@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import { getNow } from "../../utils/demoTime";
 import { fmLocale } from "../../utils/helpers";
+import HintBox from "../shared/HintBox.jsx";
 
 /* ── Inline tri-language helper (matches production T()) ── */
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
@@ -215,7 +216,7 @@ export default function DashboardView() {
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
-        <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"flex-start",gap:8,marginBottom:16,lineHeight:1.6}}>{"ℹ️"} {t("hint_first_steps")}</div>
+        <HintBox id="first_steps" style={{marginBottom:16}}>{t("hint_first_steps")}</HintBox>
       )}
 
       {/* ── Status Banner ── */}

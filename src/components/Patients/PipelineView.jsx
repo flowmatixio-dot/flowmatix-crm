@@ -6,6 +6,7 @@ import { getNowMs, isDemoMode } from "../../utils/demoTime";
 import { LOGISTICS_COLORS } from "../../data/badgeColors";
 import { getAvatarGradient, getInitials } from "../shared/index";
 import { translateValue } from "../../utils/helpers";
+import HintBox from "../shared/HintBox.jsx";
 
 /**
  * Pipeline Kanban Board — 4-column layout, neutral Notion/Linear style.
@@ -103,7 +104,7 @@ export default function PipelineView() {
       </div>
       {/* Pipeline empty hint — live mode only */}
       {myLeads.filter(l => l.stage !== "cancelled").length === 0 && !isDemoMode() && (
-        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_pipeline_empty_live")}</div>
+        <HintBox id="pipeline_empty">{t("hint_pipeline_empty_live")}</HintBox>
       )}
       {/* 4-Column Kanban */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, flex: 1, minHeight: "calc(100vh - 140px)" }}>

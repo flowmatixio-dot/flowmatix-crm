@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { Stat, Toggle } from "../shared/index";
 import { updateClinicSettings, submitWhatsAppTemplates, apiFetch } from "../../api/client";
+import HintBox from "../shared/HintBox.jsx";
 
 export default function AutomationsView() {
   const { myAutomations, toggleAutomation, clinic, setClinics, showT, t } = useApp();
@@ -127,7 +128,7 @@ export default function AutomationsView() {
 
                     {aut.type === "review_request" && (
                       <div style={{ marginTop: 8 }}>
-                        <div style={{padding:"8px 12px",borderRadius:8,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.7)",fontSize:11,lineHeight:1.6,marginBottom:10,display:"flex",alignItems:"flex-start",gap:6}}>{"ℹ️"} {t("hint_review_timing") || "Wird automatisch einige Stunden nach der Nachsorge-Nachricht an den Patienten gesendet. Der Patient erhaelt einen direkten Link zu deinem Google Maps Profil."}</div>
+                        <HintBox id="review_timing" style={{marginBottom:10}}>{t("hint_review_timing") || "Wird automatisch einige Stunden nach der Nachsorge-Nachricht an den Patienten gesendet. Der Patient erhaelt einen direkten Link zu deinem Google Maps Profil."}</HintBox>
                         <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Google Maps Link</div>
                         <div style={{ display: "flex", gap: 8 }}>
                           <input value={reviewLink} onChange={e => setReviewLink(e.target.value)} placeholder="https://g.page/r/..." style={{ flex: 1, padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "inherit", fontSize: 12, outline: "none" }} />
@@ -160,7 +161,7 @@ export default function AutomationsView() {
             </div>
             <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{t("auto_lang_auto_detect") || "Language is automatically detected"}</span>
           </div>
-          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.08)",color:"rgba(167,177,195,0.7)",fontSize:11,lineHeight:1.6,marginBottom:14,display:"flex",alignItems:"flex-start",gap:8}}>{"ℹ️"} {t("hint_templates")}</div>
+          <HintBox id="templates" style={{marginBottom:14}}>{t("hint_templates")}</HintBox>
         </div>
         <div style={{ padding: "0 12px" }}>
           {[

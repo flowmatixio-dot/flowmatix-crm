@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useApp } from "../../context/AppContext";
 import { Section, Field, Toggle } from "../shared/index";
+import HintBox from "../shared/HintBox.jsx";
 import { ROLES, PERM_LABELS, MODULE_ACCESS } from "../../data/constants";
 import { getGoogleStatus, getGoogleConnectUrlSafe, disconnectGoogle, getAnalyticsConfig, updateAnalyticsConfig, disconnectAnalytics, updateClinicSettings, isAuthenticated, inviteTeamMember, removeTeamMember, updateTeamMember, fetchTeam, updatePassword } from "../../api/client";
 import WhatsAppSetup from "../SetupGuide/WhatsAppSetup";
@@ -817,7 +818,7 @@ export default function SettingsView() {
     {/* ═══ GENERAL ═══ */}
     {settingsTab === "general" && <>
     <div style={{fontSize:16,fontWeight:800,marginBottom:16,color:"rgba(232,238,252,0.9)"}}>{t("general_label") || "Allgemein"}</div>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_general")}</div>
+    <HintBox id="settings_general">{t("hint_settings_general")}</HintBox>
     <Field label={t("clinic_name") || "Klinikname"} value={c.name || ""} onChange={v=>up("name",v)}/>
     <Field label={t("address") || "Adresse"} value={c.address || ""} onChange={v=>up("address",v)}/>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 16px"}}>
@@ -833,7 +834,7 @@ export default function SettingsView() {
 
     {/* ═══ TREATMENTS ═══ */}
     {settingsTab === "clinic_treatments" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_treatments")}</div>
+    <HintBox id="settings_treatments">{t("hint_settings_treatments")}</HintBox>
     <TreatmentTypes />
     </>}
 
@@ -949,7 +950,7 @@ export default function SettingsView() {
 
     {/* ═══ DOCTOR ASSIGNMENT ═══ */}
     {settingsTab === "doctors" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_doctor_assign")}</div>
+    <HintBox id="settings_doctor_assign">{t("hint_settings_doctor_assign")}</HintBox>
     <Section title={t("doctor_assignment") || "Arzt-Zuweisung"}>
       {/* Automatic assignment info */}
       <div style={{padding:"14px 16px",borderRadius:12,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,display:"flex",alignItems:"center",gap:10}}>
@@ -992,7 +993,7 @@ export default function SettingsView() {
 
     {/* ═══ AI BOT SETTINGS ═══ */}
     {settingsTab === "ai" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_ai")}</div>
+    <HintBox id="settings_ai">{t("hint_settings_ai")}</HintBox>
     {/* WhatsApp cost info removed — Flowmatix covers messaging costs */}
     <Section title={t("ai_bot_settings") || "KI-Bot Einstellungen"}>
       <div style={{display:"grid",gap:12}}>
@@ -1031,7 +1032,7 @@ export default function SettingsView() {
 
     {/* ═══ TEAM & ZUGRIFF ═══ */}
     {settingsTab === "team" && <>
-    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_settings_team")}</div>
+    <HintBox id="settings_team">{t("hint_settings_team")}</HintBox>
     <TeamAccessSection clinic={clinic} showT={showT} t={t} setClinics={setClinics} />
     </>}
 

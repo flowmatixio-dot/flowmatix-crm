@@ -18,6 +18,7 @@ import BlockDayModal from "./BlockDayModal";
 import DoctorSettingsModal from "./DoctorSettingsModal";
 import * as fmApi from "../../api/client";
 import RoomScheduler from "./RoomScheduler";
+import HintBox from "../shared/HintBox.jsx";
 import { fmLocale } from "../../utils/helpers";
 
 const FC_VIEW_MAP = { month: "dayGridMonth", week: "timeGridWeek", day: "timeGridDay" };
@@ -650,7 +651,7 @@ export default function AppointmentsPage() {
 
       {/* ── Empty state when no appointments ── */}
       {myAppts.length === 0 && (
-        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_appointments_empty")}</div>
+        <HintBox id="appointments_empty">{t("hint_appointments_empty")}</HintBox>
       )}
 
       {/* ── Calendar ── */}

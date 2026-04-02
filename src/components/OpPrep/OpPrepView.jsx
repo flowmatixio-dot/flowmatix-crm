@@ -4,6 +4,7 @@ import * as fmApi from "../../api/client";
 import { getNow } from "../../utils/demoTime";
 import { fmLocale } from "../../utils/helpers";
 import ConsentTracker from "../Files/ConsentTracker";
+import HintBox from "../shared/HintBox.jsx";
 
 /* ─── Shared helpers ─── */
 
@@ -832,7 +833,7 @@ export default function OpPrepView() {
       {/* ── Table ── */}
       {apiAppts !== null && filtered.length === 0 ? (
         <div>
-          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:16}}>{"ℹ️"} {t("hint_opprep_empty")}</div>
+          <HintBox id="opprep_empty" style={{marginBottom:16}}>{t("hint_opprep_empty")}</HintBox>
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.9)", marginBottom: 6 }}>{t("no_upcoming_ops")}</div>
             <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)" }}>{t("all_patients_prepared") || "Alle Patienten sind vorbereitet oder es stehen keine Termine an."}</div>
