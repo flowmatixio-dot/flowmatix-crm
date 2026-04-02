@@ -63,13 +63,10 @@ export default function LoginScreen({
   /* ======== LOGIN FORM ======== */
   return (
     <div style={{ minHeight: "100vh", background: AUTH_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", position: "relative" }}>
-      {/* Language dropdown top-right */}
-      {(() => { const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪" }, { code: "en", flag: "🇬🇧" }, { code: "tr", flag: "🇹🇷" }] : [{ code: "en", flag: "🇬🇧" }, { code: "de", flag: "🇩🇪" }]; const cur = LANGS.find(l => l.code === loginLang) || LANGS[0]; return <div style={{ position: "fixed", top: 20, right: 24, zIndex: 10 }}><div style={{ position: "relative" }}><button onClick={e => { e.currentTarget.nextSibling.style.display = e.currentTarget.nextSibling.style.display === "none" ? "flex" : "none"; }} style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>{cur.flag}</button><div style={{ display: "none", position: "absolute", top: 46, right: 0, flexDirection: "column", gap: 2, background: "rgba(15,22,35,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 6, backdropFilter: "blur(12px)" }}>{LANGS.map(l => <button key={l.code} onClick={e => { setLoginLang(l.code); e.currentTarget.parentNode.style.display = "none"; }} style={{ width: 36, height: 36, borderRadius: 8, background: loginLang === l.code ? "rgba(76,201,255,0.15)" : "transparent", border: "none", cursor: "pointer", fontSize: 17, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}</div></div></div>; })()}
-      {/* Logo */}
+      {/* Logo — text only, no image, no flags */}
       <div style={{ textAlign: "center", marginBottom: 36, position: "relative", zIndex: 1 }}>
-        <img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{ width: 72, height: 72, borderRadius: 20, objectFit: "cover", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", marginBottom: 16 }} />
-        <div style={{ fontWeight: 800, fontSize: 28, letterSpacing: "0.1em" }}><span style={{ background: "linear-gradient(135deg,#fff 30%,rgba(76,201,255,0.9) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>FLOWMATIX</span></div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "rgba(76,201,255,0.35)", marginTop: 6 }}>AUTOMATION</div>
+        <div style={{ fontWeight: 800, fontSize: 28, letterSpacing: "0.1em" }}><span style={{ background: "linear-gradient(135deg,#fff 30%,#ff8a2a 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>FLOWMATIX</span></div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "rgba(255,138,42,0.4)", marginTop: 6 }}>CONTROL CENTER</div>
       </div>
       {/* Card */}
       <div style={{ width: 420, padding: "36px 40px", borderRadius: 20, background: "#162032", border: "1px solid rgba(255,255,255,0.08)", position: "relative", zIndex: 1, boxShadow: "0 8px 24px rgba(0,0,0,0.3)" }}>

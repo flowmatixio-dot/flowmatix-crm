@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "./supabase";
 import * as fmApi from "./src/api/client";
 
+const IS_CLIENT_MODE = window.location.hostname === "crm.flowmatix.io" || window.location.hostname === "localhost";
+
 /* ═══ EXTRACTED MODULES ═══ */
 import { escHtml, genId, timeAgo, getMonthDays, fmtDate, isToday } from "./src/utils/helpers";
 import { Btn, IC, Section } from "./src/components/shared/index";
@@ -69,7 +71,7 @@ export default function App() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPass, setLoginPass] = useState("");
   const [loginErr, setLoginErr] = useState("");
-  const [loginMode, setLoginMode] = useState("magic"); /* magic | password | forgot | sent */
+  const [loginMode, setLoginMode] = useState(IS_CLIENT_MODE ? "magic" : "password"); /* magic | password | forgot | sent */
   const [authLoading, setAuthLoading] = useState(true);
   const [showPass, setShowPass] = useState(false);
   const [loginLang, setLoginLang] = useState("en");
@@ -118,7 +120,7 @@ export default function App() {
   const [invItems, setInvItems] = useState("");
   const [invVat, setInvVat] = useState("19");
   const [invDeposit, setInvDeposit] = useState("");
-  const [isDemoMode, setIsDemoMode] = useState(()=>{try{const v=localStorage.getItem("fm_env");if(!v){localStorage.setItem("fm_env","demo");return true;}return v!=="live";}catch{return true;}}); /* ← getEnv(): ONLY switchEnv button may change this */
+  const [isDemoMode, setIsDemoMode] = useState(()=>{if(!IS_CLIENT_MODE)return false;try{const v=localStorage.getItem("fm_env");if(!v){localStorage.setItem("fm_env","demo");return true;}return v!=="live";}catch{return true;}}); /* ← getEnv(): ONLY switchEnv button may change this */
   const [paymentModal, setPaymentModal] = useState(null); /* {leadId, amount, currency} */
   const [payAmount, setPayAmount] = useState("500");
   const [payCurrency, setPayCurrency] = useState("EUR");
@@ -1056,21 +1058,21 @@ export default function App() {
   if(authLoading)return<div style={{minHeight:"100vh",background:AUTH_BG,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Plus Jakarta Sans',system-ui,sans-serif"}}><div style={{textAlign:"center"}}><img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{width:56,height:56,borderRadius:16,objectFit:"cover",marginBottom:16}}/><div style={{fontWeight:800,fontSize:22,letterSpacing:"0.12em",background:"linear-gradient(135deg,#fff,rgba(76,201,255,.7))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:16}}>FLOWMATIX</div><div style={{fontSize:14,color:"rgba(167,177,195,0.5)"}}>Loading...</div></div></div>;
   if(!user)return(
     <div style={{minHeight:"100vh",background:AUTH_BG,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'Plus Jakarta Sans',system-ui,sans-serif",position:"relative"}}>
-      {/* EnvSwitch top-left — so user can always switch Demo ↔ Live */}
-      <div style={{position:"fixed",top:20,left:24,zIndex:10}}>
+      {/* EnvSwitch — Kunden-CRM only */}
+      {IS_CLIENT_MODE && <div style={{position:"fixed",top:20,left:24,zIndex:10}}>
         <button onClick={()=>{const next=isDemoMode?"live":"demo";try{localStorage.setItem("fm_env",next);}catch{}setIsDemoMode(next!=="live");setUser(null);setLoginErr("");setLoginMode("magic");}} style={{padding:"6px 14px",borderRadius:10,border:`1px solid ${isDemoMode?"rgba(255,138,42,0.25)":"rgba(76,201,255,0.25)"}`,background:isDemoMode?"rgba(255,138,42,0.1)":"rgba(76,201,255,0.1)",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"inherit",display:"flex",alignItems:"center",gap:6,transition:"all .15s"}}>{isDemoMode?"🧪 Demo":"🚀 Live"}</button>
-      </div>
-      {/* Language flags top-right — all 7 languages */}
+      </div>}
+      {/* Language flags top-right */}
       <div style={{position:"fixed",top:20,right:24,display:"flex",gap:5,zIndex:10,flexWrap:"wrap",maxWidth:320,justifyContent:"flex-end"}}>
-        {[{code:"en",flag:"🇬🇧"},{code:"de",flag:"🇩🇪"},{code:"tr",flag:"🇹🇷"},{code:"es",flag:"🇪🇸"},{code:"fr",flag:"🇫🇷"},{code:"it",flag:"🇮🇹"},{code:"pt",flag:"🇵🇹"}].map(l=>
+        {(IS_CLIENT_MODE?[{code:"en",flag:"🇬🇧"},{code:"de",flag:"🇩🇪"},{code:"tr",flag:"🇹🇷"},{code:"es",flag:"🇪🇸"},{code:"fr",flag:"🇫🇷"},{code:"it",flag:"🇮🇹"},{code:"pt",flag:"🇵🇹"}]:[{code:"de",flag:"🇩🇪"},{code:"en",flag:"🇬🇧"}]).map(l=>
           <button key={l.code} onClick={()=>setLoginLang(l.code)} style={{width:36,height:36,borderRadius:10,background:loginLang===l.code?"rgba(76,201,255,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${loginLang===l.code?"rgba(76,201,255,0.3)":"rgba(255,255,255,0.08)"}`,cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>{l.flag}</button>
         )}
       </div>
       {/* Logo */}
       <div style={{textAlign:"center",marginBottom:36,position:"relative",zIndex:1}}>
         <img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{width:72,height:72,borderRadius:20,objectFit:"cover",boxShadow:"0 4px 12px rgba(0,0,0,0.2)",marginBottom:16}}/>
-        <div style={{fontWeight:800,fontSize:28,letterSpacing:"0.1em"}}><span style={{background:"linear-gradient(135deg,#fff 30%,rgba(76,201,255,0.9) 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>FLOWMATIX</span></div>
-        <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.3em",color:"rgba(76,201,255,0.35)",marginTop:6}}>AUTOMATION</div>
+        <div style={{fontWeight:800,fontSize:28,letterSpacing:"0.1em"}}><span style={{background:IS_CLIENT_MODE?"linear-gradient(135deg,#fff 30%,rgba(76,201,255,0.9) 100%)":"linear-gradient(135deg,#fff 30%,#ff8a2a 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>FLOWMATIX</span></div>
+        <div style={{fontSize:11,fontWeight:700,letterSpacing:"0.3em",color:IS_CLIENT_MODE?"rgba(76,201,255,0.35)":"rgba(255,138,42,0.4)",marginTop:6}}>{IS_CLIENT_MODE?"AUTOMATION":"CONTROL CENTER"}</div>
       </div>
       {/* Card */}
       <div style={{width:420,padding:"36px 40px",borderRadius:20,background:"#162032",border:"1px solid rgba(255,255,255,0.08)",position:"relative",zIndex:1,boxShadow:"0 8px 24px rgba(0,0,0,0.3)"}}>
@@ -1127,7 +1129,7 @@ export default function App() {
         {/* ═══ MODE SWITCHER ═══ */}
         <div style={{textAlign:"center",marginTop:14}}>
           {loginMode==="magic"&&!isDemoMode&&<button onClick={()=>{setLoginMode("password");setLoginErr("");}} style={{background:"none",border:"none",color:"rgba(167,177,195,0.5)",cursor:"pointer",fontSize:13,fontFamily:"inherit",fontWeight:600}}>Sign in with password instead</button>}
-          {loginMode==="password"&&!isDemoMode&&<button onClick={()=>{setLoginMode("magic");setLoginErr("");}} style={{background:"none",border:"none",color:"rgba(167,177,195,0.5)",cursor:"pointer",fontSize:13,fontFamily:"inherit",fontWeight:600}}>Sign in with magic link instead</button>}
+          {loginMode==="password"&&!isDemoMode&&IS_CLIENT_MODE&&<button onClick={()=>{setLoginMode("magic");setLoginErr("");}} style={{background:"none",border:"none",color:"rgba(167,177,195,0.5)",cursor:"pointer",fontSize:13,fontFamily:"inherit",fontWeight:600}}>Sign in with magic link instead</button>}
           {loginMode==="forgot"&&<button onClick={()=>{setLoginMode("magic");setLoginErr("");}} style={{background:"none",border:"none",color:"#4cc9ff",cursor:"pointer",fontSize:13,fontFamily:"inherit",fontWeight:600}}>← Back to login</button>}
         </div>
 
