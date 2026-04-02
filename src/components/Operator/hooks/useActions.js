@@ -33,7 +33,7 @@ export function useActions() {
             ...c,
             required_action: computeAction(c),
             readiness_score: computeReadiness(c),
-            mrr: (c.subscription_status === 'active' && c.plan_price_monthly) ? c.plan_price_monthly / 100 : (c.plan_price || c.mrr || 0),
+            mrr: c.subscription_status === 'active' ? ((c.plan_price_monthly || 0) / 100 || c.plan_price || c.mrr || 0) : 0,
           }));
         }
       }

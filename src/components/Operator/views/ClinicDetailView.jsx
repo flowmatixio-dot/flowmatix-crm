@@ -77,9 +77,11 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const subStatus = safeStr(d.subscription_status || clinic?.subscription_status, '---');
   const waStatus = safeStr(d.wa_setup_status || d.whatsapp_status || clinic?.required_action, '---');
   const waPhone = safeStr(d.phone_number || d.wa_phone, '---');
-  const waActive = d.whatsapp_connected === true || d.wa_active === true || clinic?.whatsapp_connected === true;
+  const waSetupStatus = safeStr(d.wa_setup_status || clinic?.wa_setup_status, 'not_started');
+  const waActive = (d.whatsapp_connected === true || clinic?.whatsapp_connected === true) && waSetupStatus !== 'not_started';
   const gcOk = d.google_connected === true || clinic?.google_connected === true;
   const readiness = safeNum(d.readiness_score || clinic?.readiness_score);
+  const trialEnd = d.trial_end || clinic?.trial_end;
 
   return (
     <div>
@@ -118,7 +120,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           <div style={row}><span style={lbl}>Plan</span><span style={val}>{safeStr(d.plan_name || clinic?.plan_name, '---')}</span></div>
           <div style={row}><span style={lbl}>Workspace State</span><span style={val}><StatusBadge status={ws} /></span></div>
           <div style={row}><span style={lbl}>Subscription</span><span style={val}><StatusBadge status={subStatus} /></span></div>
-          <div style={row}><span style={lbl}>Trial End</span><span style={val}>{d.trial_end ? new Date(d.trial_end).toLocaleDateString('de-DE') : '---'}</span></div>
+          <div style={row}><span style={lbl}>Trial End</span><span style={val}>{trialEnd ? new Date(trialEnd).toLocaleDateString('de-DE') : '---'}</span></div>
           <div style={row}><span style={lbl}>Created</span><span style={val}>{d.created_at ? new Date(d.created_at).toLocaleDateString('de-DE') : '---'}</span></div>
         </div>
 
@@ -196,9 +198,9 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
         <div style={card}>
           <h3 style={sectionTitle}>Conversion Metrics</h3>
           {(() => {
-            const patients = safeNum(d.patient_count || d.usage?.patients || clinic?.patient_count);
-            const appointments = safeNum(d.usage?.appointments || d.appointments_this_month);
-            const messages = safeNum(d.usage?.messages || d.messages_this_month);
+            const patients = safeNum(d.usage?.total_patients || d.patient_count || clinic?.patient_count);
+            const appointments = safeNum(d.usage?.appointments_this_month || d.appointments_this_month || clinic?.appointments_this_month);
+            const messages = safeNum(d.usage?.messages_this_month || d.messages_this_month || clinic?.messages_this_month);
             const convRate = patients > 0 && appointments > 0 ? Math.round((appointments / patients) * 100) : 0;
             return (
               <>
@@ -290,11 +292,14 @@ function logColor(level) {
 }
 
 function ClinicTimeline({ ws, waStatus, waActive, subStatus }) {
+  const hasPurchased = subStatus === 'active' || subStatus === 'trialing';
+  const setupStarted = ws !== 'demo' && ws !== '---';
+  const waConnected = waActive && waStatus !== 'not_started' && waStatus !== '---' && waStatus !== 'Setup';
   const steps = [
-    { id: 'purchased', label: 'Purchased', done: subStatus !== '---' && subStatus !== 'unknown' },
-    { id: 'setup', label: 'Setup Started', done: ws !== 'demo' && ws !== '---' },
-    { id: 'wa_connected', label: 'WhatsApp Connected', done: waActive },
-    { id: 'templates', label: 'Templates Ready', done: waActive },
+    { id: 'purchased', label: hasPurchased ? 'Purchased' : 'Trial', done: hasPurchased },
+    { id: 'setup', label: 'Setup Started', done: setupStarted },
+    { id: 'wa_connected', label: 'WhatsApp Connected', done: waConnected },
+    { id: 'templates', label: 'Templates Ready', done: waConnected && ws === 'active' },
     { id: 'live', label: 'Live', done: ws === 'active' && subStatus === 'active' },
   ];
   const currentIdx = steps.findLastIndex(s => s.done);
