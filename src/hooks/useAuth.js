@@ -31,6 +31,7 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
   const handleLogout = async () => {
     try { await fmApi.logout(); } catch (e) {}
     fmApi.clearTokens();
+    sessionStorage.removeItem('fm_impersonation');
     // Reset ALL auth state
     setUser(null);
     setLoginEmail("");
@@ -113,20 +114,33 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     }
   }, []);
 
-  /* ═══ IMPERSONATION — handle #impersonate=... from operator console ═══ */
+  /* ═══ IMPERSONATION — handle ?impersonate_token=... or #impersonate=... from operator console ═══ */
   useEffect(() => {
+    // Method 1: Query param (new, preferred)
+    const params = new URLSearchParams(window.location.search);
+    const impToken = params.get('impersonate_token');
+    if (impToken) {
+      fmApi.setTokens(impToken, impToken);
+      sessionStorage.setItem('fm_impersonation', 'true');
+      sessionStorage.setItem('fm_login_at', String(Date.now()));
+      // Clean URL
+      const url = new URL(window.location);
+      url.searchParams.delete('impersonate_token');
+      window.history.replaceState({}, '', url.pathname + (url.search || ''));
+    }
+
+    // Method 2: Hash (legacy)
     const hash = window.location.hash;
-    if (hash.startsWith('#impersonate=')) {
+    if (!impToken && hash.startsWith('#impersonate=')) {
       try {
         const encoded = hash.replace('#impersonate=', '');
         const decoded = atob(encoded);
-        const params = new URLSearchParams(decoded);
-        const access = params.get('access');
+        const hashParams = new URLSearchParams(decoded);
+        const access = hashParams.get('access');
         if (access) {
-          fmApi.setTokens(access, access); // impersonation token as both access + refresh
+          fmApi.setTokens(access, access);
           sessionStorage.setItem('fm_impersonation', 'true');
           sessionStorage.setItem('fm_login_at', String(Date.now()));
-          // Don't clean hash — banner needs it
         }
       } catch (e) { console.warn('[impersonate] Failed to parse:', e); }
     }
@@ -145,8 +159,9 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       const u = me.user || me;
       const isOp = u.role === "platform_owner" || u.role === "admin";
       const orgId = (IS_CLIENT_MODE || !isOp) ? (u.organizationId || u.organization_id || null) : null;
-      setUser({ email: u.email, role: u.role, clinicId: orgId, name: u.name || u.email.split("@")[0], apiUser: true, apiRole: u.role, orgId: u.organizationId || u.organization_id });
-      if (isOp && !IS_CLIENT_MODE) setView("operator");
+      const isImpersonating = sessionStorage.getItem('fm_impersonation') === 'true';
+      setUser({ email: u.email, role: u.role, clinicId: orgId, name: u.name || u.email.split("@")[0], apiUser: true, apiRole: u.role, orgId: u.organizationId || u.organization_id, impersonating: isImpersonating });
+      if (isOp && !IS_CLIENT_MODE && !isImpersonating) setView("operator");
       if (orgId) {
         try {
           const res = await fmApi.getMyClinic();
