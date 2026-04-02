@@ -18,11 +18,7 @@ export function useActions() {
         fmApi.apiFetch('/api/v1/ops/clinic/whatsapp-activations').catch(() => null),
       ]);
 
-      if (import.meta.env.DEV) {
-        console.log('[useActions] clinic-actions response:', actionsRes);
-        console.log('[useActions] platformClinics response:', platformRes);
-        console.log('[useActions] waActivations response:', waRes);
-      }
+      // DEV logging removed for security
 
       // Prefer clinic-actions (has computed fields), fall back to platformClinics
       let clinicList = [];

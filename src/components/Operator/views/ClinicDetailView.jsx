@@ -51,7 +51,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           const res = await fmApi.impersonateClinic(orgId, reason);
           const token = res?.impersonation?.accessToken || res?.token;
           if (token) {
-            window.open(`https://crm.flowmatix.io?impersonate_token=${encodeURIComponent(token)}`, '_blank');
+            window.open(`https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`, '_blank');
             flash('Impersonation session opened (30 min)');
           } else {
             flash('Impersonation failed: ' + (res?.error || 'No token'), 'err');

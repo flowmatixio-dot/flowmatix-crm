@@ -20,11 +20,7 @@ export default function AnalyticsView() {
       fmApi.getRevenue().catch(() => null),
       fmApi.getVisitorStats().catch(e => { console.warn('Visitor stats failed:', e); return null; }),
     ]).then(([m, r, v]) => {
-      if (import.meta.env.DEV) {
-        console.log('ANALYTICS metrics:', m);
-        console.log('ANALYTICS revenue:', r);
-        console.log('ANALYTICS visitors:', v);
-      }
+      // DEV logging removed for security
       setMetrics(Array.isArray(m?.metrics) ? m.metrics : []);
       setRevenue(r);
       setVisitors(v);

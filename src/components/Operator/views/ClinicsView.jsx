@@ -44,8 +44,8 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic })
           const res = await fmApi.impersonateClinic(orgId, reason);
           const token = res?.impersonation?.accessToken || res?.token;
           if (token) {
-            // Store impersonation token and open clinic CRM
-            const url = `https://crm.flowmatix.io?impersonate_token=${encodeURIComponent(token)}`;
+            // Store impersonation token in hash fragment (not query string — avoids server logs/referrer leaks)
+            const url = `https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`;
             window.open(url, '_blank');
           } else {
             alert('Impersonation failed: ' + (res?.error || 'No token returned'));

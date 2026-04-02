@@ -21,11 +21,7 @@ export default function MonitoringView({ actions }) {
       fmApi.getPlatformClinics().catch(() => null),
       fmApi.getBackupStatus?.().catch(() => null),
     ]).then(([infraRes, dbRes, clinicsRes, backupRes]) => {
-      if (import.meta.env.DEV) {
-        console.log('MONITORING RAW infra:', infraRes);
-        console.log('MONITORING RAW db:', dbRes);
-        console.log('MONITORING RAW clinics:', clinicsRes);
-      }
+      // DEV logging removed for security
       setInfra(infraRes ? normalizeInfra(infraRes) : null);
       setDb(dbRes);
       setBackup(backupRes);
