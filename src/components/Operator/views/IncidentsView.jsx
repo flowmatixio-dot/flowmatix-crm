@@ -37,11 +37,24 @@ export default function IncidentsView() {
   useEffect(() => { load(); }, [load]);
 
   const resolve = async (id) => {
-    try { await fmApi.resolveIncidentV2(id); load(); } catch {}
+    try {
+      // Try both endpoints (incidents-v2 for operator_incidents, incidents for regular)
+      await Promise.any([
+        fmApi.resolveIncidentV2(id),
+        fmApi.resolveIncident(id),
+      ]);
+      load();
+    } catch { load(); }
   };
 
   const acknowledge = async (id) => {
-    try { await fmApi.acknowledgeIncidentV2(id); load(); } catch {}
+    try {
+      await Promise.any([
+        fmApi.acknowledgeIncidentV2(id),
+        fmApi.acknowledgeIncident(id),
+      ]);
+      load();
+    } catch { load(); }
   };
 
   const formatDuration = (createdAt, resolvedAt) => {
