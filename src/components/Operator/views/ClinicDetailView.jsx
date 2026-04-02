@@ -278,6 +278,9 @@ function bigBtn(bg) {
   return { background: bg, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center' };
 }
 
+// Force React import for fragments
+const _React = React;
+
 function logColor(level) {
   const l = typeof level === 'string' ? level.toLowerCase() : '';
   if (l === 'error' || l === 'critical') return '#ef4444';

@@ -42,9 +42,15 @@ export default function OverviewView({ events, actions }) {
       type: safeStr(ev.type, 'UNKNOWN'),
       priority: safeStr(ev.priority, 'medium'),
       clinicName: safeStr(ev.org_name, 'System'),
-      detail: safeStr(ev.payload?.email || ev.payload?.error || (typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : ''), ''),
+      detail: safeStr(ev.payload?.detail || ev.payload?.email || ev.payload?.error || (typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : ''), ''),
       timestamp: ev.created_at,
-      cta: ev.type === 'NEW_CUSTOMER' ? 'Setup' : ev.type === 'OTP_RECEIVED' ? 'Verify' : ev.type === 'PAYMENT_FAILED' ? 'View' : 'Open',
+      cta: ev.payload?.error_type === 'BOT_ERROR' ? 'Impersonate'
+        : ev.payload?.error_type === 'BOT_NO_RESPONSE' ? 'Check Bot'
+        : ev.payload?.error_type === 'WHATSAPP_SEND_FAILED' ? 'Retry'
+        : ev.type === 'NEW_CUSTOMER' ? 'Setup'
+        : ev.type === 'OTP_RECEIVED' ? 'Verify'
+        : ev.type === 'PAYMENT_FAILED' ? 'View'
+        : 'Open',
       onResolve: () => events?.resolveEvent?.(ev.id),
     });
   });

@@ -13,6 +13,8 @@ const STATE_CONFIG = {
   ACTIVATE:          { label: 'Ready to Activate', bg: '#10b98120', color: '#10b981', dot: '#10b981' },
   FIX_ERROR:         { label: 'Error',             bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
   ERROR:             { label: 'Error',             bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
+  BOT_NO_RESPONSE:   { label: 'Bot Silent',        bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
+  BOT_ERROR:         { label: 'Bot Error',         bg: '#ef444420', color: '#ef4444', dot: '#ef4444' },
   // workspace states
   pending_setup:     { label: 'Pending Setup',     bg: '#f9731620', color: '#f97316', dot: '#f97316' },
   // subscription statuses

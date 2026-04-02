@@ -16,6 +16,10 @@ const ACTION_LABELS = {
   VERIFY_OTP:          { icon: '🔑', label: 'OTP ready — verify in 360dialog' },
   CONNECT_WHATSAPP:    { icon: '💬', label: 'Connect WhatsApp' },
   FIX_ERROR:           { icon: '🚨', label: 'Fix error' },
+  BOT_NO_RESPONSE:     { icon: '🤖', label: 'Bot not responding' },
+  BOT_ERROR:           { icon: '🤖', label: 'Bot error' },
+  WHATSAPP_SEND_FAILED:{ icon: '❌', label: 'WhatsApp send failed' },
+  QUEUE_STUCK:         { icon: '⏳', label: 'Queue stuck' },
 };
 
 export default function ActionCard({ type, priority = 'medium', clinicName, detail, timestamp, cta, onAction, onResolve }) {
