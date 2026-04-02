@@ -60,14 +60,14 @@ export default function OperatorApp() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', flex: 1 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <AlertBar
         events={eventState.events}
         criticalCount={eventState.criticalCount}
         unresolvedCount={eventState.unresolvedCount}
         connected={eventState.connected}
       />
-      <div style={{ flex: 1, overflow: 'auto', padding: 24 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 24, paddingBottom: 80 }}>
         <View {...viewProps} />
       </div>
     </div>
