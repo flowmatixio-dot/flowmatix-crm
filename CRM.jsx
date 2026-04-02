@@ -1285,7 +1285,7 @@ export default function App() {
   return(
     <ErrorBoundary>
     <AppContext.Provider value={ctxValue}>
-    <div style={{display:"flex",height:"100vh",background:"#0f1623",fontFamily:"'Plus Jakarta Sans',system-ui,sans-serif",color:"rgba(232,238,252,0.96)",overflow:"hidden"}}>
+    <div style={{display:"flex",height:"100dvh",background:"#0f1623",fontFamily:"'Plus Jakarta Sans',system-ui,sans-serif",color:"rgba(232,238,252,0.96)",overflow:"hidden"}}>
       {toast&&<div style={{position:"fixed",top:24,left:"50%",transform:"translateX(-50%)",zIndex:9999,padding:"12px 24px",borderRadius:12,background:"#162032",border:"1px solid rgba(16,185,129,0.2)",color:"#10b981",fontWeight:700,fontSize:14,boxShadow:"0 4px 12px rgba(0,0,0,0.3)"}}>✓ {toast}</div>}
 
       {/* ═══ 1️⃣ SETUP SCREEN — Done-for-you Activation ═══ */}
@@ -1578,7 +1578,7 @@ export default function App() {
       </div>;})()}
 
       {/* Sidebar */}
-      <div style={{width:sidebar?260:68,minWidth:sidebar?260:68,position:"sticky",top:0,height:"100dvh",background:"#131c2e",borderRight:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",transition:"all .3s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
+      <div style={{width:sidebar?260:68,minWidth:sidebar?260:68,background:"#131c2e",borderRight:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",transition:"all .3s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
         <div style={{padding:sidebar?"20px 18px 16px":"20px 14px 16px",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>setSidebar(!sidebar)} title={sidebar?"Collapse sidebar":"Expand sidebar"}>
             <img src="/Flowmatix-Logo.png" alt="Flowmatix" style={{width:sidebar?36:32,height:sidebar?36:32,borderRadius:10,objectFit:"cover",flexShrink:0,transition:"all .3s cubic-bezier(.4,0,.2,1)"}}/>
