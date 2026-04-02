@@ -30,8 +30,8 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
         setSuccess('WhatsApp setup initiated — link sent');
         setStep('number');
       } else if (action === 'otp_pending') {
-        await fmApi.updateWaSetupStatus(orgId, 'otp_pending');
-        setSuccess('Status updated — waiting for OTP');
+        await fmApi.apiFetch(`/api/v1/ops/clinic-actions/${orgId}/send-otp-email`, { method: 'POST' });
+        setSuccess('OTP notification sent to customer — they will enter code in their CRM');
         setStep('otp');
       } else if (action === 'verify') {
         await fmApi.waForceConnect(orgId);
@@ -127,26 +127,7 @@ export default function WaOnboardingModal({ clinic, onClose, onComplete }) {
             </>
           )}
 
-          {step === 'otp' && (
-            <>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>Verify OTP</h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.6 }}>
-                The customer should receive an OTP code within ~15 minutes. Once they provide it, verify in the 360dialog partner portal and click below.
-              </p>
-              <div style={{ padding: 12, background: 'rgba(255,138,42,0.08)', borderRadius: 8, border: '1px solid rgba(255,138,42,0.2)', marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#ff8a2a', marginBottom: 4 }}>360dialog Partner Portal</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Verify the OTP in your 360dialog account, then confirm below.</div>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => handleAction('verify')} disabled={loading}
-                  style={{ ...btnPrimary, background: '#10b981', opacity: loading ? 0.6 : 1 }}>
-                  {loading ? 'Verifying...' : 'OTP Verified → Connect WhatsApp'}
-                </button>
-                <button onClick={() => handleAction('retry')} disabled={loading}
-                  style={btnSecondary}>Retry</button>
-              </div>
-            </>
-          )}
+          {step === 'otp' && <OtpStep orgId={orgId} loading={loading} onVerify={() => handleAction('verify')} onRetry={() => handleAction('retry')} />}
 
           {step === 'activate' && (
             <>
@@ -183,6 +164,68 @@ function deriveStep(clinic) {
   if (wa === 'otp_pending') return 'otp';
   if (wa === 'link_sent') return 'number';
   return 'start';
+}
+
+function OtpStep({ orgId, loading, onVerify, onRetry }) {
+  const [otpCode, setOtpCode] = React.useState(null);
+  const [polling, setPolling] = React.useState(true);
+
+  React.useEffect(() => {
+    const poll = async () => {
+      try {
+        const res = await fmApi.apiFetch(`/api/v1/ops/clinic/${orgId}/whatsapp`);
+        const details = res?.verification_details || res?.config?.verification_details;
+        if (details?.submitted_otp) {
+          setOtpCode(details.submitted_otp);
+          setPolling(false);
+        }
+      } catch {}
+    };
+    poll();
+    const iv = setInterval(poll, 5000);
+    return () => clearInterval(iv);
+  }, [orgId]);
+
+  return (
+    <>
+      <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>Waiting for OTP Code</h3>
+      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.6 }}>
+        Customer has been notified. They will enter the OTP code in their CRM. Once submitted, it will appear here automatically.
+      </p>
+
+      {/* OTP Code Display */}
+      <div style={{ padding: 16, background: otpCode ? '#10b98112' : 'rgba(255,255,255,0.03)', borderRadius: 10, border: `1px solid ${otpCode ? '#10b98130' : 'rgba(255,255,255,0.06)'}`, marginBottom: 16, textAlign: 'center' }}>
+        {otpCode ? (
+          <>
+            <div style={{ fontSize: 11, color: '#10b981', fontWeight: 700, marginBottom: 6 }}>OTP CODE RECEIVED FROM CUSTOMER</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#10b981', letterSpacing: 8, fontFamily: 'monospace' }}>{otpCode}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>Enter this code in 360dialog to verify the number</div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>Waiting for customer to enter OTP...</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{polling ? 'Checking every 5 seconds' : ''}</div>
+          </>
+        )}
+      </div>
+
+      <div style={{ padding: 12, background: 'rgba(255,138,42,0.08)', borderRadius: 8, border: '1px solid rgba(255,138,42,0.2)', marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#ff8a2a', marginBottom: 4 }}>Next: Verify in 360dialog</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Once you have the OTP, go to your 360dialog partner portal and verify the number there. Then click below.</div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={onVerify} disabled={loading}
+          style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: loading ? 0.6 : 1 }}>
+          {loading ? 'Verifying...' : 'OTP Verified in 360dialog → Connect'}
+        </button>
+        <button onClick={onRetry} disabled={loading}
+          style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+          Retry
+        </button>
+      </div>
+    </>
+  );
 }
 
 const btnPrimary = { background: '#ff8a2a', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer' };
