@@ -1,6 +1,7 @@
 import React from 'react';
 
 const STATE_CONFIG = {
+  TRIAL:             { label: 'Trial',            bg: '#eab30820', color: '#eab308', dot: '#eab308' },
   NEW:               { label: 'New',              bg: '#3b82f620', color: '#3b82f6', dot: '#3b82f6' },
   START_SETUP:       { label: 'Setup',            bg: '#3b82f620', color: '#3b82f6', dot: '#3b82f6' },
   WAIT_FOR_NUMBER:   { label: 'Waiting Number',   bg: '#eab30820', color: '#eab308', dot: '#eab308' },

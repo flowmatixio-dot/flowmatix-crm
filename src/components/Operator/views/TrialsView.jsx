@@ -4,7 +4,8 @@ import { safeNum, safeStr } from '../shared/safe.js';
 
 // Pipeline columns — reordered for conversion priority
 const PIPELINE_COLS = [
-  { id: 'setup', label: 'Setup Pending', color: '#f97316', priority: true, filter: c => ['WAIT_FOR_NUMBER', 'CONNECT_WHATSAPP', 'START_SETUP', 'ACTIVATE'].includes(c.required_action) || (c.subscription_status === 'active' && c.whatsapp_connected !== true) },
+  { id: 'setup', label: 'Setup Pending', color: '#f97316', priority: true, filter: c => ['WAIT_FOR_NUMBER', 'CONNECT_WHATSAPP', 'START_SETUP', 'ACTIVATE'].includes(c.required_action) },
+  { id: 'trial', label: 'Trial', color: '#eab308', filter: c => c.required_action === 'TRIAL' || c.subscription_status === 'trialing' },
   { id: 'action', label: 'Action Required', color: '#ef4444', filter: c => c.required_action === 'FIX_ERROR' || c.required_action === 'VERIFY_OTP' },
   { id: 'converted', label: 'Live', color: '#10b981', filter: c => c.workspace_state === 'active' && c.subscription_status === 'active' && c.whatsapp_connected === true },
   { id: 'expired', label: 'Expired', color: '#6b7280', filter: c => c.workspace_state === 'trial_expired' || c.subscription_status === 'canceled' },

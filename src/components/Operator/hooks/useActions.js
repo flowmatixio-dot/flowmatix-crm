@@ -91,14 +91,18 @@ function computeAction(c) {
   const sub = c.subscription_status || '';
 
   if (waSetup === 'failed') return 'FIX_ERROR';
+  // Trial clinics — haven't paid yet
+  if (sub === 'trialing') return 'TRIAL';
+  // Paid but pending setup
   if (ws === 'pending_setup' && waSetup === 'not_started') return 'START_SETUP';
   if (ws === 'pending_setup' && waSetup === 'link_sent') return 'CONNECT_WHATSAPP';
   if (ws === 'pending_setup' && waSetup === 'otp_pending') return 'VERIFY_OTP';
   if (ws === 'pending_setup' && waSetup === 'verified') return 'ACTIVATE';
-  if (ws === 'demo' && sub !== 'active') return 'START_SETUP';
-  if ((ws === 'live_test' || ws === 'activation_pending') && !wa) return 'WAIT_FOR_NUMBER';
+  if (ws === 'demo') return 'START_SETUP';
+  // Active + paid + WA connected = fully live
   if (ws === 'active' && sub === 'active' && wa) return 'NONE';
-  if (ws === 'active' && !wa) return 'CONNECT_WHATSAPP';
+  // Active + paid but no WA
+  if (sub === 'active' && !wa) return 'CONNECT_WHATSAPP';
   return 'START_SETUP';
 }
 
