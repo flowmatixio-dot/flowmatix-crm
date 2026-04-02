@@ -146,8 +146,8 @@ export default function AnalyticsView() {
         {daily.length > 0 ? (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 100 }}>
             {daily.slice(-14).map((d, i) => {
-              const maxV = Math.max(1, ...daily.slice(-14).map(x => safeNum(x.messages_sent || x.views || x.visitors, 1)));
-              const val = safeNum(d.messages_sent || d.views || d.visitors);
+              const maxV = Math.max(1, ...daily.slice(-14).map(x => safeNum(x.messages || x.messages_sent || x.views || x.visitors, 1)));
+              const val = safeNum(d.messages || d.messages_sent || d.views || d.visitors);
               const h = Math.max(4, (val / maxV) * 80);
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
