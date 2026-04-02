@@ -40,17 +40,19 @@ export default function OperatorApp() {
   const View = VIEWS[tab] || OverviewView;
 
   // Navigation helper — lets any view switch tabs
+  const skipClearRef = React.useRef(false);
   const navigateTo = useCallback((targetTab, clinic) => {
-    if (clinic) setSelectedClinic(clinic);
+    if (clinic) { setSelectedClinic(clinic); skipClearRef.current = true; }
     else setSelectedClinic(null);
     ctx?.setOpSubTab?.(targetTab);
   }, [ctx]);
 
-  // Clear selected clinic when tab changes
+  // Clear selected clinic when tab changes — unless navigateTo set it
   const prevTabRef = React.useRef(tab);
   if (prevTabRef.current !== tab) {
     prevTabRef.current = tab;
-    if (selectedClinic) setSelectedClinic(null);
+    if (skipClearRef.current) { skipClearRef.current = false; }
+    else if (selectedClinic) setSelectedClinic(null);
   }
 
   const viewProps = { events: eventState, actions: actionState, navigateTo };

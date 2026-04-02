@@ -14,11 +14,12 @@ const PIPELINE_COLS = [
 function getSetupSteps(c) {
   const wa = c.whatsapp_connected === true;
   const gc = c.google_connected === true;
-  const wf = safeNum(c.active_workflows) > 0;
+  // "Bot" = clinic has subscription (bot runs on all subscribed clinics)
+  const bot = c.subscription_status === 'active' || c.subscription_status === 'trialing';
   return [
     { label: 'WhatsApp', done: wa },
     { label: 'Calendar', done: gc },
-    { label: 'Automations', done: wf },
+    { label: 'Bot', done: bot },
   ];
 }
 
