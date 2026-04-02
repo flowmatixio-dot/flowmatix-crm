@@ -109,10 +109,7 @@ export default function MonitoringView({ actions }) {
             ))}
           </div>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Auto-refresh 30s</span>
-          <button onClick={load} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 6, padding: '4px 10px', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Refresh</button>
-        </div>
+        <button onClick={load} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 6, padding: '4px 10px', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto' }}>Refresh</button>
       </div>
 
       {/* Business Health */}
@@ -184,7 +181,7 @@ export default function MonitoringView({ actions }) {
                 </div>
               );
             })}
-            {queues.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: 10 }}>No queue data</div>}
+            {queues.length === 0 && <div style={{ color: '#10b981', fontSize: 13, padding: 10 }}>All queues clear — no backlog</div>}
           </div>
         </div>
 
