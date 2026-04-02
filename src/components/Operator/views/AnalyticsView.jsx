@@ -48,10 +48,12 @@ export default function AnalyticsView() {
   const visitorCount = period === '1' ? safeNum(visitors?.today?.visitors) : period === '7' ? safeNum(visitors?.week?.visitors) : safeNum(visitors?.month?.visitors);
   const totalMsgs = safeNum(waPerf?.messages_30d) || daily.reduce((s, d) => s + safeNum(d.messages), 0);
   const totalLeads = safeNum(funnel?.leads);
-  // Derive bookings from daily metrics if biz endpoint unavailable
-  const bookingsToday = safeNum(bizRev?.bookings_today) || safeNum(daily.find(d => d.day && new Date(d.day).toDateString() === new Date().toDateString())?.appointments);
-  const bookings7d = safeNum(bizRev?.bookings_7d) || daily.slice(-7).reduce((s, d) => s + safeNum(d.appointments), 0);
-  const bookings30d = safeNum(bizRev?.bookings_30d) || daily.reduce((s, d) => s + safeNum(d.appointments), 0);
+  // "Purchases" = new clinic signups, filtered by selected period
+  const periodDays = parseInt(period) || 30;
+  const periodDaily = daily.slice(-periodDays);
+  const purchasesInPeriod = periodDaily.reduce((s, d) => s + safeNum(d.new_clinics), 0);
+  const messagesInPeriod = periodDaily.reduce((s, d) => s + safeNum(d.messages), 0);
+  const purchasesToday = daily.find(d => d.day && new Date(d.day).toDateString() === new Date().toDateString());
 
   // Marketing data
   const topPages = Array.isArray(visitors?.topPages) ? visitors.topPages : [];
@@ -79,18 +81,18 @@ export default function AnalyticsView() {
       {/* ═══ 1. TOP KPIs ═══ */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
         <StatCard label="MRR" value={fmtEur(mrr)} color="green" sub={`${activeSubs} active · ${trialSubs} trial`} />
-        <StatCard label="Bookings" value={bookings30d} color="orange" sub={`${bookingsToday} today`} />
+        <StatCard label="Purchases" value={purchasesInPeriod} color="orange" sub={`${safeNum(purchasesToday?.new_clinics)} today`} />
         <StatCard label="Leads" value={noData(totalLeads)} color="purple" sub={`Last ${period}d`} />
-        <StatCard label="Messages" value={noData(totalMsgs)} color="blue" sub={`${noData(safeNum(waPerf?.messages_today))} today`} />
+        <StatCard label="Messages" value={messagesInPeriod || totalMsgs} color="blue" sub={`Last ${period}d`} />
       </div>
 
       {/* ═══ 2. BUSINESS OVERVIEW ═══ */}
       <SectionTitle>Business Overview</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, marginBottom: 32 }}>
         {[
-          { l: 'Bookings Today', v: bookingsToday, c: '#f97316' },
-          { l: 'Bookings 7d', v: bookings7d, c: '#a78bfa' },
-          { l: 'Bookings 30d', v: bookings30d, c: '#3b82f6' },
+          { l: 'Purchases Today', v: safeNum(purchasesToday?.new_clinics), c: '#f97316' },
+          { l: `Purchases ${period}d`, v: purchasesInPeriod, c: '#a78bfa' },
+          { l: `Messages ${period}d`, v: messagesInPeriod, c: '#3b82f6' },
           { l: 'Active Subs', v: activeSubs, c: '#10b981' },
           { l: 'Trial Subs', v: trialSubs, c: '#eab308' },
           { l: 'MRR', v: fmtEur(mrr), c: '#10b981' },
