@@ -44,12 +44,15 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
       }
       else if (action === 'resume') { await fmApi.resumeClinic(orgId); flash('Clinic resumed'); }
       else if (action === 'impersonate') {
-        const reason = prompt('Impersonation reason (for audit log):');
-        if (reason) {
+        const reason = prompt('Impersonation reason (min 5 chars, for audit log):');
+        if (reason && reason.length >= 5) {
           const res = await fmApi.impersonateClinic(orgId, reason);
-          if (res?.token) {
-            window.open(`https://crm.flowmatix.io?impersonate=${res.token}`, '_blank');
-            flash('Impersonation session opened');
+          const token = res?.impersonation?.accessToken || res?.token;
+          if (token) {
+            window.open(`https://crm.flowmatix.io?impersonate_token=${encodeURIComponent(token)}`, '_blank');
+            flash('Impersonation session opened (30 min)');
+          } else {
+            flash('Impersonation failed: ' + (res?.error || 'No token'), 'err');
           }
         }
       }

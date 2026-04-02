@@ -35,12 +35,16 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic })
       }
       else if (action === 'resume') await fmApi.resumeClinic(orgId);
       else if (action === 'impersonate') {
-        const reason = prompt('Impersonation reason:');
-        if (reason) {
+        const reason = prompt('Impersonation reason (min 5 chars):');
+        if (reason && reason.length >= 5) {
           const res = await fmApi.impersonateClinic(orgId, reason);
-          if (res?.token) {
-            const url = `https://crm.flowmatix.io?impersonate=${res.token}`;
+          const token = res?.impersonation?.accessToken || res?.token;
+          if (token) {
+            // Store impersonation token and open clinic CRM
+            const url = `https://crm.flowmatix.io?impersonate_token=${encodeURIComponent(token)}`;
             window.open(url, '_blank');
+          } else {
+            alert('Impersonation failed: ' + (res?.error || 'No token returned'));
           }
         }
       }
