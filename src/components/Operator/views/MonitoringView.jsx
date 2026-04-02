@@ -52,7 +52,8 @@ export default function MonitoringView({ actions }) {
   const globalStatus = useMemo(() => {
     const issues = [];
     // WA disconnected clinics
-    const waDown = clinics.filter(c => c.required_action === 'FIX_ERROR' || c.required_action === 'CONNECT_WHATSAPP');
+    // Only count paid clinics (not trials) with WA issues
+    const waDown = clinics.filter(c => c.subscription_status === 'active' && (c.required_action === 'CONNECT_WHATSAPP' || c.required_action === 'WA_PENDING' || c.required_action === 'FIX_ERROR'));
     if (waDown.length > 0) issues.push({ level: 'red', msg: `${waDown.length} clinic${waDown.length > 1 ? 's' : ''} WA not connected` });
     // Queue backlog
     const totalFailed = queues.reduce((s, q) => s + safeNum(q.failed), 0);
@@ -119,7 +120,7 @@ export default function MonitoringView({ actions }) {
             ))}
           </div>
         )}
-        <button onClick={() => { load(); }} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto', transition: 'all 0.15s' }}
+        <button onClick={load} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginLeft: 'auto', transition: 'all 0.15s' }}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
           onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card)'}>
           Refresh
