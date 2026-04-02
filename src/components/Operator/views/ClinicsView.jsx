@@ -21,6 +21,10 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic })
   const { clinics = [], loading, reload } = actions || {};
   const [hoveredRow, setHoveredRow] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+  const [showBrokenOnly, setShowBrokenOnly] = useState(false);
+
+  const filteredClinics = showBrokenOnly ? clinics.filter(c => c.required_action && c.required_action !== 'NONE') : clinics;
+  const brokenCount = clinics.filter(c => c.required_action && c.required_action !== 'NONE').length;
 
   const handleAction = async (orgId, action) => {
     setActionLoading(`${orgId}-${action}`);
@@ -108,7 +112,13 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic })
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Clinics</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{clinics.length} clinics</span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{filteredClinics.length}{showBrokenOnly ? ` / ${clinics.length}` : ''} clinics</span>
+          {brokenCount > 0 && (
+            <button onClick={() => setShowBrokenOnly(!showBrokenOnly)}
+              style={{ background: showBrokenOnly ? '#ef444420' : 'var(--bg-card)', border: `1px solid ${showBrokenOnly ? '#ef444440' : 'var(--border)'}`, borderRadius: 8, padding: '6px 14px', color: showBrokenOnly ? '#ef4444' : 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              {showBrokenOnly ? 'Show All' : `Issues (${brokenCount})`}
+            </button>
+          )}
           <button onClick={reload} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 16px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
             Refresh
           </button>
@@ -119,7 +129,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic })
       ) : (
         <DataTable
           columns={columns}
-          data={clinics}
+          data={filteredClinics}
           searchable
           searchKeys={['name', 'email', 'plan_name']}
           emptyText="No clinics found"

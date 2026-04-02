@@ -106,6 +106,9 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
         <StatCard label="MRR" value={`EUR ${safeNum(d.mrr || clinic?.mrr).toLocaleString('de-DE')}`} color="green" />
       </div>
 
+      {/* Clinic Lifecycle Timeline */}
+      <ClinicTimeline ws={ws} waStatus={waStatus} waActive={waActive} subStatus={subStatus} />
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {/* Overview Section */}
         <div style={card}>
@@ -281,4 +284,40 @@ function logColor(level) {
   if (l === 'warning' || l === 'warn') return '#f97316';
   if (l === 'success' || l === 'ok') return '#10b981';
   return '#3b82f6';
+}
+
+function ClinicTimeline({ ws, waStatus, waActive, subStatus }) {
+  const steps = [
+    { id: 'purchased', label: 'Purchased', done: subStatus !== '---' && subStatus !== 'unknown' },
+    { id: 'setup', label: 'Setup Started', done: ws !== 'demo' && ws !== '---' },
+    { id: 'wa_connected', label: 'WhatsApp Connected', done: waActive },
+    { id: 'templates', label: 'Templates Ready', done: waActive },
+    { id: 'live', label: 'Live', done: ws === 'active' && subStatus === 'active' },
+  ];
+  const currentIdx = steps.findLastIndex(s => s.done);
+
+  return (
+    <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '16px 24px', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+        {steps.map((step, i) => {
+          const isDone = step.done;
+          const isCurrent = i === currentIdx + 1;
+          const color = isDone ? '#10b981' : isCurrent ? '#ff8a2a' : 'rgba(255,255,255,0.12)';
+          return (
+            <React.Fragment key={step.id}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minWidth: 0, flex: '0 0 auto' }}>
+                <div style={{ width: 24, height: 24, borderRadius: 99, background: isDone ? '#10b98120' : isCurrent ? '#ff8a2a20' : 'rgba(255,255,255,0.04)', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color }}>
+                  {isDone ? '✓' : i + 1}
+                </div>
+                <span style={{ fontSize: 10, fontWeight: isDone || isCurrent ? 700 : 500, color: isDone ? '#10b981' : isCurrent ? '#ff8a2a' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>{step.label}</span>
+              </div>
+              {i < steps.length - 1 && (
+                <div style={{ flex: 1, height: 2, background: isDone ? '#10b981' : 'rgba(255,255,255,0.06)', margin: '0 8px', marginBottom: 20 }} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
