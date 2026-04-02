@@ -4,35 +4,79 @@ import DataTable from '../shared/DataTable.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
-function classifyWorkflow(name) {
+// Workflow classification + production metadata
+function classifyWorkflow(name, isActive) {
   const n = (name || '').toLowerCase();
-  // CRITICAL = only WhatsApp, Booking, Payment flows
+
+  // ── CRITICAL PRODUCTION (must always be active) ──
   if (n.includes('whatsapp flow') || n.includes('send router') || n.includes('inbound bridge'))
-    return { type: 'core', label: 'CRITICAL CORE', color: '#ef4444', priority: 'high', critical: true };
-  if (n.includes('zahlung') || n.includes('payment') || n.includes('overdue'))
-    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true };
+    return { type: 'core', label: 'CRITICAL CORE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'automatic', hint: 'Critical production workflow — must be active' };
+  if (n.includes('zahlung erhalten') || n.includes('zahlung fehlgeschlagen'))
+    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'event-based', hint: 'Processes Stripe payment webhooks' };
   if (n.includes('subscription') || n.includes('expiry'))
-    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true };
-  // HIGH = provisioning, booking, error handler
-  if (n.includes('provisioning') || n.includes('booking'))
-    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false };
+    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'scheduled', hint: 'Daily subscription expiry check' };
+  if (n.includes('overdue'))
+    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'scheduled', hint: 'Daily payment overdue check' };
+
+  // ── CORE (should be active in production) ──
+  if (n.includes('provisioning'))
+    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false, requiredForProd: true, trigger: 'event-based', hint: 'Provisions new clinics after signup' };
   if (n.includes('error handler') || n.includes('global error'))
-    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false };
-  // MEDIUM = ops workflows
-  if (n.includes('reminder') || n.includes('aftercare') || n.includes('follow') || n.includes('nachverfolgung') || n.includes('no-show'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false };
-  if (n.includes('flight') || n.includes('metrics') || n.includes('platform') || n.includes('willkommen'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false };
-  if (n.includes('staff') || n.includes('review') || n.includes('driver'))
-    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false };
-  // LOW = test, demo, partner, telegram
-  if (n.includes('telegram') || n.includes('demo') || n.includes('test') || n.includes('[partner]'))
-    return { type: 'test', label: 'TEST', color: '#6b7280', priority: 'low', critical: false };
-  return { type: 'other', label: 'OTHER', color: '#6b7280', priority: 'low', critical: false };
+    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false, requiredForProd: true, trigger: 'automatic', hint: 'Catches and alerts on system errors' };
+  if (n.includes('metrics') || n.includes('platform'))
+    return { type: 'core', label: 'CORE FLOW', color: '#3b82f6', priority: 'high', critical: false, requiredForProd: true, trigger: 'scheduled', hint: 'Platform health metrics every 5min' };
+
+  // ── OPS (optional, activate per plan) ──
+  if (n.includes('reminder') || n.includes('no-show'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'scheduled', hint: 'Standby — activates per clinic plan (Ops+)' };
+  if (n.includes('aftercare'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Runs only after treatment completion' };
+  if (n.includes('follow') || n.includes('nachverfolgung') || n.includes('stale'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'scheduled', hint: 'Standby — follow-up for inactive conversations' };
+  if (n.includes('flight'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Flight ticket processing (Ops+)' };
+  if (n.includes('driver'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Driver pickup notifications (Ops+)' };
+  if (n.includes('review'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Post-treatment patient reviews' };
+  if (n.includes('staff') || n.includes('willkommen'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Staff/patient notification flows' };
+
+  // ── TEST / DRAFT (never production) ──
+  if (n.includes('telegram') && n.includes('test'))
+    return { type: 'test', label: 'DRAFT', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'manual', hint: 'E2E test flow — not for production' };
+  if (n.includes('demo'))
+    return { type: 'test', label: 'DRAFT', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'manual', hint: 'Demo/testing only' };
+  if (n.includes('[partner]'))
+    return { type: 'test', label: 'ARCHIVED', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'automatic', hint: 'Partner template — archived' };
+  if (n.includes('telegram'))
+    return { type: 'ops', label: 'OPS', color: '#f97316', priority: 'medium', critical: false, requiredForProd: true, trigger: 'automatic', hint: 'Telegram bridge for notifications' };
+
+  return { type: 'other', label: 'OTHER', color: '#6b7280', priority: 'low', critical: false, requiredForProd: false, trigger: 'unknown', hint: '' };
 }
 
-const TYPE_ORDER = { core: 0, revenue: 1, ops: 2, support: 3, test: 4, other: 5 };
-const FILTERS = ['all', 'active', 'inactive', 'high', 'revenue', 'core'];
+// Derive semantic status from n8n active flag + classification
+function deriveStatus(w) {
+  if (w.active === true) return 'active';
+  if (w.type === 'test' && w.label === 'ARCHIVED') return 'archived';
+  if (w.type === 'test') return 'draft';
+  if (w.requiredForProd) return 'broken';
+  if (w.priority === 'medium') return 'standby';
+  return 'disabled';
+}
+
+const STATUS_CONFIG = {
+  active:   { label: 'Active',   color: '#10b981', dot: '#10b981' },
+  standby:  { label: 'Standby',  color: '#eab308', dot: '#eab308' },
+  disabled: { label: 'Disabled', color: '#6b7280', dot: '#6b7280' },
+  draft:    { label: 'Draft',    color: '#a78bfa', dot: '#a78bfa' },
+  broken:   { label: 'Broken',   color: '#ef4444', dot: '#ef4444' },
+  archived: { label: 'Archived', color: '#4b5563', dot: '#4b5563' },
+};
+
+const TRIGGER_ICONS = { automatic: '⚡', scheduled: '⏱', 'event-based': '📡', manual: '👆', unknown: '—' };
+const TYPE_ORDER = { core: 0, revenue: 1, ops: 2, test: 4, other: 5 };
+const FILTERS = ['all', 'active', 'broken', 'standby', 'high', 'revenue', 'core'];
 
 export default function AutomationsView() {
   const [queueStats, setQueueStats] = useState(null);
@@ -59,21 +103,23 @@ export default function AutomationsView() {
   const rawWorkflows = Array.isArray(n8n?.workflows) ? n8n.workflows : [];
 
   const workflows = useMemo(() =>
-    rawWorkflows.map(w => ({ ...w, ...classifyWorkflow(w.name) }))
-      .sort((a, b) => (a.active === b.active ? 0 : a.active ? -1 : 1) || (TYPE_ORDER[a.type] || 5) - (TYPE_ORDER[b.type] || 5)),
+    rawWorkflows.map(w => {
+      const cls = classifyWorkflow(w.name, w.active);
+      return { ...w, ...cls, status: deriveStatus({ ...w, ...cls }) };
+    }).sort((a, b) => (a.active === b.active ? 0 : a.active ? -1 : 1) || (TYPE_ORDER[a.type] || 5) - (TYPE_ORDER[b.type] || 5)),
   [rawWorkflows]);
 
-  const activeWf = workflows.filter(w => w.active === true);
-  const inactiveWf = workflows.filter(w => w.active !== true);
-  // Alert only for truly critical (WhatsApp/Payment/Booking) inactive
-  const criticalInactive = workflows.filter(w => w.critical && w.active !== true);
-  // High priority inactive (includes core flows)
-  const highInactive = workflows.filter(w => w.priority === 'high' && w.active !== true);
+  const activeWf = workflows.filter(w => w.status === 'active');
+  const brokenWf = workflows.filter(w => w.status === 'broken');
+  const standbyWf = workflows.filter(w => w.status === 'standby');
+  // Alert only for broken (requiredForProd but not active)
+  const criticalInactive = workflows.filter(w => w.critical && w.status === 'broken');
 
   const displayed = useMemo(() => {
     let list = showProduction ? workflows.filter(w => w.type !== 'test') : workflows;
-    if (filter === 'active') list = list.filter(w => w.active === true);
-    else if (filter === 'inactive') list = list.filter(w => w.active !== true);
+    if (filter === 'active') list = list.filter(w => w.status === 'active');
+    else if (filter === 'broken') list = list.filter(w => w.status === 'broken');
+    else if (filter === 'standby') list = list.filter(w => w.status === 'standby' || w.status === 'disabled');
     else if (filter === 'high') list = list.filter(w => w.priority === 'high');
     else if (filter === 'revenue') list = list.filter(w => w.type === 'revenue');
     else if (filter === 'core') list = list.filter(w => w.type === 'core');
@@ -132,18 +178,18 @@ export default function AutomationsView() {
 
       {/* Active Workflows */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 10, marginBottom: 20 }}>
-        {displayed.filter(w => w.active === true).map((w, i) => <WfCard key={w.id || i} w={w} />)}
+        {displayed.filter(w => w.status === 'active').map((w, i) => <WfCard key={w.id || i} w={w} />)}
       </div>
 
-      {/* Inactive (collapsed) */}
-      {displayed.some(w => w.active !== true) && (
+      {/* Non-active (collapsed) */}
+      {displayed.some(w => w.status !== 'active') && (
         <>
           <button onClick={() => setShowInactive(!showInactive)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, cursor: 'pointer', marginBottom: 10, padding: 0 }}>
-            {showInactive ? '▾' : '▸'} Inactive ({displayed.filter(w => w.active !== true).length})
+            {showInactive ? '▾' : '▸'} Standby / Disabled / Draft ({displayed.filter(w => w.status !== 'active').length})
           </button>
           {showInactive && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 10, marginBottom: 20, opacity: 0.5 }}>
-              {displayed.filter(w => w.active !== true).map((w, i) => <WfCard key={w.id || i} w={w} />)}
+              {displayed.filter(w => w.status !== 'active').map((w, i) => <WfCard key={w.id || i} w={w} />)}
             </div>
           )}
         </>
@@ -179,13 +225,14 @@ export default function AutomationsView() {
 }
 
 function WfCard({ w }) {
-  const on = w.active === true;
-  const isHigh = w.priority === 'high';
+  const st = STATUS_CONFIG[w.status] || STATUS_CONFIG.disabled;
+  const isBroken = w.status === 'broken';
+  const isActive = w.status === 'active';
   const isLow = w.priority === 'low';
-  const crit = w.critical && !on;
-  const bc = crit ? '#ef4444' : (isHigh && on) ? '#10b98150' : on ? '#10b98120' : 'rgba(255,255,255,0.04)';
-  const shadow = crit ? '0 0 16px rgba(239,68,68,0.12)' : (isHigh && on) ? '0 0 10px rgba(16,185,129,0.08)' : 'none';
-  const opacity = isLow && !on ? 0.5 : 1;
+  const isHigh = w.priority === 'high';
+  const bc = isBroken ? '#ef4444' : (isHigh && isActive) ? '#10b98140' : isActive ? '#10b98120' : 'rgba(255,255,255,0.04)';
+  const shadow = isBroken ? '0 0 16px rgba(239,68,68,0.12)' : (isHigh && isActive) ? '0 0 10px rgba(16,185,129,0.06)' : 'none';
+  const opacity = (isLow && !isActive) ? 0.45 : 1;
   return (
     <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: '14px 16px', border: `1px solid ${bc}`, boxShadow: shadow, opacity, transition: 'all 0.12s' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
@@ -193,11 +240,13 @@ function WfCard({ w }) {
         <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: `${w.color || '#6b7280'}18`, color: w.color || '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>{w.label || 'OTHER'}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 6, height: 6, borderRadius: 99, background: on ? '#10b981' : '#6b7280', boxShadow: on ? '0 0 6px #10b981' : 'none' }} />
-        <span style={{ fontSize: 11, color: on ? '#10b981' : '#6b7280', fontWeight: 600 }}>{on ? 'Active' : 'Inactive'}</span>
+        <span style={{ width: 6, height: 6, borderRadius: 99, background: st.dot, boxShadow: isActive ? `0 0 6px ${st.dot}` : 'none' }} />
+        <span style={{ fontSize: 11, color: st.color, fontWeight: 600 }}>{st.label}</span>
+        {w.trigger && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{TRIGGER_ICONS[w.trigger] || ''}</span>}
         {w.critical && <span style={{ fontSize: 9, fontWeight: 700, color: '#ef4444', background: '#ef444415', padding: '1px 6px', borderRadius: 3 }}>CRITICAL</span>}
         {w.updatedAt && <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>{safeStr(w.updatedAt, '').slice(0, 10)}</span>}
       </div>
+      {w.hint && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.3 }}>{w.hint}</div>}
     </div>
   );
 }
