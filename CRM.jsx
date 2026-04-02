@@ -1615,6 +1615,8 @@ export default function App() {
               </div>)}
             </div>}
           </div>
+          {/* Operator Status Pills */}
+          {isOperator&&<OperatorHeaderPills setView={setView} setOpSubTab={setOpSubTab} totalActions={totalActions} />}
           {/* Daily Overview KPIs */}
           {!isOperator&&<div style={{display:"flex",gap:12,alignItems:"center",marginRight:4}}>
             {[
@@ -1634,14 +1636,14 @@ export default function App() {
           </div>}
           {/* EnvSwitch */}
           {!isOperator&&<button onClick={()=>{const next=isDemoMode?"live":"demo";try{localStorage.setItem("fm_env",next);}catch{}setIsDemoMode(next!=="live");setUser(null);}} style={{padding:"6px 14px",borderRadius:10,border:`1px solid ${isDemoMode?"rgba(255,138,42,0.25)":"rgba(76,201,255,0.25)"}`,background:isDemoMode?"rgba(255,138,42,0.1)":"rgba(76,201,255,0.1)",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"inherit",display:"flex",alignItems:"center",gap:6,transition:"all .15s"}} title={isDemoMode?"Switch to Live Mode (Supabase)":"Switch to Demo Mode (localStorage)"}>{isDemoMode?"🧪 Demo":"🚀 Live"}</button>}
-          {/* Language switcher */}
-          <div style={{display:"flex",gap:3}}>
+          {/* Language switcher — only for clinic users */}
+          {!isOperator&&<div style={{display:"flex",gap:3}}>
             {[{code:"en",flag:"🇬🇧"},{code:"de",flag:"🇩🇪"},{code:"tr",flag:"🇹🇷"}].map(l=>
               <button key={l.code} onClick={()=>{setLang(l.code);setLoginLang(l.code);}} style={{width:32,height:32,borderRadius:9,background:lang===l.code?"rgba(76,201,255,0.08)":"transparent",border:lang===l.code?"1px solid rgba(76,201,255,0.15)":"1px solid transparent",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>{l.flag}</button>
             )}
-          </div>
-          {/* Notification bell */}
-          <div style={{position:"relative"}}>
+          </div>}
+          {/* Notification bell — only for clinic users */}
+          {!isOperator&&<div style={{position:"relative"}}>
             <button onClick={()=>{setNotifOpen(!notifOpen);if(!notifOpen)markNotifsRead();}} style={{width:36,height:36,borderRadius:10,background:notifOpen?"rgba(76,201,255,0.08)":"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,color:"rgba(167,177,195,0.6)",position:"relative",transition:"all .15s"}}>🔔
               {unreadNotifs>0&&<span style={{position:"absolute",top:-3,right:-3,width:16,height:16,borderRadius:99,background:"#ff8a2a",color:"#fff",fontSize:9,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>{unreadNotifs}</span>}
             </button>
@@ -1653,7 +1655,7 @@ export default function App() {
                 <div><div style={{fontSize:13,lineHeight:1.4,color:n.read?"rgba(167,177,195,0.6)":"rgba(232,238,252,0.9)"}}>{n.text}</div><div style={{fontSize:11,color:"rgba(167,177,195,0.35)",marginTop:3}}>{timeAgo(n.time)}</div></div>
               </div>)}
             </div>}
-          </div>
+          </div>}
           {/* System status mini */}
           <div style={{display:"flex",gap:6}}>
             {[{s:true,c:"#10b981",t:"AI Online"},{s:true,c:"#10b981",t:"WA Connected"}].map((it,i)=><div key={i} title={it.t} style={{width:8,height:8,borderRadius:99,background:it.c,boxShadow:`0 0 6px ${it.c}`}}/>)}
@@ -1726,5 +1728,83 @@ export default function App() {
     {tourActive&&!isOperator&&<ProductTour/>}
     </AppContext.Provider>
     </ErrorBoundary>
+  );
+}
+
+/* ═══ OPERATOR HEADER STATUS PILLS ═══ */
+function OperatorHeaderPills({ setView, setOpSubTab, totalActions }) {
+  const [clock, setClock] = useState("");
+  const [activeClinics, setActiveClinics] = useState(null);
+  const [visitors, setVisitors] = useState(null);
+
+  // Clock
+  useEffect(() => {
+    const tick = () => setClock(new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }));
+    tick();
+    const iv = setInterval(tick, 30000);
+    return () => clearInterval(iv);
+  }, []);
+
+  // Load data
+  useEffect(() => {
+    import("./src/api/client").then(fmApi => {
+      // Active clinics: subscription_status=active, not demo
+      fmApi.getPlatformClinics({ status: "active", limit: 100 }).then(res => {
+        const list = Array.isArray(res?.clinics) ? res.clinics : [];
+        const active = list.filter(c => c.subscription_status === "active" && c.workspace_state === "active");
+        setActiveClinics(active.length);
+      }).catch(() => {});
+      // Visitors
+      fmApi.getVisitorStats().then(res => {
+        setVisitors(res?.today?.visitors ?? res?.visitors ?? null);
+      }).catch(() => {});
+    });
+    const iv = setInterval(() => {
+      import("./src/api/client").then(fmApi => {
+        fmApi.getVisitorStats().then(res => setVisitors(res?.today?.visitors ?? res?.visitors ?? null)).catch(() => {});
+      });
+    }, 60000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const pill = (bg, border, color, cursor) => ({
+    display: "flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 10,
+    background: bg, border: `1px solid ${border}`, cursor: cursor || "default",
+    transition: "all .15s", fontSize: 12, fontWeight: 700, color,
+  });
+
+  const hasActions = totalActions > 0;
+
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "center", marginLeft: "auto" }}>
+      {/* Clock */}
+      <div style={pill("rgba(255,255,255,0.03)", "rgba(255,255,255,0.06)", "rgba(167,177,195,0.5)")}>
+        <span style={{ fontSize: 11 }}>{clock}</span>
+      </div>
+      {/* Action Needed */}
+      {hasActions && (
+        <div style={pill("rgba(239,68,68,0.08)", "rgba(239,68,68,0.2)", "#ef4444", "pointer")}
+          onClick={() => { setView("operator"); setOpSubTab("dashboard"); }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.14)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}>
+          <span style={{ width: 6, height: 6, borderRadius: 99, background: "#ef4444", boxShadow: "0 0 8px #ef4444", animation: "fmPulse 2s infinite" }} />
+          <span>Action Needed ({totalActions})</span>
+        </div>
+      )}
+      {/* Active Clinics */}
+      <div style={pill("rgba(16,185,129,0.06)", "rgba(16,185,129,0.12)", "#10b981", "pointer")}
+        onClick={() => { setView("operator"); setOpSubTab("clinics"); }}
+        onMouseEnter={e => e.currentTarget.style.background = "rgba(16,185,129,0.12)"}
+        onMouseLeave={e => e.currentTarget.style.background = "rgba(16,185,129,0.06)"}>
+        <span>Active Clinics: {activeClinics !== null ? activeClinics : "..."}</span>
+      </div>
+      {/* Visitors */}
+      <div style={pill("rgba(59,130,246,0.06)", "rgba(59,130,246,0.12)", "#3b82f6", "pointer")}
+        onClick={() => { setView("operator"); setOpSubTab("analytics"); }}
+        onMouseEnter={e => e.currentTarget.style.background = "rgba(59,130,246,0.12)"}
+        onMouseLeave={e => e.currentTarget.style.background = "rgba(59,130,246,0.06)"}>
+        <span>Visitors: {visitors !== null ? visitors : "..."}</span>
+      </div>
+    </div>
   );
 }
