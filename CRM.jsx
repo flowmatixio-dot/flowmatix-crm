@@ -1811,23 +1811,26 @@ function OperatorHeaderPills({ setView, setOpSubTab, totalActions }) {
 
   // Load data
   useEffect(() => {
-    import("./src/api/client").then(fmApi => {
-      // Active clinics: subscription_status=active, not demo
-      fmApi.getPlatformClinics({ status: "active", limit: 100 }).then(res => {
-        const list = Array.isArray(res?.clinics) ? res.clinics : [];
-        const active = list.filter(c => c.subscription_status === "active" && c.workspace_state === "active");
-        setActiveClinics(active.length);
-      }).catch(() => {});
-      // Visitors
-      fmApi.getVisitorStats().then(res => {
-        setVisitors(res?.today?.visitors ?? res?.visitors ?? null);
-      }).catch(() => {});
-    });
-    const iv = setInterval(() => {
-      import("./src/api/client").then(fmApi => {
-        fmApi.getVisitorStats().then(res => setVisitors(res?.today?.visitors ?? res?.visitors ?? null)).catch(() => {});
-      });
-    }, 60000);
+    const loadAll = async () => {
+      try {
+        const fmApi = await import("./src/api/client");
+        // Active clinics
+        try {
+          const res = await fmApi.getPlatformClinics({ limit: 100 });
+          const list = Array.isArray(res?.clinics) ? res.clinics : [];
+          const active = list.filter(c => c.subscription_status === "active" || c.workspace_state === "active");
+          setActiveClinics(active.length);
+        } catch (e) { console.warn("[header] clinics failed:", e); }
+        // Visitors
+        try {
+          const res = await fmApi.getVisitorStats();
+          const v = parseInt(res?.today?.visitors) || parseInt(res?.month?.visitors) || 0;
+          setVisitors(v);
+        } catch (e) { console.warn("[header] visitors failed:", e); }
+      } catch {}
+    };
+    loadAll();
+    const iv = setInterval(loadAll, 60000);
     return () => clearInterval(iv);
   }, []);
 
