@@ -114,33 +114,20 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     }
   }, []);
 
-  /* ═══ IMPERSONATION — handle ?impersonate_token=... or #impersonate=... from operator console ═══ */
+  /* ═══ IMPERSONATION — handle #impersonate=... from operator console ═══ */
   useEffect(() => {
-    // Method 1: Query param (new, preferred)
-    const params = new URLSearchParams(window.location.search);
-    const impToken = params.get('impersonate_token');
-    if (impToken) {
-      fmApi.setTokens(impToken, impToken);
-      sessionStorage.setItem('fm_impersonation', 'true');
-      sessionStorage.setItem('fm_login_at', String(Date.now()));
-      // Clean URL
-      const url = new URL(window.location);
-      url.searchParams.delete('impersonate_token');
-      window.history.replaceState({}, '', url.pathname + (url.search || ''));
-    }
-
-    // Method 2: Hash (legacy)
     const hash = window.location.hash;
-    if (!impToken && hash.startsWith('#impersonate=')) {
+    if (hash.startsWith('#impersonate=')) {
       try {
         const encoded = hash.replace('#impersonate=', '');
         const decoded = atob(encoded);
-        const hashParams = new URLSearchParams(decoded);
-        const access = hashParams.get('access');
+        const params = new URLSearchParams(decoded);
+        const access = params.get('access');
         if (access) {
           fmApi.setTokens(access, access);
           sessionStorage.setItem('fm_impersonation', 'true');
           sessionStorage.setItem('fm_login_at', String(Date.now()));
+          // Don't clean hash — banner needs it
         }
       } catch (e) { console.warn('[impersonate] Failed to parse:', e); }
     }

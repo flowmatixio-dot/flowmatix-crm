@@ -160,7 +160,7 @@ export function useBusinessLogic({
     if (!isDemoMode()) {
       fmApi.createCrmInvoice(inv).catch(err => { console.error("createCrmInvoice failed:", err); showT("Rechnung konnte nicht gespeichert werden"); });
     } else {
-      console.log("[Demo] createCrmInvoice blocked");
+      // Demo mode — createCrmInvoice blocked
     }
     return inv;
   };
@@ -173,7 +173,7 @@ export function useBusinessLogic({
     if (!isDemoMode()) {
       fmApi.updateInvoice(invId, { status: "paid", paidDate, paidMethod: method || "cash" }).catch(err => { console.error("updateInvoice failed:", err); showT("Zahlung konnte nicht gespeichert werden"); });
     } else {
-      console.log("[Demo] updateInvoice blocked");
+      // Demo mode — updateInvoice blocked
     }
     showT("Marked as paid");
   };
@@ -226,7 +226,7 @@ export function useBusinessLogic({
     let link;
     if (isDemoMode()) {
       link = `#DEMO-stripe-link/${inv.id.substring(0, 8)}`;
-      console.log("[Demo] createStripeCheckoutLink blocked");
+      // Demo mode — createStripeCheckoutLink blocked
     } else {
       try {
         const res = await fmApi.createStripeCheckoutLink?.({ invoiceId: inv.id, amount: inv.gross, currency: 'eur', ref: inv.nr });
@@ -251,7 +251,7 @@ export function useBusinessLogic({
     let link;
     if (isDemoMode()) {
       link = `#DEMO-stripe-deposit/${genId().substring(0, 8)}`;
-      console.log("[Demo] createStripeCheckoutLink (deposit) blocked");
+      // Demo mode — createStripeCheckoutLink (deposit) blocked
     } else {
       try {
         const res = await fmApi.createStripeCheckoutLink?.({ leadId, amount, currency: 'eur', type: 'deposit', desc: `Deposit_${lead.name.replace(/\s/g, "_")}` });
@@ -276,7 +276,7 @@ export function useBusinessLogic({
     let link;
     if (isDemoMode()) {
       link = `#DEMO-stripe-payment/${genId().substring(0, 8)}`;
-      console.log("[Demo] createStripeCheckoutLink (payment) blocked");
+      // Demo mode — createStripeCheckoutLink (payment) blocked
     } else {
       try {
         const res = await fmApi.createStripeCheckoutLink?.({ leadId, amount, currency: 'eur', clinicId: activeClinicId });
@@ -423,7 +423,7 @@ export function useBusinessLogic({
             notes: "Bitte Graft-Anzahl und Behandlungsplan bestimmen.",
           });
           addTL(lead.id, "system", `Task created for ${lead.reviewAssignedTo}: Graft count review`);
-          console.log("[CRM] Task created for doctor", doc.id, "patient", lead.id);
+          // Task created successfully
         } else {
           console.warn("[CRM] Could not find doctor ID for:", lead.reviewAssignedTo);
         }

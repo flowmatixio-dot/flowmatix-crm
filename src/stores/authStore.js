@@ -102,39 +102,40 @@ export const useAuthStore = create((set, get) => ({
    * Restore session on page load — checks API tokens.
    */
   restoreSession: async () => {
-    // ── Impersonation: accept token from URL ──
+    // ── Impersonation: accept token from URL hash (#impersonate=...) ──
     try {
-      const params = new URLSearchParams(window.location.search);
-      const impToken = params.get('impersonate_token');
-      if (impToken) {
-        // Set the impersonation token as the session token
-        fmApi.setTokens(impToken, null);
-        sessionStorage.setItem('fm_impersonating', 'true');
-        // Clean URL
-        const url = new URL(window.location);
-        url.searchParams.delete('impersonate_token');
-        window.history.replaceState({}, '', url.pathname + url.search);
-        // Fetch user info with the impersonation token
-        try {
-          const me = await fmApi.getMe();
-          if (me?.user || me?.email) {
-            const u = me.user || me;
-            set({
-              user: {
-                email: u.email,
-                role: u.role || 'clinic_admin',
-                clinicId: u.organizationId || u.org_id || null,
-                name: u.name || u.email?.split('@')[0] || 'Operator',
-                apiUser: true,
-                apiRole: u.role || 'clinic_admin',
-                orgId: u.organizationId || u.org_id,
-                impersonating: true,
-              },
-              authLoading: false,
-            });
-            return;
-          }
-        } catch { fmApi.clearTokens(); sessionStorage.removeItem('fm_impersonating'); }
+      const hash = window.location.hash;
+      if (hash.startsWith('#impersonate=')) {
+        const encoded = hash.replace('#impersonate=', '');
+        const decoded = atob(encoded);
+        const hashParams = new URLSearchParams(decoded);
+        const impToken = hashParams.get('access');
+        if (impToken) {
+          fmApi.setTokens(impToken, impToken);
+          sessionStorage.setItem('fm_impersonating', 'true');
+          sessionStorage.setItem('fm_impersonation', 'true');
+          // Don't clean hash — banner needs it
+          try {
+            const me = await fmApi.getMe();
+            if (me?.user || me?.email) {
+              const u = me.user || me;
+              set({
+                user: {
+                  email: u.email,
+                  role: u.role || 'clinic_admin',
+                  clinicId: u.organizationId || u.org_id || null,
+                  name: u.name || u.email?.split('@')[0] || 'Operator',
+                  apiUser: true,
+                  apiRole: u.role || 'clinic_admin',
+                  orgId: u.organizationId || u.org_id,
+                  impersonating: true,
+                },
+                authLoading: false,
+              });
+              return;
+            }
+          } catch { fmApi.clearTokens(); sessionStorage.removeItem('fm_impersonating'); sessionStorage.removeItem('fm_impersonation'); }
+        }
       }
     } catch {}
 
