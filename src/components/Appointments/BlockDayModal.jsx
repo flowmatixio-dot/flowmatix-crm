@@ -28,7 +28,7 @@ export default function BlockDayModal({ doctors, blockedDays = [], onSave, onDel
       const end = dateTo ? new Date(dateTo + "T00:00:00") : start;
       const current = new Date(start);
       while (current <= end) {
-        const d = current.toISOString().slice(0, 10);
+        const d = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,'0')}-${String(current.getDate()).padStart(2,'0')}`;
         await onSave({ date: d, reason: reason || "Blocked", doctorId: doctorId || null });
         current.setDate(current.getDate() + 1);
       }
