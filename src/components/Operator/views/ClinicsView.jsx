@@ -13,6 +13,7 @@ const ACTION_PRIORITY = {
 // Smart CTA per action
 const SMART_CTA = {
   TRIAL: { label: 'Trial', color: '#eab308' },
+  WA_PENDING: { label: 'WA Pending', color: '#f97316' },
   FIX_ERROR: { label: 'Fix Error', color: '#ef4444' },
   VERIFY_OTP: { label: 'Verify OTP', color: '#f97316' },
   CONNECT_WHATSAPP: { label: 'Connect WhatsApp', color: '#eab308' },

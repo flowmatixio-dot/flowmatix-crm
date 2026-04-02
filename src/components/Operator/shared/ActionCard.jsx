@@ -15,6 +15,8 @@ const ACTION_LABELS = {
   WAIT_FOR_NUMBER:     { icon: '📞', label: 'Waiting for phone number' },
   VERIFY_OTP:          { icon: '🔑', label: 'OTP ready — verify in 360dialog' },
   CONNECT_WHATSAPP:    { icon: '💬', label: 'Connect WhatsApp' },
+  WA_PENDING:          { icon: '📱', label: 'Number submitted — setup WhatsApp' },
+  PHONE_SUBMITTED:     { icon: '📱', label: 'Phone number submitted' },
   FIX_ERROR:           { icon: '🚨', label: 'Fix error' },
   BOT_NO_RESPONSE:     { icon: '🤖', label: 'Bot not responding' },
   BOT_ERROR:           { icon: '🤖', label: 'Bot error' },
