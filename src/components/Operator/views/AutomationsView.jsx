@@ -161,7 +161,7 @@ export default function AutomationsView() {
       )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 16 }}>
-        <StatCard label="Active" value={activeWf.length} color="green" sub={`${inactiveWf.length} inactive`} />
+        <StatCard label="Active" value={activeWf.length} color="green" sub={`${brokenWf.length} broken · ${standbyWf.length} standby`} />
         <StatCard label="Pending Jobs" value={totalPending} color={totalPending > 50 ? 'orange' : 'blue'} />
         <StatCard label="Failed Jobs" value={totalFailed} color={totalFailed > 0 ? 'red' : 'green'} />
         <StatCard label="Queues" value={queues.length} color="blue" />

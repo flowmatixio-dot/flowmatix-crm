@@ -8,6 +8,7 @@ export default function MonitoringView({ actions }) {
   const [infra, setInfra] = useState(null);
   const [db, setDb] = useState(null);
   const [backup, setBackup] = useState(null);
+  const [r2, setR2] = useState(null);
   const [queueStats, setQueueStats] = useState(null);
   const [localClinics, setLocalClinics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,11 +22,13 @@ export default function MonitoringView({ actions }) {
       fmApi.getPlatformClinics().catch(() => null),
       fmApi.getBackupStatus?.().catch(() => null),
       fmApi.getQueueStats?.().catch(() => null),
-    ]).then(([infraRes, dbRes, clinicsRes, backupRes, queueRes]) => {
+      fmApi.getR2Stats?.().catch(() => null),
+    ]).then(([infraRes, dbRes, clinicsRes, backupRes, queueRes, r2Res]) => {
       setInfra(infraRes ? normalizeInfra(infraRes) : null);
       setDb(dbRes);
       setLocalClinics(normalizeClinics(clinicsRes));
       setBackup(backupRes);
+      setR2(r2Res);
       setQueueStats(queueRes);
       setLoading(false);
     }).catch(err => { setError(err?.message || 'Failed'); setLoading(false); });
@@ -187,7 +190,7 @@ export default function MonitoringView({ actions }) {
 
         {/* Backup + Database */}
         <div>
-          <h2 style={secH}>Backup & Database</h2>
+          <h2 style={secH}>Backup, Database & Storage</h2>
           <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 16, borderLeft: `3px solid ${backupOk ? '#10b981' : '#f97316'}`, marginBottom: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Backup</span>
@@ -219,6 +222,9 @@ export default function MonitoringView({ actions }) {
           </div>
         </div>
       </div>
+
+      {/* R2 Storage */}
+      {r2 && r2.configured !== false && <R2Card r2={r2} />}
 
       {/* Integration Status */}
       <h2 style={secH}>Integration Status</h2>
@@ -269,6 +275,57 @@ function MetricCard({ label, pct, detail, sub, value, color }) {
       <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>{value || (hasPct ? `${pct.toFixed(1)}%` : '—')}</div>
       {detail && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5 }}>{detail}</div>}
       {sub && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{sub}</div>}
+    </div>
+  );
+}
+
+function R2Card({ r2 }) {
+  const totalGB = r2.totalSize ? (r2.totalSize / 1e9).toFixed(2) : 0;
+  const limitGB = 10; // R2 free tier = 10GB
+  const pct = totalGB > 0 ? Math.min(100, (totalGB / limitGB) * 100) : 0;
+  const color = pct > 85 ? '#ef4444' : pct > 70 ? '#eab308' : '#10b981';
+  const isCritical = pct > 85;
+  const isWarning = pct > 70;
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-secondary)', marginBottom: 12 }}>Media Storage (R2)</h2>
+      {isCritical && (
+        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 10, background: '#ef444412', border: '1px solid #ef444430', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: 99, background: '#ef4444', animation: 'fmPulse 2s infinite' }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#ef4444' }}>R2 storage nearly full — uploads may fail</span>
+        </div>
+      )}
+      {isWarning && !isCritical && (
+        <div style={{ padding: '8px 14px', borderRadius: 8, marginBottom: 10, background: '#eab30812', border: '1px solid #eab30830' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#eab308' }}>Storage usage above 70%</span>
+        </div>
+      )}
+      <div style={{ background: 'var(--bg-card)', borderRadius: 10, padding: 16, borderLeft: `3px solid ${color}` }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Cloudflare R2</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color, background: `${color}15`, padding: '2px 8px', borderRadius: 4 }}>
+            {pct.toFixed(0)}%
+          </span>
+        </div>
+        {/* Usage bar */}
+        <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)', marginBottom: 10 }}>
+          <div style={{ height: '100%', borderRadius: 3, background: color, width: `${pct}%`, transition: 'width 0.3s' }} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+          <span style={{ color: 'var(--text-muted)' }}>Used</span>
+          <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{totalGB} GB / {limitGB} GB</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+          <span style={{ color: 'var(--text-muted)' }}>Files</span>
+          <span style={{ color: 'var(--text-primary)' }}>{safeNum(r2.totalFiles).toLocaleString()}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+          <span style={{ color: 'var(--text-muted)' }}>Bucket</span>
+          <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{safeStr(r2.bucket, '—')}</span>
+        </div>
+        {r2.error && <div style={{ fontSize: 11, color: '#ef4444', marginTop: 8 }}>Error: {safeStr(r2.error)}</div>}
+      </div>
     </div>
   );
 }
