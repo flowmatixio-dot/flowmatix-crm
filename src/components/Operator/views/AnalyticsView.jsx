@@ -4,9 +4,9 @@ import DataTable from '../shared/DataTable.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
-const biz = (path) => fmApi.apiFetch(`/api/v1/ops/analytics-biz${path}`);
-const noData = (v) => (v === 0 || v === null || v === undefined) ? 'No data' : v;
-const fmtEur = (cents) => { const n = safeNum(cents); return n > 0 ? `€${(n / 100).toLocaleString('de-DE')}` : 'No data'; };
+const biz = (path) => fmApi.apiFetch(`/api/v1/ops/analytics-biz${path}`).catch(() => null);
+const noData = (v) => (v === null || v === undefined) ? 'No data' : v;
+const fmtEur = (cents) => { const n = safeNum(cents); return n > 0 ? `€${(n / 100).toLocaleString('de-DE')}` : '€0'; };
 
 export default function AnalyticsView() {
   const [period, setPeriod] = useState('30');
@@ -41,8 +41,10 @@ export default function AnalyticsView() {
     }).catch(() => setLoading(false));
   }, [period]);
 
-  const mrr = safeNum(revenue?.mrr);
+  const mrr = safeNum(revenue?.mrr) || safeNum(bizRev?.mrr_cents);
   const countByStatus = (revenue?.countByStatus && typeof revenue.countByStatus === 'object') ? revenue.countByStatus : {};
+  const activeSubs = safeNum(countByStatus.active) || safeNum(bizRev?.active_subs);
+  const trialSubs = safeNum(countByStatus.trialing) || safeNum(bizRev?.trial_subs);
   const visitorCount = period === '1' ? safeNum(visitors?.today?.visitors) : period === '7' ? safeNum(visitors?.week?.visitors) : safeNum(visitors?.month?.visitors);
   const totalMsgs = safeNum(waPerf?.messages_30d);
   const totalLeads = safeNum(funnel?.leads);
@@ -72,7 +74,7 @@ export default function AnalyticsView() {
 
       {/* ═══ 1. TOP KPIs ═══ */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 32 }}>
-        <StatCard label="MRR" value={fmtEur(mrr)} color="green" sub={`${safeNum(countByStatus.active)} active · ${safeNum(countByStatus.trialing)} trial`} />
+        <StatCard label="MRR" value={fmtEur(mrr)} color="green" sub={`${activeSubs} active · ${trialSubs} trial`} />
         <StatCard label="Bookings" value={noData(safeNum(bizRev?.bookings_30d))} color="orange" sub={`${noData(safeNum(bizRev?.bookings_today))} today`} />
         <StatCard label="Leads" value={noData(totalLeads)} color="purple" sub={`Last ${period}d`} />
         <StatCard label="Messages" value={noData(totalMsgs)} color="blue" sub={`${noData(safeNum(waPerf?.messages_today))} today`} />
@@ -85,9 +87,9 @@ export default function AnalyticsView() {
           { l: 'Bookings Today', v: safeNum(bizRev?.bookings_today), c: '#f97316' },
           { l: 'Bookings 7d', v: safeNum(bizRev?.bookings_7d), c: '#a78bfa' },
           { l: 'Bookings 30d', v: safeNum(bizRev?.bookings_30d), c: '#3b82f6' },
-          { l: 'Active Subs', v: safeNum(bizRev?.active_subs), c: '#10b981' },
-          { l: 'Trial Subs', v: safeNum(bizRev?.trial_subs), c: '#eab308' },
-          { l: 'MRR', v: fmtEur(safeNum(bizRev?.mrr_cents)), c: '#10b981' },
+          { l: 'Active Subs', v: activeSubs, c: '#10b981' },
+          { l: 'Trial Subs', v: trialSubs, c: '#eab308' },
+          { l: 'MRR', v: fmtEur(mrr), c: '#10b981' },
         ].map((m, i) => (
           <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 8, padding: '14px 12px', borderTop: `2px solid ${m.c}`, textAlign: 'center' }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>{noData(m.v)}</div>
