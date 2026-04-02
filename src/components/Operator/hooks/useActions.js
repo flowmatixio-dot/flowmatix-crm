@@ -97,7 +97,7 @@ function computeAction(c) {
   if (ws === 'pending_setup' && waSetup === 'verified') return 'ACTIVATE';
   if (ws === 'demo' && sub !== 'active') return 'START_SETUP';
   if ((ws === 'live_test' || ws === 'activation_pending') && !wa) return 'WAIT_FOR_NUMBER';
-  if (ws === 'active' && sub === 'active') return 'NONE';
+  if (ws === 'active' && sub === 'active' && wa) return 'NONE';
   if (ws === 'active' && !wa) return 'CONNECT_WHATSAPP';
   return 'START_SETUP';
 }
