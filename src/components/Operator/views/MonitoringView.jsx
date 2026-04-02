@@ -15,8 +15,10 @@ export default function MonitoringView({ actions }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const initialLoadDone = React.useRef(false);
   const load = useCallback(() => {
-    setLoading(true); setError(null);
+    if (!initialLoadDone.current) setLoading(true);
+    setError(null);
     Promise.all([
       fmApi.getInfrastructure().catch(() => null),
       fmApi.getInfraDatabase?.().catch(() => null),
@@ -33,8 +35,8 @@ export default function MonitoringView({ actions }) {
       setR2(r2Res);
       setQueueStats(queueRes);
       setBizMetrics(bizRes);
-      setLoading(false);
-    }).catch(err => { setError(err?.message || 'Failed'); setLoading(false); });
+      initialLoadDone.current = true; setLoading(false);
+    }).catch(err => { setError(err?.message || 'Failed'); initialLoadDone.current = true; setLoading(false); });
   }, []);
 
   useEffect(() => { load(); const iv = setInterval(load, 30000); return () => clearInterval(iv); }, [load]);
