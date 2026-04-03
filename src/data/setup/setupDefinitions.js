@@ -45,7 +45,7 @@ export const TIER_META = {
 /**
  * Team member limits by plan tier.
  */
-export const TEAM_LIMITS = { core: 1, pro: 3, operations: 5, enterprise: 999 };
+export const TEAM_LIMITS = { core: 999, pro: 999, operations: 999, enterprise: 999 };
 
 /**
  * Dashboard quick-steps: the subset of setup steps shown on the dashboard.

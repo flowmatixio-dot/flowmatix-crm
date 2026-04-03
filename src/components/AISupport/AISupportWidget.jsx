@@ -265,7 +265,7 @@ export default function AISupportWidget() {
     const needsAction = convs.filter(c => ["human_takeover", "needs_medical_review", "waiting_for_clinic_reply"].includes(c.convStatus));
 
     // Plan limits
-    const planLimits = { core: { patients: 250, team: 1 }, pro: { patients: 500, team: 3 }, operations: { patients: 1000, team: 5 }, enterprise: { patients: "unlimited", team: "unlimited" } };
+    const planLimits = { core: { patients: 250, team: "unlimited" }, pro: { patients: 500, team: "unlimited" }, operations: { patients: 1000, team: "unlimited" }, enterprise: { patients: "unlimited", team: "unlimited" } };
     const currentPlan = clinic.plan || "core";
     const limits = planLimits[currentPlan] || planLimits.core;
 

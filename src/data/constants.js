@@ -18,10 +18,10 @@ export const STAGES = [{ id: "new", label: "stage_new", color: "#4cc9ff", icon: 
 export const PLAN_C = { core: "#4cc9ff", pro: "#a78bfa", operations: "#ff8a2a", enterprise: "#10b981" };
 export const PLAN_PRICE = { core: "€690", pro: "€990", operations: "€1.490", enterprise: "€2.500+" };
 export const TEAM_LIMITS = {
-  core: 1,
-  pro: 3,
-  operations: 5,
-  enterprise: null,
+  core: 999,
+  pro: 999,
+  operations: 999,
+  enterprise: 999,
 };
 export const PLAN_LIMITS = {
   core:       { patients: 250 },

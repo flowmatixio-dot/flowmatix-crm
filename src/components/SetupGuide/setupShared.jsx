@@ -18,7 +18,7 @@ export const SETUP_CATS = [
   { id: "flights",     icon: "✈️", key: "sg_flights",      descKey: "sg_flight_desc",   time: "1 Min.", tier: "optional",    step: 12 },
 ];
 
-export const TEAM_LIMITS = { core: 1, pro: 3, operations: 5, enterprise: 999 };
+export const TEAM_LIMITS = { core: 999, pro: 999, operations: 999, enterprise: 999 };
 
 export const CHECKS = {
   profile:    c => !!(c.name && c.address && c.phone && c.clinicEmail),
