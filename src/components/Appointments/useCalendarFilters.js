@@ -8,7 +8,7 @@ export function useCalendarFilters(events) {
   const [selectedDoctorIds, setSelectedDoctorIds] = useState(null);
 
   const filteredEvents = useMemo(() => {
-    if (!selectedDoctorIds) return events;
+    if (!selectedDoctorIds) return events.filter(ev => (ev.extendedProps?.type !== "vacation"));
     return events.filter((ev) => {
       const props = ev.extendedProps || {};
       const appt = props.appt || {};
