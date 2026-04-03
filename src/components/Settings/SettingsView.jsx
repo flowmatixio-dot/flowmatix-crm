@@ -1071,7 +1071,7 @@ export default function SettingsView() {
         </div>
       ))}
       <div style={{marginTop:8,padding:"12px 16px",borderRadius:10,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.2)",fontSize:12,color:"#ef4444",lineHeight:1.6,fontWeight:600,animation:"fmPulseRed 2s infinite"}}>
-        ⚠️ {t("driver_telegram_hint")}
+        ⚠️ {(t("driver_telegram_hint")||"").split(/(@FlowmatixBot|\/start)/g).map((part,i) => /^(@FlowmatixBot|\/start)$/.test(part) ? <span key={i} style={{color:"#fff",background:"rgba(255,255,255,0.12)",padding:"1px 6px",borderRadius:4,fontFamily:"monospace"}}>{part}</span> : part)}
         <style>{`@keyframes fmPulseRed{0%,100%{opacity:1}50%{opacity:0.7}}`}</style>
       </div>
     </div>}
