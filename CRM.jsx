@@ -354,6 +354,19 @@ export default function App() {
     });
     return count;
   },[myLeads]);
+  // Also count pending DB tasks (followup)
+  const [dbTaskCount, setDbTaskCount] = React.useState(0);
+  React.useEffect(() => {
+    const load = () => fmApi.apiFetch("/api/v1/tasks").then(res => {
+      setDbTaskCount((res.tasks || []).filter(tk => tk.status === "pending" && tk.type === "followup").length);
+    }).catch(() => {});
+    load();
+    const iv = setInterval(load, 30000);
+    const onDismiss = () => setDbTaskCount(prev => Math.max(0, prev - 1));
+    window.addEventListener("fm:task-dismissed", onDismiss);
+    return () => { clearInterval(iv); window.removeEventListener("fm:task-dismissed", onDismiss); };
+  }, []);
+  const totalActionsWithDb = totalActions + dbTaskCount;
 
   /* ═══ AUDIT LOG ═══ */
   const logAction=(action,target,details)=>{
@@ -383,7 +396,7 @@ export default function App() {
     fmApi.updatePatient(lid,{conv_status:st,control_mode:controlMode}).catch(err=>console.warn("updatePatient convStatus failed:",err));
   };
   const handleDrop=st=>{if(dragItem){moveLead(dragItem,st);setDragItem(null);}};
-  const updateAppt=(id,data)=>{setAppts(p=>p.map(a=>a.id===id?{...a,...data}:a));showT("Updated");fmApi.updateAppointment(id,data).catch(err=>console.warn("updateAppointment failed:",err));};
+  const updateAppt=(id,data)=>{console.log("[CRM] updateAppt called:",id,JSON.stringify(data));setAppts(p=>p.map(a=>a.id===id?{...a,...data}:a));showT("Updated");fmApi.updateAppointment(id,data).then(r=>console.log("[CRM] updateAppt SUCCESS:",r)).catch(err=>{console.error("[CRM] updateAppt FAILED:",err);showT("Speichern fehlgeschlagen: "+err.message);});};
   const openPatient=(lid)=>{setSelLead(lid);const l=leads.find(x=>x.id===lid);if(l)logAction("patient_opened",l.name,`Viewed profile (${l.treatment})`);};
   const openPatientPhotos=(lid)=>{const l=leads.find(x=>x.id===lid);if(l)logAction("photos_viewed",l.name,`Viewed ${l.photoUrls?.length||0} photos`);};
   const browserNotify=(title,body)=>{if("Notification" in window && Notification.permission==="granted"){new Notification(title,{body,icon:"/Flowmatix-Logo.png"});}};
@@ -750,7 +763,7 @@ export default function App() {
     tourActive, setTourActive, tourStep, setTourStep, tourCompleted, setTourCompleted,
     templateModal, setTemplateModal, templateFilter, setTemplateFilter, successModal, setSuccessModal,
     isAdmin, isOperator, activeClinicId, clinic, myLeads, myAppts, allClinicMsgs, myMsgs, unread, opSubTab, setOpSubTab,
-    myNotifs, unreadNotifs, myFiles, myAutomations, totalActions,
+    myNotifs, unreadNotifs, myFiles, myAutomations, totalActions: totalActionsWithDb,
     usageMetrics: crmData.usageMetrics, todayMetrics: crmData.todayMetrics,
     searchResults, flightAlerts: crmData.flightAlerts, flightMatches: crmData.flightMatches,
     needsOnboarding, onboardingSteps,

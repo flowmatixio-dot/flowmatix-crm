@@ -752,7 +752,7 @@ export default function MainLayout() {
             </div>}
 
             {/* Demo/Live toggle */}
-            {IS_CLIENT_MODE && clinic && effectiveRole === "admin" && <button data-tour="demo_toggle" onClick={toggleDemoMode} disabled={demoLoading} style={{ padding: "3px 10px", borderRadius: 6, background: demoMode ? "rgba(239,68,68,0.06)" : "rgba(16,185,129,0.04)", border: `1px solid ${demoMode ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.08)"}`, color: demoMode ? "#ef4444" : "#10b981", fontWeight: 700, fontSize: 9, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, letterSpacing: "0.04em" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: demoMode ? "#ef4444" : "#10b981", flexShrink: 0 }} />{demoLoading ? "..." : demoMode ? "DEMO" : "LIVE"}</button>}
+            {IS_CLIENT_MODE && clinic && effectiveRole === "admin" && ctx.workspaceState !== "active" && <button data-tour="demo_toggle" onClick={toggleDemoMode} disabled={demoLoading} style={{ padding: "3px 10px", borderRadius: 6, background: demoMode ? "rgba(239,68,68,0.06)" : "rgba(16,185,129,0.04)", border: `1px solid ${demoMode ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.08)"}`, color: demoMode ? "#ef4444" : "#10b981", fontWeight: 700, fontSize: 9, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, letterSpacing: "0.04em" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: demoMode ? "#ef4444" : "#10b981", flexShrink: 0 }} />{demoLoading ? "..." : demoMode ? "DEMO" : "LIVE"}</button>}
 
             {/* Notification bell (hidden for doctor) */}
             {IS_CLIENT_MODE && effectiveRole !== "doctor" && <div style={{ position: "relative" }}>

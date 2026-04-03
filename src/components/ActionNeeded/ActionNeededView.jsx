@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { useInboxStore, usePatientStore } from "../../stores";
 import { apiFetch } from "../../api/client";
@@ -422,6 +422,64 @@ export default function ActionNeededView() {
     return items;
   }, [myLeads]);
 
+  /* ── Load DB tasks (followup etc.) and merge into action items ── */
+  const [dbTasks, setDbTasks] = useState([]);
+  useEffect(() => {
+    apiFetch("/api/v1/tasks").then(res => {
+      setDbTasks((res.tasks || []).filter(tk => tk.status === "pending" && tk.type === "followup"));
+    }).catch(() => {});
+    const iv = setInterval(() => {
+      apiFetch("/api/v1/tasks").then(res => {
+        setDbTasks((res.tasks || []).filter(tk => tk.status === "pending" && tk.type === "followup"));
+      }).catch(() => {});
+    }, 30000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const allActionItems = useMemo(() => {
+    const dbItems = dbTasks.map(tk => {
+      const payload = tk.payload || {};
+      const pName = tk.patient?.firstName ? `${tk.patient.firstName} ${tk.patient.lastName || ""}`.trim() : "Patient";
+      const pid = tk.patientId || tk.patient_id || tk.patient?.id;
+      const isReschedule = payload.action === "notify_rescheduled";
+      const isCancel = payload.action === "notify_canceled";
+      const title = isReschedule
+        ? (t("task_notify_reschedule") || `${pName} über Terminverschiebung informieren`)
+        : isCancel
+        ? (t("task_notify_cancel") || `${pName} über Terminstornierung informieren`)
+        : tk.notes?.split("\n")[0] || (t("task_notify_patient") || "Patient benachrichtigen");
+      const desc = isReschedule && payload.newDate
+        ? `${t("task_new_date") || "Neuer Termin"}: ${payload.newDate}`
+        : isCancel && payload.oldDate
+        ? `${t("task_cancelled_date") || "Stornierter Termin"}: ${payload.oldDate}`
+        : "";
+      return {
+        id: "dbtask_" + tk.id,
+        _dbTaskId: tk.id,
+        type: "followup",
+        icon: "📋",
+        color: "#f59e0b",
+        title,
+        desc,
+        patient: pName,
+        patientId: pid,
+        time: tk.createdAt || tk.created_at,
+        action: () => { if (pid) goToChat(pid); },
+        actionLabel: t("open_chat") || "Chat öffnen",
+        dismissable: true,
+        onDismiss: () => {
+          apiFetch(`/api/v1/tasks/${tk.id}`, { method: "PATCH", body: JSON.stringify({ status: "completed" }) })
+            .then(() => {
+              setDbTasks(prev => prev.filter(x => x.id !== tk.id));
+              window.dispatchEvent(new CustomEvent("fm:task-dismissed"));
+            })
+            .catch(() => {});
+        },
+      };
+    });
+    return [...dbItems, ...tasks];
+  }, [tasks, dbTasks]);
+
   /* Time-based grouping: Überfällig (>24h) vs Später */
   function formatWaitLabel(task) {
     // Driver: show flight date (future-based)
@@ -449,7 +507,7 @@ export default function ActionNeededView() {
   // Group by task type (category-based)
   const categories = getTaskGroups(t).map(g => {
     const tc = TASK_COLORS[g.key] || TASK_COLORS.followup;
-    return { ...g, items: tasks.filter(t => t.type === g.key), color: tc.color, dotColor: tc.dot, bg: tc.bg, border: tc.border };
+    return { ...g, items: allActionItems.filter(t => t.type === g.key), color: tc.color, dotColor: tc.dot, bg: tc.bg, border: tc.border };
   }).filter(c => c.items.length > 0);
 
   return (
@@ -565,6 +623,20 @@ export default function ActionNeededView() {
               >
                 {task.actionLabel}
               </button>
+
+              {/* Dismiss button for DB tasks */}
+              {task.dismissable && task.onDismiss && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); task.onDismiss(); }}
+                  title="Erledigt"
+                  style={{
+                    width: 28, height: 28, borderRadius: 6, fontSize: 13, fontWeight: 700,
+                    cursor: "pointer", fontFamily: "inherit", marginLeft: 8, display: "flex", alignItems: "center", justifyContent: "center",
+                    background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)",
+                    color: "rgba(239,68,68,0.7)",
+                  }}
+                >✕</button>
+              )}
 
               {/* Secondary action (flight: "Kein Flug nötig") */}
               {task.secondAction && (

@@ -33,7 +33,7 @@ export const TASK_COLORS = {
   hotel: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
   driver: { bg: "rgba(59,130,246,0.08)", color: "#3b82f6", border: "rgba(59,130,246,0.15)", dot: "#3b82f6" },
   dsgvo: { bg: "rgba(167,139,250,0.08)", color: "#a78bfa", border: "rgba(167,139,250,0.15)", dot: "#a78bfa" },
-  followup: { bg: "rgba(167,177,195,0.06)", color: "rgba(167,177,195,0.7)", border: "rgba(167,177,195,0.1)", dot: "rgba(167,177,195,0.6)" },
+  followup: { bg: "rgba(245,158,11,0.08)", color: "#f59e0b", border: "rgba(245,158,11,0.15)", dot: "#f59e0b" },
   flight: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },
   cancel: { bg: "rgba(239,68,68,0.08)", color: "#ef4444", border: "rgba(239,68,68,0.15)", dot: "#ef4444" },
   deposit: { bg: "rgba(251,191,36,0.08)", color: "#fbbf24", border: "rgba(251,191,36,0.15)", dot: "#fbbf24" },

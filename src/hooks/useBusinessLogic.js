@@ -317,7 +317,14 @@ export function useBusinessLogic({
       return { ...prev, [activeClinicId]: cm };
     });
     setConvStatus(leadId, "deposit_paid");
-    setAppts(prev => prev.map(a => a.leadId === leadId && a.status === "booked" ? { ...a, status: "confirmed" } : a));
+    setAppts(prev => prev.map(a => a.leadId === leadId && a.status === "booked" ? { ...a, status: "confirmed", depositPaid: true } : a));
+    // Persist deposit_paid to DB via appointment update
+    const appt = appts.find(a => a.leadId === leadId || a.patientId === leadId);
+    if (appt?.id) {
+      fmApi.apiFetch(`/api/v1/crm/appointments/${appt.id}`, {
+        method: 'PATCH', body: JSON.stringify({ deposit_paid: true, deposit_paid_at: new Date().toISOString() })
+      }).catch(e => console.error("[CRM] deposit_paid update failed:", e));
+    }
     addTL(leadId, "system", "💰 Deposit received — appointment confirmed");
     logAction("payment_received", lead.name, "Deposit confirmed via Stripe webhook");
     showT(`Payment received from ${lead.name} — appointment confirmed!`);
