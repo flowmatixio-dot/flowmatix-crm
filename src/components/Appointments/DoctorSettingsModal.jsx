@@ -207,33 +207,9 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
 
         {/* Capacity */}
         <SectionTitle>{t("capacity_heading") || "Kapazität"}</SectionTitle>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10, marginBottom: 20 }}>
           <CapacityInput label={t("doc_max_ops_day") || "Max OPs pro Tag"} value={capacity.maxOpsPerDay} onChange={(v) => setCapacity((p) => ({ ...p, maxOpsPerDay: v }))} />
-          <CapacityInput label={t("doc_max_grafts_day") || "Max Grafts pro Tag"} value={capacity.maxGraftsPerDay} onChange={(v) => setCapacity((p) => ({ ...p, maxGraftsPerDay: v }))} />
-          <CapacityInput label={t("max_large_ops") || "Max große OPs (>3000 Grafts)"} value={capacity.maxLargeOps} onChange={(v) => setCapacity((p) => ({ ...p, maxLargeOps: v }))} />
         </div>
-
-        {/* Capacity validation warning */}
-        {(() => {
-          const currentOps = todayBookings?.ops ?? 0;
-          const currentGrafts = todayBookings?.grafts ?? 0;
-          const opsExceeded = currentOps > capacity.maxOpsPerDay;
-          const graftsExceeded = currentGrafts > capacity.maxGraftsPerDay;
-          if (!opsExceeded && !graftsExceeded) return null;
-          return (
-            <div style={{
-              padding: "10px 14px", borderRadius: 10, marginBottom: 16,
-              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
-              display: "flex", alignItems: "center", gap: 8,
-            }}>
-              <span style={{ fontSize: 14 }}>{"\u26A0\uFE0F"}</span>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#ef4444" }}>
-                {opsExceeded && <div>Kapazit{"\u00E4"}t {"\u00FC"}berschritten: {currentOps}/{capacity.maxOpsPerDay} OPs heute</div>}
-                {graftsExceeded && <div>{t("grafts_exceeded")} {currentGrafts.toLocaleString()}/{capacity.maxGraftsPerDay.toLocaleString()} {t("grafts_today")}</div>}
-              </div>
-            </div>
-          );
-        })()}
 
         {/* Treatment types */}
         <SectionTitle>{t("treatment_types")}</SectionTitle>
