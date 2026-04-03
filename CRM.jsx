@@ -350,7 +350,8 @@ export default function App() {
       // 6. Follow-up needed
       if (l.metadata?.followup_needed && !l.metadata?.followup_completed) count++;
       // 7. Deposit pending — only if clinic has deposit policy configured
-      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'appointment_booked' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active' && !l.depositPaid && !l.metadata?.deposit_paid && clinic?.depositPolicy && clinic.depositPolicy !== 'none') count++;
+      const _apptPaid = appts.some(a => (a.patientId === l.id || a.patient_id === l.id || a.leadId === l.id) && (a.deposit_paid || a.depositPaid));
+      if (l.reviewData && l.convStatus !== 'deposit_paid' && l.convStatus !== 'appointment_booked' && l.convStatus !== 'resolved' && l.convStatus !== 'closed' && l.convStatus !== 'needs_medical_review' && l.convStatus !== 'collecting_photos' && l.convStatus !== 'ai_active' && !l.depositPaid && !l.metadata?.deposit_paid && !_apptPaid && clinic?.depositPolicy && clinic.depositPolicy !== 'none') count++;
     });
     return count;
   },[myLeads]);

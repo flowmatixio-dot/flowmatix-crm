@@ -44,7 +44,7 @@ export default function ActionNeededView() {
   }
 
   const [collapsed, setCollapsed] = useState({});
-  const { myLeads, openPatient, setView, showT, t, activeClinicId, clinic } = useApp();
+  const { myLeads, myAppts, openPatient, setView, showT, t, activeClinicId, clinic } = useApp();
   const { msgs, setSelChat } = useInboxStore();
 
   const clinicId = activeClinicId || myLeads[0]?.clinic || null;
@@ -380,7 +380,8 @@ export default function ActionNeededView() {
       }
 
       /* 7. Deposit pending — waiting for payment confirmation */
-      if (p.reviewData && p.convStatus !== 'deposit_paid' && p.convStatus !== 'appointment_booked' && p.convStatus !== 'resolved' && p.convStatus !== 'closed' && !p.depositPaid && !p.metadata?.deposit_paid) {
+      const hasApptDepositPaid = myAppts?.some(a => (a.patientId === p.id || a.patient_id === p.id || a.leadId === p.id) && (a.deposit_paid || a.depositPaid));
+      if (p.reviewData && p.convStatus !== 'deposit_paid' && p.convStatus !== 'appointment_booked' && p.convStatus !== 'resolved' && p.convStatus !== 'closed' && !p.depositPaid && !p.metadata?.deposit_paid && !hasApptDepositPaid) {
         const cli = clinic || {};
         if (cli.depositPolicy && cli.depositPolicy !== 'none') {
           const depAmt = cli.depositAmount || '';
