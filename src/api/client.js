@@ -1002,10 +1002,9 @@ export async function deleteAppointment(id) {
 
 export async function getDoctors() {
   const data = await apiFetch('/api/v1/crm/clinic/staff');
-  return (data.staff || []).filter(
+  const docs = (data.staff || []).filter(
     s => (s.role === 'doctor' || s.role === 'arzt') && s.sort_order !== 999
   ).map(s => {
-    // Unpack surgery_duration_rules JSONB into flat fields for calendar/modal
     const sdr = s.surgery_duration_rules || {};
     return {
       ...s,
@@ -1014,8 +1013,17 @@ export async function getDoctors() {
       duration_4500: sdr.duration_4500 || s.duration_4500 || 8,
       duration_4500_plus: sdr.duration_4500_plus || s.duration_4500_plus || 10,
       name: s.name || [s.title, s.first_name, s.last_name].filter(Boolean).join(' ').trim() || s.email || 'Arzt',
+      vacations: [],
     };
   });
+  // Load vacations for each doctor
+  await Promise.all(docs.map(async (doc) => {
+    try {
+      const res = await apiFetch(`/api/v1/crm/doctors/${doc.id}/unavailability`);
+      doc.vacations = (res?.unavailability || []).map(v => ({ start: v.startDate, end: v.endDate, reason: v.reason || 'Urlaub' }));
+    } catch {}
+  }));
+  return docs;
 }
 
 // ── CRM: Doctor Settings ──────────────────────────────
