@@ -386,7 +386,7 @@ function logColor(level) {
 }
 
 function ClinicTimeline({ ws, waStatus, waActive, subStatus, templates = [] }) {
-  const hasPurchased = subStatus === 'active' || subStatus === 'trialing';
+  const hasPurchased = subStatus === 'active';
   const setupStarted = ws !== 'demo' && ws !== '---';
   const waConnected = waActive && waStatus !== 'not_started' && waStatus !== '---' && waStatus !== 'Setup';
   const steps = [
