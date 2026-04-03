@@ -64,20 +64,16 @@ export default function TreatmentTypes() {
     <Field label={t("treatment_name")} value={form.name} onChange={v=>setForm(f=>({...f,name:v}))} placeholder="FUE Hair Transplant" />
     <Field label={t("description")} value={form.description} onChange={v=>setForm(f=>({...f,description:v}))} placeholder="" type="textarea" />
 
-    {/* Duration mode: graft-based OR fixed */}
-    <div style={{padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",marginBottom:12}}>
-      <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:10}}>{t("tt_duration_mode") || "Duration calculation"}</div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-        <Field label={t("tt_hours_per_1000") || "Hours per 1000 Grafts"} value={form._hours_per_1000_grafts} onChange={v=>setForm(f=>({...f,_hours_per_1000_grafts:v}))} placeholder="2" type="number" />
-        <Field label={t("duration_min") + (isGraftBased ? " (Fallback)" : "")} value={form.duration_minutes} onChange={v=>setForm(f=>({...f,duration_minutes:parseInt(v)||60}))} placeholder="60" type="number" />
-      </div>
-      {isGraftBased && <div style={{fontSize:11,color:"rgba(76,201,255,0.7)",marginTop:4}}>
-        {t("tt_graft_hint") || "Duration = Grafts ÷ 1000 × hours. Fixed duration is used as fallback when no grafts are set."}
-      </div>}
-    </div>
-
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+      <Field label={t("tt_hours_per_1000")} value={form._hours_per_1000_grafts} onChange={v=>setForm(f=>({...f,_hours_per_1000_grafts:v}))} placeholder="2" type="number" />
+      <Field label={t("duration_min") + (isGraftBased ? " (Fallback)" : "")} value={form.duration_minutes} onChange={v=>setForm(f=>({...f,duration_minutes:parseInt(v)||60}))} placeholder="60" type="number" />
       <Field label={t("buffer_min")} value={form.buffer_minutes} onChange={v=>setForm(f=>({...f,buffer_minutes:parseInt(v)||0}))} placeholder="0" type="number" />
+    </div>
+    {isGraftBased && <div style={{fontSize:11,color:"var(--text-muted)",marginTop:-4,marginBottom:12}}>
+      {t("tt_graft_hint")}
+    </div>}
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12}}>
       <Field label={t("currency")} value={form.currency} onChange={v=>setForm(f=>({...f,currency:v}))} placeholder="EUR" />
     </div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
