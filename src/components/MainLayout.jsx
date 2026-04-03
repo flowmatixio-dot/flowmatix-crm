@@ -841,15 +841,11 @@ export default function MainLayout() {
           </div>
         )}
 
-        {/* ── Trial Countdown Banner ── */}
+        {/* ── Trial Countdown Banner (hidden — skip trial button kept) ── */}
         {IS_CLIENT_MODE && trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (
-          <div style={{ padding: "8px 20px", background: "rgba(76,201,255,0.04)", borderBottom: "1px solid rgba(76,201,255,0.08)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 13 }}>⏱</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: trialCountdown.includes('hours') || trialCountdown.includes('today') ? "#ff8a2a" : "rgba(200,215,240,0.7)" }}>{trialCountdown}</span>
-            </div>
+          <div style={{ padding: "8px 20px", background: "rgba(76,201,255,0.04)", borderBottom: "1px solid rgba(76,201,255,0.08)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
             <button onClick={() => ctx.setShowPlanPicker(true)} style={{ padding: "4px 14px", background: "transparent", border: "1px solid rgba(76,201,255,0.15)", borderRadius: 8, color: "#4CC9FF", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-              {t("skip_trial")||"Skip trial — choose plan"}
+              {t("skip_trial")||"Trial überspringen — Plan wählen"}
             </button>
           </div>
         )}

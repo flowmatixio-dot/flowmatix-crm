@@ -437,7 +437,7 @@ export default function ActionNeededView() {
     // Chat + others: show past waiting time
     if (!task.time) return "—";
     const ms = getNowMs() - new Date(task.time).getTime();
-    if (ms < 0) { const d = Math.ceil(Math.abs(ms) / 86400000); return `${t("action_in") || "in"} ${d} ${t("action_days") || "Tagen"}`; }
+    if (ms < 0) { const _t = new Date(task.time), _n = new Date(); _t.setHours(0,0,0,0); _n.setHours(0,0,0,0); const d = Math.round((_t - _n) / 86400000); return `${t("action_in") || "in"} ${d} ${t("action_days") || "Tagen"}`; }
     const mins = Math.floor(ms / 60000);
     if (mins < 60) return `${t("patient_waiting_since") || "Patient wartet seit"} ${mins}min`;
     const hrs = Math.floor(mins / 60);

@@ -44,6 +44,13 @@ function applyTheme(theme) {
 
 /** Initialize theme before React renders (call from index.html or main.jsx) */
 export function initTheme() {
+  const isClientCRM = window.location.hostname === 'crm.flowmatix.io' || window.location.hostname === 'localhost';
+  if (isClientCRM) {
+    // Kunden-CRM: always dark, clear any stored light mode
+    localStorage.removeItem('fm-theme');
+    applyTheme('dark');
+    return;
+  }
   try {
     const stored = JSON.parse(localStorage.getItem('fm-theme') || '{}');
     const theme = stored?.state?.theme || 'dark';

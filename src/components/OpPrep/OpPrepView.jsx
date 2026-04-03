@@ -147,7 +147,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
   const doctor = localAppt.doctorName || localAppt.doctor || (t("op_not_assigned") || "Nicht zugewiesen");
   const r = getReadiness(localAppt, { depositEnabled, t });
   const pctColor = r.pct <= 40 ? "rgba(245,158,11,0.8)" : r.pct <= 80 ? "#f59e0b" : "#10b981";
-  const daysUntil = Math.ceil((dt - new Date()) / 86400000);
+  const _dtD = new Date(dt); _dtD.setHours(0,0,0,0); const _nD = new Date(); _nD.setHours(0,0,0,0); const daysUntil = Math.round((_dtD - _nD) / 86400000);
 
   useEffect(() => {
     if (!localAppt.patientId) { setFilesLoading(false); return; }

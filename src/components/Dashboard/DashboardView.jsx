@@ -197,7 +197,12 @@ export default function DashboardView() {
         <div>
           <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{gr}</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, color: "#fff" }}>
-            {t("welcome_back") || "Willkommen zurück"}, {un}
+            {(() => {
+              const key = "fm_has_visited";
+              const visited = localStorage.getItem(key);
+              if (!visited) { localStorage.setItem(key, "1"); return `${t("welcome") || "Herzlich willkommen"}, ${clinic?.name || un}`; }
+              return `${t("welcome_back") || "Willkommen zurück"}, ${un}`;
+            })()}
           </h1>
         </div>
         {workspaceState && workspaceState !== 'active' && workspaceState !== 'trial_expired' && workspaceState !== 'checkout_pending' && (
@@ -233,16 +238,16 @@ export default function DashboardView() {
         </div>
       )}
 
-      {ds === "automated" && !hasGoogle && (
+      {ds === "automated" && !hasGoogle && workspaceState !== 'active' && (
         <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 8, height: 8, borderRadius: 99, background: "#fbbf24" }} />
-              <div style={{ fontWeight: 700, fontSize: 14, color: "#fbbf24" }}>{T("Almost ready", "Fast fertig", "Neredeyse hazır")}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#fbbf24" }}>{T("Get the full experience", "Erlebe das volle Potenzial", "Tam deneyimi yaşayın")}</div>
             </div>
-            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 4 }}>{T("Connect Google Drive to automatically save patient files, photos, and patient cards as PDF to organized folders.", "Verbinde Google Drive um Patientenakten, Fotos und Patientenkarten als PDF automatisch in organisierten Ordnern zu speichern.", "Hasta dosyalarini, fotograflari ve hasta kartlarini PDF olarak otomatik kaydetmek icin Google Drive'i baglayin.")}</div>
+            <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginTop: 4 }}>{T("Go to Settings to set up your clinic completely — add doctors, drivers, connect Google Drive for automatic patient files & photos, and configure your AI bot for the best results.", "Gehe in die Einstellungen und richte deine Klinik vollständig ein — füge Ärzte und Fahrer hinzu, verbinde Google Drive für automatische Patientenakten & Fotos, und konfiguriere deinen KI-Bot für beste Ergebnisse.", "Kliniğinizi tam olarak kurmak için Ayarlar'a gidin — doktor ve şoför ekleyin, otomatik hasta dosyaları ve fotoğraflar için Google Drive'ı bağlayın ve en iyi sonuçlar için yapay zeka botunuzu yapılandırın.")}</div>
           </div>
-          <button onClick={() => { window.location.href = "/settings#integrations"; }} style={{ padding: "8px 18px", borderRadius: 10, background: "#fbbf24", border: "none", color: "#000", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>{T("Connect now", "Jetzt verbinden", "Şimdi bağla")}</button>
+          <button onClick={() => setView("settings")} style={{ padding: "8px 18px", borderRadius: 10, background: "#fbbf24", border: "none", color: "#000", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>{T("Open Settings", "Einstellungen öffnen", "Ayarları aç")}</button>
         </div>
       )}
 
