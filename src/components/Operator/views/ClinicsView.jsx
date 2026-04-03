@@ -152,10 +152,19 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
                 </div>
 
                 {/* Patients */}
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {patients} {patients === 1 ? 'patient' : 'patients'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {patients}
                   </span>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>/</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: patients >= safeNum(c.patient_limit) * 0.9 ? 'var(--error)' : 'var(--text-muted)' }}>
+                    {safeNum(c.patient_limit) || '∞'}
+                  </span>
+                  {safeNum(c.patient_limit) > 0 && (
+                    <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--progress-track)', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 2, width: `${Math.min(100, (patients / safeNum(c.patient_limit)) * 100)}%`, background: patients >= safeNum(c.patient_limit) * 0.9 ? 'var(--error)' : patients >= safeNum(c.patient_limit) * 0.7 ? 'var(--warning)' : 'var(--success)' }} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Smart Action */}
