@@ -4,11 +4,15 @@ import { useState, useMemo } from "react";
  * Hook for doctor-based calendar filtering.
  * selectedDoctorIds: null = show all, string[] = show only selected.
  */
-export function useCalendarFilters(events) {
+export function useCalendarFilters(events, myDoctorId) {
   const [selectedDoctorIds, setSelectedDoctorIds] = useState(null);
 
   const filteredEvents = useMemo(() => {
-    if (!selectedDoctorIds) return events.filter(ev => (ev.extendedProps?.type !== "vacation"));
+    if (!selectedDoctorIds) return events.filter(ev => {
+      if (ev.extendedProps?.type !== "vacation") return true;
+      // In doctor portal: show own vacations
+      return myDoctorId && ev.extendedProps?.doctorId === myDoctorId;
+    });
     return events.filter((ev) => {
       const props = ev.extendedProps || {};
       const appt = props.appt || {};

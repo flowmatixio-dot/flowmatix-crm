@@ -208,7 +208,7 @@ export default function AppointmentsPage() {
   const {
     selectedDoctorIds, filteredEvents: rawFilteredEvents,
     toggleDoctor, selectAll,
-  } = useCalendarFilters(allEvents);
+  } = useCalendarFilters(allEvents, isDoctor && user ? doctors.find(d => (d.email || '').toLowerCase() === (user.email || '').toLowerCase())?.id : null);
 
   // Apply search filter on top of doctor filter
   const filteredEvents = useMemo(() => {
