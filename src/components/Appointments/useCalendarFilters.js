@@ -14,6 +14,8 @@ export function useCalendarFilters(events) {
       const appt = props.appt || {};
       // Blocked days always visible
       if (props.type === "blocked") return true;
+      // Vacation: only show for the selected doctor
+      if (props.type === "vacation") return props.doctorId && selectedDoctorIds.includes(props.doctorId);
       // Check all possible doctor ID fields (staff_members.id OR doctors.id)
       const ids = [props.doctorId, appt.staffMemberId, appt.doctorsTableId, appt.doctorId, appt.doctor_id, appt.staffId, appt.staff_id].filter(Boolean);
       if (ids.length === 0) return false;
