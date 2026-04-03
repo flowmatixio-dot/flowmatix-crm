@@ -21,12 +21,17 @@ export default function TreatmentTypes() {
 
   const saveTreatment = async () => {
     const mod = await import("../../api/client");
+    // Pack hours_per_1000_grafts into metadata
+    const payload = { ...form };
+    const hpg = parseFloat(form._hours_per_1000_grafts);
+    payload.metadata = { ...(form.metadata || {}), hours_per_1000_grafts: hpg > 0 ? hpg : null };
+    delete payload._hours_per_1000_grafts;
     try {
       if (editing === "new") {
-        await mod.createTreatment(form);
+        await mod.createTreatment(payload);
         showT(t("treatment_added"));
       } else {
-        await mod.updateTreatment(editing, form);
+        await mod.updateTreatment(editing, payload);
         showT(t("treatment_updated"));
       }
       setEditing(null); setForm({});
@@ -41,6 +46,14 @@ export default function TreatmentTypes() {
     loadTreatments();
   };
 
+  const startEdit = (tr) => {
+    setEditing(tr?.id || "new");
+    const hpg = tr?.metadata?.hours_per_1000_grafts || "";
+    setForm(tr ? { ...tr, _hours_per_1000_grafts: hpg } : { duration_minutes: 60, buffer_minutes: 0, currency: "EUR", requires_consultation: true, requires_photos: true, _hours_per_1000_grafts: "" });
+  };
+
+  const isGraftBased = form._hours_per_1000_grafts !== "" && form._hours_per_1000_grafts != null && parseFloat(form._hours_per_1000_grafts) > 0;
+
   if (loading) return <div style={{padding:20,color:"var(--text-muted)"}}>{t("loading")}</div>;
 
   if (editing) return <div>
@@ -49,9 +62,21 @@ export default function TreatmentTypes() {
       <button onClick={()=>{setEditing(null);setForm({});}} style={{padding:"6px 14px",borderRadius:8,background:"var(--bg-input)",border:"1px solid var(--border-strong)",color:"var(--text-muted)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel")}</button>
     </div>
     <Field label={t("treatment_name")} value={form.name} onChange={v=>setForm(f=>({...f,name:v}))} placeholder="FUE Hair Transplant" />
-    <Field label={t("description")} value={form.description} onChange={v=>setForm(f=>({...f,description:v}))} placeholder="Beschreibung der Behandlung..." type="textarea" />
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-      <Field label={t("duration_min")} value={form.duration_minutes} onChange={v=>setForm(f=>({...f,duration_minutes:parseInt(v)||60}))} placeholder="60" type="number" />
+    <Field label={t("description")} value={form.description} onChange={v=>setForm(f=>({...f,description:v}))} placeholder="" type="textarea" />
+
+    {/* Duration mode: graft-based OR fixed */}
+    <div style={{padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",marginBottom:12}}>
+      <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:10}}>{t("tt_duration_mode") || "Duration calculation"}</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        <Field label={t("tt_hours_per_1000") || "Hours per 1000 Grafts"} value={form._hours_per_1000_grafts} onChange={v=>setForm(f=>({...f,_hours_per_1000_grafts:v}))} placeholder="2" type="number" />
+        <Field label={t("duration_min") + (isGraftBased ? " (Fallback)" : "")} value={form.duration_minutes} onChange={v=>setForm(f=>({...f,duration_minutes:parseInt(v)||60}))} placeholder="60" type="number" />
+      </div>
+      {isGraftBased && <div style={{fontSize:11,color:"rgba(76,201,255,0.7)",marginTop:4}}>
+        {t("tt_graft_hint") || "Duration = Grafts ÷ 1000 × hours. Fixed duration is used as fallback when no grafts are set."}
+      </div>}
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
       <Field label={t("buffer_min")} value={form.buffer_minutes} onChange={v=>setForm(f=>({...f,buffer_minutes:parseInt(v)||0}))} placeholder="0" type="number" />
       <Field label={t("currency")} value={form.currency} onChange={v=>setForm(f=>({...f,currency:v}))} placeholder="EUR" />
     </div>
@@ -72,9 +97,16 @@ export default function TreatmentTypes() {
     <SaveBtn onClick={saveTreatment} t={t} />
   </div>;
 
+  // Helper: format duration display
+  const fmtDuration = (tr) => {
+    const hpg = tr.metadata?.hours_per_1000_grafts;
+    if (hpg > 0) return `${hpg}h / 1000 Grafts`;
+    return `${tr.duration_minutes} ${t("minutes_short")}`;
+  };
+
   return <div>
     <p style={{fontSize:13,color:"var(--text-muted)",margin:"0 0 16px"}}>{t("treatments_desc")}</p>
-    <button onClick={()=>{setEditing("new");setForm({duration_minutes:60,buffer_minutes:0,currency:"EUR",requires_consultation:true,requires_photos:true});}} style={{marginBottom:16,padding:"12px 24px",borderRadius:12,background:"rgba(76,201,255,0.06)",border:"1px dashed rgba(76,201,255,0.3)",color:"#4cc9ff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(76,201,255,0.1)";e.currentTarget.style.borderColor="rgba(76,201,255,0.5)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(76,201,255,0.06)";e.currentTarget.style.borderColor="rgba(76,201,255,0.3)";}}>+ {t("add_treatment")}</button>
+    <button onClick={()=>startEdit(null)} style={{marginBottom:16,padding:"12px 24px",borderRadius:12,background:"rgba(76,201,255,0.06)",border:"1px dashed rgba(76,201,255,0.3)",color:"#4cc9ff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(76,201,255,0.1)";e.currentTarget.style.borderColor="rgba(76,201,255,0.5)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(76,201,255,0.06)";e.currentTarget.style.borderColor="rgba(76,201,255,0.3)";}}>+ {t("add_treatment")}</button>
     {treatments.length===0?<div style={{padding:32,textAlign:"center",borderRadius:16,background:"var(--bg-card)",border:"1px solid var(--border-default)"}}>
       <div style={{fontSize:40,marginBottom:12}}>{"\u{1F489}"}</div>
       <div style={{fontWeight:700,fontSize:15,marginBottom:6}}>{t("no_treatments")}</div>
@@ -86,14 +118,15 @@ export default function TreatmentTypes() {
         <div style={{flex:1}}>
           <div style={{fontWeight:700,fontSize:14}}>{tr.name}</div>
           <div style={{fontSize:12,color:"var(--text-muted)",display:"flex",gap:8,flexWrap:"wrap"}}>
-            <span>{"⏱"} {tr.duration_minutes} {t("minutes_short")}</span>
-            {tr.price_from&&<span>{"\u{1F4B0}"} {tr.price_from}{tr.price_to?"-"+tr.price_to:""} {tr.currency||"EUR"}</span>}
+            <span>{"⏱"} {fmtDuration(tr)}</span>
+            {tr.buffer_minutes > 0 && <span>+{tr.buffer_minutes}{t("minutes_short")}</span>}
+            {tr.price_from&&<span>{"\u{1F4B0}"} {tr.price_from}{tr.price_to&&tr.price_to!=tr.price_from?"–"+tr.price_to:""} {tr.currency||"EUR"}</span>}
             {tr.requires_photos&&<span>{"\u{1F4F7}"}</span>}
             {tr.requires_consultation&&<span>{"\u{1FA7A}"}</span>}
           </div>
         </div>
         <div style={{display:"flex",gap:6}}>
-          <button onClick={()=>{setEditing(tr.id);setForm({...tr});}} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("edit")}</button>
+          <button onClick={()=>startEdit(tr)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("edit")}</button>
           <button onClick={()=>removeTreatment(tr.id)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",color:"#ef4444",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("remove")}</button>
         </div>
       </div>)}
