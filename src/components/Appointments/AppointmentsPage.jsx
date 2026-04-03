@@ -549,8 +549,8 @@ export default function AppointmentsPage() {
         <div style={{ marginBottom: 14, padding: "10px 16px", borderRadius: 10, background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 16 }}>📅</span>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.95)" }}>Persönlicher Kalender</div>
-            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>Deine Termine und OP-Blöcke. Urlaub und Blocker werden vom Admin verwaltet.</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.95)" }}>{t("doc_personal_calendar") || "Persönlicher Kalender"}</div>
+            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{t("doc_personal_calendar_desc") || "Deine Termine und OP-Blöcke. Urlaub und Blocker werden vom Admin verwaltet."}</div>
           </div>
         </div>
       )}
@@ -666,7 +666,7 @@ export default function AppointmentsPage() {
           headerToolbar={false}
           footerToolbar={false}
           events={filteredEvents}
-          locale="de"
+          locale={fmLocale()}
           firstDay={1}
           weekends={true}
           height="auto"
