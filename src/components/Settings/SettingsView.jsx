@@ -1087,8 +1087,9 @@ export default function SettingsView() {
             <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>{t("license_plate")}</div><input value={drvPlate} onChange={e=>setDrvPlate(e.target.value)} placeholder="B-FM 1234" style={inp}/></div>
             <div><div style={{fontSize:11,fontWeight:600,color:"rgba(167,177,195,0.7)",marginBottom:4}}>{t("role")}</div><select value={drvRole} onChange={e=>setDrvRole(e.target.value)} style={inp}><option value="primary">{t("primary_role")}</option><option value="backup">Backup</option></select></div>
           </div>
-          <div style={{marginTop:16,padding:"10px 14px",borderRadius:10,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.08)",fontSize:11,color:"rgba(167,177,195,0.75)",lineHeight:1.6}}>
-            💡 {t("driver_telegram_hint")}
+          <div style={{marginTop:16,padding:"12px 16px",borderRadius:10,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.2)",fontSize:12,color:"#ef4444",lineHeight:1.6,fontWeight:600,animation:"fmPulseRed 2s infinite"}}>
+            ⚠️ {t("driver_telegram_hint")}
+            <style>{`@keyframes fmPulseRed{0%,100%{opacity:1}50%{opacity:0.7}}`}</style>
           </div>
           <div style={{marginTop:16,display:"flex",justifyContent:"flex-end"}}>
             <button onClick={editDriverId?saveEditDriver:addDriver} style={{padding:"8px 24px",borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(16,185,129,0.3)"}}>{editDriverId?(t("save_changes")||"Änderungen speichern"):t("save")}</button>
