@@ -219,7 +219,27 @@ export function blockedDayToEvent(bd) {
 }
 
 /**
- * Map all appointments + blocked days to FullCalendar events.
+ * Map a doctor vacation to a FullCalendar background event.
+ */
+function vacationToEvent(vac, doctor) {
+  const end = new Date(vac.end || vac.endDate);
+  end.setDate(end.getDate() + 1); // FullCalendar end is exclusive
+  return {
+    id: `vacation_${doctor.id}_${vac.start || vac.startDate}`,
+    title: `${doctor.name || doctor.first_name || 'Arzt'} — ${vac.reason || 'Urlaub'}`,
+    start: vac.start || vac.startDate,
+    end: end.toISOString().substring(0, 10),
+    allDay: true,
+    display: "background",
+    backgroundColor: "rgba(239,68,68,0.15)",
+    borderColor: "rgba(239,68,68,0.5)",
+    classNames: ["fm-blocked-day"],
+    extendedProps: { type: "vacation", doctorId: doctor.id, doctorName: doctor.name || doctor.first_name },
+  };
+}
+
+/**
+ * Map all appointments + blocked days + doctor vacations to FullCalendar events.
  * @param {Array}  appointments
  * @param {Array}  [blockedDays]
  * @param {Array}  [doctors] – optional doctors list for colour lookup
@@ -227,5 +247,6 @@ export function blockedDayToEvent(bd) {
 export function mapAllEvents(appointments, blockedDays = [], doctors = []) {
   const apptEvents = appointments.map((a) => apptToEvent(a, doctors)).filter(Boolean);
   const blockedEvents = blockedDays.map(blockedDayToEvent);
-  return [...apptEvents, ...blockedEvents];
+  const vacationEvents = doctors.flatMap(doc => (doc.vacations || []).map(v => vacationToEvent(v, doc)));
+  return [...apptEvents, ...blockedEvents, ...vacationEvents];
 }
