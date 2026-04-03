@@ -214,6 +214,8 @@ export default function App() {
 
   // Doctor: redirect to portal if on restricted view
   React.useEffect(()=>{if(userRole==="doctor"&&!canAccess(view)&&view!=="doctor_portal"&&view!=="support")setView("doctor_portal");},[userRole,view]);
+  // Hard block: doctor can never see admin views — even during re-auth
+  const effectiveView = (userRole==="doctor"&&!canAccess(view)&&view!=="doctor_portal"&&view!=="support") ? "doctor_portal" : view;
   const getClinicById=id=>clinics.find(c=>c.id===id);
   const getLeadById=id=>leads.find(l=>l.id===id);
   const getStageById=id=>STAGES.find(s=>s.id===id);
@@ -726,7 +728,7 @@ export default function App() {
 
   /* ═══ CONTEXT VALUE ═══ */
   const ctxValue = {
-    user, view, setView, clinics, setClinics, leads, setLeads, appts, setAppts,
+    user, view: effectiveView, setView, clinics, setClinics, leads, setLeads, appts, setAppts,
     msgs, setMsgs, selLead, setSelLead, selAppt, setSelAppt, selChat, setSelChat,
     dragItem, setDragItem, newMsg, setNewMsg, sidebar, setSidebar, toast, setToast,
     settingsData, setSettingsData, adminClinic, setAdminClinic, cancelConfirm, setCancelConfirm,
