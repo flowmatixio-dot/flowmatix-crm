@@ -955,7 +955,7 @@ function TabClinics({ d, load }) {
                 const wa = getWaState(c.id);
                 return (
                 <tr key={c.id}>
-                  <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.name}</span><br /><span style={{ fontSize: 11, color: '#666' }}>{c.email}</span></td>
+                  <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.name}</span><br /><span style={{ fontSize: 11, color: '#666' }}>{c.email}</span><br /><span onClick={() => { navigator.clipboard.writeText(c.id); }} style={{ fontSize: 10, color: '#444', cursor: 'pointer', fontFamily: 'monospace' }} title="Klick zum Kopieren">{c.id}</span></td>
                   <td style={S.td}>{statusBadge(c.is_active ? 'active' : 'inactive')}</td>
                   <td style={S.td}>{c.plan_name || '-'}</td>
                   <td style={S.td}>
@@ -1135,7 +1135,7 @@ function TabWhatsApp({ d, load }) {
             <tbody>
               {clinics.clinics.map(c => (
                 <tr key={c.id} style={{ background: selectedClinic === c.id ? 'rgba(76,201,255,0.06)' : 'transparent' }}>
-                  <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.name}</span><br /><span style={{ fontSize: 11, color: '#666' }}>{c.slug}</span></td>
+                  <td style={S.td}><span style={{ color: '#fff', fontWeight: 600 }}>{c.name}</span><br /><span onClick={() => { navigator.clipboard.writeText(c.id); }} style={{ fontSize: 10, color: '#444', cursor: 'pointer', fontFamily: 'monospace' }} title="Klick zum Kopieren">{c.id}</span></td>
                   <td style={S.td}>{c.whatsapp_phone_id || <span style={{ color: '#666' }}>Nicht gesetzt</span>}</td>
                   <td style={S.td}>{c.whatsapp_active ? badge(S.green, 'Aktiv') : badge(S.gray, 'Inaktiv')}</td>
                   <td style={S.td}><Btn small onClick={() => selectClinic(c.id)}>Konfigurieren</Btn></td>
