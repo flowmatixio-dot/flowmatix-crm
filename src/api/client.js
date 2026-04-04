@@ -94,12 +94,7 @@ export function showDemoBlockedModal() {
 }
 
 export async function apiFetch(path, options = {}) {
-  // Block write actions in demo mode
   const method = (options.method || 'GET').toUpperCase();
-  if (isDemoBlocked(method, path)) {
-    showDemoBlockedModal();
-    throw new Error('DEMO_BLOCKED');
-  }
 
   const url = `${API_URL}${path}`;
   const headers = {
@@ -1002,8 +997,9 @@ export async function deleteAppointment(id) {
 
 export async function getDoctors() {
   const data = await apiFetch('/api/v1/crm/clinic/staff');
+  const demoMode = window.__fmDemoMode;
   const docs = (data.staff || []).filter(
-    s => (s.role === 'doctor' || s.role === 'arzt') && s.sort_order !== 999
+    s => (s.role === 'doctor' || s.role === 'arzt') && s.sort_order !== 999 && (demoMode || !s.is_demo)
   ).map(s => {
     const sdr = s.surgery_duration_rules || {};
     return {

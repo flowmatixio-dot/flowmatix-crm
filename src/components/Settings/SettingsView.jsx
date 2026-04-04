@@ -829,6 +829,7 @@ export default function SettingsView() {
     <Field label={t("phone") || "Telefon"} value={c.phone || ""} onChange={v=>up("phone",v)}/>
     <Field label={t("email") || "E-Mail"} value={c.clinicEmail || ""} onChange={v=>up("clinicEmail",v)}/>
     <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={["Europe/Berlin","Europe/Istanbul","Europe/London","Europe/Paris","Europe/Rome","Europe/Madrid","Europe/Lisbon","Europe/Amsterdam","Europe/Vienna","Europe/Zurich","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Tokyo"]}/>
+    <Field label={t("google_maps_link")} value={c.googleMapsLink || ""} onChange={v=>up("googleMapsLink",v)} placeholder="https://maps.google.com/..." hint={t("google_maps_hint")}/>
     </>}
 
 

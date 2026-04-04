@@ -103,7 +103,7 @@ export default function LoginScreen({
         </div>
 
         {/* Password */}
-        {loginMode === "password" && <div style={{ marginBottom: 8 }}>
+        {loginMode !== "forgot" && <div style={{ marginBottom: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(76,201,255,0.6)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{(T[loginLang] || T.en).password}</div>
             <button onClick={() => { setLoginMode("forgot"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 12, fontFamily: "inherit", fontWeight: 600, padding: 0 }}>{(T[loginLang] || T.en).forgot}</button>
@@ -116,14 +116,11 @@ export default function LoginScreen({
         </div>}
 
         {/* ═══ PRIMARY ACTIONS ═══ */}
-        {loginMode === "magic" && <button onClick={handleMagicLink} disabled={authLoading} style={{ width: "100%", padding: 16, borderRadius: 14, background: "linear-gradient(135deg,#00B4D8,#0096c7)", border: "none", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(0,180,216,0.15)", marginBottom: 10 }}>{authLoading ? tl("sending") : tl("send_magic_link") + " ✉"}</button>}
-        {loginMode === "password" && <button onClick={handleLogin} disabled={authLoading} style={{ width: "100%", padding: 16, borderRadius: 14, background: "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))", border: "1px solid rgba(76,201,255,.3)", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all .2s" }} onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(135deg,rgba(76,201,255,.28),rgba(45,168,255,.2))"} onMouseLeave={e => e.currentTarget.style.background = "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))"}>{authLoading ? tl("signing_in") : tl("sign_in")} {!authLoading && <span style={{ fontSize: 18 }}>→</span>}</button>}
+        {loginMode !== "forgot" && <button onClick={handleLogin} disabled={authLoading} style={{ width: "100%", padding: 16, borderRadius: 14, background: "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))", border: "1px solid rgba(76,201,255,.3)", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all .2s" }} onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(135deg,rgba(76,201,255,.28),rgba(45,168,255,.2))"} onMouseLeave={e => e.currentTarget.style.background = "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))"}>{authLoading ? tl("signing_in") : tl("sign_in")} {!authLoading && <span style={{ fontSize: 18 }}>→</span>}</button>}
         {loginMode === "forgot" && <button onClick={handleForgotPw} disabled={authLoading} style={{ width: "100%", padding: 16, borderRadius: 14, background: "linear-gradient(135deg,#00B4D8,#0096c7)", border: "none", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(0,180,216,0.15)" }}>{authLoading ? tl("sending") : tl("send_reset_link")}</button>}
 
-        {/* ═══ MODE SWITCHER ═══ */}
+        {/* ═══ MODE SWITCHER — only password + forgot ═══ */}
         <div style={{ textAlign: "center", marginTop: 14 }}>
-          {loginMode === "magic" && <button onClick={() => { setLoginMode("password"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>{tl("sign_in_password_mode")}</button>}
-          {loginMode === "password" && <button onClick={() => { setLoginMode("magic"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>{tl("sign_in_magic_mode")}</button>}
           {loginMode === "forgot" && <button onClick={() => { setLoginMode("password"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>}
         </div>
 

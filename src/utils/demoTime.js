@@ -13,7 +13,7 @@ export function setDemoMode(enabled) {
 }
 
 export function isDemoMode() {
-  return _isDemoMode || !!window.__fmDemoMode;
+  return false;
 }
 
 export function getNow() {

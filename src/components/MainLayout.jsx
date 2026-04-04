@@ -751,8 +751,7 @@ export default function MainLayout() {
               <span style={{ fontSize: 9, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>Online</span>
             </div>}
 
-            {/* Demo/Live toggle */}
-            {IS_CLIENT_MODE && clinic && effectiveRole === "admin" && ctx.workspaceState !== "active" && <button data-tour="demo_toggle" onClick={toggleDemoMode} disabled={demoLoading} style={{ padding: "3px 10px", borderRadius: 6, background: demoMode ? "rgba(239,68,68,0.06)" : "rgba(16,185,129,0.04)", border: `1px solid ${demoMode ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.08)"}`, color: demoMode ? "#ef4444" : "#10b981", fontWeight: 700, fontSize: 9, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, letterSpacing: "0.04em" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: demoMode ? "#ef4444" : "#10b981", flexShrink: 0 }} />{demoLoading ? "..." : demoMode ? "DEMO" : "LIVE"}</button>}
+            {/* Demo/Live toggle — disabled */}
 
             {/* Notification bell (hidden for doctor) */}
             {IS_CLIENT_MODE && effectiveRole !== "doctor" && <div style={{ position: "relative" }}>
@@ -925,33 +924,7 @@ export default function MainLayout() {
 
         {/* Billing confirm removed — plan picker used instead */}
 
-        {/* Per-view demo banner */}
-        {demoMode && (() => {
-          const _db = {
-            "dashboard": [t("demo_banner_dashboard_title") || "Hier siehst du dein komplettes System in Echtzeit", t("demo_banner_dashboard_desc") || "Teste alles mit Beispieldaten und aktiviere dein System für echte Patienten. Wenn du bereit bist, wechsle oben rechts auf LIVE."],
-            "action_needed": [t("demo_banner_tasks_title") || "Aufgaben erscheinen nur wenn etwas fehlt", t("demo_banner_tasks_desc") || "Alles läuft automatisch – du greifst nur bei Ausnahmen ein."],
-            "inbox": [t("demo_banner_inbox_title") || "Hier landen alle WhatsApp Nachrichten automatisch", t("demo_banner_inbox_desc") || "Im Live-Modus antwortet dein Bot sofort auf echte Patientenanfragen."],
-            "pipeline": [t("demo_banner_pipeline_title") || "Hier siehst du jeden Patienten von Anfrage bis OP", t("demo_banner_pipeline_desc") || "Alle Schritte werden automatisch organisiert."],
-            "appointments": [t("demo_banner_appts_title") || "Alle Buchungen werden automatisch hier erstellt", t("demo_banner_appts_desc") || "Dein Kalender bleibt immer aktuell."],
-            "op_prep": [t("demo_banner_opprep_title") || "Welche Patienten sind bereit für die OP?", t("demo_banner_opprep_desc") || "Vorbereitung wird automatisch verfolgt."],
-            "whatsapp_setup": [t("demo_banner_wa_title") || "Dein Bot übernimmt alles automatisch", t("demo_banner_wa_desc") || "Aktiviere dein System für echte Patienten."],
-            "settings": [t("demo_banner_settings_title") || "Hier richtest du dein System einmal ein", t("demo_banner_settings_desc") || "Danach läuft alles im Hintergrund."],
-          };
-          const _t = _db[view];
-          if (!_t) return null;
-          return (
-            <div style={{ padding: "14px 20px", background: "rgba(255,140,66,0.08)", borderBottom: "1px solid rgba(255,140,66,0.25)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: 99, background: "#FFB07A", flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#FFB07A" }}>{_t[0]}</span>
-                </div>
-                <div style={{ fontSize: 12, color: "rgba(255,140,66,0.45)", marginLeft: 14 }}>{_t[1]}</div>
-              </div>
-              {view === "dashboard" && effectiveRole === "admin" && <button onClick={toggleDemoMode} disabled={demoLoading} style={{ background: "#FF8C42", color: "#fff", borderRadius: 8, padding: "8px 16px", fontWeight: 500, fontSize: 13, border: "none", cursor: "pointer", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}>{demoLoading ? "..." : (t("go_live_now") || "Jetzt live gehen")}</button>}
-            </div>
-          );
-        })()}
+        {/* Demo banners removed */}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
         <ErrorBoundary key={view}>
         {view === "action_needed" && clinic && canAccess("action_needed") && <ActionNeededView />}

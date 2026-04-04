@@ -73,7 +73,7 @@ export default function AddonsView() {
 
   if (loading) return <div style={{ padding: 60, textAlign: "center", color: "rgba(167,177,195,0.7)" }}>{t("loading_subscription")}</div>;
 
-  if (!sub?.stripe) return (
+  if (!sub?.stripe && !sub?.status) return (
     <div style={{ padding: 60, textAlign: "center" }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>💳</div>
       <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{t("no_active_subscription")}</div>

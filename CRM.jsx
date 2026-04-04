@@ -126,9 +126,12 @@ export default function App() {
   const [inviteOpen, setInviteOpen] = React.useState(false);
   const [inviteEmail, setInviteEmail] = React.useState("");
   const [inviteRole, setInviteRole] = React.useState("Receptionist");
-  const [demoMode, setDemoMode] = React.useState(false);
-  const [demoLoading, setDemoLoading] = React.useState(false);
-  const [demoBlockedModal, setDemoBlockedModal] = React.useState(false);
+  const [demoMode] = React.useState(false); // Demo mode permanently disabled
+  const setDemoMode = () => {};
+  const [demoLoading] = React.useState(false);
+  const setDemoLoading = () => {};
+  const [demoBlockedModal] = React.useState(false);
+  const setDemoBlockedModal = () => {};
   // ── Workspace state (demo/trial/live_test/activation_pending/checkout_pending/active) ──
   const [workspaceState, setWorkspaceState] = React.useState('demo');
   const [testInfo, setTestInfo] = React.useState(null);
@@ -854,18 +857,6 @@ export default function App() {
     <AppContext.Provider value={ctxValue}>
       <RouterSync />
       <MainLayout />
-      {/* Demo write-blocked modal */}
-      {demoBlockedModal && <div style={{position:"fixed",inset:0,zIndex:99999,background:"rgba(0,0,0,0.7)",display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setDemoBlockedModal(false)}>
-        <div onClick={e=>e.stopPropagation()} style={{background:"#162032",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:"32px 28px",maxWidth:400,textAlign:"center",boxShadow:"0 20px 60px rgba(0,0,0,0.5)"}}>
-          <div style={{fontSize:36,marginBottom:12}}>🔒</div>
-          <div style={{fontSize:16,fontWeight:700,color:"rgba(232,238,252,0.9)",marginBottom:8}}>{t("demo_mode_title") || "Demo-Modus"}</div>
-          <div style={{fontSize:13,color:"rgba(167,177,195,0.6)",lineHeight:1.6,marginBottom:20}}>{t("demo_mode_desc") || "Im Demo-Modus kannst du alles erkunden, aber keine echten Änderungen speichern. Wechsle zu LIVE, um diese Funktion zu aktivieren."}</div>
-          <div style={{display:"flex",gap:10,justifyContent:"center"}}>
-            <button onClick={()=>setDemoBlockedModal(false)} style={{padding:"8px 20px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.6)",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>{t("close_btn") || "Schließen"}</button>
-            <button onClick={()=>{setDemoBlockedModal(false);toggleDemoMode();}} style={{padding:"8px 20px",borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 4px 12px rgba(16,185,129,0.3)"}}>{t("go_live_now") || "Jetzt live gehen"}</button>
-          </div>
-        </div>
-      </div>}
     </AppContext.Provider>
   );
 }
