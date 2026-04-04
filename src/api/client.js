@@ -19,8 +19,6 @@ export function setTokens(access, refresh) {
   refreshToken = refresh;
   sessionStorage.setItem('fm_access_token', access);
   sessionStorage.setItem('fm_refresh_token', refresh);
-  // Set cookie for img/media auth (httpOnly=false so browser sends it with img src requests)
-  document.cookie = `fm_token=${access}; path=/; max-age=86400; SameSite=Lax; Secure`;
 }
 
 export function clearTokens() {
@@ -29,8 +27,6 @@ export function clearTokens() {
   sessionStorage.removeItem('fm_access_token');
   sessionStorage.removeItem('fm_refresh_token');
   sessionStorage.removeItem('fm_api_user');
-  document.cookie = 'fm_token=; path=/; max-age=0';
-
 }
 
 export function getAccessToken() {

@@ -9,36 +9,39 @@ import { useAppointmentStore } from "../stores/appointmentStore";
 import { useInboxStore } from "../stores/inboxStore";
 import { useBillingStore } from "../stores/billingStore";
 
-import AuditLogView from "./AuditLog/AuditLogView";
-import SupportView from "./Support/SupportView";
-import ManualPage from "./Manual/ManualPage";
-import AutomationsView from "./Automations/AutomationsView";
-import FilesView from "./Files/FilesView";
-import AnalyticsView from "./Analytics/AnalyticsView";
-import SettingsView from "./Settings/SettingsView";
-import SubscriptionView from "./Subscription/SubscriptionView";
-import AddonsView from "./Addons/AddonsView";
-import PatientPanel from "./Patients/PatientPanel";
-import PipelineView from "./Patients/PipelineView";
-import PatientsPage from "./Patients/PatientsPage";
-import ActionNeededView from "./ActionNeeded/ActionNeededView";
-import RevenueView from "./Revenue/RevenueView";
-import ProductTour, { TourWelcomeModal } from "./Tour/ProductTour";
-import AISupportWidget from "./AISupport/AISupportWidget";
-import OperatorPanel from "./Operator/OperatorPanel";
-import DashboardView from "./Dashboard/DashboardView";
-import InboxView from "./Inbox/InboxView";
-import AppointmentsPage from "./Appointments/AppointmentsPage";
-import AIControlView from "./AIControl/AIControlView";
-import WhatsAppSetupPage from "./WhatsApp/WhatsAppSetupPage";
-import SetupView from "./SetupGuide/SetupView";
 import ErrorBoundary from "./shared/ErrorBoundary";
-import OpPrepView from "./OpPrep/OpPrepView";
-import ReviewBoard from "./DoctorTasks/ReviewBoard";
-import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
-import ArchiveView from "./Archive/ArchiveView";
-import OnboardingWizard from "./Onboarding/OnboardingWizard";
-import PaymentsView from "./Finance/PaymentsView";
+
+// Lazy-loaded view components (code splitting)
+const AuditLogView = React.lazy(() => import("./AuditLog/AuditLogView"));
+const SupportView = React.lazy(() => import("./Support/SupportView"));
+const ManualPage = React.lazy(() => import("./Manual/ManualPage"));
+const AutomationsView = React.lazy(() => import("./Automations/AutomationsView"));
+const FilesView = React.lazy(() => import("./Files/FilesView"));
+const AnalyticsView = React.lazy(() => import("./Analytics/AnalyticsView"));
+const SettingsView = React.lazy(() => import("./Settings/SettingsView"));
+const SubscriptionView = React.lazy(() => import("./Subscription/SubscriptionView"));
+const AddonsView = React.lazy(() => import("./Addons/AddonsView"));
+const PatientPanel = React.lazy(() => import("./Patients/PatientPanel"));
+const PipelineView = React.lazy(() => import("./Patients/PipelineView"));
+const PatientsPage = React.lazy(() => import("./Patients/PatientsPage"));
+const ActionNeededView = React.lazy(() => import("./ActionNeeded/ActionNeededView"));
+const RevenueView = React.lazy(() => import("./Revenue/RevenueView"));
+const AISupportWidget = React.lazy(() => import("./AISupport/AISupportWidget"));
+const OperatorPanel = React.lazy(() => import("./Operator/OperatorPanel"));
+const DashboardView = React.lazy(() => import("./Dashboard/DashboardView"));
+const InboxView = React.lazy(() => import("./Inbox/InboxView"));
+const AppointmentsPage = React.lazy(() => import("./Appointments/AppointmentsPage"));
+const AIControlView = React.lazy(() => import("./AIControl/AIControlView"));
+const WhatsAppSetupPage = React.lazy(() => import("./WhatsApp/WhatsAppSetupPage"));
+const SetupView = React.lazy(() => import("./SetupGuide/SetupView"));
+const OpPrepView = React.lazy(() => import("./OpPrep/OpPrepView"));
+const ReviewBoard = React.lazy(() => import("./DoctorTasks/ReviewBoard"));
+const DoctorTasksView = React.lazy(() => import("./DoctorTasks/DoctorTasksView"));
+const ArchiveView = React.lazy(() => import("./Archive/ArchiveView"));
+const OnboardingWizard = React.lazy(() => import("./Onboarding/OnboardingWizard"));
+const PaymentsView = React.lazy(() => import("./Finance/PaymentsView"));
+
+const LazyFallback = <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',color:'#4cc9ff',fontSize:14}}>Loading...</div>;
 
 const IS_CLIENT_MODE = window.location.hostname === "crm.flowmatix.io" || window.location.hostname === "localhost";
 
@@ -158,6 +161,7 @@ export default function MainLayout() {
     if (effectiveRole !== "doctor") return;
     let mounted = true;
     const check = async () => {
+      if (document.hidden) return; // Skip when tab not visible
       try {
         const res = await fmApi.apiFetch("/api/v1/tasks");
         const tasks = res.tasks || [];
@@ -305,10 +309,10 @@ export default function MainLayout() {
       </div>
     )}
 
-    {showOnboarding && <OnboardingWizard onComplete={() => {
+    {showOnboarding && <React.Suspense fallback={LazyFallback}><OnboardingWizard onComplete={() => {
       setShowOnboarding(false);
       completeOnboarding(ctx.activeClinicId, t("onboarding_complete") || "Setup abgeschlossen!");
-    }} onSkip={() => setShowOnboarding(false)} />}
+    }} onSkip={() => setShowOnboarding(false)} /></React.Suspense>}
     <style>{`@keyframes fmHighlight{0%{box-shadow:0 0 0 0 rgba(76,201,255,0.5)}50%{box-shadow:0 0 24px 6px rgba(76,201,255,0.35)}100%{box-shadow:0 0 0 0 rgba(76,201,255,0)}}`}</style>
 
     {/* ── Plan Picker Modal (trial_expired forced OR manual trigger) ── */}
@@ -538,7 +542,7 @@ export default function MainLayout() {
         *::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.12)}
         ::selection{background:rgba(76,201,255,0.15);color:#fff}
       `}</style>
-      {selLead && <PatientPanel />}{selAppt && ApptDrawer()}
+      {selLead && <React.Suspense fallback={LazyFallback}><PatientPanel /></React.Suspense>}{selAppt && ApptDrawer()}
       {/* ═══ INVOICE CREATION MODAL ═══ */}
       {invoiceModal && (() => { const lead = getLeadById(invoiceModal); if (!lead) return null; return <div style={{ position: "fixed", inset: 0, zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div onClick={() => setInvoiceModal(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }} />
@@ -927,36 +931,36 @@ export default function MainLayout() {
         {/* Demo banners removed */}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
         <ErrorBoundary key={view}>
-        {view === "action_needed" && clinic && canAccess("action_needed") && <ActionNeededView />}
-        {view === "dashboard" && clinic && canAccess("dashboard") && <DashboardView />}
-        {view === "inbox" && canAccess("inbox") && <InboxView />}
-        {view === "pipeline" && canAccess("pipeline") && <PipelineView />}
-        {view === "patients_db" && clinic && canAccess("patients_db") && <PatientsPage />}
-        {view === "appointments" && canAccess("appointments") && <AppointmentsPage />}
-        {view === "op_prep" && clinic && canAccess("op_prep") && <OpPrepView />}
-        {view === "review_board" && clinic && canAccess("review_board") && <ReviewBoard />}
-        {view === "doctor_portal" && clinic && canAccess("doctor_portal") && <DoctorTasksView />}
-        {view === "archive" && clinic && canAccess("archive") && <ArchiveView />}
-        {view === "analytics" && clinic && canAccess("analytics") && <AnalyticsView />}
-        {view === "ai_control" && clinic && canAccess("ai_control") && <AIControlView />}
-        {view === "whatsapp_setup" && clinic && canAccess("whatsapp_setup") && <WhatsAppSetupPage />}
-        {view === "setup" && clinic && canAccess("setup") && <SetupView />}
-        {view === "automations" && clinic && canAccess("automations") && <AutomationsView />}
-        {view === "files" && clinic && canAccess("files") && <FilesView />}
-        {view === "revenue" && clinic && canAccess("revenue") && <RevenueView />}
-        {view === "payments" && clinic && canAccess("payments") && <PaymentsView />}
-        {view === "addons" && clinic && canAccess("addons") && <AddonsView />}
-        {view === "subscription" && clinic && canAccess("billing") && <SubscriptionView />}
-        {view === "settings" && canAccess("settings") && <SettingsView />}
-        {view === "audit_log" && canAccess("audit_log") && <AuditLogView />}
-        {view === "support" && canAccess("support") && <SupportView />}
-        {view === "manual" && canAccess("settings") && <div style={{position:"fixed",inset:0,zIndex:900,display:"flex"}}><div onClick={()=>setView("dashboard")} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}} /><div style={{position:"relative",marginLeft:"auto",width:"min(900px,85vw)",height:"100vh",overflowY:"auto",background:"#fff",boxShadow:"-4px 0 20px rgba(0,0,0,0.3)"}}><ManualPage isPublic={false} /></div></div>}
-        {view === "operator" && (isAdmin || isOperator) && !IS_CLIENT_MODE && <OperatorPanel />}
+        {view === "action_needed" && clinic && canAccess("action_needed") && <React.Suspense fallback={LazyFallback}><ActionNeededView /></React.Suspense>}
+        {view === "dashboard" && clinic && canAccess("dashboard") && <React.Suspense fallback={LazyFallback}><DashboardView /></React.Suspense>}
+        {view === "inbox" && canAccess("inbox") && <React.Suspense fallback={LazyFallback}><InboxView /></React.Suspense>}
+        {view === "pipeline" && canAccess("pipeline") && <React.Suspense fallback={LazyFallback}><PipelineView /></React.Suspense>}
+        {view === "patients_db" && clinic && canAccess("patients_db") && <React.Suspense fallback={LazyFallback}><PatientsPage /></React.Suspense>}
+        {view === "appointments" && canAccess("appointments") && <React.Suspense fallback={LazyFallback}><AppointmentsPage /></React.Suspense>}
+        {view === "op_prep" && clinic && canAccess("op_prep") && <React.Suspense fallback={LazyFallback}><OpPrepView /></React.Suspense>}
+        {view === "review_board" && clinic && canAccess("review_board") && <React.Suspense fallback={LazyFallback}><ReviewBoard /></React.Suspense>}
+        {view === "doctor_portal" && clinic && canAccess("doctor_portal") && <React.Suspense fallback={LazyFallback}><DoctorTasksView /></React.Suspense>}
+        {view === "archive" && clinic && canAccess("archive") && <React.Suspense fallback={LazyFallback}><ArchiveView /></React.Suspense>}
+        {view === "analytics" && clinic && canAccess("analytics") && <React.Suspense fallback={LazyFallback}><AnalyticsView /></React.Suspense>}
+        {view === "ai_control" && clinic && canAccess("ai_control") && <React.Suspense fallback={LazyFallback}><AIControlView /></React.Suspense>}
+        {view === "whatsapp_setup" && clinic && canAccess("whatsapp_setup") && <React.Suspense fallback={LazyFallback}><WhatsAppSetupPage /></React.Suspense>}
+        {view === "setup" && clinic && canAccess("setup") && <React.Suspense fallback={LazyFallback}><SetupView /></React.Suspense>}
+        {view === "automations" && clinic && canAccess("automations") && <React.Suspense fallback={LazyFallback}><AutomationsView /></React.Suspense>}
+        {view === "files" && clinic && canAccess("files") && <React.Suspense fallback={LazyFallback}><FilesView /></React.Suspense>}
+        {view === "revenue" && clinic && canAccess("revenue") && <React.Suspense fallback={LazyFallback}><RevenueView /></React.Suspense>}
+        {view === "payments" && clinic && canAccess("payments") && <React.Suspense fallback={LazyFallback}><PaymentsView /></React.Suspense>}
+        {view === "addons" && clinic && canAccess("addons") && <React.Suspense fallback={LazyFallback}><AddonsView /></React.Suspense>}
+        {view === "subscription" && clinic && canAccess("billing") && <React.Suspense fallback={LazyFallback}><SubscriptionView /></React.Suspense>}
+        {view === "settings" && canAccess("settings") && <React.Suspense fallback={LazyFallback}><SettingsView /></React.Suspense>}
+        {view === "audit_log" && canAccess("audit_log") && <React.Suspense fallback={LazyFallback}><AuditLogView /></React.Suspense>}
+        {view === "support" && canAccess("support") && <React.Suspense fallback={LazyFallback}><SupportView /></React.Suspense>}
+        {view === "manual" && canAccess("settings") && <div style={{position:"fixed",inset:0,zIndex:900,display:"flex"}}><div onClick={()=>setView("dashboard")} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}} /><div style={{position:"relative",marginLeft:"auto",width:"min(900px,85vw)",height:"100vh",overflowY:"auto",background:"#fff",boxShadow:"-4px 0 20px rgba(0,0,0,0.3)"}}><React.Suspense fallback={LazyFallback}><ManualPage isPublic={false} /></React.Suspense></div></div>}
+        {view === "operator" && (isAdmin || isOperator) && !IS_CLIENT_MODE && <React.Suspense fallback={LazyFallback}><OperatorPanel /></React.Suspense>}
         </ErrorBoundary>
         </div></div>
     </div>
     {/* Tour disabled — not in production v368 */}
-    {IS_CLIENT_MODE && user && <AISupportWidget />}
+    {IS_CLIENT_MODE && user && <React.Suspense fallback={null}><AISupportWidget /></React.Suspense>}
     </ErrorBoundary>
   );
 }
