@@ -116,6 +116,7 @@ export default function TrialsView({ actions, navigateTo }) {
 
                     {/* Name + Plan */}
                     <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{safeStr(c.name)}</div>
+                    <div onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(c.id); }} style={{ fontSize: 9, color: 'var(--text-muted)', opacity: 0.5, cursor: 'pointer', fontFamily: 'monospace', marginBottom: 2 }} title="Klick zum Kopieren">{c.id}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>{safeStr(c.plan_name, 'No plan')}</div>
 
                     {/* Status + Time */}

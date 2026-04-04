@@ -92,7 +92,10 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
         <button onClick={onClose} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
           Back
         </button>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em', flex: 1 }}>{safeStr(d.name || clinic?.name)}</h1>
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>{safeStr(d.name || clinic?.name)}</h1>
+          <div onClick={() => navigator.clipboard.writeText(d.id || clinic?.id || '')} style={{ fontSize: 10, color: 'var(--text-muted)', opacity: 0.5, cursor: 'pointer', fontFamily: 'monospace', marginTop: 2 }} title="Klick zum Kopieren">{d.id || clinic?.id}</div>
+        </div>
         <StatusBadge status={waStatus} size="lg" />
       </div>
 

@@ -115,6 +115,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>{safeStr(c.name)}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{safeStr(c.email)}</div>
+                  <div onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(c.id); }} style={{ fontSize: 9, color: 'var(--text-muted)', opacity: 0.4, cursor: 'pointer', fontFamily: 'monospace', marginTop: 1 }} title="Klick zum Kopieren">{c.id}</div>
                 </div>
 
                 {/* Plan */}
