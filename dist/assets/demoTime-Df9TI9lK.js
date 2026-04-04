@@ -1,0 +1,1 @@
+const e=new Date("2026-03-25T12:00:00");function t(n){}function o(){return!1}function r(){return new Date}function u(){return Date.now()}function D(){return e}export{D as getDemoDate,r as getNow,u as getNowMs,o as isDemoMode,t as setDemoMode};

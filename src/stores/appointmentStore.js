@@ -49,6 +49,7 @@ export const useAppointmentStore = create((set, get) => ({
       return data;
     } catch (err) {
       set({ error: err.message, loading: false });
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to load appointments", type: "error" } }));
       return null;
     }
   },
@@ -77,6 +78,7 @@ export const useAppointmentStore = create((set, get) => ({
       return appt;
     } catch (err) {
       set({ error: err.message });
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to create appointment", type: "error" } }));
       return null;
     }
   },
@@ -90,7 +92,7 @@ export const useAppointmentStore = create((set, get) => ({
     fmApi.updateAppointment(id, data).catch(e => {
       console.error("[store] API sync failed, rolling back:", e.message || e);
       if (prev) set((s) => ({ appts: s.appts.map((a) => (a.id === id ? prev : a)) }));
-      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Speichern fehlgeschlagen", type: "error" } }));
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Save failed", type: "error" } }));
     });
   },
 
@@ -123,7 +125,7 @@ export const useAppointmentStore = create((set, get) => ({
     fmApi.updateAppointment(id, { status: 'cancelled' }).catch(e => {
       console.error("[store] cancel failed, rolling back:", e.message || e);
       if (prev) set((s) => ({ appts: s.appts.map((a) => (a.id === id ? prev : a)) }));
-      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Stornierung fehlgeschlagen", type: "error" } }));
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Cancellation failed", type: "error" } }));
     });
   },
 
@@ -140,7 +142,7 @@ export const useAppointmentStore = create((set, get) => ({
       rescheduleDate: '',
       rescheduleTime: '',
     }));
-    fmApi.updateAppointment(rescheduleAppt.id, updated).catch(e => { console.error("[store] API sync failed:", e.message || e); });
+    fmApi.updateAppointment(rescheduleAppt.id, updated).catch(e => { console.error("[store] API sync failed:", e.message || e); window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to reschedule appointment", type: "error" } })); });
     return updated;
   },
 

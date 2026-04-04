@@ -20,18 +20,21 @@ route:
 receivers:
   - name: "default"
     webhook_configs:
-      - url: "http://flowmatix-api:3001/api/v1/internal/alerts"
+      - url: "http://fm-api:4000/api/v1/internal/alerts"
         send_resolved: true
 
   - name: "critical"
     webhook_configs:
-      - url: "http://flowmatix-api:3001/api/v1/internal/alerts"
+      - url: "http://fm-api:4000/api/v1/internal/alerts"
         send_resolved: true
-    # Add email/Telegram notification for critical alerts
-    # email_configs:
-    #   - to: "admin@flowmatix.io"
-    #     from: "alerts@flowmatix.io"
-    #     smarthost: "smtp.example.com:587"
+    email_configs:
+      - to: "flowmatix.io@gmail.com"
+        from: "partner@flowmatix.io"
+        smarthost: "smtp.resend.com:587"
+        auth_username: "resend"
+        auth_password_file: "/etc/alertmanager/smtp_password"
+        require_tls: true
+        send_resolved: true
 
 inhibit_rules:
   - source_match:

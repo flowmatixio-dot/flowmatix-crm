@@ -82,7 +82,7 @@ export default function App() {
     showRevenue, setShowRevenue, patientTab, setPatientTab, opSubTab, setOpSubTab,
     showToast,
   } = useUiStore();
-  const setToast = (msg) => { if(msg) showToast(msg); else useUiStore.setState({toast:null}); };
+  const setToast = (msg, type) => { if(msg) showToast(msg, type); else useUiStore.setState({toast:null}); };
 
   const {
     clinics, setClinics, adminClinic, setAdminClinic,
@@ -513,6 +513,13 @@ export default function App() {
   useEffect(()=>{
     const handler=(e)=>{if((e.metaKey||e.ctrlKey)&&e.key==="k"){e.preventDefault();const el=document.getElementById("searchQuery");if(el){el.focus();setSearchOpen(true);}}if(e.key==="Escape"){setSearchOpen(false);setSearchQuery("");document.getElementById("searchQuery")?.blur();}};
     const closeDropdowns=(e)=>{if(!e.target.closest("[data-notif-panel]")&&!e.target.closest("[data-notif-bell]"))setNotifOpen(false);if(!e.target.closest("[data-gear-menu]"))document.querySelectorAll("[data-gear-menu] > div:last-child").forEach(d=>{d.style.display="none";});};window.addEventListener("click",closeDropdowns);window.addEventListener("keydown",handler);return()=>{window.removeEventListener("keydown",handler);window.removeEventListener("click",closeDropdowns);};
+  },[]);
+
+  /* Listen for fm:toast custom events from stores */
+  useEffect(()=>{
+    const handler=(e)=>{const d=e.detail;if(d?.msg)showToast(d.msg,d.type||'error');};
+    window.addEventListener("fm:toast",handler);
+    return()=>window.removeEventListener("fm:toast",handler);
   },[]);
 
   /* Fetch pending applications count for operator badge */

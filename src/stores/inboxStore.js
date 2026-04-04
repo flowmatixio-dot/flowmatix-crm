@@ -52,6 +52,7 @@ export const useInboxStore = create((set, get) => ({
       return conversations;
     } catch (err) {
       set({ error: err.message, loading: false });
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to load conversations", type: "error" } }));
       return null;
     }
   },
@@ -64,6 +65,7 @@ export const useInboxStore = create((set, get) => ({
       return await fmApi.getMessages(conversationId, params);
     } catch (err) {
       set({ error: err.message });
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to load messages", type: "error" } }));
       return null;
     }
   },
@@ -91,7 +93,7 @@ export const useInboxStore = create((set, get) => ({
     // API call (non-blocking)
     const chat = (get().msgs[clinicId] || []).find((c) => c.id === chatId);
     if (chat) {
-      fmApi.sendCrmMessage(chatId, { text: text.trim(), sender: 'staff' }).catch(e => { console.error("[store] API sync failed:", e.message || e); });
+      fmApi.sendCrmMessage(chatId, { text: text.trim(), sender: 'staff' }).catch(e => { console.error("[store] API sync failed:", e.message || e); window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to send message", type: "error" } })); });
     }
   },
 

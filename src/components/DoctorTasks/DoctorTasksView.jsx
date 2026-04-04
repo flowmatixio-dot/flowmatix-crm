@@ -95,7 +95,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
       const freshToken = sessionStorage.getItem('fm_access_token');
       if (!freshToken) return;
       ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime?token=${freshToken}`);
-      ws.onopen = () => { failCount = 0; pingIv = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 30000); };
+      ws.onopen = () => { failCount = 0; if (pingIv) clearInterval(pingIv); pingIv = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 30000); };
       ws.onmessage = (e) => { try { const d = JSON.parse(e.data); if (d.type?.startsWith('task:')) loadTasks(); } catch {} };
       ws.onclose = () => { clearInterval(pingIv); failCount++; if (failCount < 5) reconnectTo = setTimeout(connect, Math.min(failCount * 5000, 30000)); };
       ws.onerror = () => ws.close();

@@ -60,9 +60,9 @@ export const useUiStore = create(
         set({ lang });
         document.documentElement.lang = lang;
       },
-      showToast: (msg) => {
-        set({ toast: msg });
-        setTimeout(() => set({ toast: null }), 2500);
+      showToast: (msg, type = 'success') => {
+        set({ toast: typeof msg === 'object' ? msg : { msg, type } });
+        setTimeout(() => set({ toast: null }), type === 'error' ? 4000 : 2500);
       },
       setSearchQuery: (searchQuery) => set({ searchQuery }),
       setSearchOpen: (searchOpen) => set({ searchOpen }),

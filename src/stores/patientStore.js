@@ -97,18 +97,31 @@ export const usePatientStore = create((set, get) => ({
       const total = data.total || data.count || normalized.length;
       if (total > 200 || normalized.length >= 200) {
         // Fetch remaining in background after 500ms (non-blocking)
+        // IMPORTANT: Only ADD new patients — never overwrite existing ones.
+        // Overwriting would cause a race condition: if the user made local
+        // changes (drag-drop, stage change, edits) during the 500ms window,
+        // those changes would be lost. Full state syncs on next explicit refresh.
         setTimeout(async () => {
           try {
             const allData = await fmApi.getPatients({ limit: 10000, ...params });
             const allRaw = allData.patients || allData;
             const allNormalized = normalize(allRaw);
-            set({ leads: allNormalized });
-          } catch {}
+            set((state) => {
+              const existingIds = new Set(state.leads.map(l => l.id));
+              const newLeads = allNormalized.filter(l => !existingIds.has(l.id));
+              if (newLeads.length === 0) return state; // no change needed
+              return { leads: [...state.leads, ...newLeads] };
+            });
+          } catch (bgErr) {
+            console.error('[patientStore] background load failed:', bgErr.message || bgErr);
+            window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to load all patients", type: "error" } }));
+          }
         }, 500);
       }
       return data;
     } catch (err) {
       set({ error: err.message, loading: false });
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to load patients", type: "error" } }));
       return null;
     }
   },
@@ -123,6 +136,7 @@ export const usePatientStore = create((set, get) => ({
       return patient;
     } catch (err) {
       set({ error: err.message });
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to create patient", type: "error" } }));
       return null;
     }
   },
@@ -139,7 +153,7 @@ export const usePatientStore = create((set, get) => ({
       // Rollback on failure
       if (prev) set((s) => ({ leads: s.leads.map((l) => (l.id === id ? prev : l)) }));
       set({ error: err.message });
-      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Speichern fehlgeschlagen", type: "error" } }));
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Save failed", type: "error" } }));
     }
   },
 
@@ -185,7 +199,7 @@ export const usePatientStore = create((set, get) => ({
       set((s) => ({
         leads: s.leads.map((l) => l.id === lid ? { ...l, stage: prevStage } : l),
       }));
-      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Verschieben fehlgeschlagen", type: "error" } }));
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Move failed", type: "error" } }));
     });
     return { lead, stage: st };
   },
@@ -202,6 +216,7 @@ export const usePatientStore = create((set, get) => ({
     // API call (non-blocking)
     fmApi.addTimelineEntry(lid, { type, text }).catch(e => {
       console.error('[patientStore] addTL failed:', e.message || e);
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to save timeline entry", type: "error" } }));
     });
   },
 
@@ -228,6 +243,7 @@ export const usePatientStore = create((set, get) => ({
     }));
     fmApi.updatePatient(lid, { convStatus: status }).catch(e => {
       console.error('[patientStore] setConvStatus failed:', e.message || e);
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to update status", type: "error" } }));
     });
   },
 
@@ -258,6 +274,7 @@ export const usePatientStore = create((set, get) => ({
     // Persist note via API
     fmApi.addTimelineEntry(lid, { type: 'note', content: text, author: authorName }).catch(e => {
       console.error('[patientStore] addInternalNote failed:', e.message || e);
+      window.dispatchEvent(new CustomEvent("fm:toast", { detail: { msg: "Failed to save note", type: "error" } }));
     });
   },
 

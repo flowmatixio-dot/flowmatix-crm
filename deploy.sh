@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e
+set -eo pipefail
+trap 'echo "❌ Deploy FAILED at line $LINENO"; exit 1' ERR
 
 echo "═══ Flowmatix CRM Deploy ═══"
 echo ""
@@ -21,6 +22,12 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 echo "→ Backing up production..."
 ssh flowmatix "cp -r /opt/flowmatix/services/app/dist /opt/flowmatix/backups/app-dist-$TIMESTAMP"
 echo "✓ Backup: app-dist-$TIMESTAMP"
+
+BACKUP_CHECK=$(ssh flowmatix "[ -d /opt/flowmatix/backups/app-dist-$TIMESTAMP ] && echo 'ok' || echo 'fail'" 2>/dev/null)
+if [ "$BACKUP_CHECK" != "ok" ]; then
+  echo "❌ ERROR: Backup creation failed — aborting deploy"
+  exit 1
+fi
 echo ""
 
 # 4. Deploy
@@ -36,12 +43,35 @@ echo "✓ fm-app restarted"
 echo ""
 
 # 6. Verify
-echo "→ Verifying..."
-STATUS=$(ssh flowmatix "curl -s -o /dev/null -w '%{http_code}' http://localhost:80/")
-if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ]; then
-  echo "✓ Server responding ($STATUS)"
+echo "→ Verifying health..."
+HEALTHY=false
+for i in 1 2 3 4 5; do
+  sleep 3
+  STATUS=$(curl -s -o /dev/null -w '%{http_code}' https://crm.flowmatix.io/ 2>/dev/null || echo 'FAIL')
+  if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ]; then
+    echo "✓ CRM healthy ($STATUS) — attempt $i"
+    HEALTHY=true
+    break
+  fi
+  echo "  Attempt $i: $STATUS — retrying..."
+done
+if [ "$HEALTHY" != "true" ]; then
+  echo "⚠ CRM health check failed after 5 attempts"
+  echo "  Check logs: ssh flowmatix 'docker logs fm-app --tail 20'"
+fi
+
+echo ""
+echo "→ Purging Cloudflare cache..."
+CF_ZONE=$(ssh flowmatix 'echo $CLOUDFLARE_ZONE_ID' 2>/dev/null || echo "")
+CF_TOKEN=$(ssh flowmatix 'cat /opt/flowmatix/.env | grep CLOUDFLARE_API_TOKEN | cut -d= -f2' 2>/dev/null || echo "")
+if [ -n "$CF_ZONE" ] && [ -n "$CF_TOKEN" ]; then
+  curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE}/purge_cache" \
+    -H "Authorization: Bearer ${CF_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d '{"purge_everything":true}' | grep -o '"success":[a-z]*'
+  echo " ✓ Cache purged"
 else
-  echo "⚠ Server returned $STATUS — check manually!"
+  echo "⚠ Cloudflare credentials not found — skipping cache purge"
 fi
 
 echo ""
