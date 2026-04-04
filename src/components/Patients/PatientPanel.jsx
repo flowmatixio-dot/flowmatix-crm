@@ -245,6 +245,8 @@ export default function PatientPanel() {
   const [showPlanBuilder, setShowPlanBuilder] = useState(false);
   const [detailTimeline, setDetailTimeline] = useState([]);
   const [detailNotes, setDetailNotes] = useState(null);
+  const [gdprConfirm, setGdprConfirm] = useState(false);
+  const [gdprDeleting, setGdprDeleting] = useState(false);
   useEffect(() => { import("../../api/client").then(m => m.getStaff()).then(r => setStaffList(r?.staff || [])).catch(() => {}); }, []);
   useEffect(() => {
     if (!selLead) return;
@@ -786,6 +788,33 @@ export default function PatientPanel() {
           </div>)}
         </div>}
       </div>
+      {/* ═══ GDPR DELETE — only admin ═══ */}
+      {user?.role === "admin" && <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)"}}>
+        <div style={{fontSize:13,fontWeight:800,color:"#ef4444",marginBottom:8}}>{t("gdpr_danger_zone") || "Danger Zone"}</div>
+        {!gdprConfirm ? (
+          <button onClick={()=>setGdprConfirm(true)} style={{padding:"8px 16px",borderRadius:10,background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.3)",color:"#ef4444",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{t("gdpr_delete_btn") || "Patientendaten endgültig löschen (DSGVO Art. 17)"}</button>
+        ) : (
+          <div>
+            <div style={{fontSize:12,color:"rgba(239,68,68,0.8)",marginBottom:10,lineHeight:1.5}}>{t("gdpr_delete_warning") || "Alle Daten dieses Patienten werden unwiderruflich gelöscht: Nachrichten, Fotos, Termine, Dateien. Diese Aktion kann nicht rückgängig gemacht werden."}</div>
+            <div style={{display:"flex",gap:8}}>
+              <button disabled={gdprDeleting} onClick={async()=>{
+                setGdprDeleting(true);
+                try {
+                  const { apiCall } = await import("../../api/client");
+                  const res = await apiCall(`/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
+                  if (res?.success) {
+                    showT(t("gdpr_deleted_success") || "Patientendaten gelöscht");
+                    setSelLead(null);
+                    setLeads(prev => prev.filter(l => l.id !== lead.id));
+                  } else { showT(res?.error || "Fehler", "error"); }
+                } catch(e) { showT(e.message || "Fehler", "error"); }
+                setGdprDeleting(false); setGdprConfirm(false);
+              }} style={{padding:"8px 16px",borderRadius:10,background:"#ef4444",border:"none",color:"#fff",fontWeight:700,fontSize:12,cursor:gdprDeleting?"wait":"pointer",fontFamily:"inherit",opacity:gdprDeleting?0.6:1}}>{gdprDeleting ? "..." : (t("gdpr_confirm_delete") || "Endgültig löschen")}</button>
+              <button onClick={()=>setGdprConfirm(false)} style={{padding:"8px 16px",borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#a7b1c3",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel") || "Abbrechen"}</button>
+            </div>
+          </div>
+        )}
+      </div>}
     </div>
     {lightbox&&<PhotoLightbox photos={lightbox.photos} startIdx={lightbox.idx} onClose={()=>setLightbox(null)}/>}
     {showPlanBuilder&&<div style={{position:"fixed",inset:0,zIndex:10000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
