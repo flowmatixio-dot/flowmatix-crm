@@ -539,7 +539,7 @@ export default function InboxView() {
                     <span style={{fontSize:13,fontWeight:700,color:"#ff8a2a"}}>{t('waiting_review') || "Wartet auf Bewertung"}</span>
                     <span style={{fontSize:12,color:"var(--text-muted)"}}>— {t('ai_paused_review') || "KI pausiert"}</span>
                   </div>
-                  <button onClick={() => { if (leadId) openPatient(leadId, {openReview: true}); }} style={{padding:"5px 14px",borderRadius:8,background:"rgba(255,138,42,0.1)",border:"1px solid rgba(255,138,42,0.25)",color:"#ff8a2a",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+                  <button onClick={() => { if (leadId) openPatient(leadId); }} style={{padding:"5px 14px",borderRadius:8,background:"rgba(255,138,42,0.1)",border:"1px solid rgba(255,138,42,0.25)",color:"#ff8a2a",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
                     ⚕️ {t('open_review') || "Bewertung öffnen"}
                   </button>
                 </div>
@@ -833,7 +833,7 @@ export default function InboxView() {
                   <div style={{padding:"14px 22px",borderTop:"1px solid var(--border-default)",flexShrink:0}}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 18px",borderRadius:14,background:"rgba(255,138,42,0.04)",border:"1px solid rgba(255,138,42,0.12)"}}>
                       <span style={{fontSize:13,color:"rgba(255,138,42,0.7)",fontWeight:600}}>⚕️ {t("ai_paused_review_chat") || "KI wartet auf medizinische Bewertung"}</span>
-                      <button onClick={() => { if (leadId) openPatient(leadId, {openReview: true}); }} style={{padding:"6px 16px",borderRadius:8,background:"rgba(255,138,42,0.1)",border:"1px solid rgba(255,138,42,0.25)",color:"#ff8a2a",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+                      <button onClick={() => { if (leadId) openPatient(leadId); }} style={{padding:"6px 16px",borderRadius:8,background:"rgba(255,138,42,0.1)",border:"1px solid rgba(255,138,42,0.25)",color:"#ff8a2a",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
                         {t('open_review') || "Bewertung öffnen"}
                       </button>
                     </div>
