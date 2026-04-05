@@ -904,7 +904,7 @@ export default function MainLayout() {
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {ti.session.messagesCount}/50 {t("messages") || "Nachrichten"}{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
+                    {ti.session.messagesCount}/{ti.limits?.maxMessages || 50} {t("messages") || "Nachrichten"}{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
                   </div>
                 )}
               </div>
