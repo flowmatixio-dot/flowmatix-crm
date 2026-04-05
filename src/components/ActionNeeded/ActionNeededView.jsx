@@ -113,8 +113,19 @@ export default function ActionNeededView() {
           subtle: true,
           patient: p.name, patientId: p.id,
           time: p.lastAiInteraction || p.createdAt,
-          action: () => goToChat(p.id),
-          actionLabel: t("action_request_consent") || "Zustimmung anfordern",
+          action: () => {
+            apiFetch(`/api/v1/crm/patients/${p.id}`, { method: "PATCH", body: JSON.stringify({ consent_given: true }) }).then(() => {
+              usePatientStore.getState().fetchPatients();
+              showT(t("consent_granted_manual") || "DSGVO manuell erteilt");
+            }).catch(() => showT("Fehler"));
+          },
+          actionLabel: t("action_grant_consent") || "Manuell erteilen",
+          dismissable: true,
+          onDismiss: () => {
+            apiFetch(`/api/v1/crm/patients/${p.id}`, { method: "PATCH", body: JSON.stringify({ consent_given: true }) }).then(() => {
+              usePatientStore.getState().fetchPatients();
+            }).catch(() => {});
+          },
         });
       }
 
