@@ -33,6 +33,8 @@ export default function AIControlView() {
             allowedLangs: data.languages || prev?.allowedLangs || ['German'],
             photosRequired: data.photos_required ?? true,
             minPhotos: data.min_photos || 1,
+            requiredPhotos: data.required_photos || 3,
+            requiredPhotoTypes: data.required_photo_types || ["front","top","donor"],
             maxMessageLength: data.max_message_length || 500,
             neverSay: data.never_say || [],
             workingHours: data.working_hours || null,
@@ -73,6 +75,8 @@ export default function AIControlView() {
         treatments: ac.services,
         languages: ac.allowedLangs,
         photos_required: ac.autoCollectPhotos,
+        required_photos: ac.requiredPhotos || 3,
+        required_photo_types: ac.requiredPhotoTypes || ["front","top","donor"],
         max_message_length: ac.maxMessageLength || 500,
         never_say: ac.neverSay || [],
         greeting_template: ac.greetingTemplate || null,
@@ -145,6 +149,19 @@ export default function AIControlView() {
     <Section title={t("behavior")}>
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
         <Toggle value={ac.autoCollectPhotos} onChange={v=>upAi("autoCollectPhotos",v)} label={t("auto_collect_photos")}/>
+        {ac.autoCollectPhotos && (<>
+          <div><div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("required_photos_count") || "Anzahl benötigter Fotos"}</div>
+            <input type="number" min="1" max="10" value={ac.requiredPhotos||3} onChange={e=>upAi("requiredPhotos",parseInt(e.target.value)||3)} style={{width:80,padding:"8px 12px",borderRadius:10,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none"}}/></div>
+          <div><div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:8}}>{t("required_photo_types") || "Welche Fotos benötigt?"}</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {[{id:"front",label:"Frontalansicht"},{id:"top",label:"Draufsicht (Oberkopf)"},{id:"left",label:"Linke Seite"},{id:"right",label:"Rechte Seite"},{id:"donor",label:"Spenderbereich (Hinterkopf)"},{id:"close_up",label:"Nahaufnahme"},{id:"hairline",label:"Haarlinie"}].map(pt=>{
+                const types=ac.requiredPhotoTypes||["front","top","donor"];
+                const active=types.includes(pt.id);
+                return<button key={pt.id} onClick={()=>upAi("requiredPhotoTypes",active?types.filter(x=>x!==pt.id):[...types,pt.id])} style={{padding:"6px 14px",borderRadius:10,background:active?"rgba(76,201,255,0.1)":"var(--bg-card)",border:`1px solid ${active?"rgba(76,201,255,0.25)":"var(--border-strong)"}`,color:active?"#4cc9ff":"var(--text-muted)",fontWeight:600,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{active?"✓ ":""}{pt.label}</button>;
+              })}
+            </div>
+          </div>
+        </>)}
         <Toggle value={ac.autoQualify} onChange={v=>upAi("autoQualify",v)} label={t("auto_qualify_leads")}/>
         <div><div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("max_wait_handover")}</div>
           <input id="maxWait" name="maxWait" type="number" value={ac.maxWaitBeforeHandover} onChange={e=>upAi("maxWaitBeforeHandover",parseInt(e.target.value)||5)} style={{width:80,padding:"8px 12px",borderRadius:10,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none"}}/></div>
