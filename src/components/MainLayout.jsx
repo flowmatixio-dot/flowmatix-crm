@@ -943,33 +943,31 @@ export default function MainLayout() {
           );
         })()}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
-        <ErrorBoundary key={view}>
-        {view === "action_needed" && clinic && canAccess("action_needed") && <ActionNeededView />}
-        {view === "dashboard" && clinic && canAccess("dashboard") && <DashboardView />}
-        {view === "inbox" && canAccess("inbox") && <InboxView />}
-        {view === "pipeline" && canAccess("pipeline") && <PipelineView />}
-        {view === "patients_db" && clinic && canAccess("patients_db") && <PatientsPage />}
-        {view === "appointments" && canAccess("appointments") && <AppointmentsPage />}
-        {view === "op_prep" && clinic && canAccess("op_prep") && <OpPrepView />}
-        {view === "review_board" && clinic && canAccess("review_board") && <ReviewBoard />}
-        {view === "doctor_portal" && clinic && canAccess("doctor_portal") && <DoctorTasksView />}
-        {view === "archive" && clinic && canAccess("archive") && <ArchiveView />}
-        {view === "analytics" && clinic && canAccess("analytics") && <AnalyticsView />}
-        {view === "ai_control" && clinic && canAccess("ai_control") && <AIControlView />}
-        {view === "whatsapp_setup" && clinic && canAccess("whatsapp_setup") && <WhatsAppSetupPage />}
-        {view === "setup" && clinic && canAccess("setup") && <SetupView />}
-        {view === "automations" && clinic && canAccess("automations") && <AutomationsView />}
-        {view === "files" && clinic && canAccess("files") && <FilesView />}
-        {view === "revenue" && clinic && canAccess("revenue") && <RevenueView />}
-        {view === "payments" && clinic && canAccess("payments") && <PaymentsView />}
-        {view === "addons" && clinic && canAccess("addons") && <AddonsView />}
-        {view === "subscription" && clinic && canAccess("billing") && <SubscriptionView />}
-        {view === "settings" && canAccess("settings") && <SettingsView />}
-        {view === "audit_log" && canAccess("audit_log") && <AuditLogView />}
-        {view === "support" && canAccess("support") && <SupportView />}
-        {view === "manual" && canAccess("settings") && <div style={{position:"fixed",inset:0,zIndex:900,display:"flex"}}><div onClick={()=>setView("dashboard")} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}} /><div style={{position:"relative",marginLeft:"auto",width:"min(900px,85vw)",height:"100vh",overflowY:"auto",background:"#fff",boxShadow:"-4px 0 20px rgba(0,0,0,0.3)"}}><ManualPage isPublic={false} /></div></div>}
-        {view === "operator" && (isAdmin || isOperator) && !IS_CLIENT_MODE && <OperatorPanel />}
-        </ErrorBoundary>
+        {view === "action_needed" && clinic && canAccess("action_needed") && <ErrorBoundary t={t}><ActionNeededView /></ErrorBoundary>}
+        {view === "dashboard" && clinic && canAccess("dashboard") && <ErrorBoundary t={t}><DashboardView /></ErrorBoundary>}
+        {view === "inbox" && canAccess("inbox") && <ErrorBoundary t={t}><InboxView /></ErrorBoundary>}
+        {view === "pipeline" && canAccess("pipeline") && <ErrorBoundary t={t}><PipelineView /></ErrorBoundary>}
+        {view === "patients_db" && clinic && canAccess("patients_db") && <ErrorBoundary t={t}><PatientsPage /></ErrorBoundary>}
+        {view === "appointments" && canAccess("appointments") && <ErrorBoundary t={t}><AppointmentsPage /></ErrorBoundary>}
+        {view === "op_prep" && clinic && canAccess("op_prep") && <ErrorBoundary t={t}><OpPrepView /></ErrorBoundary>}
+        {view === "review_board" && clinic && canAccess("review_board") && <ErrorBoundary t={t}><ReviewBoard /></ErrorBoundary>}
+        {view === "doctor_portal" && clinic && canAccess("doctor_portal") && <ErrorBoundary t={t}><DoctorTasksView /></ErrorBoundary>}
+        {view === "archive" && clinic && canAccess("archive") && <ErrorBoundary t={t}><ArchiveView /></ErrorBoundary>}
+        {view === "analytics" && clinic && canAccess("analytics") && <ErrorBoundary t={t}><AnalyticsView /></ErrorBoundary>}
+        {view === "ai_control" && clinic && canAccess("ai_control") && <ErrorBoundary t={t}><AIControlView /></ErrorBoundary>}
+        {view === "whatsapp_setup" && clinic && canAccess("whatsapp_setup") && <ErrorBoundary t={t}><WhatsAppSetupPage /></ErrorBoundary>}
+        {view === "setup" && clinic && canAccess("setup") && <ErrorBoundary t={t}><SetupView /></ErrorBoundary>}
+        {view === "automations" && clinic && canAccess("automations") && <ErrorBoundary t={t}><AutomationsView /></ErrorBoundary>}
+        {view === "files" && clinic && canAccess("files") && <ErrorBoundary t={t}><FilesView /></ErrorBoundary>}
+        {view === "revenue" && clinic && canAccess("revenue") && <ErrorBoundary t={t}><RevenueView /></ErrorBoundary>}
+        {view === "payments" && clinic && canAccess("payments") && <ErrorBoundary t={t}><PaymentsView /></ErrorBoundary>}
+        {view === "addons" && clinic && canAccess("addons") && <ErrorBoundary t={t}><AddonsView /></ErrorBoundary>}
+        {view === "subscription" && clinic && canAccess("billing") && <ErrorBoundary t={t}><SubscriptionView /></ErrorBoundary>}
+        {view === "settings" && canAccess("settings") && <ErrorBoundary t={t}><SettingsView /></ErrorBoundary>}
+        {view === "audit_log" && canAccess("audit_log") && <ErrorBoundary t={t}><AuditLogView /></ErrorBoundary>}
+        {view === "support" && canAccess("support") && <ErrorBoundary t={t}><SupportView /></ErrorBoundary>}
+        {view === "manual" && canAccess("settings") && <ErrorBoundary t={t}><div style={{position:"fixed",inset:0,zIndex:900,display:"flex"}}><div onClick={()=>setView("dashboard")} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}} /><div style={{position:"relative",marginLeft:"auto",width:"min(900px,85vw)",height:"100vh",overflowY:"auto",background:"#fff",boxShadow:"-4px 0 20px rgba(0,0,0,0.3)"}}><ManualPage isPublic={false} /></div></div></ErrorBoundary>}
+        {view === "operator" && (isAdmin || isOperator) && !IS_CLIENT_MODE && <ErrorBoundary t={t}><OperatorPanel /></ErrorBoundary>}
         </div></div>
     </div>
     {/* Tour disabled — not in production v368 */}
