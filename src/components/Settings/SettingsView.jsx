@@ -1003,6 +1003,22 @@ export default function SettingsView() {
           <div><div style={{fontWeight:600,fontSize:13}}>{t("fallback_to_staff") || "Fallback an Mitarbeiter"}</div><div style={{fontSize:11,color:"var(--text-faint)",marginTop:2}}>{t("fallback_to_staff_desc") || "Bei unklaren Anfragen automatisch an einen Mitarbeiter übergeben"}</div></div>
           <Toggle value={c.botFallbackHuman!==false} onChange={v=>up("botFallbackHuman",v)}/>
         </div>
+        <div style={{padding:"10px 0",borderBottom:"1px solid var(--border-subtle)"}}>
+          <div style={{fontWeight:600,fontSize:13,marginBottom:4}}>{t("required_photos_count") || "Anzahl benötigter Fotos"}</div>
+          <div style={{fontSize:11,color:"var(--text-faint)",marginBottom:8}}>{t("required_photos_desc") || "Wie viele Fotos der Bot vom Patienten anfordert"}</div>
+          <input type="number" min="1" max="10" value={c.requiredPhotos||3} onChange={e=>up("requiredPhotos",parseInt(e.target.value)||3)} style={{width:80,padding:"8px 12px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none"}}/>
+        </div>
+        <div style={{padding:"10px 0"}}>
+          <div style={{fontWeight:600,fontSize:13,marginBottom:4}}>{t("required_photo_types") || "Welche Fotos benötigt?"}</div>
+          <div style={{fontSize:11,color:"var(--text-faint)",marginBottom:8}}>{t("required_photo_types_desc") || "Bot fordert genau diese Foto-Winkel an"}</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {[{id:"front",label:"Frontalansicht"},{id:"top",label:"Draufsicht (Oberkopf)"},{id:"left",label:"Linke Seite"},{id:"right",label:"Rechte Seite"},{id:"donor",label:"Spenderbereich (Hinterkopf)"},{id:"close_up",label:"Nahaufnahme"},{id:"hairline",label:"Haarlinie"}].map(pt=>{
+              const types=c.requiredPhotoTypes||["front","top","donor"];
+              const active=types.includes(pt.id);
+              return<button key={pt.id} onClick={()=>up("requiredPhotoTypes",active?types.filter(x=>x!==pt.id):[...types,pt.id])} style={{padding:"6px 14px",borderRadius:10,background:active?"rgba(76,201,255,0.1)":"var(--bg-card)",border:`1px solid ${active?"rgba(76,201,255,0.25)":"var(--border-strong)"}`,color:active?"#4cc9ff":"var(--text-muted)",fontWeight:600,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{active?"✓ ":""}{pt.label}</button>;
+            })}
+          </div>
+        </div>
       </div>
     </Section>
 
