@@ -882,7 +882,8 @@ export default function MainLayout() {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
           const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
+          const orgCode = (activeClinicId || '').substring(0, 8).toUpperCase();
+          const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${orgCode}`;
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
             <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
@@ -898,7 +899,7 @@ export default function MainLayout() {
                   {t("lt_open_wa") || "WhatsApp öffnen"} →
                 </a>
                 <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
-                  {t("lt_use_registered_phone") || "Nutze die Nummer, mit der du dich registriert hast."}
+                  {t("lt_scan_and_send") || "QR-Code scannen und den Code absenden — Ihr Bot antwortet sofort."}
                 </div>
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
