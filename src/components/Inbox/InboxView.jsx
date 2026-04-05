@@ -366,13 +366,15 @@ export default function InboxView() {
           var upd = store.leads.map(function(l) {
             if (l.id !== p.id) return l;
             return Object.assign({}, l, {
-              intake: p.intake_data || p.intake || l.intake,
-              extractedFields: p.extracted_fields || l.extractedFields,
-              age: (p.intake_data && p.intake_data.age) || l.age,
-              treatment: p.treatment || (p.intake_data && p.intake_data.treatment) || l.treatment,
-              photoUrls: p.photo_urls || p.photoUrls || l.photoUrls,
-              country: (p.metadata && p.metadata.country) || l.country,
-              consentGiven: p.consent_given != null ? p.consent_given : l.consentGiven,
+              intake: p.intake || p.intake_data || l.intake,
+              extractedFields: p.extractedFields || p.extracted_fields || l.extractedFields,
+              age: (p.intake && p.intake.age) || l.age,
+              treatment: p.treatment || (p.intake && p.intake.treatment) || l.treatment,
+              photoUrls: p.photoUrls || p.photo_urls || l.photoUrls,
+              country: p.country || (p.metadata && p.metadata.country) || l.country,
+              consentGiven: p.consentGiven != null ? p.consentGiven : l.consentGiven,
+              language: p.locale || l.language,
+              convStatus: p.convStatus || l.convStatus,
             });
           });
           usePatientStore.setState({ leads: upd });
