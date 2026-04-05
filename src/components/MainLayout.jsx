@@ -600,17 +600,17 @@ export default function MainLayout() {
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg,rgba(0,180,216,0.08),rgba(76,201,255,0.04))", borderBottom: "1px solid rgba(0,180,216,0.12)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 44, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#00B4D8,#4cc9ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#fff", fontWeight: 800, boxShadow: "0 4px 12px rgba(0,180,216,0.3)" }}>💳</div>
-              <div><div style={{ fontSize: 16, fontWeight: 800 }}>Generate Payment Link</div><div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 1 }}>for {lead.name} — {lead.treatment}</div></div>
+              <div><div style={{ fontSize: 16, fontWeight: 800 }}>{ctx.t("pay_generate_link")}</div><div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", marginTop: 1 }}>{ctx.t("pay_for")} {lead.name} — {lead.treatment}</div></div>
             </div>
           </div>
           <div style={{ padding: "20px 24px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Amount</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>{ctx.t("pay_amount")}</div>
                 <input id="payAmount" name="payAmount" type="number" value={payAmount} onChange={e => setPayAmount(e.target.value)} style={{ width: "100%", padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(0,180,216,0.15)", color: "#fff", fontFamily: "inherit", fontSize: 18, fontWeight: 800, outline: "none", boxSizing: "border-box" }} />
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Currency</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>{ctx.t("pay_currency")}</div>
                 <select id="payCurrency" name="payCurrency" value={payCurrency} onChange={e => setPayCurrency(e.target.value)} style={{ width: "100%", padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(0,180,216,0.15)", color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, outline: "none", boxSizing: "border-box", cursor: "pointer" }}>
                   <option value="EUR">€ EUR</option><option value="USD">$ USD</option><option value="GBP">£ GBP</option><option value="TRY">₺ TRY</option>
                 </select>
@@ -624,11 +624,11 @@ export default function MainLayout() {
               <div style={{ width: 40, height: 26, borderRadius: 5, background: "linear-gradient(135deg,#00B4D8,#4cc9ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 800 }}>💳</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: "#4cc9ff" }}>{payCurrency === "EUR" ? "€" : payCurrency === "USD" ? "$" : payCurrency === "GBP" ? "£" : "₺"}{amt.toLocaleString()}</div>
-                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>Stripe Payment Link · ⏳ Pending</div>
+                <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{ctx.t("pay_stripe_pending")}</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => { sendPaymentLink(amt, lead.id, "manual"); setPaymentModal(null); }} style={{ flex: 1, padding: "12px 20px", borderRadius: 12, background: "linear-gradient(135deg,#00B4D8,#0096c7)", border: "none", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(0,180,216,0.25)" }}>💳 Jetzt senden</button>
+              <button onClick={() => { sendPaymentLink(amt, lead.id, "manual"); setPaymentModal(null); }} style={{ flex: 1, padding: "12px 20px", borderRadius: 12, background: "linear-gradient(135deg,#00B4D8,#0096c7)", border: "none", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(0,180,216,0.25)" }}>💳 {ctx.t("pay_send_now")}</button>
               <button onClick={() => setPaymentModal(null)} style={{ padding: "12px 20px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.6)", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>{ctx.t("cancel") || "Cancel"}</button>
             </div>
           </div>

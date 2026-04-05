@@ -2,6 +2,7 @@ import * as fmApi from "../api/client";
 import { escHtml, genId } from "../utils/helpers";
 import { PRICE_MAP, MONTHS } from "../data/constants";
 import { isDemoMode } from "../utils/demoTime";
+import { T } from "../data/i18n";
 
 export function useBusinessLogic({
   leads, setLeads, invoices, setInvoices, msgs, setMsgs, appts, setAppts,
@@ -19,29 +20,8 @@ export function useBusinessLogic({
     const method = lead.treatment?.includes("FUE") ? "FUE (Follicular Unit Extraction)" : lead.treatment?.includes("DHI") ? "DHI (Direct Hair Implantation)" : lead.treatment;
     const grafts = lead.reviewData.grafts || "3500 Grafts";
     const price = lead.reviewData.price || "€3,250";
-    const pdfL = {
-      treatmentPlan: { de: "Behandlungsplan", en: "Treatment Plan", tr: "Tedavi Planı" },
-      personalized: { de: "Persönlicher Behandlungsplan", en: "Personalized Treatment Plan", tr: "Kişisel Tedavi Planı" },
-      preparedOn: { de: "Erstellt am", en: "Prepared on", tr: "Hazırlanma tarihi" },
-      by: { de: "von", en: "by", tr: "tarafından" },
-      patient: { de: "Patient", en: "Patient", tr: "Hasta" },
-      dob: { de: "Geburtsdatum", en: "Date of Birth", tr: "Doğum Tarihi" },
-      country: { de: "Land", en: "Country", tr: "Ülke" },
-      language: { de: "Sprache", en: "Language", tr: "Dil" },
-      recommended: { de: "Empfohlene Behandlung", en: "Recommended Treatment", tr: "Önerilen Tedavi" },
-      procedure: { de: "Verfahren", en: "Procedure", tr: "İşlem" },
-      methodLbl: { de: "Methode", en: "Method", tr: "Yöntem" },
-      estimatedCost: { de: "Geschätzte Kosten", en: "Estimated Cost", tr: "Tahmini Maliyet" },
-      medicalNotes: { de: "Medizinische Notizen", en: "Medical Notes", tr: "Tıbbi Notlar" },
-      nextSteps: { de: "Nächste Schritte", en: "Next Steps", tr: "Sonraki Adımlar" },
-      step1: { de: "Überprüfen Sie diesen Plan und antworten Sie bei Fragen", en: "Review this plan and reply with any questions", tr: "Bu planı inceleyin ve sorularınızı iletin" },
-      step2: { de: "Bestätigen Sie Ihren bevorzugten Termin", en: "Confirm your preferred appointment date", tr: "Tercih ettiğiniz randevu tarihini onaylayın" },
-      step3: { de: "Leisten Sie die Anzahlung von 25% zur Buchungsbestätigung", en: "Complete the 25% deposit to secure your booking", tr: "Rezervasyonunuzu güvence altına almak için %25 depozito ödeyin" },
-      step4: { de: "Buchen Sie Ihre Flüge — unser Team hilft bei der Hotelorganisation", en: "Book your flights — our team will assist with hotel arrangements", tr: "Uçuşlarınızı ayırtın — ekibimiz otel düzenlemelerinde yardımcı olacak" },
-      legal: { de: "Dieser Behandlungsplan ist eine medizinische Empfehlung auf Basis der eingereichten Fotos und Krankengeschichte. Die endgültige Beurteilung erfolgt während der persönlichen Beratung. Preise können bei der Beratung bestätigt werden. Alle medizinischen Eingriffe entsprechen den geltenden Standards.", en: "This treatment plan is a medical recommendation based on evaluation of submitted photographs and patient history. Final assessment will be made during the in-person consultation. Prices are subject to confirmation during consultation. All medical procedures comply with local regulatory standards.", tr: "Bu tedavi planı, gönderilen fotoğraflar ve hasta geçmişinin değerlendirilmesine dayanan tıbbi bir öneridir. Nihai değerlendirme yüz yüze konsültasyon sırasında yapılacaktır. Fiyatlar konsültasyon sırasında onaylanacaktır. Tüm tıbbi prosedürler yerel düzenleyici standartlara uygundur." },
-      medicalTeam: { de: "Ärzteteam", en: "Medical Team", tr: "Medikal Ekip" },
-    };
-    const p = (k) => pdfL[k]?.[lang] || pdfL[k]?.en || k;
+    const tLang = T[lang] || T.en;
+    const p = (k) => tLang[k] || T.en[k] || k;
     const dateFmt = lang === "de" ? "de-DE" : lang === "tr" ? "tr-TR" : "en";
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
       body{font-family:'Helvetica Neue',sans-serif;padding:0;color:#1a1a2e;max-width:760px;margin:0 auto}
@@ -76,29 +56,29 @@ export function useBusinessLogic({
     </style></head><body>
     <div class="top-bar"></div>
     <div class="hdr">
-      <div class="logo-box"><img class="logo-icon" src="/Flowmatix-Logo.png" alt="Flowmatix"/><div><div class="logo-text">${escHtml(c?.name || "FLOWMATIX")}</div><div class="logo-sub">${escHtml(p("treatmentPlan"))}</div></div></div>
+      <div class="logo-box"><img class="logo-icon" src="/Flowmatix-Logo.png" alt="Flowmatix"/><div><div class="logo-text">${escHtml(c?.name || "FLOWMATIX")}</div><div class="logo-sub">${escHtml(p("tp_title"))}</div></div></div>
       <div class="clinic-info"><strong>${escHtml(c?.name || "")}</strong><br>${escHtml(c?.address || "")}<br>${escHtml(c?.phone || "")}<br>${escHtml(c?.clinicEmail || "")}</div>
     </div>
     <div class="content">
-      <div class="title">${escHtml(p("personalized"))}</div>
-      <div class="subtitle">${escHtml(p("preparedOn"))} ${new Date().toLocaleDateString(dateFmt, { year: "numeric", month: "long", day: "numeric" })} ${escHtml(p("by"))} ${escHtml(lead.assigned || p("medicalTeam"))}</div>
+      <div class="title">${escHtml(p("tp_subtitle"))}</div>
+      <div class="subtitle">${escHtml(p("tp_prepared_on"))} ${new Date().toLocaleDateString(dateFmt, { year: "numeric", month: "long", day: "numeric" })} ${escHtml(p("tp_by"))} ${escHtml(lead.assigned || p("tp_medical_team"))}</div>
       <div class="grid4">
-        <div class="card"><div class="card-label">${escHtml(p("patient"))}</div><div class="card-value">${escHtml(lead.name)}</div></div>
-        <div class="card"><div class="card-label">${escHtml(p("dob"))}</div><div class="card-value">${escHtml(lead.dob || "—")}</div></div>
-        <div class="card"><div class="card-label">${escHtml(p("country"))}</div><div class="card-value">${escHtml(lead.country || "—")}</div></div>
-        <div class="card"><div class="card-label">${escHtml(p("language"))}</div><div class="card-value">${escHtml(lead.language || "—")}</div></div>
+        <div class="card"><div class="card-label">${escHtml(p("tp_patient"))}</div><div class="card-value">${escHtml(lead.name)}</div></div>
+        <div class="card"><div class="card-label">${escHtml(p("tp_dob"))}</div><div class="card-value">${escHtml(lead.dob || "—")}</div></div>
+        <div class="card"><div class="card-label">${escHtml(p("tp_country"))}</div><div class="card-value">${escHtml(lead.country || "—")}</div></div>
+        <div class="card"><div class="card-label">${escHtml(p("tp_language"))}</div><div class="card-value">${escHtml(lead.language || "—")}</div></div>
       </div>
       <div class="plan-box">
-        <div class="plan-title">⚕️ ${escHtml(p("recommended"))}</div>
+        <div class="plan-title">⚕️ ${escHtml(p("tp_recommended"))}</div>
         <div class="plan-grid">
-          <div><div class="plan-label">${escHtml(p("procedure"))}</div><div class="plan-value">${escHtml(grafts)}</div></div>
-          <div><div class="plan-label">${escHtml(p("methodLbl"))}</div><div class="plan-value">${escHtml(method)}</div></div>
-          <div><div class="plan-label">${escHtml(p("estimatedCost"))}</div><div class="plan-price">${escHtml(price)}</div></div>
+          <div><div class="plan-label">${escHtml(p("tp_procedure"))}</div><div class="plan-value">${escHtml(grafts)}</div></div>
+          <div><div class="plan-label">${escHtml(p("tp_method"))}</div><div class="plan-value">${escHtml(method)}</div></div>
+          <div><div class="plan-label">${escHtml(p("tp_cost"))}</div><div class="plan-price">${escHtml(price)}</div></div>
         </div>
-        ${lead.reviewData.notes ? `<div class="notes-box"><strong>${escHtml(p("medicalNotes"))}:</strong><br>${escHtml(lead.reviewData.notes)}</div>` : ""}
+        ${lead.reviewData.notes ? `<div class="notes-box"><strong>${escHtml(p("tp_notes"))}:</strong><br>${escHtml(lead.reviewData.notes)}</div>` : ""}
       </div>
-      <div class="next-steps"><h3>✅ ${escHtml(p("nextSteps"))}</h3><ol><li>${escHtml(p("step1"))}</li><li>${escHtml(p("step2"))}</li><li>${escHtml(p("step3"))}</li><li>${escHtml(p("step4"))}</li></ol></div>
-      <div class="legal">${escHtml(p("legal"))}</div>
+      <div class="next-steps"><h3>✅ ${escHtml(p("tp_next_steps"))}</h3><ol><li>${escHtml(p("tp_step1"))}</li><li>${escHtml(p("tp_step2"))}</li><li>${escHtml(p("tp_step3"))}</li><li>${escHtml(p("tp_step4"))}</li></ol></div>
+      <div class="legal">${escHtml(p("tp_legal"))}</div>
     </div>
     <div class="footer"><div class="stamp">✦ ${escHtml((c?.name || "FLOWMATIX").toUpperCase())} CERTIFIED</div><div class="ft-text">${escHtml(c?.name || "Flowmatix")} · ${escHtml(c?.website || "flowmatix.io")}<br>Auto-generated by Flowmatix CRM · Plan ID: TP-${Date.now().toString(36).toUpperCase()}</div></div>
     </body></html>`;
@@ -179,6 +159,10 @@ export function useBusinessLogic({
   };
 
   const generateInvoicePDF = (inv) => {
+    const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+    const iLang = T[lang] || T.en;
+    const it = (k) => iLang[k] || T.en[k] || k;
+    const dateFmt = lang === "de" ? "de-DE" : lang === "tr" ? "tr-TR" : "en";
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
       body{font-family:'Helvetica Neue',sans-serif;padding:40px;color:#1a1a2e;max-width:720px;margin:0 auto;font-size:14px}
       .hdr{display:flex;justify-content:space-between;border-bottom:3px solid #4cc9ff;padding-bottom:20px;margin-bottom:30px}
@@ -200,21 +184,21 @@ export function useBusinessLogic({
       .ft{margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#999;text-align:center}
     </style></head><body>
     <div class="hdr"><div class="logo">${clinic?.logo ? '<img src="' + clinic.logo + '" style="max-height:50px;max-width:180px;object-fit:contain;margin-bottom:6px;display:block"/>' : ''}\n${escHtml(inv.clinicName || "FLOWMATIX")}${clinic?.taxId ? '<div style="font-size:11px;color:#888;font-weight:400;margin-top:2px">' + escHtml(clinic.taxId) + '</div>' : ''}</div><div class="meta">${escHtml(inv.clinicAddress || "")}<br>${escHtml(inv.clinicPhone || "")}<br>${escHtml(inv.clinicEmail || "")}</div></div>
-    <div class="inv-nr">INVOICE ${escHtml(inv.nr)}</div>
-    <div style="color:#666;margin-bottom:24px">Date: ${new Date(inv.created).toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" })} · Due: ${escHtml(inv.dueDate)} · <span class="${inv.status === "paid" ? "paid" : "unpaid"}">${escHtml(inv.status.toUpperCase())}</span></div>
+    <div class="inv-nr">${escHtml(it("inv_invoice"))} ${escHtml(inv.nr)}</div>
+    <div style="color:#666;margin-bottom:24px">${escHtml(it("inv_date"))}: ${new Date(inv.created).toLocaleDateString(dateFmt, { year: "numeric", month: "long", day: "numeric" })} · ${escHtml(it("inv_due"))}: ${escHtml(inv.dueDate)} · <span class="${inv.status === "paid" ? "paid" : "unpaid"}">${escHtml(inv.status.toUpperCase())}</span></div>
     <div class="grid2">
-      <div class="box"><div class="lbl">Bill to</div><div class="val">${escHtml(inv.patientName)}</div><div style="color:#666;font-size:13px;margin-top:4px">${escHtml(inv.patientEmail || "")}</div></div>
-      <div class="box"><div class="lbl">Treatment</div><div class="val">${escHtml(inv.treatment)}</div></div>
+      <div class="box"><div class="lbl">${escHtml(it("inv_bill_to"))}</div><div class="val">${escHtml(inv.patientName)}</div><div style="color:#666;font-size:13px;margin-top:4px">${escHtml(inv.patientEmail || "")}</div></div>
+      <div class="box"><div class="lbl">${escHtml(it("inv_treatment"))}</div><div class="val">${escHtml(inv.treatment)}</div></div>
     </div>
-    <table><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead><tbody>
+    <table><thead><tr><th>${escHtml(it("inv_description"))}</th><th style="text-align:right">${escHtml(it("inv_amount"))}</th></tr></thead><tbody>
     ${(inv.items || inv.treatment).split("\n").map(item => `<tr><td>${escHtml(item)}</td><td style="text-align:right">—</td></tr>`).join("")}
-    <tr><td style="text-align:right;color:#666">Subtotal (net)</td><td style="text-align:right">€${inv.net?.toLocaleString()}</td></tr>
-    <tr><td style="text-align:right;color:#666">VAT ${inv.vatPct}%</td><td style="text-align:right">€${inv.vatAmount?.toLocaleString()}</td></tr>
-    <tr class="total-row"><td style="text-align:right">Total</td><td style="text-align:right">€${inv.gross?.toLocaleString()}</td></tr>
+    <tr><td style="text-align:right;color:#666">${escHtml(it("inv_subtotal_net"))}</td><td style="text-align:right">${"\u20AC"}${inv.net?.toLocaleString()}</td></tr>
+    <tr><td style="text-align:right;color:#666">VAT ${inv.vatPct}%</td><td style="text-align:right">${"\u20AC"}${inv.vatAmount?.toLocaleString()}</td></tr>
+    <tr class="total-row"><td style="text-align:right">${escHtml(it("inv_total"))}</td><td style="text-align:right">${"\u20AC"}${inv.gross?.toLocaleString()}</td></tr>
     </tbody></table>
-    <div class="bank"><strong>Payment Details</strong><br>Bank: ${escHtml(clinic?.bankName || "Deutsche Bank")} · IBAN: ${escHtml(clinic?.iban || "—")}<br>BIC: ${escHtml(clinic?.bic || "—")} · Ref: ${escHtml(inv.nr)}<br><br>Or pay online via the Stripe link sent to your WhatsApp.</div>
-    ${inv.status === "paid" ? `<div style="text-align:center;margin:24px 0"><div class="paid" style="font-size:16px;padding:8px 24px">✓ PAID — ${inv.paidDate ? new Date(inv.paidDate).toLocaleDateString() : ""}${inv.paidMethod ? " via " + escHtml(inv.paidMethod) : ""}</div></div>` : ""}
-    <div class="ft">${escHtml(inv.clinicName || "Flowmatix Clinic")}<br>Generated by Flowmatix CRM · Invoice ${escHtml(inv.nr)}</div>
+    <div class="bank"><strong>${escHtml(it("inv_payment_details"))}</strong><br>${escHtml(it("inv_bank"))}: ${escHtml(clinic?.bankName || "Deutsche Bank")} · IBAN: ${escHtml(clinic?.iban || "—")}<br>BIC: ${escHtml(clinic?.bic || "—")} · Ref: ${escHtml(inv.nr)}<br><br>${escHtml(it("inv_pay_online"))}</div>
+    ${inv.status === "paid" ? `<div style="text-align:center;margin:24px 0"><div class="paid" style="font-size:16px;padding:8px 24px">✓ ${escHtml(it("inv_paid"))} — ${inv.paidDate ? new Date(inv.paidDate).toLocaleDateString(dateFmt) : ""}${inv.paidMethod ? " " + escHtml(it("inv_via")) + " " + escHtml(inv.paidMethod) : ""}</div></div>` : ""}
+    <div class="ft">${escHtml(inv.clinicName || "Flowmatix Clinic")}<br>${escHtml(it("inv_generated_by"))} · ${escHtml(it("inv_invoice"))} ${escHtml(inv.nr)}</div>
     </body></html>`;
     const w = window.open("", "_blank");
     if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 500); }
