@@ -22,6 +22,7 @@ const ACTION_LABELS = {
   CONNECT_WHATSAPP:      { icon: '💬', label: 'WhatsApp connection needed',        desc: 'Complete WA setup' },
   WA_PENDING:            { icon: '📱', label: 'WhatsApp activation pending',       desc: 'Number submitted, awaiting setup' },
   FIX_ERROR:             { icon: '🚨', label: 'Connection error',                  desc: 'Fix required to restore service' },
+  SETUP_INCOMPLETE:      { icon: '🔧', label: 'Setup incomplete',                   desc: 'Clinic still setting up — not an error' },
   BOT_NO_RESPONSE:       { icon: '🤖', label: 'Bot not responding',               desc: 'Patients not receiving replies' },
   BOT_ERROR:             { icon: '🤖', label: 'Bot encountered an error',          desc: 'AI response failing' },
   WHATSAPP_SEND_FAILED:  { icon: '❌', label: 'WhatsApp delivery failed',          desc: 'Messages not being sent' },

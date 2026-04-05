@@ -172,7 +172,7 @@ export default function OverviewView({ events, actions, navigateTo }) {
     allActions.push({
       id: `action-${c.id}`,
       type: safeStr(c.required_action, 'START_SETUP'),
-      priority: c.required_action === 'FIX_ERROR' ? 'critical' : c.required_action === 'VERIFY_OTP' ? 'high' : 'medium',
+      priority: c.required_action === 'FIX_ERROR' ? 'critical' : c.required_action === 'VERIFY_OTP' ? 'high' : c.required_action === 'SETUP_INCOMPLETE' ? 'low' : 'medium',
       clinicName: safeStr(c.name),
       detail: `${safeStr(c.plan_name, 'No plan')} — Health: ${safeNum(c.readiness_score)}%`,
       cta: 'Open Clinic',
