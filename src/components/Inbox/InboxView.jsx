@@ -173,7 +173,7 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
         <FieldRow label="Name" value={lead.name || "—"} bold />
         <FieldRow label={t("lbl_age") || "Age"} value={intake.age || lead.age || "—"} />
         <FieldRow label={t("lbl_country") || "Country"} value={<span>{TV(lead.country) || "—"}{lead.country && clinic?.country && lead.country.toLowerCase() === clinic.country.toLowerCase() && <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}>{t("local_patient") || "LOKAL"}</span>}</span>} />
-        <FieldRow label={t("lbl_language") || "Language"} value={(lead.language || "—").toUpperCase()} />
+        <FieldRow label={t("lbl_language") || "Language"} value={(chat.lang || lead.language || "—").toUpperCase()} />
 
         <SectionHeader label={t("section_medical") || "MEDICAL"} />
         <FieldRow label={t("lbl_concern") || "Concern"} value={TV(intake.concern || lead.treatment) || "—"} />

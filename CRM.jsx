@@ -207,7 +207,7 @@ export default function App() {
     const loadTest = () => fmApi.getTestInfo().then(res => {
       if (res) {
         setTestInfo(res);
-        if (res.session?.messagesCount >= 20) { setWorkspaceState('activation_pending'); setShowActivation(true); }
+        if (res.session?.messagesCount >= (res.session?.messageLimit || 50)) { setWorkspaceState('activation_pending'); setShowActivation(true); }
       }
     }).catch(() => {});
     loadTest();
