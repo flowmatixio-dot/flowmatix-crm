@@ -306,7 +306,7 @@ export default function AppointmentsPage() {
 
   const handleEventMouseLeave = useCallback(() => {
     clearTimeout(tooltipTimeout.current);
-    setTooltip(null);
+    tooltipTimeout.current = setTimeout(() => setTooltip(null), 300);
   }, []);
 
   const handleConfirm = useCallback((id) => {
@@ -717,7 +717,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* ── Tooltip ── */}
-      {tooltip && <EventTooltip {...tooltip} t={t} doctors={doctors} allAppts={enrichedAppts} clinic={clinic} updateAppt={updateAppt} />}
+      {tooltip && <EventTooltip {...tooltip} t={t} doctors={doctors} allAppts={enrichedAppts} clinic={clinic} updateAppt={updateAppt} tooltipTimeout={tooltipTimeout} setTooltip={setTooltip} />}
 
       {/* ── Drawer ── */}
       {drawerAppt && (
@@ -967,7 +967,7 @@ function renderEventContent(eventInfo) {
 }
 
 /* ─── Premium Tooltip ─── */
-function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic, updateAppt }) {
+function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic, updateAppt, tooltipTimeout, setTooltip }) {
   const sc = APPT_C[status] || APPT_C.booked;
   const revenue = appt?.price || TREAT_REVENUE[appt?.treatment] || null;
   const procColor = TREAT_COLORS[appt?.treatment] || treatmentColor || "rgba(167,177,195,0.7)";
@@ -1025,14 +1025,14 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
   const graftFormatted = grafts ? Number(grafts).toLocaleString("de-DE") : null;
 
   return (
-    <div style={{
+    <div onMouseEnter={() => clearTimeout(tooltipTimeout?.current)} onMouseLeave={() => { if (tooltipTimeout?.current !== undefined) { tooltipTimeout.current = setTimeout(() => setTooltip?.(null), 300); }}} style={{
       position: "fixed", left: x, top: adjustedY, transform,
       background: "#111827",
       border: "1px solid rgba(255,255,255,0.08)",
       borderRadius: 14, padding: 0, fontSize: 12, color: "#e8eefc",
       lineHeight: 1.5, zIndex: 10000,
       boxShadow: "0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
-      maxWidth: 300, minWidth: 240, pointerEvents: "none", overflow: "hidden",
+      maxWidth: 300, minWidth: 240, pointerEvents: "auto", overflow: "hidden",
     }}>
       {/* ── Header: Patient + Status ── */}
       <div style={{
