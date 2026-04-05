@@ -343,18 +343,6 @@ export default function InboxView() {
         return { ...prev, [activeClinicId]: cm };
       });
     }).catch(e => { console.error('Failed to load messages:', e); showT(t("messages_load_error") || "Messages could not be loaded"); });
-    // Refresh patient data so Fallübersicht gets fresh intake_data
-    const pid = selChat?.leadId || selChat?.patientId;
-    if (pid) {
-      fmApi.getPatient(pid).then(res => {
-        const p = res?.patient || res;
-        if (p?.id) {
-          const { leads: curLeads } = usePatientStore.getState();
-          const updated = curLeads.map(l => l.id === p.id ? { ...l, intake: p.intake_data || p.intake || l.intake, extractedFields: p.extracted_fields || l.extractedFields, age: p.intake_data?.age || l.age, treatment: p.treatment || p.intake_data?.treatment || l.treatment, photoUrls: p.photo_urls || p.photoUrls || l.photoUrls, country: p.metadata?.country || l.country, consentGiven: p.consent_given ?? (p.metadata?.gdpr_consent === 'verbal') ?? l.consentGiven } : l);
-          usePatientStore.setState({ leads: updated });
-        }
-      }).catch(() => {});
-    }
   }, [selChat?.id, activeClinicId]);
 
   useEffect(() => {
@@ -365,6 +353,37 @@ export default function InboxView() {
     const iv = setInterval(loadMessages, 10000);
     return () => clearInterval(iv);
   }, [selChat?.id, loadMessages]);
+
+  // Poll patient data every 10s so Fallübersicht gets fresh intake_data
+  useEffect(() => {
+    if (!selChat) return;
+    const pid = selChat.leadId || selChat.patientId;
+    if (!pid || selChat.is_demo) return;
+    const refreshPatient = () => {
+      fmApi.apiFetch('/api/v1/crm/patients/' + pid).then(function(res) {
+        const p = res && (res.patient || res);
+        if (p && p.id) {
+          var store = usePatientStore.getState();
+          var upd = store.leads.map(function(l) {
+            if (l.id !== p.id) return l;
+            return Object.assign({}, l, {
+              intake: p.intake_data || p.intake || l.intake,
+              extractedFields: p.extracted_fields || l.extractedFields,
+              age: (p.intake_data && p.intake_data.age) || l.age,
+              treatment: p.treatment || (p.intake_data && p.intake_data.treatment) || l.treatment,
+              photoUrls: p.photo_urls || p.photoUrls || l.photoUrls,
+              country: (p.metadata && p.metadata.country) || l.country,
+              consentGiven: p.consent_given != null ? p.consent_given : l.consentGiven,
+            });
+          });
+          usePatientStore.setState({ leads: upd });
+        }
+      }).catch(function() {});
+    };
+    refreshPatient();
+    var iv2 = setInterval(refreshPatient, 10000);
+    return function() { clearInterval(iv2); };
+  }, [selChat?.id]);
 
   // Auto-translate when chat selected or messages update
   const chatMsgs = msgs[activeClinicId]?.find(c => c.id === selChat?.id)?.msgs || selChat?.msgs || [];
