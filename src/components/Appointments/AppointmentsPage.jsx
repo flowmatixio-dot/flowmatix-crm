@@ -717,7 +717,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* ── Tooltip ── */}
-      {tooltip && <EventTooltip {...tooltip} t={t} doctors={doctors} allAppts={enrichedAppts} clinic={clinic} />}
+      {tooltip && <EventTooltip {...tooltip} t={t} doctors={doctors} allAppts={enrichedAppts} clinic={clinic} updateAppt={updateAppt} />}
 
       {/* ── Drawer ── */}
       {drawerAppt && (
@@ -967,7 +967,7 @@ function renderEventContent(eventInfo) {
 }
 
 /* ─── Premium Tooltip ─── */
-function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic }) {
+function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic, updateAppt }) {
   const sc = APPT_C[status] || APPT_C.booked;
   const revenue = appt?.price || TREAT_REVENUE[appt?.treatment] || null;
   const procColor = TREAT_COLORS[appt?.treatment] || treatmentColor || "rgba(167,177,195,0.7)";
