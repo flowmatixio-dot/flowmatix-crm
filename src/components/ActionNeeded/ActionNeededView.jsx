@@ -116,7 +116,7 @@ export default function ActionNeededView() {
           action: () => {
             apiFetch(`/api/v1/crm/patients/${p.id}`, { method: "PATCH", body: JSON.stringify({ consent_given: true }) }).then(() => {
               usePatientStore.getState().fetchPatients();
-              showT(t("consent_granted_manual") || "DSGVO manuell erteilt");
+              showT("DSGVO manuell erteilt");
             }).catch(() => showT("Fehler"));
           },
           actionLabel: "Manuell erteilen",
