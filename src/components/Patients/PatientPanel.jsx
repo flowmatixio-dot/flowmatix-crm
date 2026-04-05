@@ -301,7 +301,29 @@ export default function PatientPanel() {
   // Shared data
   const intake = lead.intake || {};
   const extracted = lead.extractedFields || {};
-  const fields = { ...extracted, ...intake };
+  const rawFields = { ...extracted, ...intake };
+
+  // Auto-translate intake fields to CRM language
+  const crmLang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+  const patientLang = (lead.language || "de").substring(0, 2);
+  const [translatedFields, setTranslatedFields] = useState({});
+  const fieldsKey = JSON.stringify(rawFields) + crmLang;
+  useEffect(() => {
+    if (crmLang === patientLang || !Object.values(rawFields).some(v => v && typeof v === 'string' && v.length > 2)) return;
+    const toTranslate = Object.entries(rawFields)
+      .filter(([, v]) => v && typeof v === 'string' && v.length > 2 && !/^(true|false|yes|no|ja|nein|evet|hayır|yok|keine|none)$/i.test(v))
+      .map(([k, v]) => ({ id: k, text: String(v) }));
+    if (!toTranslate.length) return;
+    import("../../api/client").then(api => {
+      api.translateBatch(toTranslate, crmLang).then(res => {
+        if (res?.translations) setTranslatedFields(res.translations);
+      }).catch(() => {});
+    });
+  }, [fieldsKey]);
+  const fields = { ...rawFields };
+  if (Object.keys(translatedFields).length) {
+    Object.entries(translatedFields).forEach(([k, v]) => { if (v && rawFields[k]) fields[k] = v; });
+  }
   const rd = lead.reviewData;
   const hotel = lead.hotelInfo || lead.hotel || {};
   const isBookedOrDone = lead.stage === "booked" || lead.stage === "done";
