@@ -178,6 +178,7 @@ export default function AppointmentsPage() {
         return {
           ...a,
           grafts: a.grafts || lead.reviewData?.grafts || lead.grafts || null,
+          consentGiven: a.documents_signed || a.documentsSigned || lead.consentGiven || false,
           photosComplete: a.photos_complete || a.photosComplete || (lead.photoUrls || []).length >= 3 || lead.photos || false,
           reviewDone: !!lead.reviewData,
           depositPaid: a.depositPaid || a.deposit_paid || lead.depositPaid || lead.convStatus === "deposit_paid",
@@ -979,14 +980,14 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
     if (!isSurgical) return null;
     const depositActive = clinic?.booking_funnel !== 'no_deposit' && clinic?.deposit_enabled !== false && clinic?.depositEnabled !== false;
     const items = [
-      { label: t("appt_dsgvo") || "DSGVO", done: !!appt.documents_signed || !!appt.documentsSigned },
-      { label: t("op_photos") || "Fotos", done: !!appt.photos_complete || !!appt.photosComplete },
+      { label: t("appt_dsgvo") || "DSGVO", done: !!appt.consentGiven, field: "documents_signed" },
+      { label: t("op_photos") || "Fotos", done: !!appt.photos_complete || !!appt.photosComplete, field: "photos_complete" },
     ];
-    if (depositActive) items.push({ label: t("op_deposit") || "Anzahlung", done: !!appt.deposit_paid || !!appt.depositPaid });
+    if (depositActive) items.push({ label: t("op_deposit") || "Anzahlung", done: !!appt.deposit_paid || !!appt.depositPaid, field: "deposit_paid" });
     items.push(
-      { label: t("appt_flight") || "Flug", done: !!appt.flight_received || !!appt.flightReceived },
-      { label: t("appt_driver_short") || "Fahrer", done: !!appt.driver_assigned || !!appt.driverAssigned },
-      { label: t("appt_hotel_short") || "Hotel", done: !!appt.hotel_booked || !!appt.hotelBooked },
+      { label: t("appt_flight") || "Flug", done: !!appt.flight_received || !!appt.flightReceived, field: "flight_received" },
+      { label: t("appt_driver_short") || "Fahrer", done: !!appt.driver_assigned || !!appt.driverAssigned, field: "driver_assigned" },
+      { label: t("appt_hotel_short") || "Hotel", done: !!appt.hotel_booked || !!appt.hotelBooked, field: "hotel_booked" },
     );
     return items;
   }, [appt]);
@@ -1122,9 +1123,9 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 14px" }}>
             {prep.map(p => (
-              <div key={p.label} style={{
+              <div key={p.label} onClick={(e) => { e.stopPropagation(); if (p.field && appt?.id) { updateAppt(appt.id, { [p.field]: !p.done }); } }} style={{
                 display: "flex", alignItems: "center", gap: 6, fontSize: 11,
-                padding: "3px 0",
+                padding: "3px 0", cursor: p.field ? "pointer" : "default",
               }}>
                 <span style={{
                   width: 16, height: 16, borderRadius: 4,
