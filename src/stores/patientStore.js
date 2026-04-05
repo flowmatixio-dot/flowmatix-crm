@@ -37,6 +37,7 @@ export const usePatientStore = create((set, get) => ({
     set({ loading: true, error: null });
     const normalize = (raw) => (Array.isArray(raw) ? raw : []).map(p => ({
       ...p,
+      intake: p.intake_data || p.intake || {},
       name: p.name || [p.first_name, p.last_name].filter(Boolean).join(' ') || p.phone || 'Unknown',
       treatment: p.treatment || p.intake_data?.treatment || p.metadata?.treatment || '',
       stage: (() => {
