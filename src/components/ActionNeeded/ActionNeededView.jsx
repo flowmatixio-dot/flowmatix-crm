@@ -119,7 +119,7 @@ export default function ActionNeededView() {
               showT(t("consent_granted_manual") || "DSGVO manuell erteilt");
             }).catch(() => showT("Fehler"));
           },
-          actionLabel: t("action_grant_consent") || "Manuell erteilen",
+          actionLabel: "Manuell erteilen",
           dismissable: true,
           onDismiss: () => {
             apiFetch(`/api/v1/crm/patients/${p.id}`, { method: "PATCH", body: JSON.stringify({ consent_given: true }) }).then(() => {
