@@ -130,6 +130,12 @@ export default function MainLayout() {
     }
   }, [myLeads, ctx.workspaceState, showTrialReviewPopup]);
 
+  React.useEffect(() => {
+    const handler = () => setShowTrialReviewPopup(true);
+    window.addEventListener('fm-open-review', handler);
+    return () => window.removeEventListener('fm-open-review', handler);
+  }, []);
+
   // Live clock for operator top bar
   const [clockNow, setClockNow] = React.useState(new Date());
   React.useEffect(() => { const iv = setInterval(() => setClockNow(new Date()), 30000); return () => clearInterval(iv); }, []);
