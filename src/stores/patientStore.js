@@ -84,6 +84,7 @@ export const usePatientStore = create((set, get) => ({
       metadata: p.metadata || {},
       createdAt: p.createdAt || p.created_at,
       lastAiInteraction: p.lastAiInteraction || p.last_contact_at,
+      lastUserMessageAt: p.lastUserMessageAt || p.last_user_message_at || null,
       lang: p.lang || p.locale || '',
       source: p.source || 'whatsapp',
     }));

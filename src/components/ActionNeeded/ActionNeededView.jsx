@@ -94,7 +94,7 @@ export default function ActionNeededView() {
           title: t("chat_takeover_required") || "Chat-Übernahme erforderlich",
           desc: "\u26A0 " + (t("chat_takeover_desc") || "KI-Automatik gestoppt — Patient wartet auf menschliche Antwort"),
           patient: p.name, patientId: p.id,
-          time: p.updatedAt || p.lastAiInteraction || p.createdAt,
+          time: p.lastUserMessageAt || p.lastContactAt || p.updatedAt || p.createdAt,
           action: () => goToChat(p.id),
           actionLabel: t("open_chat") || "Chat öffnen",
         });
