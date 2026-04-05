@@ -9,39 +9,37 @@ import { useAppointmentStore } from "../stores/appointmentStore";
 import { useInboxStore } from "../stores/inboxStore";
 import { useBillingStore } from "../stores/billingStore";
 
+import AuditLogView from "./AuditLog/AuditLogView";
+import SupportView from "./Support/SupportView";
+import ManualPage from "./Manual/ManualPage";
+import AutomationsView from "./Automations/AutomationsView";
+import FilesView from "./Files/FilesView";
+import AnalyticsView from "./Analytics/AnalyticsView";
+import SettingsView from "./Settings/SettingsView";
+import SubscriptionView from "./Subscription/SubscriptionView";
+import AddonsView from "./Addons/AddonsView";
+import PatientPanel from "./Patients/PatientPanel";
+import PipelineView from "./Patients/PipelineView";
+import PatientsPage from "./Patients/PatientsPage";
+import ActionNeededView from "./ActionNeeded/ActionNeededView";
+import RevenueView from "./Revenue/RevenueView";
+import ProductTour, { TourWelcomeModal } from "./Tour/ProductTour";
+import AISupportWidget from "./AISupport/AISupportWidget";
+import OperatorPanel from "./Operator/OperatorPanel";
+import ThemeToggle from "./Theme/ThemeToggle";
+import DashboardView from "./Dashboard/DashboardView";
+import InboxView from "./Inbox/InboxView";
+import AppointmentsPage from "./Appointments/AppointmentsPage";
+import AIControlView from "./AIControl/AIControlView";
+import WhatsAppSetupPage from "./WhatsApp/WhatsAppSetupPage";
+import SetupView from "./SetupGuide/SetupView";
 import ErrorBoundary from "./shared/ErrorBoundary";
-
-// Lazy-loaded view components (code splitting)
-const AuditLogView = React.lazy(() => import("./AuditLog/AuditLogView"));
-const SupportView = React.lazy(() => import("./Support/SupportView"));
-const ManualPage = React.lazy(() => import("./Manual/ManualPage"));
-const AutomationsView = React.lazy(() => import("./Automations/AutomationsView"));
-const FilesView = React.lazy(() => import("./Files/FilesView"));
-const AnalyticsView = React.lazy(() => import("./Analytics/AnalyticsView"));
-const SettingsView = React.lazy(() => import("./Settings/SettingsView"));
-const SubscriptionView = React.lazy(() => import("./Subscription/SubscriptionView"));
-const AddonsView = React.lazy(() => import("./Addons/AddonsView"));
-const PatientPanel = React.lazy(() => import("./Patients/PatientPanel"));
-const PipelineView = React.lazy(() => import("./Patients/PipelineView"));
-const PatientsPage = React.lazy(() => import("./Patients/PatientsPage"));
-const ActionNeededView = React.lazy(() => import("./ActionNeeded/ActionNeededView"));
-const RevenueView = React.lazy(() => import("./Revenue/RevenueView"));
-const AISupportWidget = React.lazy(() => import("./AISupport/AISupportWidget"));
-const OperatorPanel = React.lazy(() => import("./Operator/OperatorPanel"));
-const DashboardView = React.lazy(() => import("./Dashboard/DashboardView"));
-const InboxView = React.lazy(() => import("./Inbox/InboxView"));
-const AppointmentsPage = React.lazy(() => import("./Appointments/AppointmentsPage"));
-const AIControlView = React.lazy(() => import("./AIControl/AIControlView"));
-const WhatsAppSetupPage = React.lazy(() => import("./WhatsApp/WhatsAppSetupPage"));
-const SetupView = React.lazy(() => import("./SetupGuide/SetupView"));
-const OpPrepView = React.lazy(() => import("./OpPrep/OpPrepView"));
-const ReviewBoard = React.lazy(() => import("./DoctorTasks/ReviewBoard"));
-const DoctorTasksView = React.lazy(() => import("./DoctorTasks/DoctorTasksView"));
-const ArchiveView = React.lazy(() => import("./Archive/ArchiveView"));
-const OnboardingWizard = React.lazy(() => import("./Onboarding/OnboardingWizard"));
-const PaymentsView = React.lazy(() => import("./Finance/PaymentsView"));
-
-const LazyFallback = <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',color:'#4cc9ff',fontSize:14}}>Loading...</div>;
+import OpPrepView from "./OpPrep/OpPrepView";
+import ReviewBoard from "./DoctorTasks/ReviewBoard";
+import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
+import ArchiveView from "./Archive/ArchiveView";
+import OnboardingWizard from "./Onboarding/OnboardingWizard";
+import PaymentsView from "./Finance/PaymentsView";
 
 const IS_CLIENT_MODE = window.location.hostname === "crm.flowmatix.io" || window.location.hostname === "localhost";
 
@@ -118,23 +116,14 @@ export default function MainLayout() {
     if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
     if (showTrialReviewPopup) return;
     const realReview = myLeads.find(l => l.is_demo !== true && l.isDemo !== true && !l.demo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
-    if (realReview && trialReviewShownRef.current !== realReview.id) {
-      const shownIds = JSON.parse(localStorage.getItem('fm_trial_review_shown') || '[]');
-      if (shownIds.includes(realReview.id)) return;
+    if (realReview) {
       setTimeout(() => {
         trialReviewShownRef.current = realReview.id;
-        localStorage.setItem('fm_trial_review_shown', JSON.stringify([...shownIds, realReview.id]));
         setTrialReviewPatient(realReview);
         setShowTrialReviewPopup(true);
       }, 10000);
     }
   }, [myLeads, ctx.workspaceState, showTrialReviewPopup]);
-
-  React.useEffect(() => {
-    const handler = () => setShowTrialReviewPopup(true);
-    window.addEventListener('fm-open-review', handler);
-    return () => window.removeEventListener('fm-open-review', handler);
-  }, []);
 
   // Live clock for operator top bar
   const [clockNow, setClockNow] = React.useState(new Date());
@@ -167,7 +156,6 @@ export default function MainLayout() {
     if (effectiveRole !== "doctor") return;
     let mounted = true;
     const check = async () => {
-      if (document.hidden) return; // Skip when tab not visible
       try {
         const res = await fmApi.apiFetch("/api/v1/tasks");
         const tasks = res.tasks || [];
@@ -309,18 +297,16 @@ export default function MainLayout() {
           </div>
           {/* Actual DoctorTasksView */}
           <div style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
-            <React.Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(200,215,240,0.5)"}}>Laden...</div>}>
-              <DoctorTasksView />
-            </React.Suspense>
+            <DoctorTasksView />
           </div>
         </div>
       </div>
     )}
 
-    {showOnboarding && <React.Suspense fallback={LazyFallback}><OnboardingWizard onComplete={() => {
+    {showOnboarding && <OnboardingWizard onComplete={() => {
       setShowOnboarding(false);
       completeOnboarding(ctx.activeClinicId, t("onboarding_complete") || "Setup abgeschlossen!");
-    }} onSkip={() => setShowOnboarding(false)} /></React.Suspense>}
+    }} onSkip={() => setShowOnboarding(false)} />}
     <style>{`@keyframes fmHighlight{0%{box-shadow:0 0 0 0 rgba(76,201,255,0.5)}50%{box-shadow:0 0 24px 6px rgba(76,201,255,0.35)}100%{box-shadow:0 0 0 0 rgba(76,201,255,0)}}`}</style>
 
     {/* ── Plan Picker Modal (trial_expired forced OR manual trigger) ── */}
@@ -479,8 +465,8 @@ export default function MainLayout() {
       );
     })()}
 
-    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "#0f1623", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "rgba(232,238,252,0.96)", overflow: "hidden", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
-      {toast && (() => { const t = typeof toast === 'object' ? toast : { msg: toast, type: 'success' }; const isErr = t.type === 'error'; return <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: isErr ? "#1f1215" : "#162032", border: isErr ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(16,185,129,0.2)", color: isErr ? "#ef4444" : "#10b981", fontWeight: 700, fontSize: 14, boxShadow: "0 4px 12px rgba(0,0,0,0.3)" }}>{isErr ? "✕" : "✓"} {t.msg}</div>; })()}
+    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "var(--bg-app)", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "var(--text-primary)", overflow: "hidden", transition: "background .25s ease, color .25s ease", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
+      {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "var(--bg-card-solid)", border: "1px solid var(--success-muted)", color: "var(--success)", fontWeight: 700, fontSize: 14, boxShadow: "var(--shadow-md)" }}>✓ {toast}</div>}
 
       {/* ── Doctor: New Task Popup (global, any view) ── */}
       {doctorAlert && (
@@ -550,7 +536,7 @@ export default function MainLayout() {
         *::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.12)}
         ::selection{background:rgba(76,201,255,0.15);color:#fff}
       `}</style>
-      {selLead && <React.Suspense fallback={LazyFallback}><PatientPanel /></React.Suspense>}{selAppt && ApptDrawer()}
+      {selLead && <PatientPanel />}{selAppt && ApptDrawer()}
       {/* ═══ INVOICE CREATION MODAL ═══ */}
       {invoiceModal && (() => { const lead = getLeadById(invoiceModal); if (!lead) return null; return <div style={{ position: "fixed", inset: 0, zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div onClick={() => setInvoiceModal(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }} />
@@ -700,22 +686,22 @@ export default function MainLayout() {
           );
         })()}
         {/* ═══ TOP BAR — Redesigned ═══ */}
-        <div style={{ height: 52, minHeight: 52, borderBottom: "1px solid rgba(255,255,255,0.04)", background: "#0f1623", display: "flex", alignItems: "center", padding: "0 24px", gap: 0, flexShrink: 0, minWidth: 0, position: "relative", zIndex: 100 }}>
+        <div className="fm-topbar" style={{ height: 52, minHeight: 52, borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-topbar)", display: "flex", alignItems: "center", padding: "0 24px", gap: 0, flexShrink: 0, minWidth: 0, position: "relative", zIndex: 100, transition: "background .25s ease, border-color .25s ease" }}>
 
           {/* ── LEFT: Global Search (hidden for doctor) ── */}
           <div style={{ flex: "0 0 340px", position: "relative" }}>
-            {!isOperator && effectiveRole !== "doctor" && <><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }} onFocus={(e) => { setSearchOpen(true); e.target.style.borderColor = "rgba(76,201,255,0.15)"; }} onBlur={(e) => { setTimeout(() => setSearchOpen(false), 200); e.target.style.borderColor = "rgba(255,255,255,0.04)"; }} placeholder={t("search_placeholder") || `Search... (${navigator.platform?.includes("Mac") ? "⌘" : "Ctrl"}+K)`} style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 8, background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)", color: "rgba(232,238,252,0.95)", fontFamily: "inherit", fontSize: 12, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }} />
-            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "rgba(167,177,195,0.6)" }}>🔍</span></>}
-            {searchOpen && searchResults.length > 0 && <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", maxHeight: 320, overflowY: "auto", marginTop: 4, borderRadius: 10, background: "#162032", border: "1px solid rgba(255,255,255,0.08)", zIndex: 100, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
-              <div style={{ padding: "6px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.75)" }}>{searchResults.length} Ergebnisse</span><span style={{ fontSize: 9, color: "rgba(167,177,195,0.6)" }}>ESC</span></div>
-              {searchResults.map((r, i) => <div key={i} style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.03)", display: "flex", gap: 8, alignItems: "center" }} onMouseDown={() => {
+            {!isOperator && effectiveRole !== "doctor" && <><input id="searchQuery" name="searchQuery" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }} onFocus={(e) => { setSearchOpen(true); e.target.style.borderColor = "var(--border-input-focus)"; }} onBlur={(e) => { setTimeout(() => setSearchOpen(false), 200); e.target.style.borderColor = "var(--border-subtle)"; }} placeholder={t("search_placeholder") || `Search... (${navigator.platform?.includes("Mac") ? "⌘" : "Ctrl"}+K)`} style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 8, background: "var(--bg-input)", border: "1px solid var(--border-subtle)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 12, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }} />
+            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--text-muted)" }}>🔍</span></>}
+            {searchOpen && searchResults.length > 0 && <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", maxHeight: 320, overflowY: "auto", marginTop: 4, borderRadius: 10, background: "var(--bg-card-solid)", border: "1px solid var(--border-strong)", zIndex: 100, boxShadow: "var(--shadow-lg)" }}>
+              <div style={{ padding: "6px 12px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)" }}>{searchResults.length} Ergebnisse</span><span style={{ fontSize: 9, color: "var(--text-faint)" }}>ESC</span></div>
+              {searchResults.map((r, i) => <div key={i} style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: 8, alignItems: "center" }} onMouseDown={() => {
                 if (r.type === "lead") setSelLead(r.id);
                 else if (r.type === "appt") setSelAppt(r.id);
                 else if (r.type === "chat") { setView("inbox"); setSelChat(r.data); }
                 setSearchQuery(""); setSearchOpen(false);
-              }} onMouseEnter={e => e.currentTarget.style.background = "rgba(76,201,255,0.04)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+              }} onMouseEnter={e => e.currentTarget.style.background = "var(--bg-hover)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                 <span style={{ fontSize: 14 }}>{r.icon}</span>
-                <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 12 }}>{r.label}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)" }}>{r.sub}</div></div>
+                <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 12 }}>{r.label}</div><div style={{ fontSize: 10, color: "var(--text-muted)" }}>{r.sub}</div></div>
               </div>)}
             </div>}
           </div>
@@ -728,7 +714,7 @@ export default function MainLayout() {
               { label: ({de:"Neue Leads",en:"New Leads",tr:"Yeni Leadler"}[lang]||"Neue Leads"), value: myLeads.filter(l => l.stage === "new").length, color: "#4cc9ff", icon: "👤", view: "pipeline" },
             ].map((k, i) => <div key={i} onClick={() => setView(k.view)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 6, cursor: "pointer", background: "transparent", transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = `${k.color}08`} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
               <span style={{ fontSize: 14, fontWeight: 800, color: k.color, letterSpacing: "-0.02em" }}>{k.value}</span>
-              <span style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 600 }}>{k.label}</span>
+              <span style={{ fontSize: 10, color: "var(--text-secondary)", fontWeight: 600 }}>{k.label}</span>
             </div>)}
             {/* Operator badges */}
             {!IS_CLIENT_MODE && isOperator && <>
@@ -750,58 +736,61 @@ export default function MainLayout() {
               const limit = clinic.patient_limit || (PLAN_LIMITS[clinic.plan] || PLAN_LIMITS.core).patients || 1000;
               const pct = Math.round((myLeads.length / limit) * 100);
               return <div onClick={() => setView("subscription")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, cursor: "pointer" }} title={`${myLeads.length} / ${limit} Patienten`}>
-                <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                  <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "#ef4444" : pct > 50 ? "#f59e0b" : "rgba(167,177,195,0.65)", transition: "width 0.3s" }} />
+                <div style={{ width: 40, height: 4, borderRadius: 2, background: "var(--progress-track)", overflow: "hidden" }}>
+                  <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "var(--error)" : pct > 50 ? "var(--warning)" : "var(--text-muted)", transition: "width 0.3s" }} />
                 </div>
-                <span style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
+                <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
               </div>;
             })()}
 
             {/* System status */}
             {IS_CLIENT_MODE && <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 8px" }} title="System Online">
-              <span style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981", boxShadow: "0 0 6px rgba(16,185,129,0.4)" }} />
-              <span style={{ fontSize: 9, color: "rgba(167,177,195,0.65)", fontWeight: 600 }}>Online</span>
+              <span style={{ width: 6, height: 6, borderRadius: 99, background: "var(--success)", boxShadow: "var(--shadow-glow-success)" }} />
+              <span style={{ fontSize: 9, color: "var(--text-muted)", fontWeight: 600 }}>Online</span>
             </div>}
 
-            {/* Demo/Live toggle — disabled */}
+            {/* Demo/Live toggle */}
+            {IS_CLIENT_MODE && clinic && effectiveRole === "admin" && <button data-tour="demo_toggle" onClick={toggleDemoMode} disabled={demoLoading} style={{ padding: "3px 10px", borderRadius: 6, background: demoMode ? "rgba(239,68,68,0.06)" : "rgba(16,185,129,0.04)", border: `1px solid ${demoMode ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.08)"}`, color: demoMode ? "#ef4444" : "#10b981", fontWeight: 700, fontSize: 9, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, letterSpacing: "0.04em" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: demoMode ? "#ef4444" : "#10b981", flexShrink: 0 }} />{demoLoading ? "..." : demoMode ? "DEMO" : "LIVE"}</button>}
 
             {/* Notification bell (hidden for doctor) */}
             {IS_CLIENT_MODE && effectiveRole !== "doctor" && <div style={{ position: "relative" }}>
-              <button data-notif-bell onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markNotifsRead(); }} style={{ width: 32, height: 32, borderRadius: 8, background: notifOpen ? "rgba(76,201,255,0.06)" : "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.6)", position: "relative", transition: "all .15s" }}>🔔
+              <button data-notif-bell onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markNotifsRead(); }} style={{ width: 32, height: 32, borderRadius: 8, background: notifOpen ? "var(--info-subtle)" : "transparent", border: "1px solid var(--border-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--text-muted)", position: "relative", transition: "all .15s" }}>🔔
                 {unreadNotifs > 0 && <span style={{ position: "absolute", top: -2, right: -2, width: 14, height: 14, borderRadius: 99, background: "#ff8a2a", color: "#fff", fontSize: 8, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadNotifs}</span>}
               </button>
-              {notifOpen && <div data-notif-panel style={{ position: "absolute", top: "100%", right: 0, width: 360, maxHeight: 400, overflowY: "auto", marginTop: 6, borderRadius: 12, background: "#141820", border: "1px solid rgba(255,255,255,0.06)", zIndex: 9000, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-                <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)", fontWeight: 700, fontSize: 13 }}>{t("notif_title")}</div>
-                {myNotifs.length === 0 && <div style={{ padding: 20, textAlign: "center", color: "rgba(167,177,195,0.7)", fontSize: 12 }}>{t("no_notifications")}</div>}
-                {myNotifs.map(n => <div key={n.id} style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.03)", display: "flex", gap: 8, alignItems: "flex-start", background: n.read ? "transparent" : "rgba(76,201,255,0.02)" }}>
+              {notifOpen && <div data-notif-panel style={{ position: "absolute", top: "100%", right: 0, width: 360, maxHeight: 400, overflowY: "auto", marginTop: 6, borderRadius: 12, background: "var(--bg-modal)", border: "1px solid var(--border-default)", zIndex: 9000, boxShadow: "var(--shadow-xl)" }}>
+                <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", fontWeight: 700, fontSize: 13 }}>{t("notif_title")}</div>
+                {myNotifs.length === 0 && <div style={{ padding: 20, textAlign: "center", color: "var(--text-secondary)", fontSize: 12 }}>{t("no_notifications")}</div>}
+                {myNotifs.map(n => <div key={n.id} style={{ padding: "10px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: 8, alignItems: "flex-start", background: n.read ? "transparent" : "var(--info-subtle)" }}>
                   <div style={{ width: 24, height: 24, borderRadius: 6, background: `${NOTIF_COLORS[n.type] || "rgba(167,177,195,0.1)"}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0 }}>{NOTIF_ICONS[n.type] || "🔔"}</div>
-                  <div><div style={{ fontSize: 12, lineHeight: 1.4, color: n.read ? "rgba(167,177,195,0.7)" : "rgba(232,238,252,0.85)" }}>{n.text}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 2 }}>{timeAgo(n.time)}</div></div>
+                  <div><div style={{ fontSize: 12, lineHeight: 1.4, color: n.read ? "var(--text-secondary)" : "var(--text-primary)" }}>{n.text}</div><div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{timeAgo(n.time)}</div></div>
                 </div>)}
               </div>}
             </div>}
 
             {/* Clock (operator only) */}
-            {isOperator && <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(212,175,55,0.5)", fontFamily: "monospace", fontVariantNumeric: "tabular-nums" }}>{clockNow.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}</span>}
+            {isOperator && <span style={{ fontSize: 12, fontWeight: 600, color: "var(--gold-text)", fontFamily: "monospace", fontVariantNumeric: "tabular-nums" }}>{clockNow.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}</span>}
+            {/* Theme toggle (operator only) */}
+            {isOperator && <ThemeToggle />}
             {/* User menu (gear icon trigger) */}
             {(() => {
               const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
               return <div style={{ position: "relative" }} data-gear-menu>
-                <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "rgba(167,177,195,0.6)" }}>
+                <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid var(--border-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--text-muted)" }}>
                   ⚙️
                 </button>
-                <div style={{ display: "none", position: "absolute", top: 38, right: 0, minWidth: 180, background: "#141820", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: 6, zIndex: 200, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-                  <div style={{ padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 4 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(232,238,252,0.85)" }}>{user.name}</div>
-                    <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
+                <div style={{ display: "none", position: "absolute", top: 38, right: 0, minWidth: 180, background: "var(--bg-modal)", border: "1px solid var(--border-default)", borderRadius: 10, padding: 6, zIndex: 200, boxShadow: "var(--shadow-xl)" }}>
+                  <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-subtle)", marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)" }}>{user.name}</div>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
                   </div>
-                  {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
-                  <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(167,177,195,0.6)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
+                  {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
+                  <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
                   {/* Language picker inside menu */}
                   <div style={{ padding: "4px 12px", display: "flex", gap: 4 }}>
-                    {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "rgba(76,201,255,0.1)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
+                    {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "var(--info-subtle)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
                   </div>
-                  <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "4px 0" }} />
-                  <button onClick={handleLogout} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "rgba(239,68,68,0.5)", textAlign: "left", fontFamily: "inherit" }}>↗ {t("sign_out")}</button>
+                  <div style={{ height: 1, background: "var(--border-subtle)", margin: "4px 0" }} />
+                  <button onClick={handleLogout} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--error-text)", textAlign: "left", fontFamily: "inherit" }}>↗ {t("sign_out")}</button>
                 </div>
               </div>;
             })()}
@@ -812,51 +801,41 @@ export default function MainLayout() {
 
         {/* Password Change Modal */}
         {showPwModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPwModal(false)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: '#1a2236', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 380, maxWidth: '90vw' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'var(--overlay-heavy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPwModal(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-modal)', border: '1px solid var(--border-default)', borderRadius: 16, padding: 28, width: 380, maxWidth: '90vw' }}>
               <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
-                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
-                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
+                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.6)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
-                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#f1f5f9', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
+                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               </div>
-              {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', color: pwToast.type === 'error' ? '#ef4444' : '#10b981', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
+              {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'var(--error-subtle)' : 'var(--success-subtle)', color: pwToast.type === 'error' ? 'var(--error)' : 'var(--success)', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-                <button onClick={() => setShowPwModal(false)} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(167,177,195,0.7)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
-                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'rgba(255,138,42,0.3)' : 'rgba(255,138,42,0.9)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
+                <button onClick={() => setShowPwModal(false)} style={{ background: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
+                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'var(--brand-muted)' : 'var(--brand)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* ── Impersonation Banner ── */}
-        {sessionStorage.getItem('fm_impersonation') === 'true' && (
-          <div style={{ padding: "8px 20px", background: "rgba(167,107,255,0.08)", borderBottom: "1px solid rgba(167,107,255,0.2)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 13 }}>{"👁"}</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#a78bfa" }}>Operator-Impersonation aktiv</span>
-            </div>
-            <button onClick={() => { sessionStorage.removeItem('fm_impersonation'); import('../api/client').then(m => m.clearTokens()); window.close(); }}
-              style={{ padding: "4px 14px", background: "#a78bfa", border: "none", borderRadius: 8, color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-              Beenden
-            </button>
-          </div>
-        )}
-
-        {/* ── Trial Countdown Banner (hidden — skip trial button kept) ── */}
+        {/* ── Trial Countdown Banner ── */}
         {IS_CLIENT_MODE && trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (
-          <div style={{ padding: "8px 20px", background: "rgba(76,201,255,0.04)", borderBottom: "1px solid rgba(76,201,255,0.08)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          <div style={{ padding: "8px 20px", background: "rgba(76,201,255,0.04)", borderBottom: "1px solid rgba(76,201,255,0.08)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 13 }}>⏱</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: trialCountdown.includes('hours') || trialCountdown.includes('today') ? "#ff8a2a" : "rgba(200,215,240,0.7)" }}>{trialCountdown}</span>
+            </div>
             <button onClick={() => ctx.setShowPlanPicker(true)} style={{ padding: "4px 14px", background: "transparent", border: "1px solid rgba(76,201,255,0.15)", borderRadius: 8, color: "#4CC9FF", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
-              {t("skip_trial")||"Trial überspringen — Plan wählen"}
+              {t("skip_trial")||"Skip trial — choose plan"}
             </button>
           </div>
         )}
@@ -882,8 +861,7 @@ export default function MainLayout() {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
           const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const orgCode = (activeClinicId || '').substring(0, 8).toUpperCase();
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${orgCode}`;
+          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
             <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
@@ -896,15 +874,15 @@ export default function MainLayout() {
                   </div>
                 </div>
                 <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, textDecoration: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.25)", transition: "transform 0.15s, box-shadow 0.15s" }}>
-                  {t("lt_open_wa") || "WhatsApp öffnen"} →
+                  WhatsApp öffnen →
                 </a>
                 <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
-                  {t("lt_scan_and_send") || "QR-Code scannen und den Code absenden — Ihr Bot antwortet sofort."}
+                  {t("lt_use_registered_phone") || "Nutze die Nummer, mit der du dich registriert hast."}
                 </div>
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {ti.session.messagesCount}/{ti.limits?.maxMessages || 50} {t("messages") || "Nachrichten"}{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
+                    {ti.session.messagesCount}/10 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
                   </div>
                 )}
               </div>
@@ -937,39 +915,63 @@ export default function MainLayout() {
 
         {/* Billing confirm removed — plan picker used instead */}
 
-        {/* Demo banners removed */}
+        {/* Per-view demo banner */}
+        {demoMode && (() => {
+          const _db = {
+            "dashboard": [t("demo_banner_dashboard_title") || "Hier siehst du dein komplettes System in Echtzeit", t("demo_banner_dashboard_desc") || "Teste alles mit Beispieldaten und aktiviere dein System für echte Patienten. Wenn du bereit bist, wechsle oben rechts auf LIVE."],
+            "action_needed": [t("demo_banner_tasks_title") || "Aufgaben erscheinen nur wenn etwas fehlt", t("demo_banner_tasks_desc") || "Alles läuft automatisch – du greifst nur bei Ausnahmen ein."],
+            "inbox": [t("demo_banner_inbox_title") || "Hier landen alle WhatsApp Nachrichten automatisch", t("demo_banner_inbox_desc") || "Im Live-Modus antwortet dein Bot sofort auf echte Patientenanfragen."],
+            "pipeline": [t("demo_banner_pipeline_title") || "Hier siehst du jeden Patienten von Anfrage bis OP", t("demo_banner_pipeline_desc") || "Alle Schritte werden automatisch organisiert."],
+            "appointments": [t("demo_banner_appts_title") || "Alle Buchungen werden automatisch hier erstellt", t("demo_banner_appts_desc") || "Dein Kalender bleibt immer aktuell."],
+            "op_prep": [t("demo_banner_opprep_title") || "Welche Patienten sind bereit für die OP?", t("demo_banner_opprep_desc") || "Vorbereitung wird automatisch verfolgt."],
+            "whatsapp_setup": [t("demo_banner_wa_title") || "Dein Bot übernimmt alles automatisch", t("demo_banner_wa_desc") || "Aktiviere dein System für echte Patienten."],
+            "settings": [t("demo_banner_settings_title") || "Hier richtest du dein System einmal ein", t("demo_banner_settings_desc") || "Danach läuft alles im Hintergrund."],
+          };
+          const _t = _db[view];
+          if (!_t) return null;
+          return (
+            <div style={{ padding: "14px 20px", background: "rgba(255,140,66,0.08)", borderBottom: "1px solid rgba(255,140,66,0.25)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: 99, background: "#FFB07A", flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#FFB07A" }}>{_t[0]}</span>
+                </div>
+                <div style={{ fontSize: 12, color: "rgba(255,140,66,0.45)", marginLeft: 14 }}>{_t[1]}</div>
+              </div>
+              {view === "dashboard" && effectiveRole === "admin" && <button onClick={toggleDemoMode} disabled={demoLoading} style={{ background: "#FF8C42", color: "#fff", borderRadius: 8, padding: "8px 16px", fontWeight: 500, fontSize: 13, border: "none", cursor: "pointer", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}>{demoLoading ? "..." : (t("go_live_now") || "Jetzt live gehen")}</button>}
+            </div>
+          );
+        })()}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
-        <ErrorBoundary key={view}>
-        {view === "action_needed" && clinic && canAccess("action_needed") && <React.Suspense fallback={LazyFallback}><ActionNeededView /></React.Suspense>}
-        {view === "dashboard" && clinic && canAccess("dashboard") && <React.Suspense fallback={LazyFallback}><DashboardView /></React.Suspense>}
-        {view === "inbox" && canAccess("inbox") && <React.Suspense fallback={LazyFallback}><InboxView /></React.Suspense>}
-        {view === "pipeline" && canAccess("pipeline") && <React.Suspense fallback={LazyFallback}><PipelineView /></React.Suspense>}
-        {view === "patients_db" && clinic && canAccess("patients_db") && <React.Suspense fallback={LazyFallback}><PatientsPage /></React.Suspense>}
-        {view === "appointments" && canAccess("appointments") && <React.Suspense fallback={LazyFallback}><AppointmentsPage /></React.Suspense>}
-        {view === "op_prep" && clinic && canAccess("op_prep") && <React.Suspense fallback={LazyFallback}><OpPrepView /></React.Suspense>}
-        {view === "review_board" && clinic && canAccess("review_board") && <React.Suspense fallback={LazyFallback}><ReviewBoard /></React.Suspense>}
-        {view === "doctor_portal" && clinic && canAccess("doctor_portal") && <React.Suspense fallback={LazyFallback}><DoctorTasksView /></React.Suspense>}
-        {view === "archive" && clinic && canAccess("archive") && <React.Suspense fallback={LazyFallback}><ArchiveView /></React.Suspense>}
-        {view === "analytics" && clinic && canAccess("analytics") && <React.Suspense fallback={LazyFallback}><AnalyticsView /></React.Suspense>}
-        {view === "ai_control" && clinic && canAccess("ai_control") && <React.Suspense fallback={LazyFallback}><AIControlView /></React.Suspense>}
-        {view === "whatsapp_setup" && clinic && canAccess("whatsapp_setup") && <React.Suspense fallback={LazyFallback}><WhatsAppSetupPage /></React.Suspense>}
-        {view === "setup" && clinic && canAccess("setup") && <React.Suspense fallback={LazyFallback}><SetupView /></React.Suspense>}
-        {view === "automations" && clinic && canAccess("automations") && <React.Suspense fallback={LazyFallback}><AutomationsView /></React.Suspense>}
-        {view === "files" && clinic && canAccess("files") && <React.Suspense fallback={LazyFallback}><FilesView /></React.Suspense>}
-        {view === "revenue" && clinic && canAccess("revenue") && <React.Suspense fallback={LazyFallback}><RevenueView /></React.Suspense>}
-        {view === "payments" && clinic && canAccess("payments") && <React.Suspense fallback={LazyFallback}><PaymentsView /></React.Suspense>}
-        {view === "addons" && clinic && canAccess("addons") && <React.Suspense fallback={LazyFallback}><AddonsView /></React.Suspense>}
-        {view === "subscription" && clinic && canAccess("billing") && <React.Suspense fallback={LazyFallback}><SubscriptionView /></React.Suspense>}
-        {view === "settings" && canAccess("settings") && <React.Suspense fallback={LazyFallback}><SettingsView /></React.Suspense>}
-        {view === "audit_log" && canAccess("audit_log") && <React.Suspense fallback={LazyFallback}><AuditLogView /></React.Suspense>}
-        {view === "support" && canAccess("support") && <React.Suspense fallback={LazyFallback}><SupportView /></React.Suspense>}
-        {view === "manual" && canAccess("settings") && <div style={{position:"fixed",inset:0,zIndex:900,display:"flex"}}><div onClick={()=>setView("dashboard")} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}} /><div style={{position:"relative",marginLeft:"auto",width:"min(900px,85vw)",height:"100vh",overflowY:"auto",background:"#fff",boxShadow:"-4px 0 20px rgba(0,0,0,0.3)"}}><React.Suspense fallback={LazyFallback}><ManualPage isPublic={false} /></React.Suspense></div></div>}
-        {view === "operator" && (isAdmin || isOperator) && !IS_CLIENT_MODE && <React.Suspense fallback={LazyFallback}><OperatorPanel /></React.Suspense>}
-        </ErrorBoundary>
+        {view === "action_needed" && clinic && canAccess("action_needed") && <ErrorBoundary t={t}><ActionNeededView /></ErrorBoundary>}
+        {view === "dashboard" && clinic && canAccess("dashboard") && <ErrorBoundary t={t}><DashboardView /></ErrorBoundary>}
+        {view === "inbox" && canAccess("inbox") && <ErrorBoundary t={t}><InboxView /></ErrorBoundary>}
+        {view === "pipeline" && canAccess("pipeline") && <ErrorBoundary t={t}><PipelineView /></ErrorBoundary>}
+        {view === "patients_db" && clinic && canAccess("patients_db") && <ErrorBoundary t={t}><PatientsPage /></ErrorBoundary>}
+        {view === "appointments" && canAccess("appointments") && <ErrorBoundary t={t}><AppointmentsPage /></ErrorBoundary>}
+        {view === "op_prep" && clinic && canAccess("op_prep") && <ErrorBoundary t={t}><OpPrepView /></ErrorBoundary>}
+        {view === "review_board" && clinic && canAccess("review_board") && <ErrorBoundary t={t}><ReviewBoard /></ErrorBoundary>}
+        {view === "doctor_portal" && clinic && canAccess("doctor_portal") && <ErrorBoundary t={t}><DoctorTasksView /></ErrorBoundary>}
+        {view === "archive" && clinic && canAccess("archive") && <ErrorBoundary t={t}><ArchiveView /></ErrorBoundary>}
+        {view === "analytics" && clinic && canAccess("analytics") && <ErrorBoundary t={t}><AnalyticsView /></ErrorBoundary>}
+        {view === "ai_control" && clinic && canAccess("ai_control") && <ErrorBoundary t={t}><AIControlView /></ErrorBoundary>}
+        {view === "whatsapp_setup" && clinic && canAccess("whatsapp_setup") && <ErrorBoundary t={t}><WhatsAppSetupPage /></ErrorBoundary>}
+        {view === "setup" && clinic && canAccess("setup") && <ErrorBoundary t={t}><SetupView /></ErrorBoundary>}
+        {view === "automations" && clinic && canAccess("automations") && <ErrorBoundary t={t}><AutomationsView /></ErrorBoundary>}
+        {view === "files" && clinic && canAccess("files") && <ErrorBoundary t={t}><FilesView /></ErrorBoundary>}
+        {view === "revenue" && clinic && canAccess("revenue") && <ErrorBoundary t={t}><RevenueView /></ErrorBoundary>}
+        {view === "payments" && clinic && canAccess("payments") && <ErrorBoundary t={t}><PaymentsView /></ErrorBoundary>}
+        {view === "addons" && clinic && canAccess("addons") && <ErrorBoundary t={t}><AddonsView /></ErrorBoundary>}
+        {view === "subscription" && clinic && canAccess("billing") && <ErrorBoundary t={t}><SubscriptionView /></ErrorBoundary>}
+        {view === "settings" && canAccess("settings") && <ErrorBoundary t={t}><SettingsView /></ErrorBoundary>}
+        {view === "audit_log" && canAccess("audit_log") && <ErrorBoundary t={t}><AuditLogView /></ErrorBoundary>}
+        {view === "support" && canAccess("support") && <ErrorBoundary t={t}><SupportView /></ErrorBoundary>}
+        {view === "manual" && canAccess("settings") && <ErrorBoundary t={t}><div style={{position:"fixed",inset:0,zIndex:900,display:"flex"}}><div onClick={()=>setView("dashboard")} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}} /><div style={{position:"relative",marginLeft:"auto",width:"min(900px,85vw)",height:"100vh",overflowY:"auto",background:"#fff",boxShadow:"-4px 0 20px rgba(0,0,0,0.3)"}}><ManualPage isPublic={false} /></div></div></ErrorBoundary>}
+        {view === "operator" && (isAdmin || isOperator) && !IS_CLIENT_MODE && <ErrorBoundary t={t}><OperatorPanel /></ErrorBoundary>}
         </div></div>
     </div>
     {/* Tour disabled — not in production v368 */}
-    {IS_CLIENT_MODE && user && <React.Suspense fallback={null}><AISupportWidget /></React.Suspense>}
+    {IS_CLIENT_MODE && user && <AISupportWidget />}
     </ErrorBoundary>
   );
 }
