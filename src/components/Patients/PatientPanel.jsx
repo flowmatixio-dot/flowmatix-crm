@@ -403,7 +403,9 @@ export default function PatientPanel() {
               <DataField label={t("age") || "Alter"} value={fields.age} />
               <DataField label={t("country") || "Land"} value={translateValue(lead.country)} />
               <DataField label={t("language") || "Sprache"} value={lead.language} />
+              {(fields.email || lead.email) && <DataField label="E-Mail" value={fields.email || lead.email} />}
               <DataField label={t("concern") || "Anliegen"} value={translateValue(fields.concern)} />
+              {fields.desired_result && <DataField label={t("desired_result") || "Gewünschtes Ergebnis"} value={translateValue(fields.desired_result)} />}
               <DataField label={t("hair_loss_type") || "Haarausfall-Art"} value={translateValue(fields.hair_loss_type)} />
               <DataField label={t("norwood_label") || "Norwood"} value={fields.norwood_scale || fields.norwood} />
               <DataField label={translateValue("DSGVO")} value={lead.consentGiven || lead.consent?.timestamp || lead.consents?.data_privacy?.signed ? ("\u2705 " + (lead.consents?.data_privacy?.method || "WhatsApp") + (lead.consents?.data_privacy?.signedAt ? " · " + new Date(lead.consents.data_privacy.signedAt).toLocaleDateString(fmLocale()) : "")) : ("\u26A0\uFE0F " + (t("gdpr_not_granted") || "Not granted"))} />
