@@ -1012,7 +1012,7 @@ export default function SettingsView() {
           <div style={{fontWeight:600,fontSize:13,marginBottom:4}}>{t("required_photo_types") || "Welche Fotos benötigt?"}</div>
           <div style={{fontSize:11,color:"var(--text-faint)",marginBottom:8}}>{t("required_photo_types_desc") || "Bot fordert genau diese Foto-Winkel an"}</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-            {[{id:"front",label:"Frontalansicht"},{id:"top",label:"Draufsicht (Oberkopf)"},{id:"left",label:"Linke Seite"},{id:"right",label:"Rechte Seite"},{id:"donor",label:"Spenderbereich (Hinterkopf)"},{id:"close_up",label:"Nahaufnahme"},{id:"hairline",label:"Haarlinie"}].map(pt=>{
+            {[{id:"front",label:t("photo_front")||"Front view"},{id:"top",label:t("photo_top")||"Top view"},{id:"left",label:t("photo_left_side")||"Left side"},{id:"right",label:t("photo_right_side")||"Right side"},{id:"donor",label:t("photo_donor_area")||"Donor area"},{id:"close_up",label:t("photo_close_up")||"Close-up"},{id:"hairline",label:t("photo_hairline")||"Hairline"}].map(pt=>{
               const types=c.requiredPhotoTypes||["front","top","donor"];
               const active=types.includes(pt.id);
               return<button key={pt.id} onClick={()=>up("requiredPhotoTypes",active?types.filter(x=>x!==pt.id):[...types,pt.id])} style={{padding:"6px 14px",borderRadius:10,background:active?"rgba(76,201,255,0.1)":"var(--bg-card)",border:`1px solid ${active?"rgba(76,201,255,0.25)":"var(--border-strong)"}`,color:active?"#4cc9ff":"var(--text-muted)",fontWeight:600,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{active?"✓ ":""}{pt.label}</button>;
