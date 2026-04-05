@@ -5,7 +5,7 @@ import { CONV_STATUS, MSG_TEMPLATES } from "../../data/constants";
 import { getAvatarGradient, getInitials } from "../shared/index";
 import { getNow, isDemoMode } from "../../utils/demoTime";
 import { translateValue, fmLocale } from "../../utils/helpers";
-import usePatientStore from "../../stores/patientStore";
+import { usePatientStore } from "../../stores/patientStore";
 
 /* ── Helper: 24h WhatsApp window state with remaining time ── */
 function getWindowState(lastPatientMsg) {
