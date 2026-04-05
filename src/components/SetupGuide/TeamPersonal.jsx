@@ -9,11 +9,19 @@ function StaffPanel() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
+  const [invitedEmails, setInvitedEmails] = useState(new Set());
 
   const loadStaff = async () => {
     try {
-      const res = await import("../../api/client").then(m => m.getStaff());
+      const mod = await import("../../api/client");
+      const res = await mod.getStaff();
       setStaff(res?.staff || []);
+      // Load team users to check who already has an account
+      try {
+        const teamRes = await mod.getTeam();
+        const emails = new Set((teamRes?.members || teamRes || []).map(u => u.email?.toLowerCase()).filter(Boolean));
+        setInvitedEmails(emails);
+      } catch {}
     } catch { setStaff([]); }
     setLoading(false);
   };
@@ -132,7 +140,7 @@ function StaffPanel() {
               await mod.inviteTeamMember({ email: s.email, name: `${s.first_name||""} ${s.last_name||""}`.trim(), role: s.role === "doctor" ? "clinic_doctor" : "clinic_coordinator" });
               showT(`${t("invite_sent_to") || "Einladung an"} ${s.email} ${t("sent") || "gesendet"}`);
             } catch (e) { showT(e.message || (t("error_sending") || "Fehler beim Senden")); }
-          }} style={{padding:"6px 12px",borderRadius:8,background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.15)",color:"#10b981",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>📧 {t("invite") || "Einladen"}</button>}
+          }} style={{padding:"6px 12px",borderRadius:8,background:"rgba(16,185,129,0.08)",border:"1px solid rgba(16,185,129,0.15)",color:"#10b981",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{invitedEmails.has(s.email?.toLowerCase()) ? "📧 Erneut einladen" : "📧 Einladen"}</button>}
           <button onClick={()=>{setEditing(s.id);setForm({...s});}} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("edit") || "Bearbeiten"}</button>
           <button onClick={()=>removeStaff(s.id)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.15)",color:"#ef4444",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{t("archive") || "Archivieren"}</button>
         </div>
