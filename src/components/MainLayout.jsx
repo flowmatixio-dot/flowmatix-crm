@@ -309,7 +309,9 @@ export default function MainLayout() {
           </div>
           {/* Actual DoctorTasksView */}
           <div style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
-            <DoctorTasksView />
+            <React.Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(200,215,240,0.5)"}}>Laden...</div>}>
+              <DoctorTasksView />
+            </React.Suspense>
           </div>
         </div>
       </div>
