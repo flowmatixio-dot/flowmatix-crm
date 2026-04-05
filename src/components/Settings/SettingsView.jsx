@@ -446,7 +446,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                   </span>
                 </div>
                 {/* Actions */}
-                <div style={{ display: "flex", gap: 4 }}>
+                <div style={{ display: "flex", gap: 6 }}>
                   {!isCurrentUser && !isEditing && (
                     <>
                       <button onClick={async () => {
@@ -455,15 +455,15 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                           showT(`📧 ${member.email} — ${t("reinvite") || "Erneut eingeladen"}`);
                         } catch (e) { showT(e.message || "Fehler"); }
                       }} style={{
-                        padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                        background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.1)", color: "#10b981",
+                        padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                        background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "#10b981",
                       }}>📧 {t("reinvite") || "Erneut einladen"}</button>
                       <button onClick={() => { setEditingId(member.id); setEditRole(role); }} style={{
-                        padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                        padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
                       }}>{t("role_label")}</button>
-                      <button onClick={() => handleDeactivate(member.id, member.name)} style={{
-                        padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                      <button onClick={() => { if (confirm(`${member.name || member.email} wirklich entfernen?`)) handleDeactivate(member.id, member.name); }} style={{
+                        padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.08)", color: "rgba(239,68,68,0.5)",
                       }}>{t("remove") || "Entfernen"}</button>
                     </>
