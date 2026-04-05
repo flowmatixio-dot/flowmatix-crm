@@ -229,6 +229,7 @@ export default function PatientPanel() {
     setInvoiceModal, setInvAmount, setInvItems, setInvVat, setInvDeposit,
     setPayAmount, setPayCurrency, setPaymentModal, simulatePaymentReceived,
     assignDriver, notifyDriver, handleDriverResponse, escalateToBackup, handleBackupDriverResponse,
+    pendingReview, setPendingReview,
   } = useApp();
   const [selDriverId, setSelDriverId] = useState("");
   const [flightForm, setFlightForm] = useState(false);
@@ -248,6 +249,7 @@ export default function PatientPanel() {
   const [gdprConfirm, setGdprConfirm] = useState(false);
   const [gdprDeleting, setGdprDeleting] = useState(false);
   useEffect(() => { import("../../api/client").then(m => m.getStaff()).then(r => setStaffList(r?.staff || [])).catch(() => {}); }, []);
+  useEffect(() => { if (pendingReview && selLead) { setShowPlanBuilder(true); setPendingReview(false); } }, [pendingReview, selLead]);
   useEffect(() => {
     if (!selLead) return;
     import("../../api/client").then(m => m.getPatient(selLead)).then(r => {

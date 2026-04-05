@@ -401,7 +401,8 @@ export default function App() {
   };
   const handleDrop=st=>{if(dragItem){moveLead(dragItem,st);setDragItem(null);}};
   const updateAppt=(id,data)=>{console.log("[CRM] updateAppt called:",id,JSON.stringify(data));setAppts(p=>p.map(a=>a.id===id?{...a,...data}:a));showT("Updated");fmApi.updateAppointment(id,data).then(r=>console.log("[CRM] updateAppt SUCCESS:",r)).catch(err=>{console.error("[CRM] updateAppt FAILED:",err);showT("Speichern fehlgeschlagen: "+err.message);});};
-  const openPatient=(lid)=>{setSelLead(lid);const l=leads.find(x=>x.id===lid);if(l)logAction("patient_opened",l.name,`Viewed profile (${l.treatment})`);};
+  const [pendingReview, setPendingReview] = useState(false);
+  const openPatient=(lid,opts)=>{setSelLead(lid);if(opts?.openReview)setPendingReview(true);const l=leads.find(x=>x.id===lid);if(l)logAction("patient_opened",l.name,`Viewed profile (${l.treatment})`);};
   const openPatientPhotos=(lid)=>{const l=leads.find(x=>x.id===lid);if(l)logAction("photos_viewed",l.name,`Viewed ${l.photoUrls?.length||0} photos`);};
   const browserNotify=(title,body)=>{if("Notification" in window && Notification.permission==="granted"){new Notification(title,{body,icon:"/Flowmatix-Logo.png"});}};
   const completeOnboarding=(clinicId,showToastMsg)=>{
@@ -788,7 +789,7 @@ export default function App() {
     handleDriverResponse: crmHandlers.handleDriverResponse, escalateToBackup: crmHandlers.escalateToBackup,
     handleBackupDriverResponse: crmHandlers.handleBackupDriverResponse,
     sendMessage: crmHandlers.sendMessage, markResolved: crmHandlers.markResolved, doReschedule: crmHandlers.doReschedule,
-    openPatient, openPatientPhotos, syncPatientCard,
+    openPatient, openPatientPhotos, syncPatientCard, pendingReview, setPendingReview,
     generatePDF: businessLogic.generatePDF, generateMagicLink: businessLogic.generateMagicLink,
     generateInvoicePDF: businessLogic.generateInvoicePDF, generateStripeLink: businessLogic.generateStripeLink,
     generateDepositLink: businessLogic.generateDepositLink, markInvoicePaid: businessLogic.markInvoicePaid,
