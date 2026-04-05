@@ -449,6 +449,15 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                 <div style={{ display: "flex", gap: 4 }}>
                   {!isCurrentUser && !isEditing && (
                     <>
+                      <button onClick={async () => {
+                        try {
+                          await inviteTeamMember({ email: member.email, name: member.name, role: member.role });
+                          showT(`📧 ${member.email} — ${t("reinvite") || "Erneut eingeladen"}`);
+                        } catch (e) { showT(e.message || "Fehler"); }
+                      }} style={{
+                        padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                        background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.1)", color: "#10b981",
+                      }}>📧 {t("reinvite") || "Erneut einladen"}</button>
                       <button onClick={() => { setEditingId(member.id); setEditRole(role); }} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
