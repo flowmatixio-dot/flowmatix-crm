@@ -81,11 +81,10 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
   const stageLabels = { new: t("stage_new") || "Neuer Lead", contacted: t("stage_contacted") || "Kontaktiert", booked: t("stage_booked") || "Gebucht", done: t("stage_done") || "Erledigt" };
   const stageColors = { new: "#4cc9ff", contacted: "#fbbf24", booked: "#a78bfa", done: "#10b981" };
   const rawIntake = lead.intake || lead.extractedFields || {};
-  const patientLang = (lead.language || "de").substring(0, 2);
   const [trFields, setTrFields] = useState({});
   const intakeKey = JSON.stringify(rawIntake) + lang;
   useEffect(() => {
-    if (lang === patientLang || !Object.values(rawIntake).some(v => v && typeof v === 'string' && v.length > 2)) return;
+    if (!Object.values(rawIntake).some(v => v && typeof v === 'string' && v.length > 2)) return;
     const items = Object.entries(rawIntake)
       .filter(([, v]) => v && typeof v === 'string' && v.length > 2 && !/^(true|false|yes|no|ja|nein|evet|hayır|yok|keine|none)$/i.test(v))
       .map(([k, v]) => ({ id: k, text: String(v) }));

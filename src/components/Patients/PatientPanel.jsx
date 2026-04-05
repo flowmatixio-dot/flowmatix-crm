@@ -303,13 +303,12 @@ export default function PatientPanel() {
   const extracted = lead.extractedFields || {};
   const rawFields = { ...extracted, ...intake };
 
-  // Auto-translate intake fields to CRM language
+  // Auto-translate intake fields to CRM language (always translate — patient.language is often wrong)
   const crmLang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
-  const patientLang = (lead.language || "de").substring(0, 2);
   const [translatedFields, setTranslatedFields] = useState({});
   const fieldsKey = JSON.stringify(rawFields) + crmLang;
   useEffect(() => {
-    if (crmLang === patientLang || !Object.values(rawFields).some(v => v && typeof v === 'string' && v.length > 2)) return;
+    if (!Object.values(rawFields).some(v => v && typeof v === 'string' && v.length > 2)) return;
     const toTranslate = Object.entries(rawFields)
       .filter(([, v]) => v && typeof v === 'string' && v.length > 2 && !/^(true|false|yes|no|ja|nein|evet|hayır|yok|keine|none)$/i.test(v))
       .map(([k, v]) => ({ id: k, text: String(v) }));
