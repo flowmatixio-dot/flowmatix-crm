@@ -617,7 +617,7 @@ export default function OpPrepView() {
       appts = appts.filter(a => {
         const dt = new Date(a.scheduledAt || a.scheduled_at || a.date);
         const st = a.status || "";
-        return dt > now && st !== "canceled" && st !== "cancelled" && st !== "completed";
+        return dt > now && st !== "canceled" && st !== "cancelled" && st !== "completed" && st !== "rescheduled" && st !== "no_show";
       }).sort((a, b) => new Date(a.scheduledAt || a.scheduled_at || a.date) - new Date(b.scheduledAt || b.scheduled_at || b.date));
       setApiAppts(appts);
     }).catch(e => { console.error("[op-prep] fetch failed:", e.message); setApiError(true); });
@@ -634,7 +634,7 @@ export default function OpPrepView() {
       if (lead.stage !== "booked" && lead.stage !== "done") return;
       const appt = myAppts.find(a =>
         (a.leadId === lead.id || a.patientId === lead.id || a.patient === lead.name) &&
-        new Date(a.date) >= new Date(now.toDateString()) && a.status !== "cancelled"
+        new Date(a.date) >= new Date(now.toDateString()) && a.status !== "cancelled" && a.status !== "canceled" && a.status !== "rescheduled" && a.status !== "no_show"
       );
       if (!appt && lead.stage !== "booked") return;
       const opDate = appt ? new Date(appt.date) : null;
