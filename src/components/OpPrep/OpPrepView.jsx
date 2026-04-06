@@ -269,27 +269,16 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
         <span style={{ fontSize: 12, fontWeight: 600, color: checked ? "rgba(16,185,129,0.9)" : "rgba(167,177,195,0.6)", flex: 1 }}>
           {item.label}
         </span>
-        {!checked && (
-          <>
-            {item.upload && (
-              <label onClick={e => e.stopPropagation()} style={{
-                padding: "3px 8px", borderRadius: 5, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)",
-                color: "#f59e0b", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
-              }}>
-                {upState === "uploading" ? t("loading") : upState === "uploaded" ? "\u2713" : "Upload"}
-                <input type="file" style={{ display: "none" }} accept="image/*,.pdf,.doc,.docx" onChange={e => {
-                  if (e.target.files?.[0]) handleUpload(item.key, item.dbKey, item.upload, e.target.files[0]);
-                }} />
-              </label>
-            )}
-            <button onClick={e => { e.stopPropagation(); requestItem(item.key, item.reqMsg); }} style={{
-              padding: "3px 8px", borderRadius: 5, background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.15)",
-              color: reqState === "sent" ? "#10b981" : reqState === "error" ? "#ef4444" : "#4cc9ff",
-              fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
-            }}>
-              {reqState === "sending" ? "..." : reqState === "sent" ? ("\u2713 " + t("sent_status")) : reqState === "error" ? t("error_status") : t("request_action") || "Anfordern"}
-            </button>
-          </>
+        {!checked && item.upload && (
+          <label onClick={e => e.stopPropagation()} style={{
+            padding: "3px 8px", borderRadius: 5, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)",
+            color: "#f59e0b", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+          }}>
+            {upState === "uploading" ? t("loading") : upState === "uploaded" ? "\u2713" : "Upload"}
+            <input type="file" style={{ display: "none" }} accept="image/*,.pdf,.doc,.docx" onChange={e => {
+              if (e.target.files?.[0]) handleUpload(item.key, item.dbKey, item.upload, e.target.files[0]);
+            }} />
+          </label>
         )}
         {checked && <span style={{ color: "rgba(16,185,129,0.4)", fontSize: 13, fontWeight: 700 }}>{"\u2713"}</span>}
       </div>
@@ -307,14 +296,6 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
       }}>
         <ToggleSwitch checked={checked} />
         <span style={{ fontSize: 12, fontWeight: 600, color: checked ? "rgba(16,185,129,0.9)" : "rgba(167,177,195,0.6)", flex: 1 }}>{label}</span>
-        {!checked && key === "flightReceived" && (
-          <button onClick={e => { e.stopPropagation(); requestItem(key, t("flight_data_request_msg") || "Bitte teile uns deine Flugdaten mit (Flugnummer, Datum, Ankunftszeit)."); }} style={{
-            padding: "3px 8px", borderRadius: 5, background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.15)",
-            color: reqState === "sent" ? "#10b981" : "#4cc9ff", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
-          }}>
-            {reqState === "sending" ? "..." : reqState === "sent" ? ("\u2713 " + t("sent_status")) : t("request_action") || "Anfordern"}
-          </button>
-        )}
         {checked && <span style={{ color: "rgba(16,185,129,0.4)", fontSize: 13, fontWeight: 700 }}>{"\u2713"}</span>}
       </div>
     );
