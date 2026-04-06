@@ -152,6 +152,7 @@ export default function MainLayout() {
   // ── Doctor: global new-task popup (polls every 15s, works on ANY view) ──
   const [doctorAlert, setDoctorAlert] = React.useState(null);
   const doctorPrevIds = useRef(new Set());
+  const doctorShownIds = useRef(new Set()); // never show same task twice per session
   useEffect(() => {
     if (effectiveRole !== "doctor") return;
     let mounted = true;
@@ -160,17 +161,18 @@ export default function MainLayout() {
         const res = await fmApi.apiFetch("/api/v1/tasks");
         const tasks = res.tasks || [];
         if (doctorPrevIds.current.size > 0) {
-          const fresh = tasks.find(t => (t.status === "pending" || t.status === "in_progress") && !doctorPrevIds.current.has(t.id));
+          const fresh = tasks.find(t => t.status === "pending" && !doctorPrevIds.current.has(t.id) && !doctorShownIds.current.has(t.id));
           if (fresh && mounted) {
+            doctorShownIds.current.add(fresh.id);
             const name = `${fresh.patient?.firstName || "?"} ${fresh.patient?.lastName || ""}`.trim();
             setDoctorAlert({ id: fresh.id, name, type: fresh.type });
-            setTimeout(() => setDoctorAlert(prev => prev?.id === fresh.id ? null : prev), 60000);
+            setTimeout(() => setDoctorAlert(prev => prev?.id === fresh.id ? null : prev), 15000);
           }
         }
         doctorPrevIds.current = new Set(tasks.map(t => t.id));
       } catch {}
     };
-    check(); // initial load (silent — prevIds empty)
+    check();
     const iv = setInterval(check, 15000);
     return () => { mounted = false; clearInterval(iv); };
   }, [effectiveRole]);
