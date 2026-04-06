@@ -3516,7 +3516,16 @@ export const T = {
     "pay_amount": "Amount",
     "pay_currency": "Currency",
     "pay_send_now": "Send now",
-    "pay_stripe_pending": "Stripe Payment Link · Pending"
+    "pay_stripe_pending": "Stripe Payment Link · Pending",
+    "mfa_title": "Two-Factor Authentication",
+    "mfa_enable": "Enable 2FA",
+    "mfa_disable": "Disable 2FA",
+    "mfa_active": "2FA is active",
+    "mfa_enter_code": "Enter code from authenticator app",
+    "mfa_scan_secret": "Enter this code in your authenticator app",
+    "mfa_setup_complete": "2FA successfully enabled",
+    "mfa_description": "Add an extra layer of security to your account with two-factor authentication.",
+    "mfa_disabled_success": "2FA has been disabled"
   },
   "de": {
     "applications": "Bewerbungen",
@@ -7015,7 +7024,16 @@ export const T = {
     "pay_amount": "Betrag",
     "pay_currency": "Währung",
     "pay_send_now": "Jetzt senden",
-    "pay_stripe_pending": "Stripe Zahlungslink · Ausstehend"
+    "pay_stripe_pending": "Stripe Zahlungslink · Ausstehend",
+    "mfa_title": "Zwei-Faktor-Authentifizierung",
+    "mfa_enable": "2FA aktivieren",
+    "mfa_disable": "2FA deaktivieren",
+    "mfa_active": "2FA ist aktiv",
+    "mfa_enter_code": "Code aus Authenticator App eingeben",
+    "mfa_scan_secret": "Diesen Code in deiner Authenticator App eingeben",
+    "mfa_setup_complete": "2FA erfolgreich aktiviert",
+    "mfa_description": "Schuetze dein Konto mit einer zusaetzlichen Sicherheitsebene durch Zwei-Faktor-Authentifizierung.",
+    "mfa_disabled_success": "2FA wurde deaktiviert"
   },
   "tr": {
     "applications": "Başvurular",
@@ -10519,7 +10537,16 @@ export const T = {
     "pay_amount": "Tutar",
     "pay_currency": "Para Birimi",
     "pay_send_now": "Şimdi gönder",
-    "pay_stripe_pending": "Stripe Ödeme Bağlantısı · Beklemede"
+    "pay_stripe_pending": "Stripe Ödeme Bağlantısı · Beklemede",
+    "mfa_title": "İki Faktörlü Kimlik Doğrulama",
+    "mfa_enable": "2FA Etkinleştir",
+    "mfa_disable": "2FA Devre Dışı Bırak",
+    "mfa_active": "2FA aktif",
+    "mfa_enter_code": "Kimlik doğrulama uygulamasından kodu girin",
+    "mfa_scan_secret": "Bu kodu kimlik doğrulama uygulamanıza girin",
+    "mfa_setup_complete": "2FA başarıyla etkinleştirildi",
+    "mfa_description": "İki faktörlü kimlik doğrulama ile hesabınıza ekstra güvenlik katmanı ekleyin.",
+    "mfa_disabled_success": "2FA devre dışı bırakıldı"
   },
   "es": {
     "applications": "Solicitudes",

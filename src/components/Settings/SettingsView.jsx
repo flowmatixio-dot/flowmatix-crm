@@ -3,7 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { Section, Field, Toggle } from "../shared/index";
 import HintBox from "../shared/HintBox.jsx";
 import { ROLES, PERM_LABELS, MODULE_ACCESS } from "../../data/constants";
-import { getGoogleStatus, getGoogleConnectUrlSafe, disconnectGoogle, getAnalyticsConfig, updateAnalyticsConfig, disconnectAnalytics, updateClinicSettings, isAuthenticated, inviteTeamMember, removeTeamMember, updateTeamMember, fetchTeam, updatePassword } from "../../api/client";
+import { getGoogleStatus, getGoogleConnectUrlSafe, disconnectGoogle, getAnalyticsConfig, updateAnalyticsConfig, disconnectAnalytics, updateClinicSettings, isAuthenticated, inviteTeamMember, removeTeamMember, updateTeamMember, fetchTeam, updatePassword, setupMfa, verifyMfa, disableMfa, getMe } from "../../api/client";
 import WhatsAppSetup from "../SetupGuide/WhatsAppSetup";
 import BotProfile from "../SetupGuide/BotProfile";
 import FAQKnowledgeBase from "../SetupGuide/FAQKnowledgeBase";
@@ -82,7 +82,123 @@ function AccountSection({ t, showT, user }) {
         {saving ? t("saving") : t("change_password")}
       </button>
     </div>
+
+    <MfaSection t={t} showT={showT} />
   </>;
+}
+
+function MfaSection({ t, showT }) {
+  const [mfaEnabled, setMfaEnabled] = useState(null); // null = loading, true/false
+  const [step, setStep] = useState("idle"); // idle | setup | verify | disable
+  const [secret, setSecret] = useState("");
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getMe().then(u => {
+      setMfaEnabled(!!(u?.mfa_enabled));
+    }).catch(() => setMfaEnabled(false));
+  }, []);
+
+  const inp = { width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated, rgba(255,255,255,0.04))", border: "1px solid var(--border-strong, rgba(255,255,255,0.08))", color: "var(--text-primary, #e8eefc)", fontFamily: "'Plus Jakarta Sans', monospace", fontSize: 20, fontWeight: 800, letterSpacing: "0.3em", textAlign: "center", outline: "none", boxSizing: "border-box" };
+
+  const handleSetup = async () => {
+    setLoading(true); setError("");
+    try {
+      const res = await setupMfa();
+      setSecret(res.secret);
+      setStep("verify");
+    } catch (e) {
+      setError(e.message || "Error");
+    }
+    setLoading(false);
+  };
+
+  const handleVerify = async () => {
+    if (code.length !== 6) return;
+    setLoading(true); setError("");
+    try {
+      await verifyMfa(code);
+      setMfaEnabled(true);
+      setStep("idle");
+      setSecret("");
+      setCode("");
+      showT(t("mfa_setup_complete"));
+    } catch (e) {
+      setError(e.message || "Invalid code");
+    }
+    setLoading(false);
+  };
+
+  const handleDisable = async () => {
+    if (code.length !== 6) return;
+    setLoading(true); setError("");
+    try {
+      await disableMfa(code);
+      setMfaEnabled(false);
+      setStep("idle");
+      setCode("");
+      showT(t("mfa_disabled_success") || "2FA disabled");
+    } catch (e) {
+      setError(e.message || "Invalid code");
+    }
+    setLoading(false);
+  };
+
+  if (mfaEnabled === null) return null; // still loading
+
+  return <div style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 20 }}>
+    <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+      <span style={{ fontSize: 16 }}>🔐</span>
+      {t("mfa_title")}
+    </div>
+
+    {/* ── MFA is active ── */}
+    {mfaEnabled && step === "idle" && <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
+        <span style={{ color: "#10b981", fontWeight: 700, fontSize: 14 }}>&#10003;</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#10b981" }}>{t("mfa_active")}</span>
+      </div>
+      <button onClick={() => { setStep("disable"); setCode(""); setError(""); }} style={{ padding: "8px 20px", borderRadius: 10, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "#ef4444", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{t("mfa_disable")}</button>
+    </div>}
+
+    {/* ── MFA not enabled ── */}
+    {!mfaEnabled && step === "idle" && <div>
+      <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)", marginBottom: 14 }}>{t("mfa_description") || t("mfa_enter_code")}</div>
+      <button onClick={handleSetup} disabled={loading} style={{ padding: "10px 24px", borderRadius: 10, background: loading ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg,rgba(76,201,255,.12),rgba(45,168,255,.08))", border: "1px solid rgba(76,201,255,0.2)", color: loading ? "rgba(167,177,195,0.7)" : "#4cc9ff", fontWeight: 700, fontSize: 13, cursor: loading ? "default" : "pointer", fontFamily: "inherit" }}>{loading ? "..." : t("mfa_enable")}</button>
+    </div>}
+
+    {/* ── Setup step: show secret + verify ── */}
+    {step === "verify" && <div>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("mfa_scan_secret")}</div>
+        <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", fontFamily: "monospace", fontSize: 15, fontWeight: 700, color: "#4cc9ff", letterSpacing: "0.12em", wordBreak: "break-all", userSelect: "all", cursor: "text" }}>{secret}</div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", display: "block", marginBottom: 4 }}>{t("mfa_enter_code")}</label>
+        <input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" maxLength={6} inputMode="numeric" autoComplete="one-time-code" onKeyDown={e => e.key === "Enter" && handleVerify()} autoFocus style={inp} />
+      </div>
+      {error && <div style={{ fontSize: 13, color: "#ef4444", marginBottom: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>{error}</div>}
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={handleVerify} disabled={loading || code.length !== 6} style={{ padding: "8px 20px", borderRadius: 10, background: code.length === 6 ? "linear-gradient(135deg,#10b981,#059669)" : "rgba(255,255,255,0.06)", border: "none", color: code.length === 6 ? "#fff" : "rgba(167,177,195,0.7)", fontWeight: 700, fontSize: 13, cursor: code.length === 6 ? "pointer" : "default", fontFamily: "inherit", boxShadow: code.length === 6 ? "0 4px 12px rgba(16,185,129,0.3)" : "none" }}>{loading ? "..." : t("mfa_enable")}</button>
+        <button onClick={() => { setStep("idle"); setSecret(""); setCode(""); setError(""); }} style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{t("cancel") || "Cancel"}</button>
+      </div>
+    </div>}
+
+    {/* ── Disable step: enter code to confirm ── */}
+    {step === "disable" && <div>
+      <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)", marginBottom: 12 }}>{t("mfa_enter_code")}</div>
+      <div style={{ marginBottom: 12 }}>
+        <input value={code} onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" maxLength={6} inputMode="numeric" autoComplete="one-time-code" onKeyDown={e => e.key === "Enter" && handleDisable()} autoFocus style={inp} />
+      </div>
+      {error && <div style={{ fontSize: 13, color: "#ef4444", marginBottom: 12, padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>{error}</div>}
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={handleDisable} disabled={loading || code.length !== 6} style={{ padding: "8px 20px", borderRadius: 10, background: code.length === 6 ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)", border: code.length === 6 ? "1px solid rgba(239,68,68,0.3)" : "none", color: code.length === 6 ? "#ef4444" : "rgba(167,177,195,0.7)", fontWeight: 700, fontSize: 13, cursor: code.length === 6 ? "pointer" : "default", fontFamily: "inherit" }}>{loading ? "..." : t("mfa_disable")}</button>
+        <button onClick={() => { setStep("idle"); setCode(""); setError(""); }} style={{ padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{t("cancel") || "Cancel"}</button>
+      </div>
+    </div>}
+  </div>;
 }
 
 function IntegrationsSection({ t, clinic, showT }) {

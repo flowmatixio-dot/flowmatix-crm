@@ -16,6 +16,7 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     loginEmail, setLoginEmail, loginPass, setLoginPass,
     loginErr, setLoginErr, loginMode, setLoginMode,
     showPass, setShowPass, loginLang, setLoginLang,
+    mfaToken, setMfaToken, mfaCode, setMfaCode,
     authCallbackMode, setAuthCallbackMode,
     authCallbackErr, setAuthCallbackErr,
     newPassword, setNewPassword, confirmPassword, setConfirmPassword,
@@ -202,10 +203,54 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     return () => clearInterval(timer);
   }, [user]);
 
+  const handleMfaLogin = async () => {
+    if (!mfaCode || mfaCode.length !== 6) { setLoginErr("Enter a valid 6-digit code"); return; }
+    setLoginErr(""); setAuthLoading(true);
+    try {
+      const res = await fmApi.loginMfa(mfaToken, mfaCode);
+      if (res?.user) {
+        const u = res.user;
+        const isOp = u.role === "platform_owner" || u.role === "admin";
+        const orgId = (IS_CLIENT_MODE || !isOp) ? (u.organizationId || null) : null;
+        setUser({ email: u.email, role: u.role, clinicId: orgId, name: u.name || u.email.split("@")[0], apiUser: true, apiRole: u.role, orgId: u.organizationId });
+        setMfaToken(null); setMfaCode(""); setLoginMode("password");
+        if (isOp && !IS_CLIENT_MODE) setView("operator");
+        if (orgId) {
+          try {
+            const cRes = await fmApi.getMyClinic();
+            if (cRes?.clinic) {
+              const cd = cRes.clinic;
+              const c = { ...cd, plan: cd.plan || "core", status: cd.status || "active", type: cd.type, setupStatus: (cd.onboarding_completed || cd.onboarded_at) ? "live" : (cd.setup_status || "new"), onboarded: cd.onboarded_at, lastLogin: new Date().toISOString(), stats: cd.stats || { leadsMonth: 0, bookingsMonth: 0, convRate: 0, aiHandled: 0, activeConvs: 0, avgResponse: "—" }, notifications: [], billing: cd.billing || null, cancelled_at: cd.cancelled_at || null, clinicEmail: cd.clinicEmail || cd.email, drivers: cd.drivers || [], logisticsConfig: cd.logisticsConfig || {} };
+              setClinics(prev => { const exists = prev.find(x => x.id === c.id); return exists ? prev.map(x => x.id === c.id ? { ...x, ...c } : x) : [...prev, c]; });
+              setAdminClinic(orgId);
+              try {
+                const aRes2 = await fmApi.getAutomations();
+                if (aRes2?.automations?.length) {
+                  setClinics(prev => prev.map(cx => cx.id === orgId ? { ...cx, automations: aRes2.automations.map(a => ({ id: a.id, name: a.name, type: a.type, trigger: a.trigger, action: a.action, active: a.active !== false, runs: a.runs || 0, lastRun: a.lastRun || null, locked: a.locked || false, min_plan: a.min_plan || "core", n8n_synced: a.n8n_synced || false, n8n_workflow_id: a.n8n_workflow_id || null })) } : cx));
+                }
+              } catch (e) {}
+            }
+          } catch (e) {}
+        }
+        setLang(loginLang); setAuthLoading(false); return;
+      }
+    } catch (e) {
+      setLoginErr(e.message || "Invalid 2FA code");
+    }
+    setAuthLoading(false);
+  };
+
   const handleLogin = async () => {
     setLoginErr(""); setAuthLoading(true);
     try {
       const res = await fmApi.login(loginEmail, loginPass);
+      // MFA required — switch to MFA code entry
+      if (res?.requiresMfa && res?.mfaToken) {
+        setMfaToken(res.mfaToken);
+        setLoginMode("mfa");
+        setAuthLoading(false);
+        return;
+      }
       if (res?.user) {
         const u = res.user;
         const isOp = u.role === "platform_owner" || u.role === "admin";
@@ -302,11 +347,12 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     loginEmail, setLoginEmail, loginPass, setLoginPass,
     loginErr, setLoginErr, loginMode, setLoginMode,
     showPass, setShowPass, loginLang, setLoginLang,
+    mfaToken, setMfaToken, mfaCode, setMfaCode,
     authCallbackMode, setAuthCallbackMode,
     authCallbackErr, setAuthCallbackErr,
     newPassword, setNewPassword, confirmPassword, setConfirmPassword,
     resetEmail, setResetEmail, showResetForm, setShowResetForm,
-    handleLogin, handleMagicLink, handleForgotPw, handleSetPassword,
+    handleLogin, handleMfaLogin, handleMagicLink, handleForgotPw, handleSetPassword,
     handlePasswordReset, handleLogout,
   };
 }

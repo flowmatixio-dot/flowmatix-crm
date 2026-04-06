@@ -12,8 +12,10 @@ export const useAuthStore = create((set, get) => ({
   loginEmail: '',
   loginPass: '',
   loginErr: '',
-  loginMode: 'password', // password | magic | forgot | sent
+  loginMode: 'password', // password | magic | forgot | sent | mfa
   showPass: false,
+  mfaToken: null,
+  mfaCode: '',
   loginLang: (() => {
     try {
       const p = new URLSearchParams(window.location.search).get('lang');
@@ -42,6 +44,8 @@ export const useAuthStore = create((set, get) => ({
   setLoginErr: (loginErr) => set({ loginErr }),
   setLoginMode: (loginMode) => set({ loginMode }),
   setShowPass: (showPass) => set({ showPass }),
+  setMfaToken: (mfaToken) => set({ mfaToken }),
+  setMfaCode: (mfaCode) => set({ mfaCode }),
   setLoginLang: (loginLang) => set({ loginLang }),
   setAuthCallbackMode: (authCallbackMode) => set({ authCallbackMode }),
   setAuthCallbackErr: (authCallbackErr) => set({ authCallbackErr }),

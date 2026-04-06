@@ -171,6 +171,38 @@ export async function login(email, password) {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
+  // MFA required — don't set tokens yet, caller handles MFA flow
+  if (data.requiresMfa) return data;
+  setTokens(data.accessToken, data.refreshToken);
+  sessionStorage.setItem('fm_api_user', JSON.stringify(data.user));
+  return data;
+}
+
+// ── MFA ──────────────────────────────────────────────────
+
+export async function setupMfa() {
+  return apiFetch('/api/v1/auth/mfa/setup', { method: 'POST', body: '{}' });
+}
+
+export async function verifyMfa(code) {
+  return apiFetch('/api/v1/auth/mfa/verify', {
+    method: 'POST',
+    body: JSON.stringify({ totpCode: code }),
+  });
+}
+
+export async function disableMfa(code) {
+  return apiFetch('/api/v1/auth/mfa/disable', {
+    method: 'POST',
+    body: JSON.stringify({ totpCode: code }),
+  });
+}
+
+export async function loginMfa(mfaToken, code) {
+  const data = await apiFetch('/api/v1/auth/mfa/login', {
+    method: 'POST',
+    body: JSON.stringify({ mfaToken, totpCode: code }),
+  });
   setTokens(data.accessToken, data.refreshToken);
   sessionStorage.setItem('fm_api_user', JSON.stringify(data.user));
   return data;

@@ -9,9 +9,10 @@ export default function LoginScreen({
   authLoading, newPassword, setNewPassword, confirmPassword, setConfirmPassword,
   handleSetPassword,
   loginEmail, setLoginEmail, loginPass, setLoginPass,
-  loginErr, loginMode, setLoginMode, showPass, setShowPass,
+  loginErr, setLoginErr, loginMode, setLoginMode, showPass, setShowPass,
   loginLang, setLoginLang,
   handleLogin, handleMagicLink, handleForgotPw,
+  mfaCode, setMfaCode, handleMfaLogin,
 }) {
   const tl = (key) => (T[loginLang] || T.en)[key] || T.en[key] || key;
 
@@ -82,6 +83,22 @@ export default function LoginScreen({
           <div style={{ padding: 14, borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", marginBottom: 14, fontSize: 13, color: "rgba(167,177,195,0.6)" }}>{tl("magic_link_instructions")}</div>
           <div style={{ padding: 10, borderRadius: 10, background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.12)", marginBottom: 20, fontSize: 12, color: "rgba(251,191,36,0.7)" }}>💡 {tl("magic_link_device_hint")}</div>
           <button onClick={() => { setLoginMode("password"); setLoginErr(""); }} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>
+        </div> : loginMode === "mfa" ? <div>
+          {/* ═══ MODE: MFA — Enter 2FA code ═══ */}
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: 44, marginBottom: 12 }}>🔐</div>
+            <div style={{ fontWeight: 800, fontSize: 20, marginBottom: 6, color: "#fff" }}>{tl("mfa_title")}</div>
+            <div style={{ fontSize: 14, color: "rgba(167,177,195,0.6)" }}>{tl("mfa_enter_code")}</div>
+          </div>
+          {loginErr && <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 15 }}>⚠</span><span style={{ color: "#ef4444", fontSize: 13, fontWeight: 600 }}>{loginErr}</span></div>}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(76,201,255,0.6)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>2FA CODE</div>
+            <input value={mfaCode || ""} onChange={e => { const v = e.target.value.replace(/\D/g, "").slice(0, 6); setMfaCode(v); }} placeholder="000000" onKeyDown={e => e.key === "Enter" && handleMfaLogin()} maxLength={6} inputMode="numeric" autoComplete="one-time-code" autoFocus style={{ width: "100%", padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(76,201,255,0.15)", color: "#fff", fontFamily: "'Plus Jakarta Sans', monospace", fontSize: 24, fontWeight: 800, letterSpacing: "0.3em", textAlign: "center", outline: "none", boxSizing: "border-box" }} />
+          </div>
+          <button onClick={handleMfaLogin} disabled={authLoading || (mfaCode || "").length !== 6} style={{ width: "100%", padding: 16, borderRadius: 14, background: (mfaCode || "").length === 6 ? "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))" : "rgba(255,255,255,0.04)", border: (mfaCode || "").length === 6 ? "1px solid rgba(76,201,255,.3)" : "1px solid rgba(255,255,255,0.08)", color: (mfaCode || "").length === 6 ? "#fff" : "rgba(167,177,195,0.5)", fontWeight: 700, fontSize: 16, cursor: (mfaCode || "").length === 6 ? "pointer" : "default", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all .2s" }}>{authLoading ? tl("signing_in") : tl("sign_in")} {!authLoading && <span style={{ fontSize: 18 }}>→</span>}</button>
+          <div style={{ textAlign: "center", marginTop: 14 }}>
+            <button onClick={() => { setLoginMode("password"); setMfaCode(""); setLoginErr(""); }} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>
+          </div>
         </div> : <>
 
         {/* ═══ HEADER ═══ */}
