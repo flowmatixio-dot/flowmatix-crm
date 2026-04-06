@@ -468,10 +468,10 @@ export async function impersonateClinic(orgId, reason) {
   });
 }
 
-export async function generateTrialLink(orgId, plan = 'core') {
+export async function generateTrialLink(orgId) {
   return apiFetch('/api/v1/billing/trial-link', {
     method: 'POST',
-    body: JSON.stringify({ orgId, plan }),
+    body: JSON.stringify({ orgId }),
   });
 }
 

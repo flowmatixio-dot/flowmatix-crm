@@ -12,6 +12,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const [showWaModal, setShowWaModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [trialLinks, setTrialLinks] = useState(null);
 
   const orgId = clinic?.id || clinic?.org_id;
 
@@ -59,14 +60,11 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
         }
       }
       else if (action === 'trial') {
-        const plan = prompt('Plan (core / pro / operations):') || 'core';
-        if (['core','pro','operations'].includes(plan)) {
-          const res = await fmApi.generateTrialLink(orgId, plan);
-          if (res?.url) {
-            await navigator.clipboard.writeText(res.url);
-            flash(`Trial-Link (${plan}) kopiert! Gültig 24h.`);
-          } else flash('Fehler beim Generieren', 'err');
-        }
+        const res = await fmApi.generateTrialLink(orgId);
+        if (res?.links) {
+          setTrialLinks(res.links);
+        } else flash('Fehler beim Generieren', 'err');
+        return;
       }
       loadDetail();
       onRefresh?.();
@@ -97,6 +95,28 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
 
   return (
     <div>
+      {/* Trial Links Modal */}
+      {trialLinks && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => setTrialLinks(null)}>
+          <div style={{ background: '#1a1f2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 460, boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>🎁 Trial-Links</div>
+            <div style={{ fontSize: 12, color: '#8D93A6', marginBottom: 20 }}>30 Tage kostenlos · dann Setup-Gebühr + Abo · Kreditkarte jetzt hinterlegen</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              {trialLinks.map(l => (
+                <div key={l.plan} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{l.plan.charAt(0).toUpperCase() + l.plan.slice(1)} — bis {l.patientLimit} Patienten</div>
+                    <div style={{ fontSize: 11, color: '#10b981', fontFamily: 'monospace' }}>{l.shortUrl}</div>
+                  </div>
+                  <button onClick={() => { navigator.clipboard.writeText(l.shortUrl); }} style={{ padding: '6px 12px', borderRadius: 7, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>Kopieren</button>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 10, color: '#8D93A6', marginBottom: 16 }}>Links gültig 24h. Kreditkarte wird sofort hinterlegt, Abbuchung erst nach 30 Tagen.</div>
+            <button onClick={() => setTrialLinks(null)} style={{ width: '100%', padding: '8px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#8D93A6', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Schließen</button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
         <button onClick={onClose} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
