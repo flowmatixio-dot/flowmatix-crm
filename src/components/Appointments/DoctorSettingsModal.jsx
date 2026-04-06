@@ -22,13 +22,14 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
 
   const [workingHours, setWorkingHours] = useState(() => {
     const hours = {};
+    const hasExplicitHours = docWorkingHours && Object.keys(docWorkingHours).length > 0;
     DAYS_KEYS.forEach((d) => {
       const existing = docWorkingHours?.[d];
       if (existing) {
         hours[d] = { start: existing.start || existing.from || "09:00", end: existing.end || existing.to || "18:00", enabled: true };
       } else {
-        // If work_days array exists, use it to determine enabled days
-        const enabledByWorkDays = Array.isArray(docWorkDays) ? docWorkDays.includes(d) : (d !== "sat" && d !== "sun");
+        // Only fall back to work_days if working_hours has never been configured
+        const enabledByWorkDays = !hasExplicitHours && (Array.isArray(docWorkDays) ? docWorkDays.includes(d) : (d !== "sat" && d !== "sun"));
         hours[d] = { start: "09:00", end: "18:00", enabled: enabledByWorkDays };
       }
     });
