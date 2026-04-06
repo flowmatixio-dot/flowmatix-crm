@@ -178,8 +178,9 @@ function MfaSection({ t, showT }) {
     {step === "verify" && <div>
       {qrUrl && <div style={{ textAlign: "center", marginBottom: 16 }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("mfa_scan_qr") || "Scan with Authenticator App"}</div>
-        <div style={{ display: "inline-block", padding: 12, borderRadius: 12, background: "#fff" }}>
+        <div style={{ display: "inline-block", padding: 12, borderRadius: 12, background: "#fff", position: "relative" }}>
           <img src={qrUrl} alt="2FA QR Code" width={180} height={180} style={{ display: "block" }} />
+          <img src="/Flowmatix-Logo-Round.png" alt="" width={36} height={36} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", borderRadius: "50%", background: "#fff", padding: 2 }} />
         </div>
       </div>}
       <div style={{ marginBottom: 16 }}>
