@@ -58,6 +58,16 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
           }
         }
       }
+      else if (action === 'trial') {
+        const plan = prompt('Plan (core / pro / operations):') || 'core';
+        if (['core','pro','operations'].includes(plan)) {
+          const res = await fmApi.generateTrialLink(orgId, plan);
+          if (res?.url) {
+            await navigator.clipboard.writeText(res.url);
+            flash(`Trial-Link (${plan}) kopiert! Gültig 24h.`);
+          } else flash('Fehler beim Generieren', 'err');
+        }
+      }
       loadDetail();
       onRefresh?.();
     } catch (err) { flash(safeStr(err?.message, 'Action failed'), 'err'); }
@@ -225,6 +235,10 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
         <div style={card}>
           <h3 style={sectionTitle}>Actions</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button onClick={() => handleAction('trial')} disabled={actionLoading === 'trial'}
+              style={{ ...bigBtn('#10b981'), opacity: actionLoading === 'trial' ? 0.6 : 1 }}>
+              🎁 Trial-Link generieren
+            </button>
             <button onClick={() => handleAction('impersonate')} disabled={actionLoading === 'impersonate'}
               style={{ ...bigBtn('#c4a6ff'), opacity: actionLoading === 'impersonate' ? 0.6 : 1 }}>
               Impersonate Clinic
