@@ -55,10 +55,6 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
     duration_4500_plus: doctor.duration_4500_plus || 10,
   });
 
-  const [fixedDays, setFixedDays] = useState(
-    (Array.isArray(docWorkDays) ? docWorkDays : null) || ["mon", "tue", "wed", "thu", "fri"]
-  );
-
   const [autoReview, setAutoReview] = useState(docAutoReview);
   const [maxReviewsPerDay, setMaxReviewsPerDay] = useState(docMaxReviews);
 
@@ -85,12 +81,6 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
     );
   };
 
-  const toggleFixedDay = (day) => {
-    setFixedDays((prev) =>
-      prev.includes(day) ? prev.filter((x) => x !== day) : [...prev, day]
-    );
-  };
-
   const addVacation = () => {
     if (newVacStart && newVacEnd) {
       setVacations((prev) => [...prev, { start: newVacStart, end: newVacEnd }]);
@@ -110,7 +100,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
       capacity,
       treatments,
       rooms,
-      fixedWorkDays: fixedDays,
+      fixedWorkDays: Object.entries(workingHours).filter(([_, v]) => v?.enabled).map(([d]) => d),
       autoReview,
       maxReviewsPerDay,
       vacations,
@@ -236,30 +226,6 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
           })}
         </div>
 
-
-        {/* Fixed work days */}
-        <SectionTitle>{t("doc_fixed_workdays") || "Feste Arbeitstage"}</SectionTitle>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
-          {DAYS_KEYS.map((day, i) => {
-            const active = fixedDays.includes(day);
-            return (
-              <button
-                key={day}
-                onClick={() => toggleFixedDay(day)}
-                style={{
-                  width: 40, height: 36, borderRadius: 8, fontSize: 11, fontWeight: 700,
-                  cursor: "pointer", fontFamily: "inherit", outline: "none",
-                  border: `1px solid ${active ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.06)"}`,
-                  background: active ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.02)",
-                  color: active ? "#10b981" : "rgba(167,177,195,0.7)",
-                  transition: "all .15s",
-                }}
-              >
-                {(t(DAY_I18N[i]) || DAYS_FALLBACK[i]).slice(0, 2)}
-              </button>
-            );
-          })}
-        </div>
 
         {/* Auto-Review toggle */}
         <SectionTitle>{(t && t("auto_review")) || "Auto-Bewertung"}</SectionTitle>
