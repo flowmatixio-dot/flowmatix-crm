@@ -103,11 +103,16 @@ function MfaSection({ t, showT }) {
 
   const inp = { width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated, rgba(255,255,255,0.04))", border: "1px solid var(--border-strong, rgba(255,255,255,0.08))", color: "var(--text-primary, #e8eefc)", fontFamily: "'Plus Jakarta Sans', monospace", fontSize: 20, fontWeight: 800, letterSpacing: "0.3em", textAlign: "center", outline: "none", boxSizing: "border-box" };
 
+  const [qrUrl, setQrUrl] = useState("");
+
   const handleSetup = async () => {
     setLoading(true); setError("");
     try {
       const res = await setupMfa();
       setSecret(res.secret);
+      if (res.otpauthUri) {
+        setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(res.otpauthUri)}&bgcolor=0f1623&color=e8eefc`);
+      }
       setStep("verify");
     } catch (e) {
       setError(e.message || "Error");
@@ -171,6 +176,12 @@ function MfaSection({ t, showT }) {
 
     {/* ── Setup step: show secret + verify ── */}
     {step === "verify" && <div>
+      {qrUrl && <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("mfa_scan_qr") || "Scan with Authenticator App"}</div>
+        <div style={{ display: "inline-block", padding: 12, borderRadius: 12, background: "#fff" }}>
+          <img src={qrUrl} alt="2FA QR Code" width={180} height={180} style={{ display: "block" }} />
+        </div>
+      </div>}
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 8 }}>{t("mfa_scan_secret")}</div>
         <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", fontFamily: "monospace", fontSize: 15, fontWeight: 700, color: "#4cc9ff", letterSpacing: "0.12em", wordBreak: "break-all", userSelect: "all", cursor: "text" }}>{secret}</div>

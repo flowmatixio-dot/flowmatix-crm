@@ -3522,7 +3522,8 @@ export const T = {
     "mfa_disable": "Disable 2FA",
     "mfa_active": "2FA is active",
     "mfa_enter_code": "Enter code from authenticator app",
-    "mfa_scan_secret": "Enter this code in your authenticator app",
+    "mfa_scan_qr": "Scan with your Authenticator App",
+    "mfa_scan_secret": "Or enter this code manually",
     "mfa_setup_complete": "2FA successfully enabled",
     "mfa_description": "Add an extra layer of security to your account with two-factor authentication.",
     "mfa_disabled_success": "2FA has been disabled"
@@ -7030,7 +7031,8 @@ export const T = {
     "mfa_disable": "2FA deaktivieren",
     "mfa_active": "2FA ist aktiv",
     "mfa_enter_code": "Code aus Authenticator App eingeben",
-    "mfa_scan_secret": "Diesen Code in deiner Authenticator App eingeben",
+    "mfa_scan_qr": "Mit deiner Authenticator App scannen",
+    "mfa_scan_secret": "Oder Code manuell eingeben",
     "mfa_setup_complete": "2FA erfolgreich aktiviert",
     "mfa_description": "Schuetze dein Konto mit einer zusaetzlichen Sicherheitsebene durch Zwei-Faktor-Authentifizierung.",
     "mfa_disabled_success": "2FA wurde deaktiviert"
@@ -10543,7 +10545,8 @@ export const T = {
     "mfa_disable": "2FA Devre Dışı Bırak",
     "mfa_active": "2FA aktif",
     "mfa_enter_code": "Kimlik doğrulama uygulamasından kodu girin",
-    "mfa_scan_secret": "Bu kodu kimlik doğrulama uygulamanıza girin",
+    "mfa_scan_qr": "Kimlik doğrulama uygulamanızla tarayın",
+    "mfa_scan_secret": "Veya kodu manuel olarak girin",
     "mfa_setup_complete": "2FA başarıyla etkinleştirildi",
     "mfa_description": "İki faktörlü kimlik doğrulama ile hesabınıza ekstra güvenlik katmanı ekleyin.",
     "mfa_disabled_success": "2FA devre dışı bırakıldı"
