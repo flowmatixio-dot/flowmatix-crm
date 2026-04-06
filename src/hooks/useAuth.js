@@ -136,6 +136,19 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       fmApi.setTokens(token, token);
       sessionStorage.setItem('fm_impersonation', 'true');
       sessionStorage.setItem('fm_login_at', String(Date.now()));
+      // Save impersonation info for banner before clearing hash
+      const rawHash = window.location.hash;
+      if (rawHash.startsWith('#impersonate=')) {
+        try {
+          const decoded = atob(rawHash.replace('#impersonate=', ''));
+          const p = new URLSearchParams(decoded);
+          sessionStorage.setItem('fm_impersonation_info', JSON.stringify({
+            user: p.get('user'),
+            org: p.get('org'),
+            reason: decodeURIComponent(p.get('reason') || ''),
+          }));
+        } catch {}
+      }
       // Clean URL
       window.history.replaceState(null, '', window.location.pathname);
     }

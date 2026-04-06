@@ -669,11 +669,9 @@ export default function MainLayout() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
         {/* ═══ IMPERSONATION BANNER ═══ */}
         {(() => {
-          const hash = window.location.hash;
-          if (!hash.startsWith('#impersonate=')) return null;
+          if (sessionStorage.getItem('fm_impersonation') !== 'true') return null;
           let info = {};
-          try { const decoded = atob(hash.replace('#impersonate=', '')); const p = new URLSearchParams(decoded); info = { user: p.get('user'), org: p.get('org'), operator: p.get('operator') === 'true', reason: decodeURIComponent(p.get('reason') || '') }; } catch { return null; }
-          if (!info.operator) return null;
+          try { info = JSON.parse(sessionStorage.getItem('fm_impersonation_info') || '{}'); } catch {}
           return (
             <div style={{ background: "linear-gradient(90deg, #ff8a2a, #ef4444)", padding: "8px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 200 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
