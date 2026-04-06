@@ -875,7 +875,7 @@ export default function MainLayout() {
                   </div>
                 </div>
                 <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, textDecoration: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.25)", transition: "transform 0.15s, box-shadow 0.15s" }}>
-                  WhatsApp öffnen →
+                  {t("lt_open_wa") || "WhatsApp öffnen"} →
                 </a>
                 <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
                   {t("lt_scan_and_send") || "QR-Code scannen und den Code absenden — Ihr Bot antwortet sofort."}
@@ -883,7 +883,7 @@ export default function MainLayout() {
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {ti.session.messagesCount}/50 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
+                    {ti.session.messagesCount}/{ti.limits?.maxMessages || 50} {t("messages") || "Nachrichten"}{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
                   </div>
                 )}
               </div>
