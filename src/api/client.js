@@ -36,6 +36,8 @@ export function getAccessToken() {
 export function authPhotoUrl(url) {
   if (!url || !accessToken) return url;
   if (!url.includes('/crm/photos/') && !url.includes('api.flowmatix.io')) return url;
+  // If URL is already signed by backend, don't append JWT
+  if (url.includes('sig=') && url.includes('exp=')) return url;
   return url + (url.includes('?') ? '&' : '?') + 'token=' + accessToken;
 }
 
