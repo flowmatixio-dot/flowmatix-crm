@@ -108,17 +108,16 @@ export default function MainLayout() {
   };
   const [showTrialReviewPopup, setShowTrialReviewPopup] = React.useState(false);
   const [trialReviewPatient, setTrialReviewPatient] = React.useState(null);
-  const trialReviewShownRef = React.useRef(false);
+  const trialReviewShownIds = React.useRef(new Set());
 
-  // Trial popup: show when real patient is in needs_medical_review (opens for each NEW patient)
-  // Uses localStorage to persist across login/logout/mode-switch
+  // Trial popup: show once per patient when they reach needs_medical_review
   React.useEffect(() => {
     if (!['live_test', 'activation_pending'].includes(ctx.workspaceState)) return;
     if (showTrialReviewPopup) return;
-    const realReview = myLeads.find(l => l.is_demo !== true && l.isDemo !== true && !l.demo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3));
+    const realReview = myLeads.find(l => l.is_demo !== true && l.isDemo !== true && !l.demo && l.convStatus === 'needs_medical_review' && (l.photos || (l.photoUrls || []).length >= 3 || l.photosReceived >= 3) && !trialReviewShownIds.current.has(l.id));
     if (realReview) {
       setTimeout(() => {
-        trialReviewShownRef.current = realReview.id;
+        trialReviewShownIds.current.add(realReview.id);
         setTrialReviewPatient(realReview);
         setShowTrialReviewPopup(true);
       }, 10000);
