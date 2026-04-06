@@ -861,7 +861,8 @@ export default function MainLayout() {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
           const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
+          const clinicCode = (activeClinicId || '').substring(0, 8).toUpperCase();
+          const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${clinicCode}`;
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
             <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
