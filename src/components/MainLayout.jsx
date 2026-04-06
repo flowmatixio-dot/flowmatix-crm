@@ -878,12 +878,12 @@ export default function MainLayout() {
                   WhatsApp öffnen →
                 </a>
                 <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
-                  {t("lt_use_registered_phone") || "Nutze die Nummer, mit der du dich registriert hast."}
+                  {t("lt_scan_and_send") || "QR-Code scannen und den Code absenden — Ihr Bot antwortet sofort."}
                 </div>
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {ti.session.messagesCount}/10 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
+                    {ti.session.messagesCount}/50 Nachrichten{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
                   </div>
                 )}
               </div>
