@@ -287,26 +287,24 @@ export default function AppointmentsPage() {
     if (props.type !== "appointment") return;
     const rect = info.el.getBoundingClientRect();
     clearTimeout(tooltipTimeout.current);
-    tooltipTimeout.current = setTimeout(() => {
-      setTooltip({
-        x: rect.left + rect.width / 2,
-        y: rect.top - 8,
-        appt: props.appt,
-        doctorName: props.doctorName,
-        doctorColor: props.doctorColor,
-        treatmentColor: props.treatmentColor,
-        grafts: props.grafts,
-        room: props.room,
-        time: props.time,
-        endTime: props.endTime,
-        status: props.status,
-      });
-    }, 300);
+    setTooltip({
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8,
+      appt: props.appt,
+      doctorName: props.doctorName,
+      doctorColor: props.doctorColor,
+      treatmentColor: props.treatmentColor,
+      grafts: props.grafts,
+      room: props.room,
+      time: props.time,
+      endTime: props.endTime,
+      status: props.status,
+    });
   }, []);
 
   const handleEventMouseLeave = useCallback(() => {
     clearTimeout(tooltipTimeout.current);
-    tooltipTimeout.current = setTimeout(() => setTooltip(null), 300);
+    tooltipTimeout.current = setTimeout(() => setTooltip(null), 500);
   }, []);
 
   const handleConfirm = useCallback((id) => {
@@ -1025,7 +1023,7 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
   const graftFormatted = grafts ? Number(grafts).toLocaleString("de-DE") : null;
 
   return (
-    <div onMouseEnter={() => clearTimeout(tooltipTimeout?.current)} onMouseLeave={() => { if (tooltipTimeout?.current !== undefined) { tooltipTimeout.current = setTimeout(() => setTooltip?.(null), 300); }}} style={{
+    <div onMouseEnter={() => clearTimeout(tooltipTimeout?.current)} onMouseLeave={() => { tooltipTimeout.current = setTimeout(() => setTooltip?.(null), 500); }} style={{
       position: "fixed", left: x, top: adjustedY, transform,
       background: "#111827",
       border: "1px solid rgba(255,255,255,0.08)",
