@@ -1798,6 +1798,10 @@ function TabClinics({ d, load, setTab }) {
   const [impersonateTarget, setImpersonateTarget] = useState(null); // { id, name }
   const [impersonateReason, setImpersonateReason] = useState('');
   const [impersonateLoading, setImpersonateLoading] = useState(false);
+  const [trialTarget, setTrialTarget] = useState(null); // { id, name }
+  const [trialPlan, setTrialPlan] = useState('core');
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialUrl, setTrialUrl] = useState('');
   const [pauseTarget, setPauseTarget] = useState(null); // { id, name, action: 'suspend'|'resume' }
   const [pauseLoading, setPauseLoading] = useState(false);
   const clinics = d.clinics;
@@ -1838,6 +1842,11 @@ function TabClinics({ d, load, setTab }) {
         setImpersonateTarget({ id: orgId, name: orgName });
         setImpersonateReason('');
         return; // don't refresh yet
+      } else if (action === 'trial') {
+        setTrialTarget({ id: orgId, name: orgName });
+        setTrialPlan('core');
+        setTrialUrl('');
+        return;
       } else if (action === 'regen') {
         const res = await api.regenOnboardingLink(orgId);
         setActionMsg({ type: 'ok', text: `New onboarding link: ${res.invitation?.link}` });
@@ -2020,6 +2029,46 @@ function TabClinics({ d, load, setTab }) {
         </div>
       )}
 
+      {/* ═══ TRIAL LINK MODAL ═══ */}
+      {trialTarget && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => { setTrialTarget(null); setTrialUrl(''); }}>
+          <div style={{ background: '#1a1f2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 420, boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>🎁 Trial-Link generieren</div>
+            <div style={{ fontSize: 12, color: '#8D93A6', marginBottom: 20 }}>{trialTarget.name} — 30 Tage kostenlos, keine Setup-Gebühr</div>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#8D93A6', marginBottom: 6 }}>PLAN</div>
+              <select value={trialPlan} onChange={e => setTrialPlan(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, background: '#111827', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, fontFamily: 'inherit' }}>
+                <option value="core">Core — €690/mo</option>
+                <option value="pro">Pro — €990/mo</option>
+                <option value="operations">Operations — €1.490/mo</option>
+              </select>
+            </div>
+            {trialUrl ? (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#10b981', marginBottom: 6 }}>✓ LINK GENERIERT — KOPIEREN & TEILEN</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input readOnly value={trialUrl} style={{ flex: 1, padding: '8px 10px', borderRadius: 8, background: '#111827', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 11, fontFamily: 'monospace' }} onClick={e => e.target.select()} />
+                  <button onClick={() => { navigator.clipboard.writeText(trialUrl); }} style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Kopieren</button>
+                </div>
+                <div style={{ fontSize: 10, color: '#8D93A6', marginTop: 6 }}>Link ist 24h gültig (Stripe). Kreditkarte wird eingegeben, aber erst nach 30 Tagen abgebucht.</div>
+              </div>
+            ) : null}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button onClick={() => { setTrialTarget(null); setTrialUrl(''); }} style={{ padding: '8px 20px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#8D93A6', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Schließen</button>
+              {!trialUrl && <button onClick={async () => {
+                setTrialLoading(true);
+                try {
+                  const res = await api.generateTrialLink(trialTarget.id, trialPlan);
+                  if (res?.url) setTrialUrl(res.url);
+                  else setActionMsg({ type: 'err', text: 'Fehler beim Generieren' });
+                } catch (e) { setActionMsg({ type: 'err', text: e.message || 'Fehler' }); }
+                setTrialLoading(false);
+              }} disabled={trialLoading} style={{ padding: '8px 24px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', opacity: trialLoading ? 0.5 : 1 }}>{trialLoading ? 'Generiere...' : 'Link generieren'}</button>}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══ PAUSE / REACTIVATE CONFIRMATION MODAL ═══ */}
       {pauseTarget && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => setPauseTarget(null)}>
@@ -2196,6 +2245,7 @@ function TabClinics({ d, load, setTab }) {
                   <td style={S.td}>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                       <button className="fm-trial-btn" onClick={() => setExpandedTimeline(expandedTimeline === c.id ? null : c.id)} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: c.primaryActionColor + '12', border: `1px solid ${c.primaryActionColor}30`, color: c.primaryActionColor, cursor: 'pointer', fontFamily: 'inherit' }}>{c.primaryAction}</button>
+                      <Btn small onClick={() => handleAction('trial', c.id, c.name)}>Trial</Btn>
                       <Btn small onClick={() => handleAction('impersonate', c.id, c.name)}>Impersonate</Btn>
                       <Btn small onClick={() => loadDocs(c.id)}>{expandedDocs === c.id ? 'Docs \u2715' : 'Docs'}</Btn>
                       {c.is_active

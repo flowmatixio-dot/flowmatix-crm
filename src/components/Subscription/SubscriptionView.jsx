@@ -116,19 +116,6 @@ export default function SubscriptionView() {
     {/* ═══ TAB: TARIF ═══ */}
     {subTab === "plan" && <>
 
-      {/* ── Guarantee Banner ── */}
-      <div style={{
-        padding: "14px 18px", borderRadius: 12, marginBottom: 20,
-        background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.1)",
-        display: "flex", alignItems: "center", gap: 14,
-      }}>
-        <div style={{ fontSize: 22, flexShrink: 0 }}>🛡️</div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "rgba(16,185,129,0.9)", marginBottom: 2 }}>{t("guarantee_banner_title") || "14-Tage Setup-Garantie"}</div>
-          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", lineHeight: 1.5 }}>{t("guarantee_banner_desc") || "Setup-Gebühr vollständig erstattbar innerhalb von 14 Tagen. Abo startet erst nach Live-Schaltung."}</div>
-        </div>
-      </div>
-
       {/* ── Current Plan Card ── */}
       <div style={{
         padding: "22px 24px", borderRadius: 14, marginBottom: 28,

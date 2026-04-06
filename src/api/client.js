@@ -493,6 +493,13 @@ export async function impersonateClinic(orgId, reason) {
   });
 }
 
+export async function generateTrialLink(orgId, plan = 'core') {
+  return apiFetch('/api/v1/billing/trial-link', {
+    method: 'POST',
+    body: JSON.stringify({ orgId, plan }),
+  });
+}
+
 // ── WhatsApp Operator Control ────────────────────────────
 export async function waStart(orgId) {
   return apiFetch(`/api/v1/ops/clinic/${orgId}/wa-start`, { method: 'POST' });
