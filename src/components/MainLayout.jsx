@@ -466,7 +466,7 @@ export default function MainLayout() {
     })()}
 
     <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "var(--bg-app)", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "var(--text-primary)", overflow: "hidden", transition: "background .25s ease, color .25s ease", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
-      {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "var(--bg-card-solid)", border: "1px solid var(--success-muted)", color: "var(--success)", fontWeight: 700, fontSize: 14, boxShadow: "var(--shadow-md)" }}>✓ {toast}</div>}
+      {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "var(--bg-card-solid)", border: `1px solid ${(typeof toast === 'object' ? toast.type : 'success') === 'error' ? 'var(--danger-muted)' : 'var(--success-muted)'}`, color: (typeof toast === 'object' ? toast.type : 'success') === 'error' ? 'var(--danger)' : 'var(--success)', fontWeight: 700, fontSize: 14, boxShadow: "var(--shadow-md)" }}>{(typeof toast === 'object' ? toast.type : 'success') === 'error' ? '✕' : '✓'} {typeof toast === 'object' ? toast.msg : toast}</div>}
 
       {/* ── Doctor: New Task Popup (global, any view) ── */}
       {doctorAlert && (
