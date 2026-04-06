@@ -525,7 +525,7 @@ export default function InboxView() {
                         {isHumanTakeover && <ConvBadge label={t("human_takeover_badge") || "Menschliche Übernahme"} color="#ef4444" />}
                         {isDepositPaid && <ConvBadge label={t("deposit_paid_badge") || "Anzahlung bezahlt"} color="#10b981" />}
                         {sla?.overdue && <ConvBadge label={`${sla.hrs}h ${t("overdue_sla") || "überfällig"}`} color="#ef4444" />}
-                        {photoCount > 0 && <ConvBadge label={`${photoCount} Fotos`} color="#a78bfa" />}
+                        {photoCount > 0 && <ConvBadge label={`${photoCount} ${t("photos") || "Fotos"}`} color="#a78bfa" />}
                         {lead?.flightConfirmed?.date && !lead?.logistics?.driverName && <ConvBadge label={t("driver_missing")||"Fahrer fehlt"} color="#ec4899" />}
                         {lead?.flightConfirmed?.date && !(lead?.hotelInfo?.name||lead?.hotel?.name) && <ConvBadge label={t("hotel_missing")||"Hotel fehlt"} color="#a78bfa" />}
                         {lead?.stage==="booked" && !lead?.flightConfirmed?.date && !(lead?.metadata?.noFlightNeeded) && <ConvBadge label={t("flight_missing_badge")||"Flug fehlt"} color="#ef4444" />}
