@@ -407,6 +407,21 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
           )}
 
           {/* ── Readiness progress ── */}
+          {!localStorage.getItem("fm_opprep_drive_hint_dismissed") && (() => {
+            const hints = {
+              de: "Hochgeladene Dokumente werden automatisch in Google Drive gespeichert, wenn Sie Google Drive in den Einstellungen verbunden haben.",
+              en: "Uploaded documents are automatically saved to Google Drive when you have connected Google Drive in your settings.",
+              tr: "Yüklenen belgeler, ayarlarınızda Google Drive'ı bağladığınızda otomatik olarak Google Drive'a kaydedilir.",
+            };
+            const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+            return (
+              <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <span style={{ fontSize: 12, color: "rgba(76,201,255,0.8)", lineHeight: 1.5, flex: 1 }}>💡 {hints[lang] || hints.en}</span>
+                <button onClick={() => { localStorage.setItem("fm_opprep_drive_hint_dismissed", "1"); window.location.reload(); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", fontSize: 16, cursor: "pointer", padding: "0 4px", lineHeight: 1, flexShrink: 0 }}>✕</button>
+              </div>
+            );
+          })()}
+
           <div style={{
             padding: "12px 14px", borderRadius: 8, marginBottom: 20,
             background: `${pctColor}06`, border: `1px solid ${pctColor}15`,
