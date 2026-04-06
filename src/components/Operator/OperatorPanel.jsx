@@ -851,6 +851,9 @@ function TabClinics({ d, load }) {
   const [trialPlan, setTrialPlan] = useState('core');
   const [trialLoading, setTrialLoading] = useState(false);
   const [trialUrl, setTrialUrl] = useState('');
+  const [promoModal, setPromoModal] = useState(false);
+  const [promoGenLoading, setPromoGenLoading] = useState(false);
+  const [generatedPromo, setGeneratedPromo] = useState(null);
   const clinics = d.clinics;
 
   const doSearch = () => load('clinics', () => api.getPlatformClinics({ search }));
@@ -963,7 +966,47 @@ function TabClinics({ d, load }) {
           </div>
         </div>
       )}
-      <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Kliniken</h2>
+      {/* ═══ PROMO CODE MODAL ═══ */}
+      {promoModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => { setPromoModal(false); setGeneratedPromo(null); }}>
+          <div style={{ background: '#1a1f2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 380, boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>Promo-Code generieren</div>
+            <div style={{ fontSize: 12, color: '#8D93A6', marginBottom: 20 }}>Einmaliger Code — 30 Tage kostenlos, danach Setup Fee + Abo. Gültig 90 Tage.</div>
+            {generatedPromo ? (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#10b981', marginBottom: 10 }}>CODE GENERIERT — KOPIEREN & PER MAIL SCHICKEN</div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ flex: 1, padding: '12px 16px', borderRadius: 10, background: '#111827', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 18, fontWeight: 800, letterSpacing: '0.1em', fontFamily: 'monospace', textAlign: 'center' }}>{generatedPromo.code}</div>
+                  <button onClick={() => navigator.clipboard.writeText(generatedPromo.code)} style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Kopieren</button>
+                </div>
+                <div style={{ fontSize: 10, color: '#8D93A6', marginTop: 8 }}>Klinik gibt den Code im CRM unter Abonnement ein → Stripe öffnet sich mit 30-Tage-Trial.</div>
+              </div>
+            ) : (
+              <button onClick={async () => {
+                setPromoGenLoading(true);
+                try {
+                  const res = await api.generatePromoCode();
+                  if (res?.code) setGeneratedPromo(res);
+                  else setActionMsg({ type: 'err', text: 'Fehler beim Generieren' });
+                } catch (e) { setActionMsg({ type: 'err', text: e.message || 'Fehler' }); }
+                setPromoGenLoading(false);
+              }} disabled={promoGenLoading} style={{ width: '100%', padding: '12px 0', borderRadius: 10, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: promoGenLoading ? 0.5 : 1 }}>
+                {promoGenLoading ? 'Generiere...' : 'Code generieren'}
+              </button>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+              <button onClick={() => { setPromoModal(false); setGeneratedPromo(null); }} style={{ padding: '8px 20px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#8D93A6', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Schließen</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <h2 style={{ color: '#fff', fontSize: 20, margin: 0 }}>Kliniken</h2>
+        <button onClick={() => { setPromoModal(true); setGeneratedPromo(null); }} style={{ padding: '8px 18px', borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', color: '#10b981', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          Promo-Code generieren
+        </button>
+      </div>
       {actionMsg && (
         <div style={{ ...S.card, borderLeft: `3px solid ${actionMsg.type === 'ok' ? S.green : S.red}`, marginBottom: 12 }}>
           <div style={{ fontSize: 13, color: actionMsg.type === 'ok' ? S.green : S.red, wordBreak: 'break-all' }}>{actionMsg.text}</div>

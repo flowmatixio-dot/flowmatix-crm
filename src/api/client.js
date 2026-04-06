@@ -475,6 +475,10 @@ export async function generateTrialLink(orgId) {
   });
 }
 
+export async function generatePromoCode() {
+  return apiFetch('/api/v1/billing/generate-promo-code', { method: 'POST' });
+}
+
 // ── WhatsApp Operator Control ────────────────────────────
 export async function waStart(orgId) {
   return apiFetch(`/api/v1/ops/clinic/${orgId}/wa-start`, { method: 'POST' });
