@@ -88,6 +88,10 @@ export default function MainLayout() {
   const effectiveRole = userRole || "admin";
   const canAccess = (mod) => hasModuleAccess(effectiveRole, mod, clinicPlan);
   const [billingCycle, setBillingCycle] = React.useState('monthly');
+  const [promoCode, setPromoCode] = React.useState('');
+  const [promoLoading, setPromoLoading] = React.useState(false);
+  const [promoError, setPromoError] = React.useState('');
+  const [showPromoInput, setShowPromoInput] = React.useState(false);
   const [showPwModal, setShowPwModal] = React.useState(false);
   const [pwForm, setPwForm] = React.useState({ current: '', newPw: '', confirm: '' });
   const [pwLoading, setPwLoading] = React.useState(false);
@@ -328,14 +332,20 @@ export default function MainLayout() {
           window.open(`https://mail.google.com/mail/?view=cm&to=info@flowmatix.io&su=${encodeURIComponent("Enterprise Anfrage")}&body=${encodeURIComponent(`Wir interessieren uns für den Enterprise Plan.\n\nKlinik: ${clinic?.name || ''}`)}`, '_blank');
           return;
         }
-        ctx.showT?.(t("plan_checkout_loading")||"Redirecting to checkout...");
+        setPromoLoading(true);
+        setPromoError('');
         try {
           await fmApi.setWorkspaceState('checkout_pending');
           ctx.setWorkspaceState('checkout_pending');
-          const res = await fmApi.startTrialActivation(plan, billingCycle);
+          const res = await fmApi.startTrialActivation(plan, billingCycle, promoCode.trim() || null);
           if (res?.url) window.location.href = res.url;
-          else ctx.showT?.(t("plan_checkout_error")||'Checkout failed');
-        } catch (e) { ctx.showT?.((t("plan_checkout_error")||'Checkout failed') + ': ' + (e.message || '')); }
+          else { ctx.setWorkspaceState('live_test'); ctx.showT?.(t("plan_checkout_error")||'Checkout failed'); }
+        } catch (e) {
+          ctx.setWorkspaceState('live_test');
+          const msg = e.message || '';
+          if (msg.includes('Ungültiger') || msg.includes('Promo')) setPromoError(msg);
+          else ctx.showT?.((t("plan_checkout_error")||'Checkout failed') + ': ' + msg);
+        } finally { setPromoLoading(false); }
       };
       const valueItems = [
         { icon: "🤖", text: t("pv_1")||"WhatsApp AI active 24/7" },
@@ -385,6 +395,30 @@ export default function MainLayout() {
               </div>
             </div>
 
+            {/* Promo Code */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+              {!showPromoInput ? (
+                <button onClick={() => setShowPromoInput(true)} style={{ background: "transparent", border: "none", color: "rgba(167,177,195,0.5)", fontSize: 11, cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}>
+                  {t("pp_have_promo") || "Promo-Code vorhanden?"}
+                </button>
+              ) : (
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexDirection: "column" }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input
+                      value={promoCode}
+                      onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError(''); }}
+                      placeholder="TRIAL-XXXX"
+                      maxLength={12}
+                      style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: `1px solid ${promoError ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`, color: "#fff", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em", width: 160, outline: "none" }}
+                    />
+                    <button onClick={() => { setShowPromoInput(false); setPromoCode(''); setPromoError(''); }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "rgba(167,177,195,0.5)", fontSize: 11, cursor: "pointer", padding: "8px 12px", fontFamily: "inherit" }}>✕</button>
+                  </div>
+                  {promoError && <div style={{ fontSize: 11, color: "#ef4444" }}>{promoError}</div>}
+                  {promoCode && !promoError && <div style={{ fontSize: 11, color: "#10b981" }}>30 Tage kostenlos — Setup Fee + Abo nach Trial</div>}
+                </div>
+              )}
+            </div>
+
             {/* Plan Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
               {PLAN_ORDER.map((pk) => {
@@ -430,14 +464,14 @@ export default function MainLayout() {
                         fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit",
                       }}>{t("plan_contact_us")||"Contact us"}</button>
                     ) : (
-                      <button onClick={() => handleSelectPlan(pk)} style={{
+                      <button onClick={() => handleSelectPlan(pk)} disabled={promoLoading} style={{
                         width: "100%", padding: isPro ? "12px 0" : "11px 0", borderRadius: 10,
                         background: isPro ? `linear-gradient(135deg, ${color}, ${color}cc)` : `${color}10`,
                         border: isPro ? "none" : `1px solid ${color}20`, color: isPro ? "#fff" : color,
-                        fontWeight: 700, fontSize: isPro ? 14 : 12, cursor: "pointer", fontFamily: "inherit",
+                        fontWeight: 700, fontSize: isPro ? 14 : 12, cursor: promoLoading ? "default" : "pointer", fontFamily: "inherit",
                         boxShadow: isPro ? `0 4px 20px ${color}35` : "none",
-                        transition: "box-shadow 0.2s",
-                      }}>{t("pp_activate")||"Activate Plan"}</button>
+                        transition: "box-shadow 0.2s", opacity: promoLoading ? 0.6 : 1,
+                      }}>{promoLoading ? "..." : (t("pp_activate")||"Activate Plan")}</button>
                     )}
                   </div>
                 );

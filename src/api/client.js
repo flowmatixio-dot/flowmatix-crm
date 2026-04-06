@@ -1489,11 +1489,15 @@ export async function getTestInfo() {
 
 // ── Trial Subscription (reuses existing billing/subscribe) ──
 
-export async function startTrialActivation(plan = 'pro', billingCycle = 'monthly') {
+export async function startTrialActivation(plan = 'pro', billingCycle = 'monthly', promoCode = null) {
   return apiFetch('/api/v1/billing/subscribe', {
     method: 'POST',
-    body: JSON.stringify({ plan, billingCycle }),
+    body: JSON.stringify({ plan, billingCycle, ...(promoCode ? { promoCode } : {}) }),
   });
+}
+
+export async function generatePromoCode() {
+  return apiFetch('/api/v1/billing/generate-promo-code', { method: 'POST' });
 }
 
 // ── Stripe Checkout ──────────────────────────────────────
