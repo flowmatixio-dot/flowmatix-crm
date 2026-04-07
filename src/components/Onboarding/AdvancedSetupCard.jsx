@@ -134,6 +134,20 @@ export default function AdvancedSetupCard() {
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Collapsed by default — saves dashboard space and reduces setup
+  // pressure on first impression. State persists in localStorage so
+  // a user who expanded it once stays expanded across reloads.
+  const [expanded, setExpanded] = useState(() => {
+    try { return localStorage.getItem("fm_advanced_setup_expanded") === "1"; } catch { return false; }
+  });
+  const toggleExpanded = () => {
+    setExpanded((prev) => {
+      const next = !prev;
+      try { localStorage.setItem("fm_advanced_setup_expanded", next ? "1" : "0"); } catch {}
+      return next;
+    });
+  };
+
   const fetchStatus = useCallback(async () => {
     try {
       const [res, me] = await Promise.all([
@@ -206,20 +220,58 @@ export default function AdvancedSetupCard() {
         marginBottom: 16,
       }}
     >
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 3, letterSpacing: -0.05 }}>
-          {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
-        </div>
-        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
-          {T(
-            "Optimize your system for more bookings and automation.",
-            "Optimiere dein System für mehr Buchungen und Automatisierung.",
-            "Daha fazla rezervasyon ve otomasyon için sisteminizi optimize edin."
-          )}
-        </div>
-      </div>
+      {/* Collapsible header — clicking toggles the checklist below.
+          Default state is collapsed so the dashboard stays focused on
+          the demo as the primary action. */}
+      {(() => {
+        const totalCount = visibleSteps.length;
+        const doneCount = visibleSteps.filter((s) => !!flags[s.key]).length;
+        return (
+          <button
+            onClick={toggleExpanded}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              width: "100%",
+              padding: 0,
+              marginBottom: expanded ? 14 : 0,
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 3, letterSpacing: -0.05 }}>
+                {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
+                {T(
+                  "Optimize your system for more bookings and automation.",
+                  "Optimiere dein System für mehr Buchungen und Automatisierung.",
+                  "Daha fazla rezervasyon ve otomasyon için sisteminizi optimize edin."
+                )}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+              <span style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", fontWeight: 600 }}>
+                {doneCount}/{totalCount}
+              </span>
+              <span style={{
+                fontSize: 11, color: "rgba(167,177,195,0.55)",
+                transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+                transition: "transform .2s",
+                display: "inline-block",
+              }}>▶</span>
+            </div>
+          </button>
+        );
+      })()}
 
-      {/* Detailed checklist — 2 columns on wider screens for better density */}
+      {/* Detailed checklist — only rendered when expanded */}
+      {expanded && (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 8 }}>
         {visibleSteps.map((s) => {
           const done = !!flags[s.key];
@@ -288,6 +340,7 @@ export default function AdvancedSetupCard() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }
