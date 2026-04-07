@@ -73,7 +73,7 @@ const ADVANCED_STEPS = [
     section: "payments",
     icon: "💳",
     label:    { de: "Zahlungen aktivieren", en: "Enable payments", tr: "Ödemeleri etkinleştir" },
-    sublabel: { de: "Stripe, Anzahlungen, PayPal", en: "Stripe, deposits, PayPal", tr: "Stripe, depozitolar, PayPal" },
+    sublabel: { de: "Stripe & Anzahlungen einrichten", en: "Stripe & deposits", tr: "Stripe & depozitolar" },
     priority: "optional",
   },
   {

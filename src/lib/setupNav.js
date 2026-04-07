@@ -31,7 +31,10 @@ const SECTION_TARGETS = {
   // Advanced setup
   general:            { view: "settings",   settingsTab: "general",            scrollAnchor: "fm-section-clinic" },
   treatments:         { view: "settings",   settingsTab: "clinic_treatments",  scrollAnchor: "fm-section-treatments" },
-  ai_settings:        { view: "settings",   settingsTab: "ai",                 scrollAnchor: "fm-section-ai" },
+  // KI-Bot lives in its own top-level view (AIControlView). Settings →
+  // AI tab only has the photo / fallback config — tonality + languages
+  // are in the standalone view.
+  ai_settings:        { view: "ai_control", settingsTab: null,                 scrollAnchor: null },
   booking_rules:      { view: "settings",   settingsTab: "booking_rules", scrollAnchor: "fm-section-booking-rules" },
   doctor_assignment:  { view: "settings",   settingsTab: "doctors",       scrollAnchor: "fm-section-doctors" },
   payments:           { view: "settings",   settingsTab: "payments",      scrollAnchor: "fm-section-payments" },
