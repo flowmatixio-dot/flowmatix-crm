@@ -154,16 +154,14 @@ export default function TeamPersonal({ clinic, activeClinicId, updateClinic, sho
   const plan = clinic.plan || "core";
   const teamLimit = TEAM_LIMITS[plan] || 1;
   const locked = false; // team never locks
-  const stored = (() => { try { return JSON.parse(localStorage.getItem("fm_teamSlots_" + activeClinicId) || "{}"); } catch { return {}; } })();
-  const teamMap = { ...stored, ...(clinic.teamSlots || {}) };
+  // Source of truth: clinic.teamSlots from API (organizations.metadata.team_slots)
+  const teamMap = clinic.teamSlots || {};
 
   const addMember = (slotIdx) => {
     const email = (teamEmails[slotIdx] || "").trim();
     if (!email || !email.includes("@")) { showT(t("enter_valid_email")); return; }
     const member = { name: email.split("@")[0], email, role: "Member", lastLogin: "-", inviteStatus: "pending" };
     const updated = { ...teamMap, [slotIdx]: member };
-    // Persist to localStorage so it survives API refreshes
-    try { localStorage.setItem("fm_teamSlots_" + activeClinicId, JSON.stringify(updated)); } catch(e) {}
     updateClinic({ teamSlots: updated, team: Object.values(updated) });
     showT(t("invite_sent"));
     setTeamEmails(prev => ({ ...prev, [slotIdx]: "" }));
@@ -197,7 +195,7 @@ export default function TeamPersonal({ clinic, activeClinicId, updateClinic, sho
                 <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{member.email}</div>
               </div>
               <span style={{ padding: "3px 10px", borderRadius: 7, fontSize: 11, fontWeight: 700, background: member.inviteStatus === "active" ? "rgba(16,185,129,0.12)" : "rgba(255,138,42,0.12)", color: member.inviteStatus === "active" ? "#10b981" : "#ff8a2a" }}>{member.inviteStatus === "active" ? (t("active") || "Aktiv") : (t("pending") || "Ausstehend")}</span>
-              <button onClick={() => { const updated = { ...teamMap }; delete updated[i]; try { localStorage.setItem("fm_teamSlots_" + activeClinicId, JSON.stringify(updated)); } catch(e) {} updateClinic({ teamSlots: updated, team: Object.values(updated) }); showT(t("member_archived") || "Archiviert"); }} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", color: "#ef4444", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{t("archive") || "Archivieren"}</button>
+              <button onClick={() => { const updated = { ...teamMap }; delete updated[i]; updateClinic({ teamSlots: updated, team: Object.values(updated) }); showT(t("member_archived") || "Archiviert"); }} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", color: "#ef4444", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{t("archive") || "Archivieren"}</button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8, opacity: locked ? 0.4 : 1, pointerEvents: locked ? "none" : "auto" }}>
