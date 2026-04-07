@@ -20,51 +20,59 @@
 import { useEffect, useState, useCallback } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
+import { navigateToSetupSection } from "../../lib/setupNav";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
 const ADVANCED_STEPS = [
   {
     key: "booking_rules",
+    section: "booking_rules",
     icon: "📅",
     label:    { de: "Buchungsregeln konfigurieren", en: "Configure booking rules", tr: "Rezervasyon kurallarını yapılandır" },
     sublabel: { de: "Vorlaufzeit, Zeitfenster, Pausen", en: "Lead time, slots, breaks", tr: "Ön süre, saatler, molalar" },
-    view: "ai_control",
   },
   {
     key: "doctor_assignment",
+    section: "doctor_assignment",
     icon: "👨‍⚕️",
     label:    { de: "Arzt-Zuweisung optimieren", en: "Optimize doctor assignment", tr: "Doktor atamasını optimize et" },
     sublabel: { de: "Round-Robin, Spezialisierung, Last", en: "Round-robin, specialty, load", tr: "Sırayla, uzmanlık, yük" },
-    view: "settings",
   },
   {
     key: "payments",
+    section: "payments",
     icon: "💳",
     label:    { de: "Zahlungen aktivieren", en: "Enable payments", tr: "Ödemeleri etkinleştir" },
     sublabel: { de: "Stripe, Anzahlungen, PayPal", en: "Stripe, deposits, PayPal", tr: "Stripe, depozitolar, PayPal" },
-    view: "payments",
   },
   {
     key: "team",
+    section: "team",
     icon: "👥",
     label:    { de: "Team einrichten", en: "Set up team", tr: "Ekibi kur" },
     sublabel: { de: "Koordinatoren, Ärzte einladen", en: "Invite coordinators & doctors", tr: "Koordinatörleri ve doktorları davet et" },
-    view: "settings",
   },
   {
     key: "automations",
+    section: "automations",
     icon: "⚡",
     label:    { de: "Automationen aktivieren", en: "Activate automations", tr: "Otomasyonları etkinleştir" },
     sublabel: { de: "Erinnerungen, Follow-ups, Nachsorge", en: "Reminders, follow-ups, aftercare", tr: "Hatırlatmalar, takipler, bakım" },
-    view: "automations",
   },
   {
     key: "integrations",
+    section: "integrations",
     icon: "🔌",
     label:    { de: "Integrationen verbinden", en: "Connect integrations", tr: "Entegrasyonları bağla" },
-    sublabel: { de: "Google Calendar, n8n, Telegram", en: "Google Calendar, n8n, Telegram", tr: "Google Calendar, n8n, Telegram" },
-    view: "settings",
+    sublabel: { de: "n8n, Telegram, Webhooks", en: "n8n, Telegram, webhooks", tr: "n8n, Telegram, webhook'lar" },
+  },
+  {
+    key: "google_drive",
+    section: "google_drive",
+    icon: "📁",
+    label:    { de: "Google Drive verbinden",     en: "Connect Google Drive",       tr: "Google Drive'ı bağla" },
+    sublabel: { de: "Patientenfotos automatisch sichern", en: "Auto-save patient photos", tr: "Hasta fotoğraflarını otomatik kaydet" },
   },
 ];
 
@@ -155,7 +163,7 @@ export default function AdvancedSetupCard() {
           return (
             <button
               key={s.key}
-              onClick={() => setView(s.view)}
+              onClick={() => navigateToSetupSection(setView, s.section)}
               style={{
                 display: "flex",
                 alignItems: "center",

@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { Section, Field, Toggle } from "../shared/index";
 import HintBox from "../shared/HintBox.jsx";
 import { ROLES, PERM_LABELS, MODULE_ACCESS } from "../../data/constants";
+import { consumePendingSettingsTab, consumeHighlightAnchor, isFromSetup, clearFromSetup } from "../../lib/setupNav";
 import { getGoogleStatus, getGoogleConnectUrlSafe, disconnectGoogle, getAnalyticsConfig, updateAnalyticsConfig, disconnectAnalytics, updateClinicSettings, isAuthenticated, inviteTeamMember, removeTeamMember, updateTeamMember, fetchTeam, updatePassword, setupMfa, verifyMfa, disableMfa, getMe } from "../../api/client";
 import WhatsAppSetup from "../SetupGuide/WhatsAppSetup";
 import BotProfile from "../SetupGuide/BotProfile";
@@ -846,7 +847,7 @@ function DoctorCapabilities({ clinic, showT }) {
 }
 
 export default function SettingsView() {
-  const { clinic, setClinics, settingsData, setSettingsData, showT, inviteOpen, setInviteOpen, inviteEmail, setInviteEmail, inviteRole, setInviteRole, setTourActive, setTourStep, setTourCompleted, t, user } = useApp();
+  const { clinic, setClinics, settingsData, setSettingsData, showT, inviteOpen, setInviteOpen, inviteEmail, setInviteEmail, inviteRole, setInviteRole, setTourActive, setTourStep, setTourCompleted, t, user, setView } = useApp();
   const [drvForm, setDrvForm] = useState(false);
   const [drvName, setDrvName] = useState("");
   const [drvPhone, setDrvPhone] = useState("");
@@ -902,7 +903,27 @@ export default function SettingsView() {
   };
 
   const inp={width:"100%",padding:"8px 12px",borderRadius:8,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box"};
-  const [settingsTab, setSettingsTab] = useState("general");
+  const [settingsTab, setSettingsTab] = useState(() => consumePendingSettingsTab() || "general");
+  const [fromSetup, setFromSetup] = useState(() => isFromSetup());
+  const [highlightFlash, setHighlightFlash] = useState(false);
+
+  // Deep-link signal from SetupCard / AdvancedSetupCard / SetupBanner.
+  // When the user clicks "Arzt hinzufügen", setupNav drops a target tab
+  // in sessionStorage; we read + clear it here. Plus a brief highlight
+  // flash so the user notices the right section is active.
+  useEffect(() => {
+    const pending = consumePendingSettingsTab();
+    if (pending) {
+      setSettingsTab(pending);
+      // Trigger a 1.5s flash on the active tab content
+      setHighlightFlash(true);
+      setTimeout(() => setHighlightFlash(false), 1500);
+      // Pop pending highlight anchor (just consume so it doesn't carry over)
+      consumeHighlightAnchor();
+    }
+    // Sync fromSetup state
+    setFromSetup(isFromSetup());
+  }, []);
 
   const SETTINGS_TABS = [
     "grp:" + (t("grp_clinic") || "KLINIK"),
@@ -950,7 +971,19 @@ export default function SettingsView() {
     </div>
 
     {/* ── Settings Content ── */}
-    <div style={{flex:1,padding:"20px 32px",overflowY:"auto"}}>
+    <div style={{flex:1,padding:"20px 32px",overflowY:"auto",position:"relative"}}>
+
+    {/* Highlight flash for the active tab when arriving from a deep link */}
+    {highlightFlash && (
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: 4,
+        background: "linear-gradient(90deg, transparent, rgba(76,201,255,0.6), transparent)",
+        animation: "fmTabFlashTop 1.5s ease-out",
+        pointerEvents: "none",
+      }}>
+        <style>{`@keyframes fmTabFlashTop { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }`}</style>
+      </div>
+    )}
 
     {/* ═══ GENERAL ═══ */}
     {settingsTab === "general" && <>

@@ -14,43 +14,42 @@
 import { useEffect, useState, useCallback } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
+import { navigateToSetupSection } from "../../lib/setupNav";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
 const STEP_DEFS = [
   {
     key: "clinic",
+    section: "clinic",
     icon: "🏥",
     label:    { de: "Klinikdaten",          en: "Clinic data",        tr: "Klinik bilgileri" },
     sublabel: { de: "Name, Adresse, Land",  en: "Name, address, country", tr: "İsim, adres, ülke" },
     cta:      { de: "Klinikdaten ergänzen", en: "Complete clinic info", tr: "Klinik bilgilerini tamamla" },
-    view: "settings",
   },
   {
     key: "treatment",
+    section: "treatment",
     icon: "💉",
     label:    { de: "Behandlung",            en: "Treatment",          tr: "Tedavi" },
     sublabel: { de: "Mind. 1 Behandlung",   en: "At least 1 treatment", tr: "En az 1 tedavi" },
     cta:      { de: "Behandlung hinzufügen", en: "Add treatment",      tr: "Tedavi ekle" },
-    view: "settings",
   },
   {
     key: "doctor",
+    section: "doctor",
     icon: "👨‍⚕️",
     label:    { de: "Arzt",            en: "Doctor",       tr: "Doktor" },
     sublabel: { de: "Mind. 1 Arzt",   en: "At least 1 doctor", tr: "En az 1 doktor" },
     cta:      { de: "Arzt hinzufügen", en: "Add doctor",   tr: "Doktor ekle" },
-    view: "settings",
   },
   {
     key: "whatsapp",
+    section: "whatsapp",
     icon: "💬",
-    // Spec: "Eigene WhatsApp-Nummer verbinden" — clearly different from
-    // the trial test number block at the top of the dashboard.
     label:    { de: "Eigene WhatsApp-Nummer", en: "Own WhatsApp number",       tr: "Kendi WhatsApp numarası" },
     sublabel: { de: "Produktive Verbindung",  en: "Production connection",      tr: "Üretim bağlantısı" },
     cta:      { de: "WhatsApp verbinden",     en: "Connect WhatsApp",           tr: "WhatsApp bağla" },
-    view: "whatsapp_setup",
     optional: true,
   },
 ];
@@ -142,7 +141,7 @@ export default function SetupCard() {
         </div>
         {nextDef && (
           <button
-            onClick={() => setView(nextDef.view)}
+            onClick={() => navigateToSetupSection(setView, nextDef.section)}
             style={{
               padding: "11px 20px",
               background: "linear-gradient(135deg, #4cc9ff, #2892d7)",
@@ -186,7 +185,7 @@ export default function SetupCard() {
           return (
             <button
               key={s.key}
-              onClick={() => setView(s.view)}
+              onClick={() => navigateToSetupSection(setView, s.section)}
               style={{
                 display: "flex",
                 alignItems: "center",

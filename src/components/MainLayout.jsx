@@ -40,6 +40,7 @@ import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
 import ArchiveView from "./Archive/ArchiveView";
 import OnboardingWizard from "./Onboarding/OnboardingWizard";
 import SetupBanner from "./Onboarding/SetupBanner";
+import { isFromSetup, clearFromSetup } from "../lib/setupNav";
 import PaymentsView from "./Finance/PaymentsView";
 
 const IS_CLIENT_MODE = window.location.hostname === "crm.flowmatix.io" || window.location.hostname === "localhost";
@@ -1011,6 +1012,40 @@ export default function MainLayout() {
         {/* ── Setup progress banner — global, visible on all main pages, auto-hides when complete ── */}
         {clinic && IS_CLIENT_MODE && view !== "settings" && view !== "whatsapp_setup" && (
           <SetupBanner />
+        )}
+
+        {/* ── "Zurück zum Setup" pill — visible on the deep-link target views ── */}
+        {clinic && IS_CLIENT_MODE && isFromSetup() && view !== "dashboard" && (
+          <div style={{
+            flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            gap: 12,
+            padding: "10px 32px",
+            background: "linear-gradient(135deg, rgba(76,201,255,0.07), rgba(76,201,255,0.02))",
+            borderBottom: "1px solid rgba(76,201,255,0.18)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 14 }}>⚙️</span>
+              <div style={{ fontSize: 12.5, color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>
+                {t("from_setup_hint") || "Du bist hier vom Setup. Schließe diesen Schritt ab und geh zurück."}
+              </div>
+            </div>
+            <button
+              onClick={() => { clearFromSetup(); ctx.setView("dashboard"); }}
+              style={{
+                padding: "6px 14px", borderRadius: 8,
+                background: "rgba(76,201,255,0.12)",
+                border: "1px solid rgba(76,201,255,0.28)",
+                color: "#4cc9ff",
+                fontSize: 11.5, fontWeight: 700, fontFamily: "inherit",
+                cursor: "pointer", whiteSpace: "nowrap",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(76,201,255,0.18)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(76,201,255,0.12)"; }}
+            >
+              {t("back_to_setup") || "Zurück zum Setup"} →
+            </button>
+          </div>
         )}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
         {view === "action_needed" && clinic && canAccess("action_needed") && <ErrorBoundary t={t}><ActionNeededView /></ErrorBoundary>}

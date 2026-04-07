@@ -13,15 +13,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
+import { navigateToSetupSection } from "../../lib/setupNav";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
-// Maps the next missing step → (label for CTA, target view)
+// Maps the next missing step → CTA label
 const STEP_CTA = {
-  clinic:    { label: { de: "Klinikdaten ergänzen",  en: "Complete clinic info", tr: "Klinik bilgilerini tamamla" }, view: "settings" },
-  treatment: { label: { de: "Behandlung hinzufügen", en: "Add treatment",        tr: "Tedavi ekle" },                view: "settings" },
-  doctor:    { label: { de: "Arzt hinzufügen",       en: "Add doctor",           tr: "Doktor ekle" },                view: "settings" },
-  whatsapp:  { label: { de: "WhatsApp verbinden",    en: "Connect WhatsApp",     tr: "WhatsApp bağla" },             view: "whatsapp_setup" },
+  clinic:    { label: { de: "Klinikdaten ergänzen",  en: "Complete clinic info", tr: "Klinik bilgilerini tamamla" } },
+  treatment: { label: { de: "Behandlung hinzufügen", en: "Add treatment",        tr: "Tedavi ekle" } },
+  doctor:    { label: { de: "Arzt hinzufügen",       en: "Add doctor",           tr: "Doktor ekle" } },
+  whatsapp:  { label: { de: "WhatsApp verbinden",    en: "Connect WhatsApp",     tr: "WhatsApp bağla" } },
 };
 
 export default function SetupBanner() {
@@ -99,9 +100,9 @@ export default function SetupBanner() {
           )}
         </div>
 
-        {/* Single dynamic CTA */}
+        {/* Single dynamic CTA — deep-links straight to the missing step's settings tab */}
         <button
-          onClick={() => setView(cta.view)}
+          onClick={() => navigateToSetupSection(setView, nextKey || "clinic")}
           style={{
             padding: "7px 16px",
             background: "rgba(76,201,255,0.1)",
