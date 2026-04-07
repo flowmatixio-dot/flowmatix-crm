@@ -40,6 +40,7 @@ import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
 import ArchiveView from "./Archive/ArchiveView";
 import OnboardingWizard from "./Onboarding/OnboardingWizard";
 import SetupBanner from "./Onboarding/SetupBanner";
+import AutoDemoPlayer from "./Onboarding/AutoDemoPlayer";
 import { isFromSetup, clearFromSetup } from "../lib/setupNav";
 import PaymentsView from "./Finance/PaymentsView";
 
@@ -322,6 +323,10 @@ export default function MainLayout() {
       setShowOnboarding(false);
       completeOnboarding(ctx.activeClinicId, t("onboarding_complete") || "Setup abgeschlossen!");
     }} onSkip={() => setShowOnboarding(false)} />}
+
+    {/* AutoDemoPlayer overlay — mounted globally so it survives view changes
+        triggered by the player itself (it calls setView to walk through CRM) */}
+    {ctx.demoTourOpen && <AutoDemoPlayer onClose={() => ctx.setDemoTourOpen(false)} />}
     <style>{`@keyframes fmHighlight{0%{box-shadow:0 0 0 0 rgba(76,201,255,0.5)}50%{box-shadow:0 0 24px 6px rgba(76,201,255,0.35)}100%{box-shadow:0 0 0 0 rgba(76,201,255,0)}}`}</style>
 
     {/* ── Plan Picker Modal (trial_expired forced OR manual trigger) ── */}

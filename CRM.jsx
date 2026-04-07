@@ -80,6 +80,7 @@ export default function App() {
     templateModal, setTemplateModal, templateFilter, setTemplateFilter,
     successModal, setSuccessModal, showPlanPicker, setShowPlanPicker,
     showRevenue, setShowRevenue, patientTab, setPatientTab, opSubTab, setOpSubTab,
+    demoTourOpen, setDemoTourOpen,
     showToast,
   } = useUiStore();
   const setToast = (msg, type) => { if(msg) showToast(msg, type); else useUiStore.setState({toast:null}); };
@@ -776,6 +777,7 @@ export default function App() {
     tourActive, setTourActive, tourStep, setTourStep, tourCompleted, setTourCompleted,
     templateModal, setTemplateModal, templateFilter, setTemplateFilter, successModal, setSuccessModal,
     isAdmin, isOperator, activeClinicId, clinic, myLeads, myAppts, allClinicMsgs, myMsgs, unread, opSubTab, setOpSubTab,
+    demoTourOpen, setDemoTourOpen,
     myNotifs, unreadNotifs, myFiles, myAutomations, totalActions: totalActionsWithDb,
     usageMetrics: crmData.usageMetrics, todayMetrics: crmData.todayMetrics,
     searchResults, flightAlerts: crmData.flightAlerts, flightMatches: crmData.flightMatches,

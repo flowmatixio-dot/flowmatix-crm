@@ -51,6 +51,7 @@ export const useUiStore = create(
       showRevenue: true,
       patientTab: 'timeline',
       opSubTab: 'dashboard',
+      demoTourOpen: false,
 
       // ── Actions ──
       setView: (view) => set({ view }),
@@ -82,6 +83,7 @@ export const useUiStore = create(
       setShowRevenue: (showRevenue) => set({ showRevenue }),
       setPatientTab: (patientTab) => set({ patientTab }),
       setOpSubTab: (opSubTab) => set({ opSubTab }),
+      setDemoTourOpen: (demoTourOpen) => set({ demoTourOpen }),
     }),
     {
       name: 'fm-ui',

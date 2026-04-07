@@ -1,0 +1,363 @@
+/**
+ * AutoDemoPlayer — guided product tour with real demo data.
+ *
+ * Triggered from Dashboard "🎬 Komplette Demo abspielen" button.
+ *
+ * Lifecycle:
+ *   idle → preparing → running ↔ paused → completed → cleaning → idle
+ *                              ↘ failed
+ *
+ * 1. User clicks Trigger button somewhere on the dashboard
+ * 2. Player calls POST /api/v1/clinic/mode/demo/run-tour
+ *    Backend acquires Redis lock + creates 1 demo patient with full
+ *    journey (events, photos, review, booking, flight, driver, opprep)
+ * 3. Player walks through 9 views with timed setView() calls and
+ *    a floating overlay showing step + label + controls
+ * 4. User can pause / resume / replay / exit at any time
+ * 5. On exit (or completion + auto-cleanup), the player calls
+ *    POST /api/v1/clinic/mode/demo/cleanup-tour which wipes ONLY
+ *    the demo_tour-tagged rows
+ *
+ * SAFETY:
+ *  - All data is_demo=true and tagged demo_tour
+ *  - Demo phone is +99999... (test range, can't collide with real WA)
+ *  - Cleanup is row-tag-filtered, never touches real data
+ *  - Redis lock prevents two parallel tours in the same org
+ *  - No external messaging triggered (events are written, not sent)
+ */
+
+import { useEffect, useState, useCallback, useRef } from "react";
+import { useApp } from "../../context/AppContext";
+import * as fmApi from "../../api/client";
+
+const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
+
+// 9-step playback sequence — each step navigates to the right view +
+// shows a descriptive overlay label so the user always knows what they
+// are looking at. Durations are tuned to feel "quick but readable".
+const STEPS = [
+  {
+    id: "inbox_message",
+    view: "inbox",
+    label: { de: "Neue Patienten-Anfrage trifft ein", en: "New patient request comes in", tr: "Yeni hasta talebi geldi" },
+    duration: 5000,
+  },
+  {
+    id: "inbox_photos",
+    view: "inbox",
+    label: { de: "Patient sendet 3 Fotos", en: "Patient sends 3 photos", tr: "Hasta 3 fotoğraf gönderdi" },
+    duration: 5000,
+  },
+  {
+    id: "review",
+    view: "review_board",
+    label: { de: "Arzt bewertet den Patienten", en: "Doctor reviews the patient", tr: "Doktor hastayı değerlendiriyor" },
+    duration: 5000,
+  },
+  {
+    id: "booking",
+    view: "inbox",
+    label: { de: "Termin wird vorgeschlagen + bestätigt", en: "Appointment proposed + confirmed", tr: "Randevu önerildi + onaylandı" },
+    duration: 5000,
+  },
+  {
+    id: "calendar",
+    view: "appointments",
+    label: { de: "Termin landet im Kalender", en: "Appointment lands in the calendar", tr: "Randevu takvime düşer" },
+    duration: 5000,
+  },
+  {
+    id: "pipeline",
+    view: "pipeline",
+    label: { de: "Patient bewegt sich durch die Pipeline", en: "Patient moves through the pipeline", tr: "Hasta hattı boyunca ilerliyor" },
+    duration: 5000,
+  },
+  {
+    id: "logistics",
+    view: "patients_db",
+    label: { de: "Flug + Fahrer organisiert", en: "Flight + driver organized", tr: "Uçuş + sürücü organize edildi" },
+    duration: 6000,
+  },
+  {
+    id: "op_prep",
+    view: "op_prep",
+    label: { de: "OP-Vorbereitung — Checkliste", en: "Pre-op preparation — checklist", tr: "Ameliyat öncesi hazırlık — kontrol listesi" },
+    duration: 6000,
+  },
+  {
+    id: "patient_record",
+    view: "patients_db",
+    label: { de: "Komplette Patientenakte", en: "Full patient record", tr: "Tam hasta dosyası" },
+    duration: 5000,
+  },
+];
+
+export default function AutoDemoPlayer({ onClose }) {
+  const { setView } = useApp();
+  const lang = localStorage.getItem("fm_lang") || "de";
+
+  // State machine: idle → preparing → running ↔ paused → completed → cleaning → idle
+  //                                                ↘ failed
+  const [state, setState] = useState("preparing");
+  const [stepIdx, setStepIdx] = useState(0);
+  const [error, setError] = useState(null);
+  const [tourMeta, setTourMeta] = useState(null);
+  const timerRef = useRef(null);
+  const startedAtRef = useRef(null);
+
+  const cleanup = useCallback(async () => {
+    try {
+      await fmApi.apiFetch("/api/v1/clinic/mode/demo/cleanup-tour", { method: "POST" });
+    } catch (e) {
+      // non-fatal
+    }
+  }, []);
+
+  // Start the tour: ask backend to create the demo data, then advance
+  // through STEPS one at a time.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fmApi.apiFetch("/api/v1/clinic/mode/demo/run-tour", { method: "POST" });
+        if (cancelled) return;
+        if (!res?.ok) throw new Error(res?.error || "tour_failed");
+        setTourMeta(res);
+        setState("running");
+        setStepIdx(0);
+        startedAtRef.current = Date.now();
+      } catch (e) {
+        if (!cancelled) {
+          setError(e.message || "Unknown error");
+          setState("failed");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  // Advance the playback when running
+  useEffect(() => {
+    if (state !== "running") return;
+    const step = STEPS[stepIdx];
+    if (!step) {
+      setState("completed");
+      // Auto-cleanup after a short pause so user sees the final state
+      setTimeout(() => {
+        cleanup().finally(() => {
+          if (onClose) onClose();
+        });
+      }, 1500);
+      return;
+    }
+    setView(step.view);
+    timerRef.current = setTimeout(() => {
+      setStepIdx((i) => i + 1);
+    }, step.duration);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [state, stepIdx, setView, cleanup, onClose]);
+
+  const handlePause = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setState("paused");
+  }, []);
+
+  const handleResume = useCallback(() => {
+    setState("running");
+  }, []);
+
+  const handleReplay = useCallback(async () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setState("cleaning");
+    await cleanup();
+    // Restart by triggering a fresh run-tour. Easiest way: bounce mount.
+    setStepIdx(0);
+    setState("preparing");
+    try {
+      const res = await fmApi.apiFetch("/api/v1/clinic/mode/demo/run-tour", { method: "POST" });
+      if (!res?.ok) throw new Error(res?.error || "tour_failed");
+      setTourMeta(res);
+      setState("running");
+      startedAtRef.current = Date.now();
+    } catch (e) {
+      setError(e.message);
+      setState("failed");
+    }
+  }, [cleanup]);
+
+  const handleExit = useCallback(async () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setState("cleaning");
+    await cleanup();
+    if (onClose) onClose();
+  }, [cleanup, onClose]);
+
+  const currentStep = STEPS[stepIdx] || STEPS[STEPS.length - 1];
+  const progressPct = Math.round(((stepIdx + (state === "completed" ? 1 : 0)) / STEPS.length) * 100);
+  const showOverlay = ["preparing", "running", "paused", "completed", "failed", "cleaning"].includes(state);
+
+  if (!showOverlay) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 24,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 999990,
+        width: "min(720px, calc(100vw - 32px))",
+        background: "linear-gradient(135deg, #0f1623, #131d2e)",
+        border: "1px solid rgba(76,201,255,0.35)",
+        borderRadius: 16,
+        boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(76,201,255,0.08)",
+        padding: "16px 20px",
+        fontFamily: "inherit",
+        color: "white",
+      }}
+    >
+      {/* Header row: title + close */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 18 }}>🎬</span>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "white", letterSpacing: -0.1 }}>
+              {T("Live demo tour", "Live-Demo-Tour", "Canlı demo turu")}
+            </div>
+            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 1, fontWeight: 600 }}>
+              {state === "preparing" && T("Preparing demo data…", "Demo-Daten werden vorbereitet…", "Demo verileri hazırlanıyor…")}
+              {state === "running" && T(`Step ${stepIdx + 1} of ${STEPS.length}`, `Schritt ${stepIdx + 1} von ${STEPS.length}`, `Adım ${stepIdx + 1} / ${STEPS.length}`)}
+              {state === "paused" && T("Paused", "Pausiert", "Duraklatıldı")}
+              {state === "completed" && T("Demo finished — cleaning up…", "Demo beendet — wird aufgeräumt…", "Demo bitti — temizleniyor…")}
+              {state === "cleaning" && T("Cleaning up demo data…", "Demo-Daten werden entfernt…", "Demo verileri temizleniyor…")}
+              {state === "failed" && T("Demo failed", "Demo fehlgeschlagen", "Demo başarısız")}
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={handleExit}
+          title={T("Exit demo", "Demo beenden", "Demoyu kapat")}
+          style={{
+            background: "transparent",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(200,215,240,0.7)",
+            fontSize: 14,
+            padding: "4px 10px",
+            borderRadius: 8,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Current step label — large, readable */}
+      {state !== "failed" && (
+        <div
+          style={{
+            fontSize: 16,
+            fontWeight: 800,
+            color: "rgba(232,238,252,0.92)",
+            marginBottom: 12,
+            minHeight: 22,
+          }}
+        >
+          {state === "preparing"
+            ? T("Loading demo journey…", "Demo-Patient wird erstellt…", "Demo hastası oluşturuluyor…")
+            : state === "completed"
+            ? T("✓ All done — your bot just handled a full patient", "✓ Fertig — dein Bot hat einen kompletten Patienten betreut", "✓ Tamam — botunuz tam bir hastayı yönetti")
+            : currentStep.label[lang] || currentStep.label.de}
+        </div>
+      )}
+
+      {state === "failed" && (
+        <div
+          style={{
+            fontSize: 13,
+            color: "#ef4444",
+            background: "rgba(239,68,68,0.06)",
+            border: "1px solid rgba(239,68,68,0.18)",
+            borderRadius: 10,
+            padding: "10px 14px",
+            marginBottom: 12,
+          }}
+        >
+          {error === "tour_already_running"
+            ? T("A demo tour is already running. Try again in a minute.",
+                "Eine Demo-Tour läuft bereits. Versuch's in einer Minute nochmal.",
+                "Bir demo turu zaten çalışıyor. Bir dakika sonra tekrar deneyin.")
+            : T(`Could not start demo: ${error}`, `Demo konnte nicht gestartet werden: ${error}`, `Demo başlatılamadı: ${error}`)}
+        </div>
+      )}
+
+      {/* Progress bar */}
+      <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.05)", overflow: "hidden", marginBottom: 12 }}>
+        <div
+          style={{
+            height: "100%",
+            width: `${progressPct}%`,
+            background:
+              state === "failed"
+                ? "linear-gradient(90deg, #ef4444, #f87171)"
+                : state === "completed"
+                ? "linear-gradient(90deg, #10b981, #34d399)"
+                : "linear-gradient(90deg, #4cc9ff, #2892d7)",
+            transition: "width .4s",
+          }}
+        />
+      </div>
+
+      {/* Controls */}
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        {state === "running" && (
+          <button onClick={handlePause} style={btnSecondary}>
+            ⏸ {T("Pause", "Pause", "Duraklat")}
+          </button>
+        )}
+        {state === "paused" && (
+          <button onClick={handleResume} style={btnPrimary}>
+            ▶ {T("Continue", "Weiter", "Devam et")}
+          </button>
+        )}
+        {(state === "completed" || state === "failed") && (
+          <button onClick={handleReplay} style={btnSecondary}>
+            ↻ {T("Replay", "Nochmal", "Tekrar oynat")}
+          </button>
+        )}
+        <button onClick={handleExit} style={btnSecondary}>
+          {T("Exit", "Beenden", "Çıkış")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const btnPrimary = {
+  padding: "8px 16px",
+  background: "linear-gradient(135deg, #4cc9ff, #2892d7)",
+  color: "white",
+  fontWeight: 700,
+  fontSize: 12,
+  border: "none",
+  borderRadius: 8,
+  cursor: "pointer",
+  fontFamily: "inherit",
+};
+
+const btnSecondary = {
+  padding: "8px 16px",
+  background: "rgba(255,255,255,0.04)",
+  color: "rgba(232,238,252,0.85)",
+  fontWeight: 700,
+  fontSize: 12,
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 8,
+  cursor: "pointer",
+  fontFamily: "inherit",
+};

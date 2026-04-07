@@ -15,7 +15,7 @@ const isLoc = (p) => !!(p.metadata?.noTransferNeeded || p.metadata?.noFlightNeed
 export default function DashboardView() {
   const {
     clinic, myLeads, myAppts, setView, setInboxFilter, t, openPatient,
-    workspaceState, setShowPlanPicker,
+    workspaceState, setShowPlanPicker, demoTourOpen, setDemoTourOpen,
   } = useApp();
 
   const n = clinic;
@@ -226,6 +226,53 @@ export default function DashboardView() {
 
       {/* ── Advanced setup: "Volles Potenzial freischalten" — dashboard only, no banner ── */}
       <AdvancedSetupCard />
+
+      {/* ── Auto demo tour trigger — opens AutoDemoPlayer overlay ── */}
+      {!demoTourOpen && (
+        <div style={{
+          padding: "16px 20px", borderRadius: 14,
+          background: "linear-gradient(135deg, rgba(168,85,247,0.06), rgba(76,201,255,0.03))",
+          border: "1px solid rgba(168,85,247,0.18)",
+          marginBottom: 20,
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 200 }}>
+            <span style={{ fontSize: 22 }}>🎬</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>
+                {T(
+                  "See the full patient journey in 60 seconds",
+                  "Sieh den kompletten Patienten-Flow in 60 Sekunden",
+                  "Tam hasta yolculuğunu 60 saniyede izleyin"
+                )}
+              </div>
+              <div style={{ fontSize: 11.5, color: "rgba(167,177,195,0.65)", lineHeight: 1.4 }}>
+                {T(
+                  "Auto demo: WhatsApp → photos → review → booking → flight → driver → OP-prep → patient record",
+                  "Auto-Demo: WhatsApp → Fotos → Bewertung → Buchung → Flug → Fahrer → OP-Vorbereitung → Patientenakte",
+                  "Otomatik demo: WhatsApp → fotoğraflar → değerlendirme → rezervasyon → uçuş → sürücü → ameliyat hazırlığı → hasta dosyası"
+                )}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setDemoTourOpen(true)}
+            style={{
+              padding: "11px 22px", borderRadius: 10,
+              background: "linear-gradient(135deg, #a855f7, #7c3aed)",
+              color: "#fff", fontWeight: 800, fontSize: 13,
+              border: "none", cursor: "pointer", fontFamily: "inherit",
+              boxShadow: "0 4px 18px rgba(168,85,247,0.3)",
+              flexShrink: 0, whiteSpace: "nowrap",
+            }}
+          >
+            {T("Play full demo", "Komplette Demo abspielen", "Tam demoyu oynat")} →
+          </button>
+        </div>
+      )}
+      {/* AutoDemoPlayer overlay is mounted globally in MainLayout so it
+          survives view changes (the player calls setView() to walk through
+          the CRM and would otherwise unmount itself). */}
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
