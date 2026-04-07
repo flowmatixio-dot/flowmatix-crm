@@ -167,10 +167,15 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
                 </div>
 
                 {/* WhatsApp */}
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 12, fontWeight: 600, color: waOk ? 'var(--success)' : 'var(--error)' }}>
                     {waOk ? '● Connected' : '● Not connected'}
                   </span>
+                  {c.wa_is_shared_clone && (
+                    <span title="Nutzt geteilte Test-Nummer (kein eigener Token)" style={{ display: 'inline-block', padding: '2px 6px', fontSize: 9, fontWeight: 700, color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 4, letterSpacing: 0.5 }}>
+                      SHARED
+                    </span>
+                  )}
                 </div>
 
                 {/* Health */}
