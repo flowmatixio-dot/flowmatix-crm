@@ -42,6 +42,15 @@ const STEPS = [
     check: (c) => (c.team?.length || 0) >= 1,
   },
   {
+    id: "drivers",
+    icon: "🚗",
+    headline: { de: "Fahrer für Patiententransfers", en: "Drivers for patient transfers", tr: "Hasta transferleri için sürücüler" },
+    subtitle: { de: "Mindestens ein Fahrer reicht für den Start. Name und WhatsApp-Nummer — der Bot benachrichtigt sie automatisch bei neuen Transfers.", en: "One driver is enough to start. Name and WhatsApp number — the bot notifies them automatically about new transfers.", tr: "Başlamak için bir sürücü yeterli. İsim ve WhatsApp numarası — bot yeni transferler hakkında otomatik olarak bildirim gönderir." },
+    label: { de: "Fahrer", en: "Drivers", tr: "Sürücüler" },
+    required: true,
+    check: (c) => (c.drivers?.length || 0) >= 1,
+  },
+  {
     id: "calendar",
     icon: "📅",
     headline: { de: "Kalender & Buchungsregeln", en: "Calendar & Booking Rules", tr: "Takvim & Rezervasyon Kuralları" },
@@ -249,6 +258,7 @@ export default function OnboardingWizard({ onComplete, onSkip }) {
       case "profile": return <ClinicProfile {...shared} localData={localData} setLocalData={setLocalData} autoSave />;
       case "treatments": return <TreatmentTypes />;
       case "team": return <WizardTeamAccess clinic={clinic} showT={showT} t={t} />;
+      case "drivers": return <WizardDriversStep clinic={clinic} setClinics={setClinics} activeClinicId={activeClinicId} showT={showT} l={wizardLang || lang || "de"} />;
       case "calendar": return <CalendarSettings {...shared} wizardMode />;
       case "whatsapp": return <WhatsAppConnectStep />;
       case "automations": return <div style={{ textAlign: "center", padding: "32px 0" }}>
@@ -432,6 +442,147 @@ function ExtrasStep({ lang }) {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── WIZARD DRIVERS STEP ──
+ * Minimal driver setup: name (required) + WhatsApp number (optional).
+ * Saves to clinic.drivers via updateClinicSettings — same source-of-truth
+ * as the existing SettingsView drivers tab. Add a driver here and it
+ * appears immediately in Settings. No new API needed.
+ */
+function WizardDriversStep({ clinic, setClinics, activeClinicId, showT, l }) {
+  const drivers = clinic?.drivers || [];
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  const T = (de, en, tr) => ({ de, en, tr }[l] || de);
+
+  const persist = useCallback(async (next) => {
+    setClinics(prev => prev.map(c => c.id === activeClinicId ? { ...c, drivers: next } : c));
+    try {
+      await updateClinicSettings({ drivers: next });
+    } catch (e) {
+      // Revert on error
+      setClinics(prev => prev.map(c => c.id === activeClinicId ? { ...c, drivers } : c));
+      showT?.(T("Speichern fehlgeschlagen", "Save failed", "Kaydetme başarısız"));
+    }
+  }, [activeClinicId, setClinics, drivers, showT]);
+
+  const addDriver = useCallback(async () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setAdding(true);
+    const newDriver = {
+      id: "drv_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: trimmed,
+      phone: phone.trim() || "",
+      role: "transfer",
+    };
+    await persist([...drivers, newDriver]);
+    setName(""); setPhone(""); setAdding(false);
+  }, [name, phone, drivers, persist]);
+
+  const removeDriver = useCallback((id) => {
+    persist(drivers.filter(d => d.id !== id));
+  }, [drivers, persist]);
+
+  return (
+    <div>
+      {/* Existing drivers list */}
+      {drivers.length > 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, color: "rgba(167,177,195,0.55)", textTransform: "uppercase", marginBottom: 8 }}>
+            {T("Hinzugefügte Fahrer", "Added drivers", "Eklenen sürücüler")} ({drivers.length})
+          </div>
+          {drivers.map((d) => (
+            <div key={d.id} style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "12px 16px", borderRadius: 12, marginBottom: 8,
+              background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.15)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 18 }}>🚗</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{d.name}</div>
+                  {d.phone && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 }}>{d.phone}</div>}
+                </div>
+              </div>
+              <button onClick={() => removeDriver(d.id)} style={{
+                background: "transparent", border: "none", color: "rgba(239,68,68,0.7)",
+                fontSize: 18, cursor: "pointer", padding: "4px 10px", fontFamily: "inherit",
+              }} title={T("Entfernen", "Remove", "Kaldır")}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add form */}
+      <div style={{
+        padding: "18px 20px", borderRadius: 14,
+        background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 14 }}>
+          {drivers.length === 0
+            ? T("Ersten Fahrer hinzufügen", "Add your first driver", "İlk sürücüyü ekleyin")
+            : T("Weiteren Fahrer hinzufügen", "Add another driver", "Başka sürücü ekle")}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={T("Name (Pflicht)", "Name (required)", "İsim (zorunlu)")}
+            style={{
+              padding: "11px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+              color: "#fff", fontSize: 13, fontFamily: "inherit", outline: "none",
+            }}
+            onKeyDown={(e) => { if (e.key === "Enter" && name.trim()) addDriver(); }}
+          />
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder={T("WhatsApp (z.B. +90...)", "WhatsApp (e.g. +90...)", "WhatsApp (örn. +90...)")}
+            style={{
+              padding: "11px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+              color: "#fff", fontSize: 13, fontFamily: "inherit", outline: "none",
+            }}
+            onKeyDown={(e) => { if (e.key === "Enter" && name.trim()) addDriver(); }}
+          />
+        </div>
+        <button
+          onClick={addDriver}
+          disabled={!name.trim() || adding}
+          style={{
+            padding: "10px 22px", borderRadius: 10,
+            background: name.trim() && !adding
+              ? "linear-gradient(135deg, #4cc9ff, #2da8ff)"
+              : "rgba(255,255,255,0.04)",
+            color: name.trim() && !adding ? "#fff" : "rgba(167,177,195,0.5)",
+            border: "none", fontWeight: 700, fontSize: 13, fontFamily: "inherit",
+            cursor: name.trim() && !adding ? "pointer" : "default",
+            transition: "all .15s",
+          }}
+        >
+          {adding ? "..." : T("Fahrer hinzufügen", "Add driver", "Sürücü ekle")}
+        </button>
+      </div>
+
+      {/* Hint */}
+      <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)" }}>
+        <div style={{ fontSize: 11, color: "rgba(200,215,240,0.7)", lineHeight: 1.5 }}>
+          💡 {T(
+            "Mehr Details (Fahrzeug, Kennzeichen, Telegram-Chat-ID) kannst du später in den Einstellungen → Fahrer hinzufügen.",
+            "More details (vehicle, plate, Telegram chat ID) can be added later in Settings → Drivers.",
+            "Daha fazla ayrıntı (araç, plaka, Telegram chat ID) daha sonra Ayarlar → Sürücüler bölümünden eklenebilir."
+          )}
+        </div>
       </div>
     </div>
   );
