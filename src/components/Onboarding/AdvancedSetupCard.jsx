@@ -78,6 +78,21 @@ const ADVANCED_STEPS = [
       tr: "Tüm hasta fotoğrafları ve verileri otomatik olarak kaydedilir ve düzenlenir — hiçbir şey kaybolmaz."
     },
   },
+  {
+    key: "drivers",
+    section: "drivers",
+    icon: "🚗",
+    label:    {
+      de: "Fahrer & Transfers einrichten",
+      en: "Set up drivers & transfers",
+      tr: "Sürücüler ve transferleri kur"
+    },
+    sublabel: {
+      de: "Automatisiere Flughafen- und Hotel-Transfers für deine Patienten.",
+      en: "Automate airport and hotel transfers for your patients.",
+      tr: "Hastalarınız için havalimanı ve otel transferlerini otomatikleştirin."
+    },
+  },
 ];
 
 export default function AdvancedSetupCard() {

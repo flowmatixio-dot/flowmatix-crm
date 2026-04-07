@@ -36,6 +36,7 @@ const SECTION_TARGETS = {
   automations:        { view: "automations",settingsTab: null,            scrollAnchor: "fm-section-automations" },
   integrations:       { view: "settings",   settingsTab: "integrations",  scrollAnchor: "fm-section-integrations" },
   google_drive:       { view: "settings",   settingsTab: "integrations",  scrollAnchor: "fm-section-google" },
+  drivers:            { view: "settings",   settingsTab: "drivers",       scrollAnchor: "fm-section-drivers" },
 };
 
 const SS_TAB_KEY = "fm_settings_target";
