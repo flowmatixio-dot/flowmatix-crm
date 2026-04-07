@@ -24,7 +24,31 @@ import { navigateToSetupSection } from "../../lib/setupNav";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
+// Each step has an optional `requires` (other key that must be true
+// before this step is clickable) and an optional `lockedHint` (shown
+// in the tooltip when the user clicks the locked card).
 const ADVANCED_STEPS = [
+  {
+    key: "general",
+    section: "general",
+    icon: "🏥",
+    label:    { de: "Allgemein", en: "General", tr: "Genel" },
+    sublabel: { de: "Klinik-Stammdaten, Adresse, Ansprechpartner", en: "Clinic basics, address, contact", tr: "Klinik bilgileri, adres, iletişim" },
+  },
+  {
+    key: "treatments",
+    section: "treatments",
+    icon: "💉",
+    label:    { de: "Behandlungsarten", en: "Treatment types", tr: "Tedavi türleri" },
+    sublabel: { de: "Preise, Dauer, Anzahlungs-Logik", en: "Prices, duration, deposit logic", tr: "Fiyatlar, süre, depozito" },
+  },
+  {
+    key: "ai_settings",
+    section: "ai_settings",
+    icon: "🤖",
+    label:    { de: "KI-Bot Einstellungen", en: "AI bot settings", tr: "AI bot ayarları" },
+    sublabel: { de: "Tonalität, Begrüßung, Sprachen, Foto-Anforderung", en: "Tone, greeting, languages, photo rules", tr: "Ton, karşılama, diller, fotoğraf kuralları" },
+  },
   {
     key: "booking_rules",
     section: "booking_rules",
@@ -54,11 +78,21 @@ const ADVANCED_STEPS = [
     sublabel: { de: "Koordinatoren, Ärzte einladen", en: "Invite coordinators & doctors", tr: "Koordinatörleri ve doktorları davet et" },
   },
   {
+    key: "whatsapp",
+    section: "whatsapp",
+    icon: "💬",
+    label:    { de: "WhatsApp verbinden", en: "Connect WhatsApp", tr: "WhatsApp bağla" },
+    sublabel: { de: "Eigene Nummer für den Live-Betrieb", en: "Own number for live operation", tr: "Canlı kullanım için kendi numara" },
+    paidOnly: true,
+  },
+  {
     key: "automations",
     section: "automations",
     icon: "⚡",
     label:    { de: "Automationen aktivieren", en: "Activate automations", tr: "Otomasyonları etkinleştir" },
     sublabel: { de: "Erinnerungen, Follow-ups, Nachsorge", en: "Reminders, follow-ups, aftercare", tr: "Hatırlatmalar, takipler, bakım" },
+    requires: "whatsapp",
+    lockedHint: { de: "Erst WhatsApp verbinden", en: "Connect WhatsApp first", tr: "Önce WhatsApp bağlayın" },
   },
   {
     key: "integrations",
@@ -96,7 +130,7 @@ const ADVANCED_STEPS = [
 ];
 
 export default function AdvancedSetupCard() {
-  const { setView } = useApp();
+  const { setView, workspaceState, showT } = useApp();
   const lang = localStorage.getItem("fm_lang") || "de";
 
   const [status, setStatus] = useState(null);
@@ -105,7 +139,7 @@ export default function AdvancedSetupCard() {
   const fetchStatus = useCallback(async () => {
     try {
       const res = await fmApi.apiFetch("/api/v1/clinic/onboarding-status");
-      setStatus(res?.advanced || null);
+      setStatus(res || null);
     } catch (e) {
       setStatus(null);
     } finally {
@@ -122,7 +156,41 @@ export default function AdvancedSetupCard() {
 
   if (loading || !status) return null;
 
-  const steps = status.steps || {};
+  // Build a unified done-flag map. Backend exposes:
+  //   status.minimal.steps  — clinic, treatment, doctor (+ whatsapp if paid)
+  //   status.advanced.steps — booking_rules, ..., drivers
+  //   status.steps          — legacy flat map (whatsapp_connected, agent_configured, etc.)
+  const minimalSteps = (status.minimal && status.minimal.steps) || {};
+  const advancedSteps = (status.advanced && status.advanced.steps) || {};
+  const legacySteps = status.steps || {};
+  const planActive = workspaceState === 'active';
+  const flags = {
+    general:           !!minimalSteps.clinic,
+    treatments:        !!minimalSteps.treatment,
+    ai_settings:       !!legacySteps.agent_configured,
+    booking_rules:     !!advancedSteps.booking_rules,
+    doctor_assignment: !!advancedSteps.doctor_assignment,
+    payments:          !!advancedSteps.payments,
+    team:              !!advancedSteps.team,
+    whatsapp:          !!legacySteps.whatsapp_connected,
+    automations:       !!advancedSteps.automations,
+    integrations:      !!advancedSteps.integrations,
+    google_drive:      !!advancedSteps.google_drive,
+    drivers:           !!advancedSteps.drivers,
+  };
+
+  // Filter: hide paidOnly steps (e.g. whatsapp) until the workspace is active
+  const visibleSteps = ADVANCED_STEPS.filter((s) => !s.paidOnly || planActive);
+
+  const handleClick = (s) => {
+    // Locked if a prerequisite isn't met yet
+    if (s.requires && !flags[s.requires]) {
+      const hint = (s.lockedHint && (s.lockedHint[lang] || s.lockedHint.de)) || "Voraussetzung fehlt";
+      try { showT && showT(hint); } catch {}
+      return;
+    }
+    navigateToSetupSection(setView, s.section);
+  };
 
   return (
     <div
@@ -150,12 +218,14 @@ export default function AdvancedSetupCard() {
 
       {/* Detailed checklist — 2 columns on wider screens for better density */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 8 }}>
-        {ADVANCED_STEPS.map((s) => {
-          const done = !!steps[s.key];
+        {visibleSteps.map((s) => {
+          const done = !!flags[s.key];
+          const locked = !done && !!s.requires && !flags[s.requires];
           return (
             <button
               key={s.key}
-              onClick={() => navigateToSetupSection(setView, s.section)}
+              onClick={() => handleClick(s)}
+              title={locked ? (s.lockedHint?.[lang] || s.lockedHint?.de || "") : undefined}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -164,7 +234,7 @@ export default function AdvancedSetupCard() {
                 borderRadius: 11,
                 background: done ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.03)",
                 border: done ? "1px solid rgba(16,185,129,0.18)" : "1px solid rgba(255,255,255,0.06)",
-                color: done ? "#10b981" : "rgba(232,238,252,0.85)",
+                color: done ? "#10b981" : locked ? "rgba(167,177,195,0.5)" : "rgba(232,238,252,0.85)",
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -172,14 +242,15 @@ export default function AdvancedSetupCard() {
                 textAlign: "left",
                 width: "100%",
                 transition: "all .15s",
+                opacity: locked ? 0.65 : 1,
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateX(2px)";
-                if (!done) e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                if (!done && !locked) e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "";
-                if (!done) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                if (!done && !locked) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
               }}
             >
               <span
@@ -195,7 +266,7 @@ export default function AdvancedSetupCard() {
                   flexShrink: 0,
                 }}
               >
-                {done ? "✓" : s.icon}
+                {done ? "✓" : locked ? "🔒" : s.icon}
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -203,11 +274,13 @@ export default function AdvancedSetupCard() {
                 </div>
                 {!done && (
                   <div style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", fontWeight: 500, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {s.sublabel[lang] || s.sublabel.de}
+                    {locked
+                      ? (s.lockedHint?.[lang] || s.lockedHint?.de || (s.sublabel[lang] || s.sublabel.de))
+                      : (s.sublabel[lang] || s.sublabel.de)}
                   </div>
                 )}
               </div>
-              {!done && <span style={{ opacity: 0.4, fontSize: 12, flexShrink: 0 }}>→</span>}
+              {!done && <span style={{ opacity: 0.4, fontSize: 12, flexShrink: 0 }}>{locked ? "" : "→"}</span>}
             </button>
           );
         })}

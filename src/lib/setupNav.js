@@ -29,6 +29,9 @@ const SECTION_TARGETS = {
   whatsapp:  { view: "whatsapp_setup", settingsTab: null,                 scrollAnchor: "fm-section-whatsapp" },
 
   // Advanced setup
+  general:            { view: "settings",   settingsTab: "general",            scrollAnchor: "fm-section-clinic" },
+  treatments:         { view: "settings",   settingsTab: "clinic_treatments",  scrollAnchor: "fm-section-treatments" },
+  ai_settings:        { view: "settings",   settingsTab: "ai",                 scrollAnchor: "fm-section-ai" },
   booking_rules:      { view: "settings",   settingsTab: "booking_rules", scrollAnchor: "fm-section-booking-rules" },
   doctor_assignment:  { view: "settings",   settingsTab: "doctors",       scrollAnchor: "fm-section-doctors" },
   payments:           { view: "payments",   settingsTab: null,            scrollAnchor: "fm-section-payments" },
