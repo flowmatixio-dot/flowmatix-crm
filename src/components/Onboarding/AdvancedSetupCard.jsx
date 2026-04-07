@@ -122,57 +122,33 @@ export default function AdvancedSetupCard() {
 
   if (loading || !status) return null;
 
-  const progress = status.progress || 0;
   const steps = status.steps || {};
 
   return (
     <div
       style={{
-        padding: "22px 24px",
-        borderRadius: 16,
-        // Warmer accent than required setup card — feels like opportunity, not urgency
-        background: "linear-gradient(135deg, rgba(255,138,42,0.05), rgba(212,175,55,0.025))",
-        border: "1px solid rgba(255,138,42,0.18)",
-        marginBottom: 20,
+        padding: "20px 22px",
+        borderRadius: 14,
+        // Dezenter — keine Pressure, keine Accent-Border
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(255,255,255,0.06)",
+        marginBottom: 16,
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
-            <span style={{ fontSize: 18 }}>✨</span>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: -0.2 }}>
-              {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
-            </div>
-          </div>
-          <div style={{ fontSize: 13, color: "rgba(200,215,240,0.65)", lineHeight: 1.5 }}>
-            {T(
-              "Optimize your system for more bookings and automation.",
-              "Optimiere dein System für mehr Buchungen und Automatisierung.",
-              "Daha fazla rezervasyon ve otomasyon için sisteminizi optimize edin."
-            )}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <span style={{ fontSize: 14 }}>✨</span>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", letterSpacing: -0.1 }}>
+            {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
           </div>
         </div>
-        <div style={{ flexShrink: 0, textAlign: "right" }}>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#fbbf24", lineHeight: 1 }}>
-            {progress}%
-          </div>
-          <div style={{ fontSize: 10, color: "rgba(167,177,195,0.55)", marginTop: 4, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase" }}>
-            {T("Optimization", "Optimierung", "Optimizasyon")}
-          </div>
+        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", lineHeight: 1.5 }}>
+          {T(
+            "Optimize your system for more bookings and automation.",
+            "Optimiere dein System für mehr Buchungen und Automatisierung.",
+            "Daha fazla rezervasyon ve otomasyon için sisteminizi optimize edin."
+          )}
         </div>
-      </div>
-
-      {/* Progress bar — warm gradient distinct from required setup */}
-      <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.05)", overflow: "hidden", marginBottom: 18 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${progress}%`,
-            background: "linear-gradient(90deg, #fbbf24, #ff8a2a)",
-            transition: "width .3s",
-            borderRadius: 3,
-          }}
-        />
       </div>
 
       {/* Detailed checklist — 2 columns on wider screens for better density */}

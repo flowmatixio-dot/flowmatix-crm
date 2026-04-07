@@ -39,7 +39,6 @@ import ReviewBoard from "./DoctorTasks/ReviewBoard";
 import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
 import ArchiveView from "./Archive/ArchiveView";
 import OnboardingWizard from "./Onboarding/OnboardingWizard";
-import SetupBanner from "./Onboarding/SetupBanner";
 import AutoDemoPlayer from "./Onboarding/AutoDemoPlayer";
 import { isFromSetup, clearFromSetup } from "../lib/setupNav";
 import PaymentsView from "./Finance/PaymentsView";
@@ -910,70 +909,10 @@ export default function MainLayout() {
           </div>
         )}
 
-        {/* ── Live Test Panel (workspace_state === 'live_test') ── */}
-        {!demoMode && ctx.workspaceState === 'live_test' && view === 'dashboard' && (() => {
-          const ti = ctx.testInfo;
-          const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
-          const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const clinicCode = (activeClinicId || '').substring(0, 8).toUpperCase();
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${clinicCode}`;
-          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
-          // Inline tri-language helper for the test-mode wording — clearer
-          // than the existing lt_* keys (which sounded like "production
-          // WhatsApp connected"). This block is the trial test, NOT the
-          // clinic's production WhatsApp setup.
-          const _ltLang = (document.documentElement.lang || 'de').substring(0, 2);
-          const _ltT = (de, en, tr) => ({ de, en, tr }[_ltLang] || de);
-          return (
-            <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 28, justifyContent: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ width: 14, height: 14, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>
-                        {_ltT("Bot live testen", "Test the bot live", "Botu canlı test edin")}
-                      </div>
-                      <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
-                        {_ltT("TESTMODUS AKTIV", "TEST MODE ACTIVE", "TEST MODU AKTİF")}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.78)", marginTop: 4, fontWeight: 600 }}>
-                      {_ltT(
-                        "Keine eigene WhatsApp-Nummer nötig — du kannst den Bot sofort testen.",
-                        "No own WhatsApp number needed — you can test the bot right now.",
-                        "Kendi WhatsApp numaranız gerekmez — botu hemen test edebilirsiniz."
-                      )}
-                    </div>
-                    <div style={{ fontSize: 11, color: "rgba(200,215,240,0.55)", marginTop: 2 }}>
-                      {_ltT(
-                        "Wir nutzen eine geteilte Test-Nummer. Deine eigene Nummer wird nach dem Kauf eingerichtet.",
-                        "We use a shared test number. Your own number is set up after purchase.",
-                        "Paylaşılan bir test numarası kullanıyoruz. Kendi numaranız satın alma sonrası kurulur."
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, textDecoration: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.25)", transition: "transform 0.15s, box-shadow 0.15s" }}>
-                  {_ltT("Testnachricht senden", "Send test message", "Test mesajı gönder")} →
-                </a>
-                <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
-                  {_ltT(
-                    "QR scannen oder Button klicken — der Bot antwortet sofort.",
-                    "Scan the QR or tap the button — the bot replies instantly.",
-                    "QR'ı tarayın veya butona dokunun — bot anında yanıtlar."
-                  )}
-                </div>
-                <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
-                {ti?.session && (
-                  <div style={{ fontSize: 12, color: "rgba(200,215,240,0.45)", background: "rgba(255,255,255,0.04)", padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {ti.session.messagesCount}/{ti.limits?.maxMessages || 50} {t("messages") || "Nachrichten"}{ti.session.photoUploaded ? ' · 📷 ✓' : ''}
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })()}
+        {/* Live Test Panel removed — moved into DashboardView as a secondary
+            section below the demo hero. This used to be a global header banner
+            that took the top of the dashboard; now it lives inline so the
+            demo hero is the first thing the trial user sees. */}
 
         {/* ── Activation UI (workspace_state === 'activation_pending') ── */}
         {ctx.showActivation && ctx.workspaceState === 'activation_pending' && (
@@ -1027,10 +966,9 @@ export default function MainLayout() {
             </div>
           );
         })()}
-        {/* ── Setup progress banner — global, visible on all main pages, auto-hides when complete ── */}
-        {clinic && IS_CLIENT_MODE && view !== "settings" && view !== "whatsapp_setup" && (
-          <SetupBanner />
-        )}
+        {/* SetupBanner removed — dashboard is now a sales experience, not a
+            settings page. The detailed checklist still lives in DashboardView
+            as the optional "System weiter optimieren" card. */}
 
         {/* ── "Zurück zum Setup" pill — visible on the deep-link target views ── */}
         {clinic && IS_CLIENT_MODE && isFromSetup() && view !== "dashboard" && (

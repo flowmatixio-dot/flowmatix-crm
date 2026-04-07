@@ -16,6 +16,7 @@ export default function DashboardView() {
   const {
     clinic, myLeads, myAppts, setView, setInboxFilter, t, openPatient,
     workspaceState, setShowPlanPicker, demoTourOpen, setDemoTourOpen,
+    activeClinicId, testInfo,
   } = useApp();
 
   const n = clinic;
@@ -209,70 +210,145 @@ export default function DashboardView() {
         </div>
         {workspaceState && workspaceState !== 'active' && workspaceState !== 'trial_expired' && workspaceState !== 'checkout_pending' && (
           <button onClick={() => setShowPlanPicker(true)} style={{
-            padding: "8px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-            background: "linear-gradient(135deg, rgba(76,201,255,0.1), rgba(76,201,255,0.04))",
-            border: "1px solid rgba(76,201,255,0.2)", color: "#4cc9ff",
-            display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap",
+            padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+            background: "transparent",
+            border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)",
+            display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
             transition: "all 0.2s",
           }}>
-            <span style={{ fontSize: 14 }}>⚡</span>
-            {t("skip_trial") || "Skip trial — choose plan"}
+            {t("skip_trial") || "Trial überspringen"}
           </button>
         )}
       </div>
 
-      {/* ── Setup progress card (auto-hides when onboarding_completed) ── */}
-      <SetupCard />
-
-      {/* ── Advanced setup: "Volles Potenzial freischalten" — dashboard only, no banner ── */}
-      <AdvancedSetupCard />
-
-      {/* ── Auto demo tour trigger — opens AutoDemoPlayer overlay ── */}
+      {/* ═══════════════════════════════════════════════════════════════
+          PRIMARY HERO — Auto demo tour
+          This is the FIRST thing a trial user sees. Large, high-contrast,
+          accent-colored, single primary CTA. The setup checklist used to
+          live above this; it has been moved below the live-test section
+          to reduce perceived setup friction.
+          ═══════════════════════════════════════════════════════════════ */}
       {!demoTourOpen && (
         <div style={{
-          padding: "16px 20px", borderRadius: 14,
-          background: "linear-gradient(135deg, rgba(168,85,247,0.06), rgba(76,201,255,0.03))",
-          border: "1px solid rgba(168,85,247,0.18)",
+          padding: "32px 36px", borderRadius: 20,
+          background: "linear-gradient(135deg, rgba(168,85,247,0.14), rgba(76,201,255,0.06))",
+          border: "1px solid rgba(168,85,247,0.32)",
           marginBottom: 20,
-          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap",
+          boxShadow: "0 10px 40px rgba(168,85,247,0.15)",
+          position: "relative",
+          overflow: "hidden",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 200 }}>
-            <span style={{ fontSize: 22 }}>🎬</span>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>
+          {/* Decorative glow */}
+          <div style={{ position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle, rgba(168,85,247,0.18), transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 12px", borderRadius: 99, background: "rgba(168,85,247,0.16)", border: "1px solid rgba(168,85,247,0.3)", marginBottom: 14 }}>
+                <span style={{ fontSize: 13 }}>🎬</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: "#c084fc", letterSpacing: "0.08em" }}>
+                  {T("LIVE PRODUCT TOUR", "LIVE PRODUKT-TOUR", "CANLI ÜRÜN TURU")}
+                </span>
+              </div>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 10px", lineHeight: 1.2, letterSpacing: -0.4 }}>
                 {T(
-                  "See the full patient journey in 60 seconds",
+                  "See the full patient flow in 60 seconds",
                   "Sieh den kompletten Patienten-Flow in 60 Sekunden",
-                  "Tam hasta yolculuğunu 60 saniyede izleyin"
+                  "Tam hasta akışını 60 saniyede izleyin"
                 )}
-              </div>
-              <div style={{ fontSize: 11.5, color: "rgba(167,177,195,0.65)", lineHeight: 1.4 }}>
+              </h2>
+              <p style={{ fontSize: 14, color: "rgba(200,215,240,0.75)", margin: 0, lineHeight: 1.55, maxWidth: 560 }}>
                 {T(
-                  "Auto demo: WhatsApp → photos → review → booking → flight → driver → OP-prep → patient record",
-                  "Auto-Demo: WhatsApp → Fotos → Bewertung → Buchung → Flug → Fahrer → OP-Vorbereitung → Patientenakte",
-                  "Otomatik demo: WhatsApp → fotoğraflar → değerlendirme → rezervasyon → uçuş → sürücü → ameliyat hazırlığı → hasta dosyası"
+                  "From the first WhatsApp message to booking, flight and driver — fully automatic.",
+                  "Von der ersten WhatsApp-Nachricht bis zur Buchung, Flug und Fahrer — alles automatisch.",
+                  "İlk WhatsApp mesajından rezervasyona, uçuşa ve sürücüye — tamamen otomatik."
                 )}
-              </div>
+              </p>
             </div>
+            <button
+              onClick={() => setDemoTourOpen(true)}
+              style={{
+                padding: "16px 32px", borderRadius: 12,
+                background: "linear-gradient(135deg, #a855f7, #7c3aed)",
+                color: "#fff", fontWeight: 800, fontSize: 15,
+                border: "none", cursor: "pointer", fontFamily: "inherit",
+                boxShadow: "0 8px 28px rgba(168,85,247,0.45)",
+                flexShrink: 0, whiteSpace: "nowrap",
+                transition: "transform .15s, box-shadow .15s",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 36px rgba(168,85,247,0.55)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 8px 28px rgba(168,85,247,0.45)"; }}
+            >
+              ▶ {T("Play full demo", "Komplette Demo abspielen", "Tam demoyu oynat")}
+            </button>
           </div>
-          <button
-            onClick={() => setDemoTourOpen(true)}
-            style={{
-              padding: "11px 22px", borderRadius: 10,
-              background: "linear-gradient(135deg, #a855f7, #7c3aed)",
-              color: "#fff", fontWeight: 800, fontSize: 13,
-              border: "none", cursor: "pointer", fontFamily: "inherit",
-              boxShadow: "0 4px 18px rgba(168,85,247,0.3)",
-              flexShrink: 0, whiteSpace: "nowrap",
-            }}
-          >
-            {T("Play full demo", "Komplette Demo abspielen", "Tam demoyu oynat")} →
-          </button>
         </div>
       )}
       {/* AutoDemoPlayer overlay is mounted globally in MainLayout so it
           survives view changes (the player calls setView() to walk through
           the CRM and would otherwise unmount itself). */}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECONDARY — Live test (Bot live selbst testen)
+          Was previously a global header banner above all main pages.
+          Moved here as a secondary section below the demo hero so the
+          primary action is unmistakably "play the demo".
+          ═══════════════════════════════════════════════════════════════ */}
+      {workspaceState === 'live_test' && (() => {
+        const ti = testInfo;
+        const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
+        const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
+        const clinicCode = (activeClinicId || '').substring(0, 8).toUpperCase();
+        const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${clinicCode}`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
+        return (
+          <div style={{
+            padding: "20px 24px", borderRadius: 16,
+            background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.02))",
+            border: "1px solid rgba(37,211,102,0.18)",
+            marginBottom: 20,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 240 }}>
+                <div style={{ width: 12, height: 12, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
+                      {T("Test the bot live yourself", "Bot live selbst testen", "Botu canlı kendiniz test edin")}
+                    </div>
+                    <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
+                      {T("TEST MODE", "TESTMODUS", "TEST MODU")}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>
+                    {T(
+                      "Send a WhatsApp message — your bot replies instantly. No setup required.",
+                      "Schicke eine WhatsApp-Nachricht — dein Bot antwortet sofort. Keine Einrichtung nötig.",
+                      "Bir WhatsApp mesajı gönderin — botunuz anında yanıtlar. Kurulum gerekmez."
+                    )}
+                  </div>
+                </div>
+              </div>
+              <a href={waLink} target="_blank" rel="noopener" style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "11px 22px",
+                background: "linear-gradient(135deg, #25D366, #128C7E)",
+                color: "white", fontWeight: 700, fontSize: 13,
+                border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
+                boxShadow: "0 4px 18px rgba(37,211,102,0.25)",
+                flexShrink: 0, whiteSpace: "nowrap",
+              }}>
+                {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
+              </a>
+              <img src={qrUrl} alt="QR" style={{ width: 56, height: 56, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", flexShrink: 0 }} />
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ── Optional setup (was the urgent SetupCard) ── */}
+      <SetupCard />
+
+      {/* ── Optional optimization (was the Volles Potenzial card) ── */}
+      <AdvancedSetupCard />
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
@@ -297,13 +373,12 @@ export default function DashboardView() {
           and pushed users to generic /settings (spec: no generic navigation, no duplication). */}
 
       {ds === "action" && (
-        <div style={{ borderRadius: 14, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.12)", marginBottom: 20, overflow: "hidden" }}>
+        <div style={{ borderRadius: 14, background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.1)", marginBottom: 20, overflow: "hidden" }}>
           <div style={{ padding: "14px 20px", display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 10, height: 10, borderRadius: 99, background: "#ef4444", animation: "fmDotPulse 2s ease-in-out infinite" }} />
             <span style={{ fontSize: 14 }}>⚡</span>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#10b981" }}>{T("System running", "System läuft", "Sistem çalışıyor")}</span>
-            <span style={{ color: "rgba(167,177,195,0.7)" }}>·</span>
-            <span style={{ fontWeight: 700, fontSize: 14 }}>{crT} {T("actions required", "Aktionen erforderlich", "işlem gerekli")}</span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "rgba(232,238,252,0.9)" }}>{T("Just one more thing to optimize", "Noch eine Sache optimieren", "Optimize edilecek bir şey daha")}</span>
+            <span style={{ color: "rgba(167,177,195,0.5)" }}>·</span>
+            <span style={{ fontSize: 12, color: "rgba(167,177,195,0.65)" }}>{crT}</span>
           </div>
           {crG.map((c) => (
             <div key={c.type} style={{ padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -314,10 +389,10 @@ export default function DashboardView() {
                   {c.desc && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 2 }}>{c.desc}</div>}
                 </div>
               </div>
-              <span onClick={() => setView("action_needed")} style={{ color: "#ef4444", cursor: "pointer", fontSize: 16 }}>→</span>
+              <span onClick={() => setView("action_needed")} style={{ color: "#4cc9ff", cursor: "pointer", fontSize: 16 }}>→</span>
             </div>
           ))}
-          <div onClick={() => setView("action_needed")} style={{ padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.04)", textAlign: "center", fontSize: 13, color: "#ff8a2a", cursor: "pointer", fontWeight: 600, background: "rgba(255,138,42,0.04)" }}>{T("Go to tasks", "Zu Aufgaben", "Görevlere git")} →</div>
+          <div onClick={() => setView("action_needed")} style={{ padding: "10px 20px", borderTop: "1px solid rgba(255,255,255,0.04)", textAlign: "center", fontSize: 12, color: "rgba(76,201,255,0.85)", cursor: "pointer", fontWeight: 600 }}>{T("Open tasks", "Zu den Aufgaben", "Görevlere git")} →</div>
         </div>
       )}
 

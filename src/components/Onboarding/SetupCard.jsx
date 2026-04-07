@@ -134,78 +134,34 @@ export default function SetupCard() {
     );
   }
 
-  const progress = status.progress || 0;
   const steps = status.steps || {};
-
-  // Dynamic primary CTA — points at the next missing required step
-  const nextDef = STEP_DEFS.find((s) => !steps[s.key] && !s.optional)
-    || STEP_DEFS.find((s) => !steps[s.key]);
-  const ctaLabel = nextDef ? (nextDef.cta[lang] || nextDef.cta.de) : (T("Continue setup", "Setup fortsetzen", "Kuruluma devam et"));
 
   return (
     <div
       style={{
-        padding: "22px 24px",
-        borderRadius: 16,
-        background: "linear-gradient(135deg, rgba(76,201,255,0.05), rgba(255,138,42,0.025))",
-        border: "1px solid rgba(76,201,255,0.18)",
-        marginBottom: 20,
+        padding: "20px 22px",
+        borderRadius: 14,
+        // Dezenter Look — keine Pressure mehr, keine Accent-Borders
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(255,255,255,0.06)",
+        marginBottom: 16,
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 5, letterSpacing: -0.2 }}>
-            {T(
-              `Your system is ${progress}% set up`,
-              `Dein System ist zu ${progress}% eingerichtet`,
-              `Sisteminiz %${progress} kuruldu`
-            )}
-          </div>
-          <div style={{ fontSize: 13, color: "rgba(200,215,240,0.65)", lineHeight: 1.5 }}>
-            {T(
-              "Complete the final steps so your bot works correctly.",
-              "Schließe die letzten Schritte ab, damit dein Bot korrekt arbeitet.",
-              "Botunuzun düzgün çalışması için son adımları tamamlayın."
-            )}
-          </div>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 4, letterSpacing: -0.1 }}>
+          {T(
+            "Optional: optimize your system further",
+            "Optional: System weiter optimieren",
+            "İsteğe bağlı: sisteminizi daha da optimize edin"
+          )}
         </div>
-        {nextDef && (
-          <button
-            onClick={() => navigateToSetupSection(setView, nextDef.section)}
-            style={{
-              padding: "11px 20px",
-              background: "linear-gradient(135deg, #4cc9ff, #2892d7)",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 13,
-              border: "none",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              flexShrink: 0,
-              boxShadow: "0 4px 18px rgba(76,201,255,0.25)",
-              transition: "transform .15s",
-              whiteSpace: "nowrap",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = ""; }}
-          >
-            {ctaLabel} →
-          </button>
-        )}
-      </div>
-
-      {/* Progress bar */}
-      <div style={{ height: 7, borderRadius: 4, background: "rgba(255,255,255,0.05)", overflow: "hidden", marginBottom: 18 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${progress}%`,
-            background: progress >= 75 ? "linear-gradient(90deg, #10b981, #34d399)" : "linear-gradient(90deg, #4cc9ff, #2892d7)",
-            transition: "width .3s",
-            borderRadius: 4,
-          }}
-        />
+        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", lineHeight: 1.5 }}>
+          {T(
+            "Add more details to get even better results.",
+            "Füge weitere Details hinzu, um noch bessere Ergebnisse zu erzielen.",
+            "Daha iyi sonuçlar için daha fazla ayrıntı ekleyin."
+          )}
+        </div>
       </div>
 
       {/* Detailed checklist */}
