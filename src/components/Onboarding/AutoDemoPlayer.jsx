@@ -109,14 +109,17 @@ const STEPS = [
   },
   {
     id: "patient_record",
-    view: "patients_db",
+    view: "inbox",
     label: { de: "Komplette Patientenakte", en: "Full patient record", tr: "Tam hasta dosyası" },
-    duration: 5000,
+    duration: 6000,
+    // Open the PatientPanel detail (slide-in) for the demo patient on
+    // top of the inbox. Avoids the patients_db FullCalendar render path.
+    onEnter: "openPatientRecord",
   },
 ];
 
 export default function AutoDemoPlayer({ onClose }) {
-  const { setView, setSelAppt, setLeads } = useApp();
+  const { setView, setSelAppt, setLeads, setSelLead } = useApp();
   const lang = localStorage.getItem("fm_lang") || "de";
 
   // State machine: idle → preparing → running ↔ paused → completed → cleaning → idle
@@ -142,6 +145,8 @@ export default function AutoDemoPlayer({ onClose }) {
   useEffect(() => { setSelApptRef.current = setSelAppt; });
   const setLeadsRef = useRef(setLeads);
   useEffect(() => { setLeadsRef.current = setLeads; });
+  const setSelLeadRef = useRef(setSelLead);
+  useEffect(() => { setSelLeadRef.current = setSelLead; });
 
   // Centralized DOM cleanup — closes any popup/panel the player might
   // have opened. Called from every code path that ends/restarts a tour
@@ -151,6 +156,7 @@ export default function AutoDemoPlayer({ onClose }) {
     try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
     try { setSelApptRef.current && setSelApptRef.current(null); } catch {}
     try { window.dispatchEvent(new CustomEvent("fm-close-op-prep")); } catch {}
+    try { setSelLeadRef.current && setSelLeadRef.current(null); } catch {}
   }, []);
 
   const cleanup = useCallback(async () => {
@@ -227,6 +233,21 @@ export default function AutoDemoPlayer({ onClose }) {
       // Fire the existing fm-open-review event so MainLayout opens the
       // real DoctorTasksView popup with our demo task pre-loaded.
       try { window.dispatchEvent(new CustomEvent("fm-open-review")); } catch {}
+      // After the popup mounts, smoothly scroll the popup body all the
+      // way down so the user sees photos + intake fields without having
+      // to scroll manually. Two phases: scroll to bottom, then back up.
+      setTimeout(() => {
+        if (cancelledHook) return;
+        const el = document.getElementById("fm-trial-review-scroll");
+        if (!el) return;
+        const max = el.scrollHeight - el.clientHeight;
+        if (max <= 0) return;
+        try { el.scrollTo({ top: max, behavior: "smooth" }); } catch { el.scrollTop = max; }
+        setTimeout(() => {
+          if (cancelledHook) return;
+          try { el.scrollTo({ top: 0, behavior: "smooth" }); } catch { el.scrollTop = 0; }
+        }, 3500);
+      }, 1000);
     }
     if (step.onEnter === "confirmBooking") {
       // Backend: flip the demo patient into "booked" with flight info
@@ -267,6 +288,20 @@ export default function AutoDemoPlayer({ onClose }) {
           }));
         } catch {}
       }, 800);
+    }
+    if (step.onEnter === "openPatientRecord") {
+      // Open the patient detail panel (slide-in) for the demo patient.
+      // PatientPanel reads from leads via selLead id. Background view
+      // is "inbox" so we don't trigger the FullCalendar render path
+      // that fails on demo data (TypeError: t is not a function in
+      // vendor-calendar bundle).
+      const tourPatientId = (tourMeta && tourMeta.patientId) || null;
+      if (tourPatientId) {
+        setTimeout(() => {
+          if (cancelledHook) return;
+          try { setSelLeadRef.current && setSelLeadRef.current(tourPatientId); } catch {}
+        }, 600);
+      }
     }
     if (step.onEnter === "openHotelAssign") {
       // Open the real "Hotel zuweisen" panel from ActionNeededView for
@@ -363,6 +398,10 @@ export default function AutoDemoPlayer({ onClose }) {
       // Close the OP-Prep drawer on the way out — same reason.
       if (step.onEnter === "openOpPrepDetail") {
         try { window.dispatchEvent(new CustomEvent("fm-close-op-prep")); } catch {}
+      }
+      // Close the patient panel on the way out.
+      if (step.onEnter === "openPatientRecord") {
+        try { setSelLeadRef.current && setSelLeadRef.current(null); } catch {}
       }
     };
   }, [state, stepIdx]);

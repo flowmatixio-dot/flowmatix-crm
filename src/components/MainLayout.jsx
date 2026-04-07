@@ -317,7 +317,7 @@ export default function MainLayout() {
             </div>
           </div>
           {/* Actual DoctorTasksView */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
+          <div id="fm-trial-review-scroll" style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
             <DoctorTasksView />
           </div>
         </div>
