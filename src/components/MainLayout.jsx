@@ -802,8 +802,10 @@ export default function MainLayout() {
               <span style={{ fontSize: 9, color: "var(--text-muted)", fontWeight: 600 }}>Online</span>
             </div>}
 
-            {/* Demo/Live toggle */}
-            {IS_CLIENT_MODE && clinic && effectiveRole === "admin" && <button data-tour="demo_toggle" onClick={toggleDemoMode} disabled={demoLoading} style={{ padding: "3px 10px", borderRadius: 6, background: demoMode ? "rgba(239,68,68,0.06)" : "rgba(16,185,129,0.04)", border: `1px solid ${demoMode ? "rgba(239,68,68,0.12)" : "rgba(16,185,129,0.08)"}`, color: demoMode ? "#ef4444" : "#10b981", fontWeight: 700, fontSize: 9, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, letterSpacing: "0.04em" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: demoMode ? "#ef4444" : "#10b981", flexShrink: 0 }} />{demoLoading ? "..." : demoMode ? "DEMO" : "LIVE"}</button>}
+            {/* Demo/Live toggle removed — demoMode is hard-coded false
+                and the button only added confusion (and was the source of
+                workspace_state='demo' getting stuck). The auto demo tour
+                replaces all legitimate use of demo mode. */}
 
             {/* Notification bell (hidden for doctor) */}
             {IS_CLIENT_MODE && effectiveRole !== "doctor" && <div style={{ position: "relative" }}>
