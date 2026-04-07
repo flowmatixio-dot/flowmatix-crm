@@ -811,6 +811,30 @@ export default function PatientPanel() {
           </div>)}
         </div>}
       </div>
+      {/* ═══ GDPR DATA EXPORT — Art. 15 + 20 ═══ */}
+      <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.15)"}}>
+        <div style={{fontSize:13,fontWeight:800,color:"#4cc9ff",marginBottom:6}}>{t("gdpr_data_export") || "Datenauskunft (DSGVO Art. 15/20)"}</div>
+        <div style={{fontSize:12,color:"rgba(167,177,195,0.65)",marginBottom:10,lineHeight:1.5}}>{t("gdpr_data_export_desc") || "Lädt alle gespeicherten Daten dieses Patienten als JSON herunter — für Auskunfts- oder Portabilitätsanfragen."}</div>
+        <button onClick={async()=>{
+          try {
+            const { apiCall } = await import("../../api/client");
+            const data = await apiCall(`/crm/patients/${lead.id}/export`);
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `flowmatix-patient-${lead.id}-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showT(t("gdpr_export_success") || "Daten heruntergeladen");
+          } catch (e) {
+            showT(e.message || "Fehler", "error");
+          }
+        }} style={{padding:"8px 16px",borderRadius:10,background:"rgba(76,201,255,0.1)",border:"1px solid rgba(76,201,255,0.3)",color:"#4cc9ff",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>⬇ {t("gdpr_export_btn") || "Patientendaten exportieren (JSON)"}</button>
+      </div>
+
       {/* ═══ GDPR DELETE — only admin ═══ */}
       {user?.role === "admin" && <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)"}}>
         <div style={{fontSize:13,fontWeight:800,color:"#ef4444",marginBottom:8}}>{t("gdpr_danger_zone") || "Danger Zone"}</div>

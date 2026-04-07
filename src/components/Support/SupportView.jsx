@@ -39,7 +39,7 @@ export default function SupportView() {
           {label:t("privacy_policy"),icon:"🔒",url:"https://www.flowmatix.io/privacy-policy"},
           {label:t("terms_service"),icon:"📄",url:"https://www.flowmatix.io/terms"},
           {label:t("imprint"),icon:"🏢",url:"https://www.flowmatix.io/imprint"},
-          {label:t("avv_dpa"),icon:"📋",url:{de:"https://www.flowmatix.io/documents/AVV-Deutsch.html",en:"https://www.flowmatix.io/documents/AVV-Englisch.html",tr:"https://www.flowmatix.io/documents/DPA-Turkisch.html"}},
+          {label:t("avv_dpa"),icon:"📋",url:{de:"/legal/AVV-Deutsch.pdf",en:"/legal/AVV-Englisch.pdf",tr:"/legal/DPA-Turkisch.pdf"}},
         ].map((l,i)=>{
           const href = typeof l.url === "object" ? (l.url[lang] || l.url.en) : l.url;
           return <a key={i} href={href} target="_blank" rel="noopener noreferrer" style={{padding:"8px 16px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.7)",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:6,textDecoration:"none"}}>{l.icon} {l.label}</a>;
