@@ -226,53 +226,44 @@ export default function AdvancedSetupCard() {
     >
       {/* Collapsible header — clicking toggles the checklist below.
           Default state is collapsed so the dashboard stays focused on
-          the demo as the primary action. */}
-      {(() => {
-        const totalCount = visibleSteps.length;
-        const doneCount = visibleSteps.filter((s) => !!flags[s.key]).length;
-        return (
-          <button
-            onClick={toggleExpanded}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              width: "100%",
-              padding: 0,
-              marginBottom: expanded ? 14 : 0,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontFamily: "inherit",
-              textAlign: "left",
-            }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 3, letterSpacing: -0.05 }}>
-                {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
-              </div>
-              <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
-                {T(
-                  "Optimize your system for more bookings and automation.",
-                  "Optimiere dein System für mehr Buchungen und Automatisierung.",
-                  "Daha fazla rezervasyon ve otomasyon için sisteminizi optimize edin."
-                )}
-              </div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-              <span style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", fontWeight: 600 }}>
-                {doneCount}/{totalCount}
-              </span>
-              <span style={{
-                fontSize: 11, color: "rgba(167,177,195,0.55)",
-                transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
-                transition: "transform .2s",
-                display: "inline-block",
-              }}>▶</span>
-            </div>
-          </button>
-        );
-      })()}
+          the demo as the primary action. No "X/Y" counter — that
+          created a wizard / setup-progress feeling we want to avoid. */}
+      <button
+        onClick={toggleExpanded}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          width: "100%",
+          padding: 0,
+          marginBottom: expanded ? 14 : 0,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          fontFamily: "inherit",
+          textAlign: "left",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 3, letterSpacing: -0.05 }}>
+            {T("🚀 Win more patients automatically", "🚀 Mehr Patienten automatisch gewinnen", "🚀 Otomatik olarak daha fazla hasta kazanın")}
+          </div>
+          <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
+            {T(
+              "Each upgrade increases bookings and automation.",
+              "Jede Optimierung steigert Buchungen und Automatisierung.",
+              "Her optimizasyon rezervasyonları ve otomasyonu artırır."
+            )}
+          </div>
+        </div>
+        <span style={{
+          fontSize: 11, color: "rgba(167,177,195,0.55)",
+          transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+          transition: "transform .2s",
+          display: "inline-block",
+          flexShrink: 0,
+        }}>▶</span>
+      </button>
 
       {/* Detailed checklist — only rendered when expanded.
           Three-tier priority styling (no red anywhere — would create

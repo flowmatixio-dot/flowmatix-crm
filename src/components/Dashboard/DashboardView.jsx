@@ -363,6 +363,17 @@ export default function DashboardView() {
       {/* ── System performance indicator (replaces the old Einrichtung %) ── */}
       <PerformanceIndicator />
 
+      {/* Connection text — bridges the performance bar and the upgrade
+          card so the user understands the link between optimisations
+          and bookings. Keeps the language outcome-focused. */}
+      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginBottom: 10, marginTop: -4, paddingLeft: 4 }}>
+        {T(
+          "Optimize your system for more bookings:",
+          "Optimiere dein System für mehr Buchungen:",
+          "Daha fazla rezervasyon için sisteminizi optimize edin:"
+        )}
+      </div>
+
       {/* ── Optional setup (was the urgent SetupCard) ── */}
       <SetupCard />
 

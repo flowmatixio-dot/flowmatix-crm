@@ -128,6 +128,14 @@ export default function PerformanceIndicator() {
           }}
         />
       </div>
+      <div style={{ marginTop: 10, fontSize: 11, color: "rgba(167,177,195,0.6)", lineHeight: 1.5, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981", flexShrink: 0, animation: "fmPulseGreen 2s infinite" }} />
+        {T(
+          "Your system is already responding to requests automatically.",
+          "Dein System beantwortet bereits Anfragen automatisch.",
+          "Sisteminiz talepleri zaten otomatik olarak yanıtlıyor."
+        )}
+      </div>
     </div>
   );
 }
