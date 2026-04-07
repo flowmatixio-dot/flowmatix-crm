@@ -325,7 +325,10 @@ export default function InboxView() {
   /* ── Load + auto-refresh messages from API ── */
   const loadMessages = useCallback(() => {
     if (!selChat?.id || !activeClinicId) return;
-    if (selChat.is_demo) return;
+    // Note: previously skipped when selChat.is_demo was true (legacy
+    // mock-data demo mode). Removed because the auto demo tour stores
+    // its messages in the real DB — without this fetch, the inbox stayed
+    // empty during the tour.
     fmApi.getMessages(selChat.id).then(data => {
       const apiMsgs = (data?.messages || []).map(m => ({
         text: m.text || m.content || '',
@@ -345,12 +348,20 @@ export default function InboxView() {
   }, [selChat?.id, activeClinicId]);
 
   useEffect(() => {
-    if (!selChat?.id || selChat.is_demo) return;
+    if (!selChat?.id) return;
     setLoadingMsgs(true);
     loadMessages();
     setLoadingMsgs(false);
     const iv = setInterval(loadMessages, 10000);
-    return () => clearInterval(iv);
+    // Demo tour bridge: force-reload messages on demand (e.g. after the
+    // tour writes new booking messages mid-step). Without this the user
+    // would have to wait up to 10s for the next poll tick.
+    const reloadHandler = () => loadMessages();
+    window.addEventListener('fm-reload-chat-messages', reloadHandler);
+    return () => {
+      clearInterval(iv);
+      window.removeEventListener('fm-reload-chat-messages', reloadHandler);
+    };
   }, [selChat?.id, loadMessages]);
 
   // Poll patient data every 10s so Fallübersicht gets fresh intake_data

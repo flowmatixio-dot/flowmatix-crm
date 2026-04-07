@@ -253,12 +253,17 @@ export default function AutoDemoPlayer({ onClose }) {
       // Backend: flip the demo patient into "booked" with flight info
       // and a backdated bookedAt so ActionNeededView's hotel-assign
       // escalation kicks in for the hotel step a few seconds later.
-      // Fire-and-forget — we don't want to delay step playback.
+      // The endpoint also writes 3 chat messages (proposal +
+      // confirmation + welcome) so the inbox shows the booking flow.
       fmApi.apiFetch("/api/v1/clinic/mode/demo/tour-confirm-booking", {
         method: "POST",
         body: "{}",
       }).then(() => {
         try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
+        // Trigger a chat message reload so the new booking messages
+        // appear in the inbox right away. The InboxView polls every
+        // 10s normally; this short-circuits that wait.
+        try { window.dispatchEvent(new CustomEvent("fm-reload-chat-messages")); } catch {}
       }).catch(() => {});
     }
     if (step.onEnter === "openAppointmentDetail") {
