@@ -133,10 +133,16 @@ export default function MainLayout() {
 
   // Manual "open review" trigger — fired by buttons in InboxView via CustomEvent.
   // Without this listener, the click handlers in InboxView (lines ~593, ~887) were silent no-ops.
+  // Also used by the auto demo tour to open the popup at step 3 (review).
   React.useEffect(() => {
-    const handler = () => setShowTrialReviewPopup(true);
-    window.addEventListener('fm-open-review', handler);
-    return () => window.removeEventListener('fm-open-review', handler);
+    const openHandler = () => setShowTrialReviewPopup(true);
+    const closeHandler = () => setShowTrialReviewPopup(false);
+    window.addEventListener('fm-open-review', openHandler);
+    window.addEventListener('fm-close-review', closeHandler);
+    return () => {
+      window.removeEventListener('fm-open-review', openHandler);
+      window.removeEventListener('fm-close-review', closeHandler);
+    };
   }, []);
 
   // Live clock for operator top bar

@@ -63,9 +63,12 @@ const STEPS = [
   },
   {
     id: "review",
-    view: "review_board",
+    view: "inbox",
     label: { de: "Arzt bewertet den Patienten", en: "Doctor reviews the patient", tr: "Doktor hastayı değerlendiriyor" },
-    duration: 5000,
+    duration: 7000,
+    // Opens the existing trial-review popup (DoctorTasksView) so the
+    // user sees the real review UI with the demo task pre-loaded.
+    onEnter: "openReviewPopup",
   },
   {
     id: "booking",
@@ -194,6 +197,11 @@ export default function AutoDemoPlayer({ onClose }) {
     // appear with zero network latency. Backend writes happen in the
     // background (fire-and-forget) so cleanup-tour can still find them.
     let cancelledHook = false;
+    if (step.onEnter === "openReviewPopup") {
+      // Fire the existing fm-open-review event so MainLayout opens the
+      // real DoctorTasksView popup with our demo task pre-loaded.
+      try { window.dispatchEvent(new CustomEvent("fm-open-review")); } catch {}
+    }
     if (step.onEnter === "addPhotosSequentially") {
       const types = ["front", "top", "side"];
       const stagger = 450; // ms between thumbnails
@@ -232,6 +240,11 @@ export default function AutoDemoPlayer({ onClose }) {
     return () => {
       cancelledHook = true;
       if (timerRef.current) clearTimeout(timerRef.current);
+      // If this step opened the review popup, close it as we leave so
+      // the next step's view isn't covered.
+      if (step.onEnter === "openReviewPopup") {
+        try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
+      }
     };
   }, [state, stepIdx]);
 
@@ -265,6 +278,7 @@ export default function AutoDemoPlayer({ onClose }) {
 
   const handleExit = useCallback(async () => {
     if (timerRef.current) clearTimeout(timerRef.current);
+    try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
     setState("cleaning");
     await cleanup();
     if (onClose) onClose();
