@@ -1051,6 +1051,11 @@ function TabClinics({ d, load }) {
                   <td style={S.td}>{c.plan_name || '-'}</td>
                   <td style={S.td}>
                     {waStateBadge(wa?.onboarding_state || wa?.status || (c.whatsapp_connected === true || c.whatsapp_connected === 't' ? 'connected' : null))}
+                    {wa?.is_shared_clone && (
+                      <div style={{ display: 'inline-block', marginLeft: 4, padding: '2px 6px', fontSize: 9, fontWeight: 700, color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: 4, verticalAlign: 'middle' }} title="Nutzt geteilte Test-Nummer (kein eigener Token)">
+                        SHARED
+                      </div>
+                    )}
                     {(wa?.phone_number || c.whatsapp_phone_id) && <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>{wa?.phone_number || c.whatsapp_phone_id}</div>}
                     {wa?.onboarding_state === 'requested' && (
                       <Btn small onClick={() => handleProvision(c.id, c.name)} disabled={provLoading === c.id} style={{ marginTop: 4 }}>
