@@ -906,21 +906,44 @@ export default function MainLayout() {
           const clinicCode = (activeClinicId || '').substring(0, 8).toUpperCase();
           const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${clinicCode}`;
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
+          // Inline tri-language helper for the test-mode wording — clearer
+          // than the existing lt_* keys (which sounded like "production
+          // WhatsApp connected"). This block is the trial test, NOT the
+          // clinic's production WhatsApp setup.
+          const _ltLang = (document.documentElement.lang || 'de').substring(0, 2);
+          const _ltT = (de, en, tr) => ({ de, en, tr }[_ltLang] || de);
           return (
             <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 28, justifyContent: "center" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                   <div style={{ width: 14, height: 14, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>{t("lt_title")}</div>
-                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>{t("lt_sub")}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>
+                        {_ltT("Bot live testen", "Test the bot live", "Botu canlı test edin")}
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
+                        {_ltT("TEST-MODUS", "TEST MODE", "TEST MODU")}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>
+                      {_ltT(
+                        "Sende eine Testnachricht über unsere geteilte Test-Nummer — der Bot antwortet sofort.",
+                        "Send a test message via our shared test number — the bot replies instantly.",
+                        "Paylaşılan test numaramız üzerinden bir test mesajı gönderin — bot anında yanıtlar."
+                      )}
+                    </div>
                   </div>
                 </div>
                 <a href={waLink} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "white", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 12, textDecoration: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(37,211,102,0.25)", transition: "transform 0.15s, box-shadow 0.15s" }}>
-                  {t("lt_open_wa") || "WhatsApp öffnen"} →
+                  {_ltT("Testnachricht senden", "Send test message", "Test mesajı gönder")} →
                 </a>
                 <div style={{ fontSize: 12, color: "#fbbf24", background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.15)", borderRadius: 8, padding: "8px 14px", maxWidth: 220, lineHeight: 1.5 }}>
-                  {t("lt_scan_and_send") || "QR-Code scannen und den Code absenden — Ihr Bot antwortet sofort."}
+                  {_ltT(
+                    "QR scannen oder Button klicken — der Bot antwortet sofort.",
+                    "Scan the QR or tap the button — the bot replies instantly.",
+                    "QR'ı tarayın veya butona dokunun — bot anında yanıtlar."
+                  )}
                 </div>
                 <img src={qrUrl} alt="QR" style={{ width: 64, height: 64, borderRadius: 10, border: "1px solid rgba(37,211,102,0.2)", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }} />
                 {ti?.session && (
