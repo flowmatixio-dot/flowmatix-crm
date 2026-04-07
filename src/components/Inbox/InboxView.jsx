@@ -462,6 +462,7 @@ export default function InboxView() {
             const isDepositPaid = csKey === "deposit_paid";
             const isMedReview = csKey === "needs_medical_review";
             const isAiActive = csKey === "ai_active" || csKey === "collecting_photos" || csKey === "new";
+            const isLocal = !!(lead?.metadata?.noTransferNeeded || lead?.metadata?.noFlightNeeded);
 
             // Avatar initials + unified color
             const initials = ch.name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
@@ -526,9 +527,9 @@ export default function InboxView() {
                         {isDepositPaid && <ConvBadge label={t("deposit_paid_badge") || "Anzahlung bezahlt"} color="#10b981" />}
                         {sla?.overdue && <ConvBadge label={`${sla.hrs}h ${t("overdue_sla") || "überfällig"}`} color="#ef4444" />}
                         {photoCount > 0 && <ConvBadge label={`${photoCount} ${t("photos") || "Fotos"}`} color="#a78bfa" />}
-                        {lead?.flightConfirmed?.date && !lead?.logistics?.driverName && <ConvBadge label={t("driver_missing")||"Fahrer fehlt"} color="#ec4899" />}
-                        {lead?.flightConfirmed?.date && !(lead?.hotelInfo?.name||lead?.hotel?.name) && <ConvBadge label={t("hotel_missing")||"Hotel fehlt"} color="#a78bfa" />}
-                        {lead?.stage==="booked" && !lead?.flightConfirmed?.date && !(lead?.metadata?.noFlightNeeded) && <ConvBadge label={t("flight_missing_badge")||"Flug fehlt"} color="#ef4444" />}
+                        {!isLocal && lead?.flightConfirmed?.date && !lead?.logistics?.driverName && <ConvBadge label={t("driver_missing")||"Fahrer fehlt"} color="#ec4899" />}
+                        {!isLocal && lead?.flightConfirmed?.date && !(lead?.hotelInfo?.name||lead?.hotel?.name) && <ConvBadge label={t("hotel_missing")||"Hotel fehlt"} color="#a78bfa" />}
+                        {!isLocal && lead?.stage==="booked" && !lead?.flightConfirmed?.date && <ConvBadge label={t("flight_missing_badge")||"Flug fehlt"} color="#ef4444" />}
                         {!isMedReview && !isAiActive && !isHumanTakeover && !isDepositPaid && cs && (
                           <ConvBadge icon={cs.icon} label={cs.label} color={cs.color} />
                         )}
