@@ -316,6 +316,9 @@ export default function AdvancedSetupCard() {
                 fontFamily: "inherit",
                 textAlign: "left",
                 width: "100%",
+                height: "100%",
+                minHeight: 64,
+                boxSizing: "border-box",
                 transition: "all .15s",
                 opacity: locked ? 0.65 : 1,
               }}
@@ -383,11 +386,9 @@ export default function AdvancedSetupCard() {
                     </span>
                   )}
                 </div>
-                {!done && (
+                {!done && !locked && (
                   <div style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", fontWeight: 500, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {locked
-                      ? (s.lockedHint?.[lang] || s.lockedHint?.de || (s.sublabel[lang] || s.sublabel.de))
-                      : (s.sublabel[lang] || s.sublabel.de)}
+                    {s.sublabel[lang] || s.sublabel.de}
                   </div>
                 )}
               </div>
