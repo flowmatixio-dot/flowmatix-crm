@@ -111,24 +111,26 @@ export default function SetupCard() {
 
   if (loading || !status) return null;
 
-  // Completed → minimal celebratory tile
+  // Completed → subtle "system ready" tile (intentionally low-emphasis,
+  // no green celebration — the user did not actually complete setup,
+  // saying "Setup complete" felt fake).
   if (status.completed) {
     return (
       <div
         style={{
-          padding: "16px 20px",
-          borderRadius: 14,
-          background: "linear-gradient(135deg, rgba(16,185,129,0.06), rgba(52,211,153,0.03))",
-          border: "1px solid rgba(16,185,129,0.18)",
+          padding: "12px 16px",
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.02)",
+          border: "1px solid rgba(255,255,255,0.06)",
           display: "flex",
           alignItems: "center",
-          gap: 12,
+          gap: 10,
           marginBottom: 16,
         }}
       >
-        <span style={{ fontSize: 20 }}>✅</span>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>
-          {T("Setup complete", "Setup abgeschlossen", "Kurulum tamamlandı")}
+        <span style={{ width: 6, height: 6, borderRadius: 99, background: "#10b981", flexShrink: 0 }} />
+        <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.75)" }}>
+          {T("System ready", "System ist bereit", "Sistem hazır")}
         </div>
       </div>
     );

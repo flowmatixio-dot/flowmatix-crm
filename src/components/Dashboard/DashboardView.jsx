@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { getNow } from "../../utils/demoTime";
 import { fmLocale } from "../../utils/helpers";
 import HintBox from "../shared/HintBox.jsx";
 import SetupCard from "../Onboarding/SetupCard.jsx";
 import AdvancedSetupCard from "../Onboarding/AdvancedSetupCard.jsx";
+import PerformanceIndicator from "../Onboarding/PerformanceIndicator.jsx";
 
 /* ── Inline tri-language helper (matches production T()) ── */
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
@@ -18,6 +19,21 @@ export default function DashboardView() {
     workspaceState, setShowPlanPicker, demoTourOpen, setDemoTourOpen,
     activeClinicId, testInfo,
   } = useApp();
+
+  // "Trial überspringen" pill: hidden initially. Shows after the user
+  // has either watched the demo (demoTourSeen flag in localStorage,
+  // set when the player first opens) OR scrolled past the hero
+  // (IntersectionObserver on a sentinel placed right after the hero).
+  // Goal: avoid premature pricing pressure on first impression.
+  const [showSkipTrial, setShowSkipTrial] = useState(() => {
+    try { return localStorage.getItem("fm_demo_tour_seen") === "1"; } catch { return false; }
+  });
+  useEffect(() => {
+    if (demoTourOpen) {
+      try { localStorage.setItem("fm_demo_tour_seen", "1"); } catch {}
+      setShowSkipTrial(true);
+    }
+  }, [demoTourOpen]);
 
   const n = clinic;
   const o = myLeads || [];
@@ -208,7 +224,7 @@ export default function DashboardView() {
             })()}
           </h1>
         </div>
-        {workspaceState && workspaceState !== 'active' && workspaceState !== 'trial_expired' && workspaceState !== 'checkout_pending' && (
+        {showSkipTrial && workspaceState && workspaceState !== 'active' && workspaceState !== 'trial_expired' && workspaceState !== 'checkout_pending' && (
           <button onClick={() => setShowPlanPicker(true)} style={{
             padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
             background: "transparent",
@@ -250,16 +266,16 @@ export default function DashboardView() {
               </div>
               <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 10px", lineHeight: 1.2, letterSpacing: -0.4 }}>
                 {T(
-                  "See the full patient flow in 60 seconds",
-                  "Sieh den kompletten Patienten-Flow in 60 Sekunden",
-                  "Tam hasta akışını 60 saniyede izleyin"
+                  "From WhatsApp request to booked patient — automatically",
+                  "Von WhatsApp-Anfrage zu gebuchtem Patienten – automatisch",
+                  "WhatsApp talebinden rezerveli hastaya — otomatik olarak"
                 )}
               </h2>
               <p style={{ fontSize: 14, color: "rgba(200,215,240,0.75)", margin: 0, lineHeight: 1.55, maxWidth: 560 }}>
                 {T(
-                  "From the first WhatsApp message to booking, flight and driver — fully automatic.",
-                  "Von der ersten WhatsApp-Nachricht bis zur Buchung, Flug und Fahrer — alles automatisch.",
-                  "İlk WhatsApp mesajından rezervasyona, uçuşa ve sürücüye — tamamen otomatik."
+                  "See how requests, photos, review, booking, flight and driver all run automatically.",
+                  "Erlebe, wie Anfragen, Fotos, Bewertung, Buchung, Flug und Fahrer automatisch ablaufen.",
+                  "Talepler, fotoğraflar, değerlendirme, rezervasyon, uçuş ve sürücünün otomatik olarak nasıl çalıştığını izleyin."
                 )}
               </p>
             </div>
@@ -277,7 +293,7 @@ export default function DashboardView() {
               onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 36px rgba(168,85,247,0.55)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 8px 28px rgba(168,85,247,0.45)"; }}
             >
-              ▶ {T("Play full demo", "Komplette Demo abspielen", "Tam demoyu oynat")}
+              {T("Start demo", "Demo starten", "Demoyu başlat")} →
             </button>
           </div>
         </div>
@@ -343,6 +359,9 @@ export default function DashboardView() {
           </div>
         );
       })()}
+
+      {/* ── System performance indicator (replaces the old Einrichtung %) ── */}
+      <PerformanceIndicator />
 
       {/* ── Optional setup (was the urgent SetupCard) ── */}
       <SetupCard />

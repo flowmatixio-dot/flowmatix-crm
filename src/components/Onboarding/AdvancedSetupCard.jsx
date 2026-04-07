@@ -135,14 +135,11 @@ export default function AdvancedSetupCard() {
         marginBottom: 16,
       }}
     >
-      <div style={{ marginBottom: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-          <span style={{ fontSize: 14 }}>✨</span>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", letterSpacing: -0.1 }}>
-            {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
-          </div>
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 3, letterSpacing: -0.05 }}>
+          {T("Unlock the full potential", "Volles Potenzial freischalten", "Tam potansiyeli ortaya çıkarın")}
         </div>
-        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", lineHeight: 1.5 }}>
+        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
           {T(
             "Optimize your system for more bookings and automation.",
             "Optimiere dein System für mehr Buchungen und Automatisierung.",
@@ -178,7 +175,7 @@ export default function AdvancedSetupCard() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateX(2px)";
-                if (!done) e.currentTarget.style.borderColor = "rgba(255,138,42,0.3)";
+                if (!done) e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "";
@@ -193,7 +190,7 @@ export default function AdvancedSetupCard() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: done ? "rgba(16,185,129,0.18)" : "rgba(255,138,42,0.08)",
+                  background: done ? "rgba(16,185,129,0.18)" : "rgba(255,255,255,0.05)",
                   fontSize: 12,
                   flexShrink: 0,
                 }}
