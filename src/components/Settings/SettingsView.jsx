@@ -1166,6 +1166,43 @@ export default function SettingsView() {
     {settingsTab === "ai" && <>
     <HintBox id="settings_ai">{t("hint_settings_ai")}</HintBox>
     {/* WhatsApp cost info removed — Flowmatix covers messaging costs */}
+
+    {/* Status row — adopted from AIControlView so the user sees what's
+        already working out of the box. Visual only, not toggles. */}
+    <div id="fm-section-ai" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
+      {[
+        { icon: "📩", label: t("incoming_messages") || "Eingehende Nachrichten", desc: t("incoming_messages_desc") || "Werden automatisch beantwortet" },
+        { icon: "🎙", label: t("voice_messages") || "Sprachnachrichten", desc: t("voice_messages_desc") || "Automatische Transkription" },
+        { icon: "🌙", label: t("auto_responder_247") || "24/7 Auto-Responder", desc: t("auto_responder_247_desc") || "Auch außerhalb der Öffnungszeiten" },
+      ].map((w, i) => (
+        <div key={i} style={{padding:"12px 14px",borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+            <span style={{fontSize:14}}>{w.icon}</span>
+            <span style={{fontWeight:700,fontSize:13,color:"rgba(232,238,252,0.9)"}}>{w.label}</span>
+          </div>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.6)",marginBottom:6}}>{w.desc}</div>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:6,height:6,borderRadius:99,background:"#10b981",animation:"fmPulseGreen 2s infinite"}}/>
+            <span style={{fontSize:11,fontWeight:600,color:"#10b981"}}>{t("active") || "Aktiv"}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* AI model — read-only display of the model the bot uses */}
+    <div style={{padding:"14px 18px",borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+      <div>
+        <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.65)",letterSpacing:"0.04em",textTransform:"uppercase",marginBottom:4}}>
+          {t("ai_model_label") || "KI-Modell"}
+        </div>
+        <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)"}}>Claude Sonnet 4.5</div>
+        <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",marginTop:2}}>{t("ai_model_desc") || "Anthropic's neuestes Modell — schnell, präzise, mehrsprachig."}</div>
+      </div>
+      <span style={{padding:"4px 10px",borderRadius:6,fontSize:10,fontWeight:800,background:"rgba(168,85,247,0.12)",color:"#c084fc",border:"1px solid rgba(168,85,247,0.25)",letterSpacing:0.5}}>
+        {t("ai_model_managed") || "VON FLOWMATIX VERWALTET"}
+      </span>
+    </div>
+
     <Section title={t("ai_bot_settings") || "KI-Bot Einstellungen"}>
       <div style={{display:"grid",gap:12}}>
         <div style={{marginBottom:16}}><div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("response_delay_seconds") || "Antwortverzögerung (Sekunden)"}</div><select value={c.botResponseDelay || "3"} onChange={e=>up("botResponseDelay",e.target.value)} style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",boxSizing:"border-box",cursor:"pointer"}}><option value="0">{t("sec_0")||"0 Sekunden"}</option><option value="1">{t("sec_1")||"1 Sekunde"}</option><option value="2">{t("sec_2")||"2 Sekunden"}</option><option value="3">{t("sec_3")||"3 Sekunden"}</option><option value="5">{t("sec_5")||"5 Sekunden"}</option><option value="10">{t("sec_10")||"10 Sekunden"}</option></select></div>
