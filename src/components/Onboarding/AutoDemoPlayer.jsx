@@ -75,6 +75,8 @@ const STEPS = [
     view: "inbox",
     label: { de: "Termin wird vorgeschlagen + bestätigt", en: "Appointment proposed + confirmed", tr: "Randevu önerildi + onaylandı" },
     duration: 5000,
+    // Backend: flip patient to booked + flight confirmed + bookedAt 2d ago
+    onEnter: "confirmBooking",
   },
   {
     id: "calendar",
@@ -89,10 +91,12 @@ const STEPS = [
     duration: 5000,
   },
   {
-    id: "logistics",
-    view: "patients_db",
-    label: { de: "Flug + Fahrer organisiert", en: "Flight + driver organized", tr: "Uçuş + sürücü organize edildi" },
-    duration: 6000,
+    id: "hotel_assignment",
+    view: "action_needed",
+    label: { de: "Hotel muss zugewiesen werden", en: "Hotel needs to be assigned", tr: "Otel atanmalı" },
+    duration: 7000,
+    // Opens the existing "Hotel zuweisen" panel from ActionNeededView
+    onEnter: "openHotelAssign",
   },
   {
     id: "op_prep",
@@ -202,6 +206,33 @@ export default function AutoDemoPlayer({ onClose }) {
       // real DoctorTasksView popup with our demo task pre-loaded.
       try { window.dispatchEvent(new CustomEvent("fm-open-review")); } catch {}
     }
+    if (step.onEnter === "confirmBooking") {
+      // Backend: flip the demo patient into "booked" with flight info
+      // and a backdated bookedAt so ActionNeededView's hotel-assign
+      // escalation kicks in for the hotel step a few seconds later.
+      // Fire-and-forget — we don't want to delay step playback.
+      fmApi.apiFetch("/api/v1/clinic/mode/demo/tour-confirm-booking", {
+        method: "POST",
+        body: "{}",
+      }).then(() => {
+        try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
+      }).catch(() => {});
+    }
+    if (step.onEnter === "openHotelAssign") {
+      // Open the real "Hotel zuweisen" panel from ActionNeededView for
+      // the demo tour patient. ActionNeededView listens for this event
+      // and triggers the matching item.action() callback. Slight delay
+      // so the user first sees the action_needed view land.
+      const tourPatientId = (tourMeta && tourMeta.patientId) || null;
+      setTimeout(() => {
+        if (cancelledHook) return;
+        try {
+          window.dispatchEvent(new CustomEvent("fm-trigger-action", {
+            detail: { type: "hotel", patientId: tourPatientId },
+          }));
+        } catch {}
+      }, 1200);
+    }
     if (step.onEnter === "addPhotosSequentially") {
       const types = ["front", "top", "side"];
       const stagger = 450; // ms between thumbnails
@@ -245,6 +276,10 @@ export default function AutoDemoPlayer({ onClose }) {
       if (step.onEnter === "openReviewPopup") {
         try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
       }
+      // Same idea for the hotel-assign DOM panel: remove it on the way out.
+      if (step.onEnter === "openHotelAssign") {
+        try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
+      }
     };
   }, [state, stepIdx]);
 
@@ -279,6 +314,7 @@ export default function AutoDemoPlayer({ onClose }) {
   const handleExit = useCallback(async () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
+    try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
     setState("cleaning");
     await cleanup();
     if (onClose) onClose();

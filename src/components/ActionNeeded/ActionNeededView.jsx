@@ -448,6 +448,26 @@ export default function ActionNeededView() {
     return () => clearInterval(iv);
   }, []);
 
+  // Demo tour bridge: keep the latest computed action list in a ref so
+  // a window event listener can fire any item.action() (e.g. open the
+  // "Hotel zuweisen" panel) without having to re-export the items.
+  const allActionItemsRef = React.useRef([]);
+  React.useEffect(() => {
+    const handler = (e) => {
+      const { type, patientId } = (e && e.detail) || {};
+      if (!type) return;
+      const list = allActionItemsRef.current || [];
+      const item = patientId
+        ? list.find(i => i.type === type && i.patientId === patientId)
+        : list.find(i => i.type === type);
+      if (item && typeof item.action === "function") {
+        try { item.action(); } catch {}
+      }
+    };
+    window.addEventListener("fm-trigger-action", handler);
+    return () => window.removeEventListener("fm-trigger-action", handler);
+  }, []);
+
   const allActionItems = useMemo(() => {
     const dbItems = dbTasks.map(tk => {
       const payload = tk.payload || {};
@@ -516,6 +536,9 @@ export default function ActionNeededView() {
     if (days < 7) return `${t("patient_waiting_since") || "Patient wartet seit"} ${days} ${t("action_days") || "Tagen"}`;
     return `${t("patient_waiting_since") || "Patient wartet seit"} ${Math.floor(days / 7)} ${t("action_weeks") || "Wochen"}`;
   }
+  // Keep the ref fresh so the demo-tour event handler can dispatch an
+  // item's .action() callback without re-binding.
+  React.useEffect(() => { allActionItemsRef.current = allActionItems; }, [allActionItems]);
   // Group by task type (category-based)
   const categories = getTaskGroups(t).map(g => {
     const tc = TASK_COLORS[g.key] || TASK_COLORS.followup;
