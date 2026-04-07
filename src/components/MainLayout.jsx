@@ -39,6 +39,7 @@ import ReviewBoard from "./DoctorTasks/ReviewBoard";
 import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
 import ArchiveView from "./Archive/ArchiveView";
 import OnboardingWizard from "./Onboarding/OnboardingWizard";
+import SetupBanner from "./Onboarding/SetupBanner";
 import PaymentsView from "./Finance/PaymentsView";
 
 const IS_CLIENT_MODE = window.location.hostname === "crm.flowmatix.io" || window.location.hostname === "localhost";
@@ -984,6 +985,10 @@ export default function MainLayout() {
             </div>
           );
         })()}
+        {/* ── Setup progress banner — global, visible on all main pages, auto-hides when complete ── */}
+        {clinic && IS_CLIENT_MODE && view !== "settings" && view !== "whatsapp_setup" && (
+          <SetupBanner />
+        )}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
         {view === "action_needed" && clinic && canAccess("action_needed") && <ErrorBoundary t={t}><ActionNeededView /></ErrorBoundary>}
         {view === "dashboard" && clinic && canAccess("dashboard") && <ErrorBoundary t={t}><DashboardView /></ErrorBoundary>}

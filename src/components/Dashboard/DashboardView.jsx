@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { getNow } from "../../utils/demoTime";
 import { fmLocale } from "../../utils/helpers";
 import HintBox from "../shared/HintBox.jsx";
+import SetupCard from "../Onboarding/SetupCard.jsx";
 
 /* ── Inline tri-language helper (matches production T()) ── */
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
@@ -218,6 +219,9 @@ export default function DashboardView() {
           </button>
         )}
       </div>
+
+      {/* ── Setup progress card (auto-hides when onboarding_completed) ── */}
+      <SetupCard />
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
