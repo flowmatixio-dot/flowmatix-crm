@@ -621,6 +621,27 @@ export default function OpPrepView() {
 
   useEffect(() => { loadApiData(); }, [loadApiData]);
 
+  // Demo tour bridge — open the prep drawer for a specific appointment.
+  // Listens for window 'fm-open-op-prep' { detail: { appointmentId } }.
+  // Used by AutoDemoPlayer at step 8 (op_prep) to show the drawer
+  // automatically. Falls back to the first available appt when no id
+  // is given so the demo still works if the player can't pin one.
+  useEffect(() => {
+    const openHandler = (e) => {
+      const id = e?.detail?.appointmentId;
+      const list = apiAppts || [];
+      const target = id ? list.find(a => a.id === id) : list[0];
+      if (target) setSelectedAppt(target);
+    };
+    const closeHandler = () => setSelectedAppt(null);
+    window.addEventListener("fm-open-op-prep", openHandler);
+    window.addEventListener("fm-close-op-prep", closeHandler);
+    return () => {
+      window.removeEventListener("fm-open-op-prep", openHandler);
+      window.removeEventListener("fm-close-op-prep", closeHandler);
+    };
+  }, [apiAppts]);
+
   const useApiData = apiAppts !== null && apiAppts.length > 0;
 
   const localPrepData = useMemo(() => {

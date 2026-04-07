@@ -104,7 +104,8 @@ const STEPS = [
     id: "op_prep",
     view: "op_prep",
     label: { de: "OP-Vorbereitung — Checkliste", en: "Pre-op preparation — checklist", tr: "Ameliyat öncesi hazırlık — kontrol listesi" },
-    duration: 6000,
+    duration: 7000,
+    onEnter: "openOpPrepDetail",
   },
   {
     id: "patient_record",
@@ -115,7 +116,7 @@ const STEPS = [
 ];
 
 export default function AutoDemoPlayer({ onClose }) {
-  const { setView, setSelAppt } = useApp();
+  const { setView, setSelAppt, setLeads } = useApp();
   const lang = localStorage.getItem("fm_lang") || "de";
 
   // State machine: idle → preparing → running ↔ paused → completed → cleaning → idle
@@ -139,6 +140,8 @@ export default function AutoDemoPlayer({ onClose }) {
   useEffect(() => { onCloseRef.current = onClose; });
   const setSelApptRef = useRef(setSelAppt);
   useEffect(() => { setSelApptRef.current = setSelAppt; });
+  const setLeadsRef = useRef(setLeads);
+  useEffect(() => { setLeadsRef.current = setLeads; });
 
   // Centralized DOM cleanup — closes any popup/panel the player might
   // have opened. Called from every code path that ends/restarts a tour
@@ -147,6 +150,7 @@ export default function AutoDemoPlayer({ onClose }) {
     try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
     try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
     try { setSelApptRef.current && setSelApptRef.current(null); } catch {}
+    try { window.dispatchEvent(new CustomEvent("fm-close-op-prep")); } catch {}
   }, []);
 
   const cleanup = useCallback(async () => {
@@ -250,6 +254,20 @@ export default function AutoDemoPlayer({ onClose }) {
         }, 800);
       }
     }
+    if (step.onEnter === "openOpPrepDetail") {
+      // Auto-open the OP-Prep detail drawer (right slide-in) for the
+      // demo tour appointment. OpPrepView listens for fm-open-op-prep
+      // and falls back to the first appt if no id is given.
+      const apptId = (tourMeta && tourMeta.appointmentId) || null;
+      setTimeout(() => {
+        if (cancelledHook) return;
+        try {
+          window.dispatchEvent(new CustomEvent("fm-open-op-prep", {
+            detail: { appointmentId: apptId },
+          }));
+        } catch {}
+      }, 800);
+    }
     if (step.onEnter === "openHotelAssign") {
       // Open the real "Hotel zuweisen" panel from ActionNeededView for
       // the demo tour patient. Step:
@@ -277,15 +295,34 @@ export default function AutoDemoPlayer({ onClose }) {
       types.forEach((type, i) => {
         setTimeout(() => {
           if (cancelledHook) return;
-          // Optimistic local update: append the photo URL to selChat.photoUrls
+          // Optimistic local update: append the photo URL to BOTH the
+          // inbox store's selChat AND the leads array. Reason: the
+          // Fallübersicht panel reads photos from leads (via overviewLead),
+          // not from selChat — updating selChat alone wouldn't make the
+          // thumbnails appear in the right panel during step 2.
+          let newPhotoUrls = null;
+          let tourPatientId = null;
           try {
             const store = useInboxStore.getState();
             const sc = store.selChat;
             if (sc) {
               const existing = Array.isArray(sc.photoUrls) ? sc.photoUrls : [];
-              store.setSelChat({ ...sc, photoUrls: [...existing, DEMO_PHOTO_URLS[type]] });
+              newPhotoUrls = [...existing, DEMO_PHOTO_URLS[type]];
+              store.setSelChat({ ...sc, photoUrls: newPhotoUrls });
+              tourPatientId = sc.patientId || sc.id;
             }
           } catch {}
+          if (newPhotoUrls && tourPatientId && setLeadsRef.current) {
+            try {
+              setLeadsRef.current((prev) =>
+                prev.map((l) =>
+                  l.id === tourPatientId
+                    ? { ...l, photoUrls: newPhotoUrls, photosReceived: newPhotoUrls.length, photos: true }
+                    : l
+                )
+              );
+            } catch {}
+          }
           // Background DB write — non-blocking, ignored on failure.
           // Pass the URL so the DB row matches what we just rendered
           // optimistically (otherwise a later refresh would replace
@@ -322,6 +359,10 @@ export default function AutoDemoPlayer({ onClose }) {
       // (pipeline) isn't covered.
       if (step.onEnter === "openAppointmentDetail") {
         try { setSelApptRef.current && setSelApptRef.current(null); } catch {}
+      }
+      // Close the OP-Prep drawer on the way out — same reason.
+      if (step.onEnter === "openOpPrepDetail") {
+        try { window.dispatchEvent(new CustomEvent("fm-close-op-prep")); } catch {}
       }
     };
   }, [state, stepIdx]);
