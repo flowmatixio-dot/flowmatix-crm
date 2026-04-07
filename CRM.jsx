@@ -676,11 +676,24 @@ export default function App() {
     if(!user||!activeClinicId)return;
     const orgId=user.orgId||user.clinicId;
     if(!orgId)return;
-    const handler=()=>{
-      // Re-pull conversations
+    const handler=(ev)=>{
+      const tourPatientId=ev?.detail?.patientId;
+      // Re-pull conversations AND auto-open the demo patient's chat so
+      // the user doesn't have to click manually during the tour. We do
+      // this via the inbox store's fetch (which feeds the inbox view)
+      // PLUS a direct getConversations call so we can hand the matching
+      // conversation object straight to setSelChat.
       try{
         useInboxStore.getState().fetchConversations(orgId).catch(()=>{});
       }catch{}
+      fmApi.getConversations().then(data=>{
+        const convs=data?.conversations||[];
+        if(!convs.length||!tourPatientId)return;
+        const tourConv=convs.find(c=>(c.patientId||c.id)===tourPatientId);
+        if(tourConv){
+          try{ useInboxStore.getState().setSelChat(tourConv); }catch{}
+        }
+      }).catch(()=>{});
       // Re-pull patients into the leads list
       fmApi.getPatients().then(data=>{
         const pats=data?.patients||data||[];
