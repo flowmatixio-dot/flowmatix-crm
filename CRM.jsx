@@ -217,6 +217,8 @@ export default function App() {
 
   // Doctor: redirect to portal if on restricted view
   React.useEffect(()=>{if(userRole==="doctor"&&!canAccess(view)&&view!=="doctor_portal"&&view!=="support")setView("doctor_portal");},[userRole,view]);
+  /* Google OAuth callback toast — google.ts redirects to /?google=success|error|denied */
+  React.useEffect(()=>{try{const params=new URLSearchParams(window.location.search);const g=params.get("google");if(!g)return;params.delete("google");const newQs=params.toString();window.history.replaceState({},"",window.location.pathname+(newQs?"?"+newQs:""));if(g==="success"){const l=localStorage.getItem("fm_lang")||"de";const msg={de:"Google Drive erfolgreich verbunden",en:"Google Drive connected successfully",tr:"Google Drive başarıyla bağlandı"}[l]||"Google Drive verbunden";showT(msg);setView("dashboard");}else if(g==="error"||g==="denied"){const l=localStorage.getItem("fm_lang")||"de";const msg={de:"Google-Verbindung fehlgeschlagen",en:"Google connection failed",tr:"Google bağlantısı başarısız"}[l]||"Google connection failed";showT(msg,"error");}}catch(e){}},[]);
   // Hard block: doctor can never see admin views — even during re-auth
   const effectiveView = (userRole==="doctor"&&!canAccess(view)&&view!=="doctor_portal"&&view!=="support") ? "doctor_portal" : view;
   const getClinicById=id=>clinics.find(c=>c.id===id);

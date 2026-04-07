@@ -72,7 +72,11 @@ const ADVANCED_STEPS = [
     section: "google_drive",
     icon: "📁",
     label:    { de: "Google Drive verbinden",     en: "Connect Google Drive",       tr: "Google Drive'ı bağla" },
-    sublabel: { de: "Patientenfotos automatisch sichern", en: "Auto-save patient photos", tr: "Hasta fotoğraflarını otomatik kaydet" },
+    sublabel: {
+      de: "Alle Patientenfotos und Daten werden automatisch gespeichert und organisiert – nichts geht verloren.",
+      en: "All patient photos and data are automatically saved and organized — nothing gets lost.",
+      tr: "Tüm hasta fotoğrafları ve verileri otomatik olarak kaydedilir ve düzenlenir — hiçbir şey kaybolmaz."
+    },
   },
 ];
 
@@ -138,7 +142,7 @@ export default function AdvancedSetupCard() {
             {progress}%
           </div>
           <div style={{ fontSize: 10, color: "rgba(167,177,195,0.55)", marginTop: 4, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase" }}>
-            {T("Optimized", "Optimiert", "Optimize")}
+            {T("Optimization", "Optimierung", "Optimizasyon")}
           </div>
         </div>
       </div>

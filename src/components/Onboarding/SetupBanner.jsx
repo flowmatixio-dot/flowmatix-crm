@@ -71,16 +71,20 @@ export default function SetupBanner() {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 18, maxWidth: 1400, margin: "0 auto" }}>
-        {/* Title + percentage */}
+        {/* Status only — no checklist, no subtitle (spec: avoid duplication with SetupCard) */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <span style={{ fontSize: 14 }}>⚙️</span>
           <span style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(232,238,252,0.92)", whiteSpace: "nowrap" }}>
-            {T("Setup", "Einrichtung", "Kurulum")} <span style={{ color: "#4cc9ff" }}>{progress}%</span>
+            {T(
+              `Setup ${progress}% complete`,
+              `Einrichtung ${progress}% abgeschlossen`,
+              `Kurulum %${progress} tamamlandı`
+            )}
           </span>
         </div>
 
-        {/* Progress bar */}
-        <div style={{ flex: 1, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.05)", overflow: "hidden", maxWidth: 380 }}>
+        {/* Progress bar — visual aid only, takes the rest of the row */}
+        <div style={{ flex: 1, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.05)", overflow: "hidden" }}>
           <div
             style={{
               height: "100%",
@@ -89,15 +93,6 @@ export default function SetupBanner() {
               transition: "width .3s",
             }}
           />
-        </div>
-
-        {/* Subtitle (only on wider screens) */}
-        <div style={{ flex: 1, fontSize: 11.5, color: "rgba(167,177,195,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {T(
-            "A few quick steps left to finish your setup.",
-            "Nur noch wenige Schritte bis zum fertigen Setup.",
-            "Kurulumu bitirmek için birkaç hızlı adım."
-          )}
         </div>
 
         {/* Single dynamic CTA — deep-links straight to the missing step's settings tab */}
