@@ -104,7 +104,7 @@ const STEPS = [
       en: "The confirmed appointment appears in the calendar instantly.",
       tr: "Onaylanan randevu takvimde anında görünür.",
     },
-    duration: 9000,
+    duration: 12000,
     onEnter: "openAppointmentDetail",
   },
   {
@@ -139,7 +139,7 @@ const STEPS = [
       en: "Medical and logistical steps are prepared centrally.",
       tr: "Tıbbi ve organizasyonel adımlar merkezi olarak hazırlanır.",
     },
-    duration: 10000,
+    duration: 13000,
     onEnter: "openOpPrepDetail",
   },
   {
@@ -326,22 +326,22 @@ export default function AutoDemoPlayer({ onClose }) {
     }
     if (step.onEnter === "openAppointmentDetail") {
       // Auto-open the appointment drawer for the demo tour appointment.
-      // selAppt is just the appointment id; the drawer fetches the rest
-      // from the appts store. The id was returned by run-tour as
-      // tourMeta.appointmentId. Slight delay so the calendar view has
-      // time to mount + render the cell first.
+      // The user wants to first SEE the calendar with the appointment
+      // tile for a bit, THEN have the drawer slide in. So we wait
+      // ~3 seconds before opening it.
       const apptId = (tourMeta && tourMeta.appointmentId) || null;
       if (apptId) {
         setTimeout(() => {
           if (cancelledHook) return;
           try { setSelApptRef.current && setSelApptRef.current(apptId); } catch {}
-        }, 800);
+        }, 3000);
       }
     }
     if (step.onEnter === "openOpPrepDetail") {
       // Auto-open the OP-Prep detail drawer (right slide-in) for the
-      // demo tour appointment. OpPrepView listens for fm-open-op-prep
-      // and falls back to the first appt if no id is given.
+      // demo tour appointment. Same idea as the calendar step: let the
+      // user see the OP-Planning page for ~3 seconds before the drawer
+      // slides in.
       const apptId = (tourMeta && tourMeta.appointmentId) || null;
       setTimeout(() => {
         if (cancelledHook) return;
@@ -350,7 +350,7 @@ export default function AutoDemoPlayer({ onClose }) {
             detail: { appointmentId: apptId },
           }));
         } catch {}
-      }, 800);
+      }, 3000);
     }
     if (step.onEnter === "openPatientRecord") {
       // Open the patient detail panel (slide-in) for the demo patient.

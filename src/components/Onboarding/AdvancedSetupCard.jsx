@@ -88,7 +88,7 @@ const ADVANCED_STEPS = [
     section: "ai_settings",
     icon: "🤖",
     label:    { de: "KI-Bot Einstellungen", en: "AI bot settings", tr: "AI bot ayarları" },
-    sublabel: { de: "Tonalität, Begrüßung, Sprachen, Foto-Anforderung", en: "Tone, greeting, languages, photo rules", tr: "Ton, karşılama, diller, fotoğraf kuralları" },
+    sublabel: { de: "Sprache", en: "Language", tr: "Dil" },
   },
   {
     key: "automations",

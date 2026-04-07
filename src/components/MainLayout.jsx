@@ -968,43 +968,9 @@ export default function MainLayout() {
             </div>
           );
         })()}
-        {/* SetupBanner removed — dashboard is now a sales experience, not a
-            settings page. The detailed checklist still lives in DashboardView
-            as the optional "System weiter optimieren" card. */}
-
-        {/* ── "Zurück zum Setup" pill — visible on the deep-link target views ── */}
-        {clinic && IS_CLIENT_MODE && isFromSetup() && view !== "dashboard" && (
-          <div style={{
-            flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            gap: 12,
-            padding: "10px 32px",
-            background: "linear-gradient(135deg, rgba(76,201,255,0.07), rgba(76,201,255,0.02))",
-            borderBottom: "1px solid rgba(76,201,255,0.18)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 14 }}>⚙️</span>
-              <div style={{ fontSize: 12.5, color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>
-                {(() => { const v = t("from_setup_hint"); return v && v !== "from_setup_hint" ? v : "Du bist hier vom Setup. Schließe diesen Schritt ab und geh zurück."; })()}
-              </div>
-            </div>
-            <button
-              onClick={() => { clearFromSetup(); ctx.setView("dashboard"); }}
-              style={{
-                padding: "6px 14px", borderRadius: 8,
-                background: "rgba(76,201,255,0.12)",
-                border: "1px solid rgba(76,201,255,0.28)",
-                color: "#4cc9ff",
-                fontSize: 11.5, fontWeight: 700, fontFamily: "inherit",
-                cursor: "pointer", whiteSpace: "nowrap",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(76,201,255,0.18)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(76,201,255,0.12)"; }}
-            >
-              {(() => { const v = t("back_to_setup"); return v && v !== "back_to_setup" ? v : "Zurück zum Setup"; })()} →
-            </button>
-          </div>
-        )}
+        {/* SetupBanner + "Zurück zum Setup" pill removed — both created
+            setup-pressure on every page and confused users navigating
+            between dashboard and settings. */}
         <div ref={scrollRef} style={{ flex: 1, overflow: "auto", minWidth: 0 }}>
         {view === "action_needed" && clinic && canAccess("action_needed") && <ErrorBoundary t={t}><ActionNeededView /></ErrorBoundary>}
         {view === "dashboard" && clinic && canAccess("dashboard") && <ErrorBoundary t={t}><DashboardView /></ErrorBoundary>}
