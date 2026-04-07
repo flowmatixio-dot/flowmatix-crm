@@ -43,80 +43,125 @@ const DEMO_PHOTO_URLS = {
 };
 
 // 9-step playback sequence — each step navigates to the right view +
-// shows a descriptive overlay label so the user always knows what they
-// are looking at. Durations are tuned to feel "quick but readable".
+// shows a polished title + sublabel in the bottom overlay. Durations
+// are tuned to feel "quick but readable". Copy is intentionally short,
+// outcome-focused, and free of engineering language.
 const STEPS = [
   {
     id: "inbox_message",
     view: "inbox",
-    label: { de: "Neue Patienten-Anfrage trifft ein", en: "New patient request comes in", tr: "Yeni hasta talebi geldi" },
+    title:    { de: "Neue Anfrage", en: "New request", tr: "Yeni talep" },
+    sublabel: {
+      de: "Der Bot reagiert sofort auf eine neue WhatsApp-Anfrage.",
+      en: "The bot instantly responds to every new WhatsApp request.",
+      tr: "Bot, yeni bir WhatsApp talebine anında yanıt verir.",
+    },
     duration: 5000,
   },
   {
     id: "inbox_photos",
     view: "inbox",
-    label: { de: "Patient sendet Fotos", en: "Patient sends photos", tr: "Hasta fotoğraf gönderiyor" },
+    title:    { de: "Patient sendet Fotos", en: "Patient sends photos", tr: "Hasta fotoğraf gönderiyor" },
+    sublabel: {
+      de: "Fotos werden automatisch dem Patienten zugeordnet.",
+      en: "Photos are automatically linked to the patient record.",
+      tr: "Fotoğraflar otomatik olarak hasta kaydına eklenir.",
+    },
     // 3 photos × 500ms gap = ~1500ms + buffer to read the last one
     duration: 4000,
-    // Animated photo arrival — handled by the playback effect via this hook id
     onEnter: "addPhotosSequentially",
   },
   {
     id: "review",
     view: "inbox",
-    label: { de: "Arzt bewertet den Patienten", en: "Doctor reviews the patient", tr: "Doktor hastayı değerlendiriyor" },
+    title:    { de: "Ärztliche Bewertung", en: "Medical review", tr: "Tıbbi değerlendirme" },
+    sublabel: {
+      de: "Die medizinische Einschätzung wird direkt im System erfasst.",
+      en: "The medical assessment is captured directly in the system.",
+      tr: "Tıbbi değerlendirme doğrudan sistemde kaydedilir.",
+    },
     duration: 7000,
-    // Opens the existing trial-review popup (DoctorTasksView) so the
-    // user sees the real review UI with the demo task pre-loaded.
     onEnter: "openReviewPopup",
   },
   {
     id: "booking",
     view: "inbox",
-    label: { de: "Termin wird vorgeschlagen + bestätigt", en: "Appointment proposed + confirmed", tr: "Randevu önerildi + onaylandı" },
+    title:    { de: "Termin bestätigt", en: "Appointment confirmed", tr: "Randevu onaylandı" },
+    sublabel: {
+      de: "Der Patient bestätigt den vorgeschlagenen Termin direkt im Chat.",
+      en: "The patient confirms the proposed appointment right in the chat.",
+      tr: "Hasta önerilen randevuyu doğrudan sohbette onaylar.",
+    },
     duration: 5000,
-    // Backend: flip patient to booked + flight confirmed + bookedAt 2d ago
     onEnter: "confirmBooking",
   },
   {
     id: "calendar",
     view: "appointments",
-    label: { de: "Termin landet im Kalender", en: "Appointment lands in the calendar", tr: "Randevu takvime düşer" },
+    title:    { de: "Termin im Kalender", en: "Appointment in the calendar", tr: "Randevu takvimde" },
+    sublabel: {
+      de: "Der bestätigte Termin erscheint sofort im Kalender.",
+      en: "The confirmed appointment appears in the calendar instantly.",
+      tr: "Onaylanan randevu takvimde anında görünür.",
+    },
     duration: 6000,
-    // Auto-opens the appointment detail drawer for the demo tour appointment
     onEnter: "openAppointmentDetail",
   },
   {
     id: "pipeline",
     view: "pipeline",
-    label: { de: "Patient bewegt sich durch die Pipeline", en: "Patient moves through the pipeline", tr: "Hasta hattı boyunca ilerliyor" },
+    title:    { de: "Patient in der Pipeline", en: "Patient in the pipeline", tr: "Hattaki hasta" },
+    sublabel: {
+      de: "Der Fall wechselt automatisch in die richtige Phase.",
+      en: "The case automatically moves to the right stage.",
+      tr: "Vaka otomatik olarak doğru aşamaya geçer.",
+    },
     duration: 5000,
   },
   {
     id: "hotel_assignment",
     view: "action_needed",
-    label: { de: "Hotel muss zugewiesen werden", en: "Hotel needs to be assigned", tr: "Otel atanmalı" },
+    title:    { de: "Hotel muss zugewiesen werden", en: "Hotel needs to be assigned", tr: "Otel atanmalı" },
+    sublabel: {
+      de: "Das System erstellt automatisch die nächste Aufgabe für das Team.",
+      en: "The system automatically creates the next task for the team.",
+      tr: "Sistem ekip için bir sonraki görevi otomatik olarak oluşturur.",
+    },
     duration: 7000,
-    // Opens the existing "Hotel zuweisen" panel from ActionNeededView
     onEnter: "openHotelAssign",
   },
   {
     id: "op_prep",
     view: "op_prep",
-    label: { de: "OP-Vorbereitung — Checkliste", en: "Pre-op preparation — checklist", tr: "Ameliyat öncesi hazırlık — kontrol listesi" },
+    title:    { de: "OP-Vorbereitung", en: "Pre-op preparation", tr: "Ameliyat öncesi hazırlık" },
+    sublabel: {
+      de: "Medizinische und organisatorische Schritte werden zentral vorbereitet.",
+      en: "Medical and logistical steps are prepared centrally.",
+      tr: "Tıbbi ve organizasyonel adımlar merkezi olarak hazırlanır.",
+    },
     duration: 7000,
     onEnter: "openOpPrepDetail",
   },
   {
     id: "patient_record",
     view: "inbox",
-    label: { de: "Komplette Patientenakte", en: "Full patient record", tr: "Tam hasta dosyası" },
+    title:    { de: "Komplette Patientenakte", en: "Full patient record", tr: "Tam hasta dosyası" },
+    sublabel: {
+      de: "Vom ersten Kontakt bis zur vollständigen Patientenakte – alles automatisch.",
+      en: "From first contact to a complete patient record — fully automatic.",
+      tr: "İlk temastan tam hasta dosyasına kadar — tamamen otomatik.",
+    },
     duration: 6000,
-    // Open the PatientPanel detail (slide-in) for the demo patient on
-    // top of the inbox. Avoids the patients_db FullCalendar render path.
     onEnter: "openPatientRecord",
   },
 ];
+
+// Final payoff line shown briefly at the very end of the tour.
+const FINAL_LINE = {
+  de: "Alles automatisch. 24/7.",
+  en: "Fully automatic. 24/7.",
+  tr: "Tamamen otomatik. 7/24.",
+};
 
 export default function AutoDemoPlayer({ onClose }) {
   const { setView, setSelAppt, setLeads, setSelLead } = useApp();
@@ -458,140 +503,230 @@ export default function AutoDemoPlayer({ onClose }) {
 
   if (!showOverlay) return null;
 
+  // Resolve current step copy with language fallback
+  const stepTitle = currentStep.title?.[lang] || currentStep.title?.de || "";
+  const stepSub = currentStep.sublabel?.[lang] || currentStep.sublabel?.de || "";
+  const counterLabel = T(
+    `Step ${stepIdx + 1} of ${STEPS.length}`,
+    `Schritt ${stepIdx + 1} von ${STEPS.length}`,
+    `Adım ${stepIdx + 1} / ${STEPS.length}`
+  );
+
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 24,
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: 999990,
-        width: "min(720px, calc(100vw - 32px))",
-        background: "linear-gradient(135deg, #0f1623, #131d2e)",
-        border: "1px solid rgba(76,201,255,0.35)",
-        borderRadius: 16,
-        boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(76,201,255,0.08)",
-        padding: "16px 20px",
-        fontFamily: "inherit",
-        color: "white",
-      }}
-    >
-      {/* Header row: title + close */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 18 }}>🎬</span>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "white", letterSpacing: -0.1 }}>
-              {T("Live demo tour", "Live-Demo-Tour", "Canlı demo turu")}
+    <>
+      {/* Inline keyframes for the per-step entry animation. Subtle: fade
+          + 6px translate + 0.985 scale. ~220ms ease-out. */}
+      <style>{`
+        @keyframes fmDemoStepIn {
+          from { opacity: 0; transform: translateY(6px) scale(0.985); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fmDemoOverlayIn {
+          from { opacity: 0; transform: translate(-50%, 12px); }
+          to   { opacity: 1; transform: translate(-50%, 0); }
+        }
+      `}</style>
+      <div
+        style={{
+          position: "fixed",
+          bottom: 28,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 999990,
+          width: "min(680px, calc(100vw - 32px))",
+          // Premium glass background — slightly stronger blur, deeper
+          // gradient, soft multi-layer shadow + accent border glow.
+          background: "linear-gradient(180deg, rgba(15,22,35,0.92), rgba(19,29,46,0.92))",
+          backdropFilter: "blur(18px) saturate(140%)",
+          WebkitBackdropFilter: "blur(18px) saturate(140%)",
+          border: "1px solid rgba(76,201,255,0.22)",
+          borderRadius: 18,
+          boxShadow:
+            "0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(76,201,255,0.05), 0 0 60px rgba(76,201,255,0.08)",
+          padding: "20px 24px 18px",
+          fontFamily: "inherit",
+          color: "white",
+          animation: "fmDemoOverlayIn .35s cubic-bezier(.2,.7,.2,1) both",
+        }}
+      >
+        {/* ── Top label row: LIVE-DEMO-TOUR + counter + close ── */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "3px 9px", borderRadius: 99,
+              background: "rgba(168,85,247,0.12)",
+              border: "1px solid rgba(168,85,247,0.22)",
+            }}>
+              <span style={{ width: 5, height: 5, borderRadius: 99, background: "#c084fc", boxShadow: "0 0 6px rgba(192,132,252,0.8)" }} />
+              <span style={{ fontSize: 9, fontWeight: 800, color: "#c084fc", letterSpacing: "0.1em" }}>
+                {T("LIVE DEMO TOUR", "LIVE-DEMO-TOUR", "CANLI DEMO TURU")}
+              </span>
+            </span>
+            <span style={{ fontSize: 10.5, color: "rgba(167,177,195,0.55)", fontWeight: 600 }}>
+              {state === "preparing"
+                ? T("Preparing…", "Wird vorbereitet…", "Hazırlanıyor…")
+                : state === "paused"
+                ? T("Paused", "Pausiert", "Duraklatıldı")
+                : state === "completed"
+                ? T("Finished", "Beendet", "Tamamlandı")
+                : state === "cleaning"
+                ? T("Cleaning up…", "Wird aufgeräumt…", "Temizleniyor…")
+                : state === "failed"
+                ? T("Failed", "Fehlgeschlagen", "Başarısız")
+                : counterLabel}
+            </span>
+          </div>
+          <button
+            onClick={handleExit}
+            title={T("Exit demo", "Demo beenden", "Demoyu kapat")}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "rgba(200,215,240,0.55)",
+              fontSize: 14,
+              padding: "3px 9px",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "all .15s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(232,238,252,0.95)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(200,215,240,0.55)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* ── Title + sublabel (the main focus) ── */}
+        {state === "failed" ? (
+          <div
+            style={{
+              fontSize: 13,
+              color: "rgba(232,238,252,0.85)",
+              background: "rgba(76,201,255,0.04)",
+              border: "1px solid rgba(76,201,255,0.12)",
+              borderRadius: 10,
+              padding: "12px 14px",
+              marginBottom: 14,
+            }}
+          >
+            {error === "tour_already_running"
+              ? T("A demo tour is already running. Try again in a minute.",
+                  "Eine Demo-Tour läuft bereits. Versuch's in einer Minute nochmal.",
+                  "Bir demo turu zaten çalışıyor. Bir dakika sonra tekrar deneyin.")
+              : T(`Could not start demo: ${error}`, `Demo konnte nicht gestartet werden: ${error}`, `Demo başlatılamadı: ${error}`)}
+          </div>
+        ) : (
+          <div
+            // key on stepIdx so React re-mounts the block on every step
+            // change → the entry keyframe re-plays automatically.
+            key={`step-${stepIdx}-${state}`}
+            style={{
+              marginBottom: 14,
+              animation: "fmDemoStepIn .22s cubic-bezier(.2,.7,.2,1) both",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 19,
+                fontWeight: 800,
+                color: "rgba(245,248,255,0.96)",
+                letterSpacing: -0.3,
+                lineHeight: 1.25,
+                marginBottom: 4,
+              }}
+            >
+              {state === "preparing"
+                ? T("Loading demo journey…", "Demo-Patient wird erstellt…", "Demo hastası oluşturuluyor…")
+                : state === "completed"
+                ? T("Full patient record", "Komplette Patientenakte", "Tam hasta dosyası")
+                : stepTitle}
             </div>
-            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.65)", marginTop: 1, fontWeight: 600 }}>
-              {state === "preparing" && T("Preparing demo data…", "Demo-Daten werden vorbereitet…", "Demo verileri hazırlanıyor…")}
-              {state === "running" && T(`Step ${stepIdx + 1} of ${STEPS.length}`, `Schritt ${stepIdx + 1} von ${STEPS.length}`, `Adım ${stepIdx + 1} / ${STEPS.length}`)}
-              {state === "paused" && T("Paused", "Pausiert", "Duraklatıldı")}
-              {state === "completed" && T("Demo finished — cleaning up…", "Demo beendet — wird aufgeräumt…", "Demo bitti — temizleniyor…")}
-              {state === "cleaning" && T("Cleaning up demo data…", "Demo-Daten werden entfernt…", "Demo verileri temizleniyor…")}
-              {state === "failed" && T("Demo failed", "Demo fehlgeschlagen", "Demo başarısız")}
+            <div
+              style={{
+                fontSize: 12.5,
+                color: "rgba(167,177,195,0.7)",
+                lineHeight: 1.55,
+                fontWeight: 500,
+              }}
+            >
+              {state === "preparing"
+                ? T("Setting up your demo patient and conversation…", "Dein Demo-Patient und die Konversation werden eingerichtet…", "Demo hastanız ve konuşmanız hazırlanıyor…")
+                : state === "completed"
+                ? (FINAL_LINE[lang] || FINAL_LINE.de)
+                : stepSub}
             </div>
           </div>
-        </div>
-        <button
-          onClick={handleExit}
-          title={T("Exit demo", "Demo beenden", "Demoyu kapat")}
-          style={{
-            background: "transparent",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "rgba(200,215,240,0.7)",
-            fontSize: 14,
-            padding: "4px 10px",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          ×
-        </button>
-      </div>
-
-      {/* Current step label — large, readable */}
-      {state !== "failed" && (
-        <div
-          style={{
-            fontSize: 16,
-            fontWeight: 800,
-            color: "rgba(232,238,252,0.92)",
-            marginBottom: 12,
-            minHeight: 22,
-          }}
-        >
-          {state === "preparing"
-            ? T("Loading demo journey…", "Demo-Patient wird erstellt…", "Demo hastası oluşturuluyor…")
-            : state === "completed"
-            ? T("✓ All done — your bot just handled a full patient", "✓ Fertig — dein Bot hat einen kompletten Patienten betreut", "✓ Tamam — botunuz tam bir hastayı yönetti")
-            : currentStep.label[lang] || currentStep.label.de}
-        </div>
-      )}
-
-      {state === "failed" && (
-        <div
-          style={{
-            fontSize: 13,
-            color: "#ef4444",
-            background: "rgba(239,68,68,0.06)",
-            border: "1px solid rgba(239,68,68,0.18)",
-            borderRadius: 10,
-            padding: "10px 14px",
-            marginBottom: 12,
-          }}
-        >
-          {error === "tour_already_running"
-            ? T("A demo tour is already running. Try again in a minute.",
-                "Eine Demo-Tour läuft bereits. Versuch's in einer Minute nochmal.",
-                "Bir demo turu zaten çalışıyor. Bir dakika sonra tekrar deneyin.")
-            : T(`Could not start demo: ${error}`, `Demo konnte nicht gestartet werden: ${error}`, `Demo başlatılamadı: ${error}`)}
-        </div>
-      )}
-
-      {/* Progress bar */}
-      <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,0.05)", overflow: "hidden", marginBottom: 12 }}>
-        <div
-          style={{
-            height: "100%",
-            width: `${progressPct}%`,
-            background:
-              state === "failed"
-                ? "linear-gradient(90deg, #ef4444, #f87171)"
-                : state === "completed"
-                ? "linear-gradient(90deg, #10b981, #34d399)"
-                : "linear-gradient(90deg, #4cc9ff, #2892d7)",
-            transition: "width .4s",
-          }}
-        />
-      </div>
-
-      {/* Controls */}
-      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-        {state === "running" && (
-          <button onClick={handlePause} style={btnSecondary}>
-            ⏸ {T("Pause", "Pause", "Duraklat")}
-          </button>
         )}
-        {state === "paused" && (
-          <button onClick={handleResume} style={btnPrimary}>
-            ▶ {T("Continue", "Weiter", "Devam et")}
+
+        {/* ── Progress bar — refined gradient + soft glow ── */}
+        <div style={{
+          height: 4,
+          borderRadius: 99,
+          background: "rgba(255,255,255,0.05)",
+          overflow: "hidden",
+          marginBottom: 14,
+          position: "relative",
+        }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${progressPct}%`,
+              borderRadius: 99,
+              background:
+                state === "failed"
+                  ? "linear-gradient(90deg, rgba(76,201,255,0.6), rgba(124,58,237,0.6))"
+                  : state === "completed"
+                  ? "linear-gradient(90deg, #10b981, #34d399)"
+                  : "linear-gradient(90deg, #4cc9ff, #a855f7)",
+              boxShadow: state === "completed"
+                ? "0 0 12px rgba(16,185,129,0.4)"
+                : "0 0 10px rgba(168,85,247,0.35)",
+              transition: "width .55s cubic-bezier(.2,.7,.2,1)",
+            }}
+          />
+        </div>
+
+        {/* ── Controls — minimal + secondary styling ── */}
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          {state === "running" && (
+            <button onClick={handlePause} style={btnGhost}>
+              {T("Pause", "Pause", "Duraklat")}
+            </button>
+          )}
+          {state === "paused" && (
+            <button onClick={handleResume} style={btnPrimary}>
+              ▶ {T("Continue", "Weiter", "Devam et")}
+            </button>
+          )}
+          {(state === "completed" || state === "failed") && (
+            <button onClick={handleReplay} style={btnGhost}>
+              ↻ {T("Replay", "Nochmal", "Tekrar oynat")}
+            </button>
+          )}
+          <button onClick={handleExit} style={btnGhost}>
+            {T("Exit", "Beenden", "Çıkış")}
           </button>
-        )}
-        {(state === "completed" || state === "failed") && (
-          <button onClick={handleReplay} style={btnSecondary}>
-            ↻ {T("Replay", "Nochmal", "Tekrar oynat")}
-          </button>
-        )}
-        <button onClick={handleExit} style={btnSecondary}>
-          {T("Exit", "Beenden", "Çıkış")}
-        </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
+
+const btnGhost = {
+  padding: "7px 14px",
+  background: "transparent",
+  color: "rgba(200,215,240,0.7)",
+  fontWeight: 600,
+  fontSize: 11.5,
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 8,
+  cursor: "pointer",
+  fontFamily: "inherit",
+  letterSpacing: 0.1,
+  transition: "all .15s",
+};
 
 const btnPrimary = {
   padding: "8px 16px",
