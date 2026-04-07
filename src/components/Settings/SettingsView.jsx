@@ -154,7 +154,7 @@ function MfaSection({ t, showT }) {
 
   if (mfaEnabled === null) return null; // still loading
 
-  return <div style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 20 }}>
+  return <div id="fm-section-mfa" style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 20 }}>
     <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
       <span style={{ fontSize: 16 }}>🔐</span>
       {t("mfa_title")}
