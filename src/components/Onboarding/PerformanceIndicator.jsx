@@ -17,25 +17,25 @@ import * as fmApi from "../../api/client";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
-// Capability weights — sum should land near 100. Each capability
-// contributes its weight when the corresponding flag is true.
-const WEIGHTS = {
-  // Required setup (counts but is not the full score)
-  clinic:           8,
-  treatment:        7,
-  doctor:           7,
-  // Demo seen — set in localStorage when the player first opens
-  demo_executed:   10,
-  // Advanced (optimization) capabilities
-  booking_rules:   12,
-  doctor_assignment: 8,
-  payments:         8,
-  team:             7,
-  automations:     12,
-  integrations:     7,
-  google_drive:     7,
-  drivers:          7,
-};
+// Base level — every signed-up clinic gets this for free. Reframes
+// the indicator from "you have a lot to do" to "your system is
+// already running, optimization adds bonus performance". Clamps to
+// 100 so the bar never overflows even when all capabilities are on.
+const BASE = 50;
+
+// Each capability adds +10 when its flag is true. With BASE=50, the
+// user starts at 50% on day one and a single optimization bumps them
+// straight to 60%. All 7 enabled = 120 → clamped to 100.
+const CAPABILITY_WEIGHT = 10;
+const CAPABILITIES = [
+  "bot_responding",  // clinic_agent_config exists — always true after signup
+  "demo_executed",   // localStorage flag set when player first opens
+  "booking_rules",
+  "automations",
+  "integrations",
+  "drivers",
+  "team",
+];
 
 export default function PerformanceIndicator() {
   const [status, setStatus] = useState(null);
@@ -61,34 +61,28 @@ export default function PerformanceIndicator() {
 
   if (loading || !status) return null;
 
-  // Capability map: backend flags + local flag for "demo executed"
-  const minimalSteps = (status.minimal && status.minimal.steps) || {};
+  // Capability map: backend flags + local flag for "demo executed".
+  // bot_responding is implicit: every signed-up org has a
+  // clinic_agent_config row, so the bot is responding from day 1.
   const advancedSteps = (status.advanced && status.advanced.steps) || {};
   let demoExecuted = false;
   try { demoExecuted = localStorage.getItem("fm_demo_tour_seen") === "1"; } catch {}
 
   const flags = {
-    clinic:           !!minimalSteps.clinic,
-    treatment:        !!minimalSteps.treatment,
-    doctor:           !!minimalSteps.doctor,
-    demo_executed:    demoExecuted,
-    booking_rules:    !!advancedSteps.booking_rules,
-    doctor_assignment:!!advancedSteps.doctor_assignment,
-    payments:         !!advancedSteps.payments,
-    team:             !!advancedSteps.team,
-    automations:      !!advancedSteps.automations,
-    integrations:     !!advancedSteps.integrations,
-    google_drive:     !!advancedSteps.google_drive,
-    drivers:          !!advancedSteps.drivers,
+    bot_responding:  true,  // always — clinic_agent_config seeded at signup
+    demo_executed:   demoExecuted,
+    booking_rules:   !!advancedSteps.booking_rules,
+    automations:     !!advancedSteps.automations,
+    integrations:    !!advancedSteps.integrations,
+    drivers:         !!advancedSteps.drivers,
+    team:            !!advancedSteps.team,
   };
 
   let earned = 0;
-  let total = 0;
-  for (const key of Object.keys(WEIGHTS)) {
-    total += WEIGHTS[key];
-    if (flags[key]) earned += WEIGHTS[key];
+  for (const key of CAPABILITIES) {
+    if (flags[key]) earned += CAPABILITY_WEIGHT;
   }
-  const pct = total > 0 ? Math.round((earned / total) * 100) : 0;
+  const pct = Math.min(100, BASE + earned);
 
   return (
     <div
@@ -104,13 +98,10 @@ export default function PerformanceIndicator() {
         <span style={{ fontSize: 14 }}>⚡</span>
         <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(232,238,252,0.85)", letterSpacing: -0.1, flex: 1 }}>
           {T(
-            `System performance: ${pct}%`,
-            `Systemleistung: ${pct}%`,
-            `Sistem performansı: %${pct}`
+            `Your system is running – ${pct}% optimized`,
+            `Dein System läuft – ${pct}% optimiert`,
+            `Sisteminiz çalışıyor – %${pct} optimize`
           )}
-        </div>
-        <div style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", fontWeight: 500 }}>
-          {T("Optimized", "Optimiert", "Optimize")}
         </div>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.05)", overflow: "hidden" }}>
