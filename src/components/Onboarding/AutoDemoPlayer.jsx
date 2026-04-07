@@ -46,8 +46,8 @@ const STEPS = [
     id: "inbox_photos",
     view: "inbox",
     label: { de: "Patient sendet Fotos", en: "Patient sends photos", tr: "Hasta fotoğraf gönderiyor" },
-    // 3 photos × 1500ms gap = 4500ms + a tiny buffer to read the last one
-    duration: 6000,
+    // 3 photos × 500ms gap = ~1500ms + buffer to read the last one
+    duration: 4000,
     // Animated photo arrival — handled by the playback effect via this hook id
     onEnter: "addPhotosSequentially",
   },
@@ -179,16 +179,15 @@ export default function AutoDemoPlayer({ onClose }) {
     setViewRef.current(step.view);
 
     // Optional per-step onEnter hook. Used by the photos step to drop
-    // 3 photos into the conversation one by one (1500ms apart) so the
+    // 3 photos into the conversation one by one (~500ms apart) so the
     // user can SEE them arrive instead of all 3 popping in at once.
+    // We fire the API call FIRST and only delay the next iteration —
+    // the first photo therefore lands as fast as the network permits.
     let cancelledHook = false;
     if (step.onEnter === "addPhotosSequentially") {
       (async () => {
         const types = ["front", "top", "side"];
         for (let i = 0; i < types.length; i++) {
-          if (cancelledHook) return;
-          // Stagger: first photo at +200ms, then 1500ms apart
-          await new Promise((r) => setTimeout(r, i === 0 ? 200 : 1500));
           if (cancelledHook) return;
           try {
             await fmApi.apiFetch("/api/v1/clinic/mode/demo/tour-add-photo", {
@@ -198,6 +197,8 @@ export default function AutoDemoPlayer({ onClose }) {
             // Tell the inbox/case-overview to re-pull so the new photo shows up
             try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
           } catch { /* non-fatal — keep playback going */ }
+          if (cancelledHook) return;
+          if (i < types.length - 1) await new Promise((r) => setTimeout(r, 500));
         }
       })();
     }
