@@ -335,14 +335,20 @@ export default function AutoDemoPlayer({ onClose }) {
           // Fallübersicht panel reads photos from leads (via overviewLead),
           // not from selChat — updating selChat alone wouldn't make the
           // thumbnails appear in the right panel during step 2.
+          //
+          // We use the ABSOLUTE URL (window.location.origin + path) so the
+          // CaseOverviewPanel + PatientPanel "isReal" filter (startsWith
+          // 'https://' || 'http://') treats them as real images instead
+          // of falling back to a 📷 placeholder icon.
           let newPhotoUrls = null;
           let tourPatientId = null;
+          const absoluteUrl = window.location.origin + DEMO_PHOTO_URLS[type];
           try {
             const store = useInboxStore.getState();
             const sc = store.selChat;
             if (sc) {
               const existing = Array.isArray(sc.photoUrls) ? sc.photoUrls : [];
-              newPhotoUrls = [...existing, DEMO_PHOTO_URLS[type]];
+              newPhotoUrls = [...existing, absoluteUrl];
               store.setSelChat({ ...sc, photoUrls: newPhotoUrls });
               tourPatientId = sc.patientId || sc.id;
             }
@@ -359,15 +365,13 @@ export default function AutoDemoPlayer({ onClose }) {
             } catch {}
           }
           // Background DB write — non-blocking, ignored on failure.
-          // Pass the URL so the DB row matches what we just rendered
-          // optimistically (otherwise a later refresh would replace
-          // our local SVG with a picsum image).
+          // Pass the same absolute URL so a later refresh stays consistent.
           fmApi
             .apiFetch("/api/v1/clinic/mode/demo/tour-add-photo", {
               method: "POST",
               body: JSON.stringify({
                 photo_type: type,
-                url: window.location.origin + DEMO_PHOTO_URLS[type],
+                url: absoluteUrl,
               }),
             })
             .catch(() => {});
