@@ -105,6 +105,17 @@ export default function AutoDemoPlayer({ onClose }) {
   const timerRef = useRef(null);
   const startedAtRef = useRef(null);
 
+  // ── Stable refs for functions used INSIDE the playback effect ──
+  // The playback effect only depends on [state, stepIdx]; everything
+  // else is reached through these refs so the effect doesn't re-fire
+  // on every parent re-render (which would cause an infinite loop:
+  // setView → MainLayout re-render → new onClose ref → effect re-run
+  // → setView → …, React error #185).
+  const setViewRef = useRef(setView);
+  useEffect(() => { setViewRef.current = setView; });
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; });
+
   const cleanup = useCallback(async () => {
     try {
       await fmApi.apiFetch("/api/v1/clinic/mode/demo/cleanup-tour", { method: "POST" });
@@ -112,9 +123,11 @@ export default function AutoDemoPlayer({ onClose }) {
       // non-fatal
     }
   }, []);
+  const cleanupRef = useRef(cleanup);
+  useEffect(() => { cleanupRef.current = cleanup; });
 
   // Start the tour: ask backend to create the demo data, then advance
-  // through STEPS one at a time.
+  // through STEPS one at a time. Runs once on mount.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -137,30 +150,32 @@ export default function AutoDemoPlayer({ onClose }) {
       cancelled = true;
       if (timerRef.current) clearTimeout(timerRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Advance the playback when running
+  // Playback effect — only depends on state + stepIdx. Functions are
+  // accessed via refs above so this effect runs ONLY when the playback
+  // actually advances, never on unrelated parent re-renders.
   useEffect(() => {
     if (state !== "running") return;
     const step = STEPS[stepIdx];
     if (!step) {
       setState("completed");
-      // Auto-cleanup after a short pause so user sees the final state
       setTimeout(() => {
-        cleanup().finally(() => {
-          if (onClose) onClose();
+        cleanupRef.current().finally(() => {
+          if (onCloseRef.current) onCloseRef.current();
         });
       }, 1500);
       return;
     }
-    setView(step.view);
+    setViewRef.current(step.view);
     timerRef.current = setTimeout(() => {
       setStepIdx((i) => i + 1);
     }, step.duration);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [state, stepIdx, setView, cleanup, onClose]);
+  }, [state, stepIdx]);
 
   const handlePause = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
