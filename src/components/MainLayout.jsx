@@ -924,14 +924,21 @@ export default function MainLayout() {
                         {_ltT("Bot live testen", "Test the bot live", "Botu canlı test edin")}
                       </div>
                       <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
-                        {_ltT("TEST-MODUS", "TEST MODE", "TEST MODU")}
+                        {_ltT("TESTMODUS AKTIV", "TEST MODE ACTIVE", "TEST MODU AKTİF")}
                       </span>
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>
+                    <div style={{ fontSize: 13, color: "rgba(200,215,240,0.78)", marginTop: 4, fontWeight: 600 }}>
                       {_ltT(
-                        "Sende eine Testnachricht über unsere geteilte Test-Nummer — der Bot antwortet sofort.",
-                        "Send a test message via our shared test number — the bot replies instantly.",
-                        "Paylaşılan test numaramız üzerinden bir test mesajı gönderin — bot anında yanıtlar."
+                        "Keine eigene WhatsApp-Nummer nötig — du kannst den Bot sofort testen.",
+                        "No own WhatsApp number needed — you can test the bot right now.",
+                        "Kendi WhatsApp numaranız gerekmez — botu hemen test edebilirsiniz."
+                      )}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(200,215,240,0.55)", marginTop: 2 }}>
+                      {_ltT(
+                        "Wir nutzen eine geteilte Test-Nummer. Deine eigene Nummer wird nach dem Kauf eingerichtet.",
+                        "We use a shared test number. Your own number is set up after purchase.",
+                        "Paylaşılan bir test numarası kullanıyoruz. Kendi numaranız satın alma sonrası kurulur."
                       )}
                     </div>
                   </div>

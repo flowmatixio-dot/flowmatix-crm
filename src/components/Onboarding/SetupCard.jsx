@@ -11,14 +11,21 @@
  * not the trial test number — backend logic excludes pool aliases.
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
 import { navigateToSetupSection } from "../../lib/setupNav";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
-const STEP_DEFS = [
+// Required setup steps shown in the SetupCard.
+//
+// NOTE: the WhatsApp step is conditionally hidden in trial mode. Trial
+// users cannot see "Eigene WhatsApp-Nummer" anywhere — they're on the
+// shared test number and there is nothing to connect. Only after a
+// purchase (workspace_state === 'active') does whatsapp become a real
+// setup step. Filtering happens below in the component, not here.
+const ALL_STEP_DEFS = [
   {
     key: "clinic",
     section: "clinic",
@@ -26,6 +33,8 @@ const STEP_DEFS = [
     label:    { de: "Klinikdaten",          en: "Clinic data",        tr: "Klinik bilgileri" },
     sublabel: { de: "Name, Adresse, Land",  en: "Name, address, country", tr: "İsim, adres, ülke" },
     cta:      { de: "Klinikdaten ergänzen", en: "Complete clinic info", tr: "Klinik bilgilerini tamamla" },
+    trialOnly: false,
+    paidOnly: false,
   },
   {
     key: "treatment",
@@ -34,6 +43,8 @@ const STEP_DEFS = [
     label:    { de: "Behandlung",            en: "Treatment",          tr: "Tedavi" },
     sublabel: { de: "Mind. 1 Behandlung",   en: "At least 1 treatment", tr: "En az 1 tedavi" },
     cta:      { de: "Behandlung hinzufügen", en: "Add treatment",      tr: "Tedavi ekle" },
+    trialOnly: false,
+    paidOnly: false,
   },
   {
     key: "doctor",
@@ -42,6 +53,8 @@ const STEP_DEFS = [
     label:    { de: "Arzt",            en: "Doctor",       tr: "Doktor" },
     sublabel: { de: "Mind. 1 Arzt",   en: "At least 1 doctor", tr: "En az 1 doktor" },
     cta:      { de: "Arzt hinzufügen", en: "Add doctor",   tr: "Doktor ekle" },
+    trialOnly: false,
+    paidOnly: false,
   },
   {
     key: "whatsapp",
@@ -50,16 +63,33 @@ const STEP_DEFS = [
     label:    { de: "Eigene WhatsApp-Nummer", en: "Own WhatsApp number",       tr: "Kendi WhatsApp numarası" },
     sublabel: { de: "Produktive Verbindung",  en: "Production connection",      tr: "Üretim bağlantısı" },
     cta:      { de: "WhatsApp verbinden",     en: "Connect WhatsApp",           tr: "WhatsApp bağla" },
-    optional: true,
+    paidOnly: true,  // hidden in trial — trial uses the shared test number
   },
 ];
 
 export default function SetupCard() {
-  const { setView } = useApp();
+  const { setView, workspaceState } = useApp();
   const lang = localStorage.getItem("fm_lang") || "de";
 
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // plan_active: true after the customer has paid and the workspace
+  // is fully active. Trial users are in 'live_test', activation_pending,
+  // demo, or trial_expired — none of those should see "Eigene WhatsApp".
+  const planActive = workspaceState === 'active';
+
+  // Filter steps based on trial vs paid:
+  //  - paidOnly  steps are hidden until plan_active
+  //  - trialOnly steps would be hidden after activation (none currently)
+  const STEP_DEFS = useMemo(
+    () => ALL_STEP_DEFS.filter((s) => {
+      if (s.paidOnly && !planActive) return false;
+      if (s.trialOnly && planActive) return false;
+      return true;
+    }),
+    [planActive]
+  );
 
   const fetchStatus = useCallback(async () => {
     try {
