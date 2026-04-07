@@ -314,9 +314,10 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
         background: "rgba(0,0,0,0.3)", backdropFilter: "blur(2px)",
       }} />
       <div style={{
-        position: "fixed", top: 0, right: 0, width: 460, height: "100vh", background: "#0f1420",
+        position: "fixed", top: 0, right: 0, width: 420, height: "100vh", background: "#0f1420",
         borderLeft: "1px solid rgba(255,255,255,0.06)", zIndex: 10000, overflowY: "auto",
         boxShadow: "-8px 0 40px rgba(0,0,0,0.5)", animation: "fm-slide-in 0.2s ease",
+        fontSize: 12.5,
       }}>
         <style>{`@keyframes fm-slide-in{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
 
@@ -377,34 +378,52 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
             ))}
           </div>
 
-          {/* ── Medical Details (from patient intake) ── */}
-          {localAppt._intake && Object.keys(localAppt._intake).length > 0 && (
-            <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{"🩺"} {t("medical_details") || "Medizinische Details"}</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px" }}>
-                {[
-                  { k: "treatment", l: t("treatment") || "Behandlung" },
-                  { k: "concern", l: t("concern") || "Anliegen" },
-                  { k: "age", l: t("age") || "Alter" },
-                  { k: "country", l: t("country") || "Land" },
-                  { k: "hair_loss_type", l: t("hair_loss") || "Haarausfall" },
-                  { k: "medications", l: t("medications") || "Medikamente" },
-                  { k: "allergies", l: t("allergies") || "Allergien" },
-                  { k: "previous_treatments", l: t("prev_treatments") || "Vorbehandlungen" },
-                  { k: "medical_conditions", l: t("medical_conditions") || "Vorerkrankungen" },
-                  { k: "smoker", l: t("smoker") || "Raucher" },
-                  { k: "blood_thinners", l: t("blood_thinners") || "Blutverdünner" },
-                ].map(f => {
-                  const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
-                  if (!v || v === '—') return null;
-                  return <div key={f.k} style={{ fontSize: 11 }}>
-                    <span style={{ color: "rgba(167,177,195,0.6)" }}>{f.l}: </span>
-                    <span style={{ color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>{v}</span>
-                  </div>;
-                })}
+          {/* ── Medical Details (from patient intake) ──
+              Inline DE/EN/TR translations because the i18n keys for
+              several of these labels don't exist in i18n.js and t()
+              would return the raw key string. Layout: small label on
+              top, value below — easier to scan than "label: value"
+              inline. */}
+          {localAppt._intake && Object.keys(localAppt._intake).length > 0 && (() => {
+            const _lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+            const _T = (de, en, tr) => ({ de, en, tr }[_lang] || de);
+            const fields = [
+              { k: "treatment",          l: _T("Behandlung", "Treatment", "Tedavi") },
+              { k: "concern",            l: _T("Anliegen", "Concern", "Sorun") },
+              { k: "age",                l: _T("Alter", "Age", "Yaş") },
+              { k: "country",            l: _T("Land", "Country", "Ülke") },
+              { k: "hair_loss_type",     l: _T("Haarausfall", "Hair loss", "Saç dökülmesi") },
+              { k: "medications",        l: _T("Medikamente", "Medications", "İlaçlar") },
+              { k: "allergies",          l: _T("Allergien", "Allergies", "Alerjiler") },
+              { k: "previous_treatments",l: _T("Vorbehandlungen", "Previous treatments", "Önceki tedaviler") },
+              { k: "medical_conditions", l: _T("Vorerkrankungen", "Medical history", "Tıbbi geçmiş") },
+              { k: "smoker",             l: _T("Raucher", "Smoker", "Sigara") },
+              { k: "blood_thinners",     l: _T("Blutverdünner", "Blood thinners", "Kan sulandırıcı") },
+            ];
+            return (
+              <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
+                  {"🩺"} {_T("Medizinische Details", "Medical details", "Tıbbi detaylar")}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 14px" }}>
+                  {fields.map(f => {
+                    const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
+                    if (!v || v === '—') return null;
+                    return (
+                      <div key={f.k}>
+                        <div style={{ fontSize: 9, color: "rgba(167,177,195,0.55)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700, marginBottom: 2 }}>
+                          {f.l}
+                        </div>
+                        <div style={{ fontSize: 12, color: "rgba(232,238,252,0.92)", fontWeight: 600, lineHeight: 1.35 }}>
+                          {v}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── Readiness progress ── */}
           {!localStorage.getItem("fm_opprep_drive_hint_dismissed") && (() => {
