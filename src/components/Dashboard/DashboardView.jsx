@@ -4,6 +4,7 @@ import { getNow } from "../../utils/demoTime";
 import { fmLocale } from "../../utils/helpers";
 import HintBox from "../shared/HintBox.jsx";
 import SetupCard from "../Onboarding/SetupCard.jsx";
+import AdvancedSetupCard from "../Onboarding/AdvancedSetupCard.jsx";
 
 /* ── Inline tri-language helper (matches production T()) ── */
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
@@ -222,6 +223,9 @@ export default function DashboardView() {
 
       {/* ── Setup progress card (auto-hides when onboarding_completed) ── */}
       <SetupCard />
+
+      {/* ── Advanced setup: "Volles Potenzial freischalten" — dashboard only, no banner ── */}
+      <AdvancedSetupCard />
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
