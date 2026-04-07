@@ -176,28 +176,35 @@ export default function AdvancedSetupCard() {
 
   if (loading || !status) return null;
 
-  // Build a unified done-flag map. Backend exposes:
-  //   status.minimal.steps  — clinic, treatment, doctor (+ whatsapp if paid)
-  //   status.advanced.steps — booking_rules, ..., drivers
-  //   status.steps          — legacy flat map (whatsapp_connected, agent_configured, etc.)
-  const minimalSteps = (status.minimal && status.minimal.steps) || {};
-  const advancedSteps = (status.advanced && status.advanced.steps) || {};
-  const legacySteps = status.steps || {};
+  // Build a unified done-flag map.
+  //
+  // IMPORTANT: backend "done" flags are mostly seed-defaults — every
+  // signed-up clinic gets agent_configured=true, ≥1 treatment, Dr. Demo,
+  // working_hours, etc. The user wants none of that to render as green
+  // ("kunde muss alles selber machen"). So we ignore the seeded flags
+  // and only mark something as done when the user has explicitly
+  // completed it (tracked in localStorage `fm_setup_done_<key>`).
+  // Real backend signals are still respected for items that genuinely
+  // need an external action: whatsapp connection + 2FA toggle.
   const planActive = workspaceState === 'active';
+  const userMarked = (key) => {
+    try { return localStorage.getItem(`fm_setup_done_${key}`) === "1"; } catch { return false; }
+  };
+  const legacySteps = status.steps || {};
   const flags = {
-    general:           !!minimalSteps.clinic,
-    treatments:        !!minimalSteps.treatment,
-    ai_settings:       !!legacySteps.agent_configured,
-    booking_rules:     !!advancedSteps.booking_rules,
-    doctor_assignment: !!advancedSteps.doctor_assignment,
-    payments:          !!advancedSteps.payments,
-    two_factor:        mfaEnabled,
-    team:              !!advancedSteps.team,
+    general:           userMarked("general"),
+    treatments:        userMarked("treatments"),
+    ai_settings:       userMarked("ai_settings"),
+    booking_rules:     userMarked("booking_rules"),
+    doctor_assignment: userMarked("doctor_assignment"),
+    payments:          userMarked("payments"),
+    two_factor:        mfaEnabled || userMarked("two_factor"),
+    team:              userMarked("team"),
+    // whatsapp_connected is a real external action — trust the backend
     whatsapp:          !!legacySteps.whatsapp_connected,
-    automations:       !!advancedSteps.automations,
-    integrations:      !!advancedSteps.integrations,
-    google_drive:      !!advancedSteps.google_drive,
-    drivers:           !!advancedSteps.drivers,
+    automations:       userMarked("automations"),
+    google_drive:      userMarked("google_drive"),
+    drivers:           userMarked("drivers"),
   };
 
   // Filter: hide paidOnly steps (e.g. whatsapp) until the workspace is active
@@ -210,6 +217,10 @@ export default function AdvancedSetupCard() {
       try { showT && showT(hint); } catch {}
       return;
     }
+    // Mark as user-initiated. The next render will show this item as
+    // done. Two_factor / whatsapp also fall back to backend flags so
+    // they update when the real action completes.
+    try { localStorage.setItem(`fm_setup_done_${s.key}`, "1"); } catch {}
     navigateToSetupSection(setView, s.section);
   };
 
@@ -245,8 +256,18 @@ export default function AdvancedSetupCard() {
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", marginBottom: 3, letterSpacing: -0.05 }}>
-            {T("🚀 Win more patients automatically", "🚀 Mehr Patienten automatisch gewinnen", "🚀 Otomatik olarak daha fazla hasta kazanın")}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", letterSpacing: -0.05 }}>
+              {T("🚀 Win more patients automatically", "🚀 Mehr Patienten automatisch gewinnen", "🚀 Otomatik olarak daha fazla hasta kazanın")}
+            </span>
+            <span style={{
+              fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+              background: "rgba(255,255,255,0.04)", color: "rgba(167,177,195,0.6)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              letterSpacing: 0.2, whiteSpace: "nowrap",
+            }}>
+              {T("Optional", "Optional", "İsteğe bağlı")}
+            </span>
           </div>
           <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
             {T(

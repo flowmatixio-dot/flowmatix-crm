@@ -68,27 +68,33 @@ export default function PerformanceIndicator() {
 
   if (loading || !status) return null;
 
-  // Capability map: backend flags + local flag for "demo executed".
-  // bot_responding is implicit: every signed-up org has a
-  // clinic_agent_config row, so the bot is responding from day 1.
-  const minimalSteps = (status.minimal && status.minimal.steps) || {};
-  const advancedSteps = (status.advanced && status.advanced.steps) || {};
+  // Capability map. Seed-default backend flags are ignored on purpose
+  // (the user wants the system to feel like THEY built it up, not like
+  // it was already done by signup defaults). Each capability is only
+  // counted when the user explicitly clicked through it via
+  // AdvancedSetupCard, which writes localStorage `fm_setup_done_<key>`.
+  // bot_responding is the only "free" baseline (the bot really IS
+  // responding from day 1) and demo_executed is set when the player
+  // first opens.
   let demoExecuted = false;
   try { demoExecuted = localStorage.getItem("fm_demo_tour_seen") === "1"; } catch {}
+  const userMarked = (key) => {
+    try { return localStorage.getItem(`fm_setup_done_${key}`) === "1"; } catch { return false; }
+  };
 
   const flags = {
-    bot_responding:  true,  // always — clinic_agent_config seeded at signup
+    bot_responding:  true,
     demo_executed:   demoExecuted,
-    general:         !!minimalSteps.clinic,
-    treatments:      !!minimalSteps.treatment,
-    doctor:          !!minimalSteps.doctor,
-    booking_rules:   !!advancedSteps.booking_rules,
-    team:            !!advancedSteps.team,
-    drivers:         !!advancedSteps.drivers,
-    payments:        !!advancedSteps.payments,
-    two_factor:      false, // PerformanceIndicator doesn't fetch getMe — leave conservative; AdvancedSetupCard handles its own check
-    automations:     !!advancedSteps.automations,
-    integrations:    !!advancedSteps.integrations,
+    general:         userMarked("general"),
+    treatments:      userMarked("treatments"),
+    doctor:          userMarked("doctor_assignment"),
+    booking_rules:   userMarked("booking_rules"),
+    team:            userMarked("team"),
+    drivers:         userMarked("drivers"),
+    payments:        userMarked("payments"),
+    two_factor:      userMarked("two_factor"),
+    automations:     userMarked("automations"),
+    integrations:    false,
   };
 
   let earned = 0;
