@@ -340,12 +340,70 @@ export default function MainLayout() {
       const isYearly = billingCycle === 'yearly';
       const PLAN_ORDER = ["core", "pro", "operations", "enterprise"];
       const PLAN_LABELS = { core: "Core", pro: "Pro", operations: "Operations", enterprise: "Enterprise" };
-      const sharedFeatures = [t("pf_shared_ai")||"AI WhatsApp assistant", t("pf_shared_crm")||"Full CRM & pipeline", t("pf_shared_calendar")||"Calendar & booking", t("pf_shared_automations")||"All automations", t("pf_shared_languages")||"All languages", t("pf_shared_team")||"Unlimited team members"];
+      // Inline DE/EN/TR helper — most of the i18n keys for the new
+      // outcome-focused copy don't exist in i18n.js and t() returns
+      // the raw key when missing.
+      const _ppLang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+      const _ppT = (de, en, tr) => ({ de, en, tr }[_ppLang] || de);
+      // Outcome-based features (shared across all plans). Reads as
+      // "what does the customer get?" instead of "what's included?".
+      const sharedFeatures = [
+        _ppT(
+          "Antwortet automatisch auf Patientenanfragen (24/7)",
+          "Replies automatically to patient inquiries (24/7)",
+          "Hasta taleplerini otomatik yanıtlar (7/24)"
+        ),
+        _ppT(
+          "Termine werden automatisch gebucht",
+          "Appointments are booked automatically",
+          "Randevular otomatik olarak alınır"
+        ),
+        _ppT(
+          "Alle Patienten automatisch organisiert",
+          "Every patient organised automatically",
+          "Tüm hastalar otomatik olarak düzenlenir"
+        ),
+        _ppT(
+          "Erinnerungen, Follow-ups & Nachsorge laufen automatisch",
+          "Reminders, follow-ups & aftercare run on autopilot",
+          "Hatırlatmalar, takipler ve bakım otomatik çalışır"
+        ),
+        _ppT(
+          "Mehrsprachig: Deutsch, Englisch, Türkisch",
+          "Multilingual: German, English, Turkish",
+          "Çok dilli: Almanca, İngilizce, Türkçe"
+        ),
+        _ppT(
+          "Unbegrenzt viele Team-Mitglieder",
+          "Unlimited team members",
+          "Sınırsız ekip üyeleri"
+        ),
+      ];
       const PLAN_FEATURES = {
-        core: [t("pf_c1")||"Up to 250 patients/month", ...sharedFeatures],
-        pro: [t("pf_p1")||"Up to 500 patients/month", ...sharedFeatures],
-        operations: [t("pf_o1")||"Up to 1,000 patients/month", ...sharedFeatures],
-        enterprise: [t("pf_e1")||"Unlimited patients", ...sharedFeatures, t("pf_e_dedicated")||"Dedicated support & SLA"],
+        core: [
+          _ppT("Bis zu 250 Patienten pro Monat", "Up to 250 patients/month", "Aylık 250 hastaya kadar"),
+          ...sharedFeatures,
+        ],
+        pro: [
+          _ppT("Bis zu 500 Patienten pro Monat", "Up to 500 patients/month", "Aylık 500 hastaya kadar"),
+          ...sharedFeatures,
+        ],
+        operations: [
+          _ppT("Bis zu 1.000 Patienten pro Monat", "Up to 1,000 patients/month", "Aylık 1.000 hastaya kadar"),
+          ...sharedFeatures,
+        ],
+        enterprise: [
+          _ppT("Unbegrenzte Patienten", "Unlimited patients", "Sınırsız hasta"),
+          ...sharedFeatures,
+          _ppT("Dedizierter Support & SLA", "Dedicated support & SLA", "Özel destek ve SLA"),
+        ],
+      };
+      // ROI hint per plan — frames the price as "X bookings cover the cost"
+      const PLAN_ROI = {
+        core:       _ppT("≈ 1–2 Patienten decken die Kosten", "≈ 1–2 patients cover the cost", "≈ 1–2 hasta maliyeti karşılar"),
+        pro:        _ppT("≈ 1–2 Patienten decken die Kosten", "≈ 1–2 patients cover the cost", "≈ 1–2 hasta maliyeti karşılar"),
+        operations: _ppT("≈ 2–3 Patienten decken die Kosten", "≈ 2–3 patients cover the cost", "≈ 2–3 hasta maliyeti karşılar"),
+        enterprise: _ppT("Individuelles ROI-Modell", "Custom ROI model", "Özel ROI modeli"),
       };
       const handleSelectPlan = async (plan) => {
         if (plan === "enterprise") {
@@ -386,7 +444,13 @@ export default function MainLayout() {
                 {isForced ? "⏸" : "⚡"} {isForced ? (t("pp_paused")||"System paused") : (t("pp_upgrade")||"Upgrade")}
               </div>
               <h2 style={{ color: "white", fontSize: 24, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.3 }}>
-                {isForced ? (t("pp_title_expired")||"Your system is currently paused") : (t("pp_title")||"Choose your plan")}
+                {isForced
+                  ? (t("pp_title_expired") || "Your system is currently paused")
+                  : _ppT(
+                      "Von WhatsApp-Anfrage zu gebuchtem Patienten – automatisch",
+                      "From WhatsApp request to booked patient — automatically",
+                      "WhatsApp talebinden rezerveli hastaya — otomatik olarak"
+                    )}
               </h2>
               <p style={{ color: "rgba(200,215,240,0.6)", fontSize: 13, margin: "0 0 4px", maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
                 {isForced ? (t("pp_desc_expired")||"Activate your plan to continue receiving and converting patient inquiries via WhatsApp") : (t("pp_desc")||"Select the right plan for your clinic")}
@@ -479,14 +543,26 @@ export default function MainLayout() {
                   onMouseEnter={e => { if (!isPro) { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1.01)"; }}}
                   onMouseLeave={e => { if (!isPro) { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "none"; }}}
                   >
-                    {isPro && <div style={{ position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)", padding: "4px 14px", borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", background: `linear-gradient(135deg, ${color}, ${color}cc)`, color: "#fff", boxShadow: `0 2px 12px ${color}40` }}>{t("pp_popular")||"MOST POPULAR"}</div>}
+                    {isPro && <div style={{ position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)", padding: "4px 14px", borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", background: `linear-gradient(135deg, ${color}, ${color}cc)`, color: "#fff", boxShadow: `0 2px 12px ${color}40`, whiteSpace: "nowrap" }}>{_ppT("BESTE WAHL FÜR WACHSENDE KLINIKEN", "BEST CHOICE FOR GROWING CLINICS", "BÜYÜYEN KLİNİKLER İÇİN EN İYİ SEÇİM")}</div>}
 
                     <div style={{ fontWeight: 800, fontSize: 13, color, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>{PLAN_LABELS[pk]}</div>
                     <div style={{ fontSize: 28, fontWeight: 800, color: "rgba(232,238,252,0.95)", marginBottom: 2 }}>
                       {(() => { const prices = { core: 690, pro: 990, operations: 1490, enterprise: 2500 }; const m = prices[pk] || 0; return isYearly ? `€${(m * 12).toLocaleString('de-DE')}` : PLAN_PRICE[pk]; })()}<span style={{ fontSize: 12, fontWeight: 500, color: "rgba(167,177,195,0.7)" }}>{isYearly ? "/Jahr" : "/mo"}</span>
                     </div>
-                    <div style={{ fontSize: 10, color: isYearly ? "rgba(16,185,129,0.5)" : "rgba(167,177,195,0.65)", marginBottom: 16 }}>
-                      {isYearly ? (t("pp_no_setup_fee")||"Keine Setup-Gebühr") : `+ ${t("pp_setup")||"€1.990 Setup-Gebühr (einmalig)"}`}
+                    {/* ROI line — frames the monthly cost in patients */}
+                    {pk !== "enterprise" && (
+                      <div style={{ fontSize: 10.5, color: "#10b981", fontWeight: 600, marginBottom: 4, opacity: 0.85 }}>
+                        {PLAN_ROI[pk]}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 10, color: isYearly ? "rgba(16,185,129,0.55)" : "rgba(167,177,195,0.65)", marginBottom: 16, lineHeight: 1.4 }}>
+                      {isYearly
+                        ? _ppT("Keine Einrichtungsgebühr", "No setup fee", "Kurulum ücreti yok")
+                        : _ppT(
+                            "+ €1.990 Einrichtung (einmalig, inkl. vollständigem Setup)",
+                            "+ €1,990 setup (one-time, full onboarding included)",
+                            "+ €1.990 kurulum (tek seferlik, tam kurulum dahil)"
+                          )}
                     </div>
 
                     <div style={{ flex: 1, marginBottom: 18 }}>
