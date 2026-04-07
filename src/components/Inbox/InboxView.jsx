@@ -529,6 +529,8 @@ export default function InboxView() {
                         {photoCount > 0 && <ConvBadge label={`${photoCount} ${t("photos") || "Fotos"}`} color="#a78bfa" />}
                         {!isLocal && lead?.flightConfirmed?.date && !lead?.logistics?.driverName && <ConvBadge label={t("driver_missing")||"Fahrer fehlt"} color="#ec4899" />}
                         {!isLocal && lead?.flightConfirmed?.date && !(lead?.hotelInfo?.name||lead?.hotel?.name) && <ConvBadge label={t("hotel_missing")||"Hotel fehlt"} color="#a78bfa" />}
+                        {/* Hotel explicitly requested by patient (works for local patients too — they may arrive early and still need a hotel) */}
+                        {lead?.metadata?.hotelRequested === true && !(lead?.hotelInfo?.name||lead?.hotel?.name) && <ConvBadge label={t("hotel_missing")||"Hotel fehlt"} color="#a78bfa" />}
                         {!isLocal && lead?.stage==="booked" && !lead?.flightConfirmed?.date && <ConvBadge label={t("flight_missing_badge")||"Flug fehlt"} color="#ef4444" />}
                         {!isMedReview && !isAiActive && !isHumanTakeover && !isDepositPaid && cs && (
                           <ConvBadge icon={cs.icon} label={cs.label} color={cs.color} />

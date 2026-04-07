@@ -311,6 +311,10 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
         opBadges.push({ label: "🏨 " + (t("wait_hotel") || "Waiting for hotel"), background: LOGISTICS_COLORS.hotel_missing.bg, color: LOGISTICS_COLORS.hotel_missing.color });
     }
   }
+  // Hotel explicitly requested — shows for local patients too (flies in early, still needs a bed)
+  if (lead.metadata?.hotelRequested === true && !(lead.hotelInfo?.name || lead.hotel?.name) && !opBadges.some(b => b.label?.includes('hotel') || b.label?.includes('Hotel'))) {
+    opBadges.push({ label: "🏨 " + (t("wait_hotel") || "Waiting for hotel"), background: LOGISTICS_COLORS.hotel_missing.bg, color: LOGISTICS_COLORS.hotel_missing.color });
+  }
   if (lead.metadata?.depositPending)
     opBadges.push({ label: t("step_deposit") || "Anzahlung", background: "rgba(234,179,8,0.12)", color: "#eab308" });
   else if (opBadges.length === 0 && (lead.convStatus === "deposit_paid" || (lead.financials && lead.financials.depositStatus === "paid")))
