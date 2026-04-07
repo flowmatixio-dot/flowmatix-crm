@@ -1168,40 +1168,75 @@ export default function SettingsView() {
     {/* WhatsApp cost info removed — Flowmatix covers messaging costs */}
 
     {/* Status row — adopted from AIControlView so the user sees what's
-        already working out of the box. Visual only, not toggles. */}
-    <div id="fm-section-ai" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
-      {[
-        { icon: "📩", label: t("incoming_messages") || "Eingehende Nachrichten", desc: t("incoming_messages_desc") || "Werden automatisch beantwortet" },
-        { icon: "🎙", label: t("voice_messages") || "Sprachnachrichten", desc: t("voice_messages_desc") || "Automatische Transkription" },
-        { icon: "🌙", label: t("auto_responder_247") || "24/7 Auto-Responder", desc: t("auto_responder_247_desc") || "Auch außerhalb der Öffnungszeiten" },
-      ].map((w, i) => (
-        <div key={i} style={{padding:"12px 14px",borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)"}}>
-          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
-            <span style={{fontSize:14}}>{w.icon}</span>
-            <span style={{fontWeight:700,fontSize:13,color:"rgba(232,238,252,0.9)"}}>{w.label}</span>
-          </div>
-          <div style={{fontSize:11,color:"rgba(167,177,195,0.6)",marginBottom:6}}>{w.desc}</div>
-          <div style={{display:"flex",alignItems:"center",gap:4}}>
-            <div style={{width:6,height:6,borderRadius:99,background:"#10b981",animation:"fmPulseGreen 2s infinite"}}/>
-            <span style={{fontSize:11,fontWeight:600,color:"#10b981"}}>{t("active") || "Aktiv"}</span>
-          </div>
+        already working out of the box. Visual only, not toggles.
+        Inline language map because the i18n keys for these strings
+        don't exist in i18n.js (and t() returns the raw key when
+        missing, defeating the `|| fallback` pattern). */}
+    {(() => {
+      const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+      const TR = (de, en, tr) => ({ de, en, tr }[lang] || de);
+      const cards = [
+        {
+          icon: "📩",
+          label: TR("Eingehende Nachrichten", "Incoming messages", "Gelen mesajlar"),
+          desc:  TR("Werden automatisch beantwortet", "Replied to automatically", "Otomatik olarak yanıtlanır"),
+        },
+        {
+          icon: "🎙",
+          label: TR("Sprachnachrichten", "Voice messages", "Sesli mesajlar"),
+          desc:  TR("Automatische Transkription", "Automatic transcription", "Otomatik transkripsiyon"),
+        },
+        {
+          icon: "🌙",
+          label: TR("24/7 Auto-Responder", "24/7 auto-responder", "7/24 otomatik yanıt"),
+          desc:  TR("Auch außerhalb der Öffnungszeiten", "Even outside opening hours", "Açılış saatleri dışında bile"),
+        },
+      ];
+      const activeLabel = TR("Aktiv", "Active", "Aktif");
+      return (
+        <div id="fm-section-ai" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
+          {cards.map((w, i) => (
+            <div key={i} style={{padding:"12px 14px",borderRadius:12,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                <span style={{fontSize:14}}>{w.icon}</span>
+                <span style={{fontWeight:700,fontSize:13,color:"rgba(232,238,252,0.9)"}}>{w.label}</span>
+              </div>
+              <div style={{fontSize:11,color:"rgba(167,177,195,0.6)",marginBottom:6}}>{w.desc}</div>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
+                <div style={{width:6,height:6,borderRadius:99,background:"#10b981",animation:"fmPulseGreen 2s infinite"}}/>
+                <span style={{fontSize:11,fontWeight:600,color:"#10b981"}}>{activeLabel}</span>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      );
+    })()}
 
     {/* AI model — read-only display of the model the bot uses */}
-    <div style={{padding:"14px 18px",borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-      <div>
-        <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.65)",letterSpacing:"0.04em",textTransform:"uppercase",marginBottom:4}}>
-          {t("ai_model_label") || "KI-Modell"}
+    {(() => {
+      const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+      const TR = (de, en, tr) => ({ de, en, tr }[lang] || de);
+      return (
+        <div style={{padding:"14px 18px",borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+          <div>
+            <div style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.65)",letterSpacing:"0.04em",textTransform:"uppercase",marginBottom:4}}>
+              {TR("KI-Modell", "AI model", "AI modeli")}
+            </div>
+            <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)"}}>Claude Sonnet 4.5</div>
+            <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",marginTop:2}}>
+              {TR(
+                "Anthropics neuestes Modell — schnell, präzise, mehrsprachig.",
+                "Anthropic's latest model — fast, precise, multilingual.",
+                "Anthropic'in en yeni modeli — hızlı, hassas, çok dilli."
+              )}
+            </div>
+          </div>
+          <span style={{padding:"4px 10px",borderRadius:6,fontSize:10,fontWeight:800,background:"rgba(168,85,247,0.12)",color:"#c084fc",border:"1px solid rgba(168,85,247,0.25)",letterSpacing:0.5}}>
+            {TR("VON FLOWMATIX VERWALTET", "MANAGED BY FLOWMATIX", "FLOWMATIX TARAFINDAN YÖNETİLİYOR")}
+          </span>
         </div>
-        <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)"}}>Claude Sonnet 4.5</div>
-        <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",marginTop:2}}>{t("ai_model_desc") || "Anthropic's neuestes Modell — schnell, präzise, mehrsprachig."}</div>
-      </div>
-      <span style={{padding:"4px 10px",borderRadius:6,fontSize:10,fontWeight:800,background:"rgba(168,85,247,0.12)",color:"#c084fc",border:"1px solid rgba(168,85,247,0.25)",letterSpacing:0.5}}>
-        {t("ai_model_managed") || "VON FLOWMATIX VERWALTET"}
-      </span>
-    </div>
+      );
+    })()}
 
     <Section title={t("ai_bot_settings") || "KI-Bot Einstellungen"}>
       <div style={{display:"grid",gap:12}}>
