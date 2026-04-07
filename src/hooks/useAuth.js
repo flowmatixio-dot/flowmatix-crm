@@ -286,19 +286,11 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
                 }
               } catch (e) {}
               /* Deposit settings already loaded via getMyClinic() above — no second fetch needed */
-              /* First login → demo mode (only once, not on every login) */
-              const demoSeeded = localStorage.getItem("fm_demo_seeded_" + orgId);
-              if (IS_CLIENT_MODE && cd.setup_status === "new" && !cd.onboarding_completed && !cd.onboarded_at && !demoSeeded) {
-                try {
-                  await fmApi.setClinicMode("demo");
-                  await fmApi.resetDemoData();
-                  localStorage.setItem("fm_demo_seeded_" + orgId, "true");
-                  if (typeof enrichDemoData === "function") {
-                    setTimeout(() => enrichDemoData(), 200);
-                  }
-                  setTimeout(() => { setTourStep(0); setTourActive(true); }, 1500);
-                } catch (e) {}
-              }
+              /* REMOVED 2026-04-07: First-login demo seeding flipped demo_mode_enabled
+                 to true on every brand-new clinic, which silently blocked the bot from
+                 sending real WhatsApp replies during the trial. Customer flow is now
+                 only Trial → Live, no auto demo seeding. The marketing tour
+                 (AutoDemoPlayer) is still available via the dashboard button. */
             }
           } catch (e) {}
         }
