@@ -669,6 +669,34 @@ export default function App() {
     return()=>{clearInterval(iv);clearInterval(iv2);};
   },[user,activeClinicId]);
 
+  /* Demo tour: force-refresh conversations + patients the moment a tour
+     starts so the demo patient shows up in the inbox immediately, instead
+     of having to wait for the next 30s/5s polling tick. */
+  useEffect(()=>{
+    if(!user||!activeClinicId)return;
+    const orgId=user.orgId||user.clinicId;
+    if(!orgId)return;
+    const handler=()=>{
+      // Re-pull conversations
+      try{
+        useInboxStore.getState().fetchConversations(orgId).catch(()=>{});
+      }catch{}
+      // Re-pull patients into the leads list
+      fmApi.getPatients().then(data=>{
+        const pats=data?.patients||data||[];
+        if(!pats.length)return;
+        setLeads(prev=>{
+          const existingIds=new Set(prev.map(l=>l.id));
+          const newPats=pats.filter(p=>!existingIds.has(p.id)&&p.conversation_state!=='resolved');
+          if(!newPats.length)return prev;
+          return [...newPats,...prev];
+        });
+      }).catch(()=>{});
+    };
+    window.addEventListener('fm:demo-tour-ready',handler);
+    return()=>window.removeEventListener('fm:demo-tour-ready',handler);
+  },[user,activeClinicId]);
+
   /* Onboarding check */
   // Setup wizard only when workspace is ACTIVE (paid) and setup is incomplete
   const needsOnboarding=clinic&&!onboardingDismissed&&workspaceState==='active'&&(!clinic.clinicEmail||clinic.clinicEmail==="info@hairclinicturkiye.com"||!clinic.waName);

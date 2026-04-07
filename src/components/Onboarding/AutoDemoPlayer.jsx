@@ -136,6 +136,11 @@ export default function AutoDemoPlayer({ onClose }) {
         if (cancelled) return;
         if (!res?.ok) throw new Error(res?.error || "tour_failed");
         setTourMeta(res);
+        // Tell the app to drop its caches and re-fetch conversations +
+        // patients NOW so the demo patient shows up in the inbox before
+        // the playback advances past step 1 (otherwise the user has to
+        // wait for the next 30s polling tick).
+        try { window.dispatchEvent(new CustomEvent("fm:demo-tour-ready", { detail: { patientId: res.patientId } })); } catch {}
         setState("running");
         setStepIdx(0);
         startedAtRef.current = Date.now();
