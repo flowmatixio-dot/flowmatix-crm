@@ -415,13 +415,33 @@ export default function MainLayout() {
               </div>
             </div>
 
-            {/* Promo Code */}
+            {/* Promo Code — more visible pill so users actually notice it */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-              {!showPromoInput ? (
-                <button onClick={() => setShowPromoInput(true)} style={{ background: "transparent", border: "none", color: "rgba(167,177,195,0.5)", fontSize: 11, cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}>
-                  {t("pp_have_promo") || "Promo-Code vorhanden?"}
-                </button>
-              ) : (
+              {!showPromoInput ? (() => {
+                const _lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+                const _T = (de, en, tr) => ({ de, en, tr }[_lang] || de);
+                return (
+                  <button
+                    onClick={() => setShowPromoInput(true)}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      padding: "8px 16px", borderRadius: 99,
+                      background: "linear-gradient(135deg, rgba(168,85,247,0.12), rgba(76,201,255,0.06))",
+                      border: "1px solid rgba(168,85,247,0.3)",
+                      color: "#c084fc",
+                      fontSize: 12, fontWeight: 700,
+                      cursor: "pointer", fontFamily: "inherit",
+                      transition: "all 0.2s",
+                      boxShadow: "0 2px 12px rgba(168,85,247,0.15)",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 18px rgba(168,85,247,0.25)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 12px rgba(168,85,247,0.15)"; }}
+                  >
+                    <span style={{ fontSize: 13 }}>🎟️</span>
+                    {_T("Promo-Code einlösen", "Redeem promo code", "Promosyon kodunu kullan")}
+                  </button>
+                );
+              })() : (
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexDirection: "column" }}>
                   <div style={{ display: "flex", gap: 8 }}>
                     <input
