@@ -80,7 +80,7 @@ const STEPS = [
       en: "The medical assessment is captured directly in the system.",
       tr: "Tıbbi değerlendirme doğrudan sistemde kaydedilir.",
     },
-    duration: 7000,
+    duration: 10000,
     onEnter: "openReviewPopup",
   },
   {
@@ -274,6 +274,9 @@ export default function AutoDemoPlayer({ onClose }) {
       setState("completed");
       setTimeout(() => {
         cleanupRef.current().finally(() => {
+          // Navigate back to the dashboard so the user lands where
+          // they started, then close the player overlay.
+          try { setViewRef.current && setViewRef.current("dashboard"); } catch {}
           if (onCloseRef.current) onCloseRef.current();
         });
       }, 1500);
@@ -288,24 +291,28 @@ export default function AutoDemoPlayer({ onClose }) {
     // background (fire-and-forget) so cleanup-tour can still find them.
     let cancelledHook = false;
     if (step.onEnter === "openReviewPopup") {
-      // Fire the existing fm-open-review event so MainLayout opens the
-      // real DoctorTasksView popup with our demo task pre-loaded.
-      try { window.dispatchEvent(new CustomEvent("fm-open-review")); } catch {}
-      // After the popup mounts, smoothly scroll the popup body all the
-      // way down so the user sees photos + intake fields without having
-      // to scroll manually. Two phases: scroll to bottom, then back up.
+      // Wait ~2.5s before opening the review popup so the user has
+      // time to read the step title + sublabel in the bottom overlay
+      // first. Then the popup slides in.
       setTimeout(() => {
         if (cancelledHook) return;
-        const el = document.getElementById("fm-trial-review-scroll");
-        if (!el) return;
-        const max = el.scrollHeight - el.clientHeight;
-        if (max <= 0) return;
-        try { el.scrollTo({ top: max, behavior: "smooth" }); } catch { el.scrollTop = max; }
+        try { window.dispatchEvent(new CustomEvent("fm-open-review")); } catch {}
+        // After the popup mounts, smoothly scroll the popup body all
+        // the way down so the user sees photos + intake fields, then
+        // back to top.
         setTimeout(() => {
           if (cancelledHook) return;
-          try { el.scrollTo({ top: 0, behavior: "smooth" }); } catch { el.scrollTop = 0; }
-        }, 3500);
-      }, 1000);
+          const el = document.getElementById("fm-trial-review-scroll");
+          if (!el) return;
+          const max = el.scrollHeight - el.clientHeight;
+          if (max <= 0) return;
+          try { el.scrollTo({ top: max, behavior: "smooth" }); } catch { el.scrollTop = max; }
+          setTimeout(() => {
+            if (cancelledHook) return;
+            try { el.scrollTo({ top: 0, behavior: "smooth" }); } catch { el.scrollTop = 0; }
+          }, 3500);
+        }, 1000);
+      }, 2500);
     }
     if (step.onEnter === "confirmBooking") {
       // Backend: flip the demo patient into "booked" with flight info
