@@ -71,6 +71,13 @@ const ADVANCED_STEPS = [
     sublabel: { de: "Stripe, Anzahlungen, PayPal", en: "Stripe, deposits, PayPal", tr: "Stripe, depozitolar, PayPal" },
   },
   {
+    key: "two_factor",
+    section: "two_factor",
+    icon: "🔐",
+    label:    { de: "Zwei-Faktor-Authentifizierung", en: "Two-factor authentication", tr: "İki faktörlü kimlik doğrulama" },
+    sublabel: { de: "Konto mit Authenticator-App schützen", en: "Protect your account with an authenticator app", tr: "Hesabınızı authenticator uygulaması ile koruyun" },
+  },
+  {
     key: "team",
     section: "team",
     icon: "👥",
@@ -134,12 +141,17 @@ export default function AdvancedSetupCard() {
   const lang = localStorage.getItem("fm_lang") || "de";
 
   const [status, setStatus] = useState(null);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = useCallback(async () => {
     try {
-      const res = await fmApi.apiFetch("/api/v1/clinic/onboarding-status");
+      const [res, me] = await Promise.all([
+        fmApi.apiFetch("/api/v1/clinic/onboarding-status"),
+        fmApi.getMe().catch(() => null),
+      ]);
       setStatus(res || null);
+      setMfaEnabled(!!me?.mfa_enabled);
     } catch (e) {
       setStatus(null);
     } finally {
@@ -171,6 +183,7 @@ export default function AdvancedSetupCard() {
     booking_rules:     !!advancedSteps.booking_rules,
     doctor_assignment: !!advancedSteps.doctor_assignment,
     payments:          !!advancedSteps.payments,
+    two_factor:        mfaEnabled,
     team:              !!advancedSteps.team,
     whatsapp:          !!legacySteps.whatsapp_connected,
     automations:       !!advancedSteps.automations,
