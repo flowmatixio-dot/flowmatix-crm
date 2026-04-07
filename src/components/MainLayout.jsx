@@ -983,7 +983,7 @@ export default function MainLayout() {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ fontSize: 14 }}>⚙️</span>
               <div style={{ fontSize: 12.5, color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>
-                {t("from_setup_hint") || "Du bist hier vom Setup. Schließe diesen Schritt ab und geh zurück."}
+                {(() => { const v = t("from_setup_hint"); return v && v !== "from_setup_hint" ? v : "Du bist hier vom Setup. Schließe diesen Schritt ab und geh zurück."; })()}
               </div>
             </div>
             <button
@@ -999,7 +999,7 @@ export default function MainLayout() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(76,201,255,0.18)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(76,201,255,0.12)"; }}
             >
-              {t("back_to_setup") || "Zurück zum Setup"} →
+              {(() => { const v = t("back_to_setup"); return v && v !== "back_to_setup" ? v : "Zurück zum Setup"; })()} →
             </button>
           </div>
         )}

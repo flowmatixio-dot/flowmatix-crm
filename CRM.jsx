@@ -707,7 +707,11 @@ export default function App() {
       }).catch(()=>{});
     };
     // Lightweight refresh: re-pull conversations so photoUrls etc. update
-    // for the currently-selected chat. Used during the photo animation.
+    // for the currently-selected chat. Also force-merge fresh patient
+    // data into myLeads for the demo tour patient — the regular polling
+    // skips merging is_demo leads (CRM.jsx polling effect, line ~633),
+    // so without this the booking/flight info from /demo/tour-confirm-booking
+    // never reaches ActionNeededView and the hotel-assign card stays hidden.
     const refreshHandler=()=>{
       try{
         useInboxStore.getState().fetchConversations(orgId).then(convs=>{
@@ -719,6 +723,18 @@ export default function App() {
           }
         }).catch(()=>{});
       }catch{}
+      // Pull fresh patient data and force-merge into the existing demo
+      // tour leads in myLeads (the polling effect skips is_demo merges).
+      fmApi.getPatients().then(data=>{
+        const pats=data?.patients||data||[];
+        if(!pats.length)return;
+        setLeads(prev=>prev.map(l=>{
+          const p=pats.find(pt=>pt.id===l.id);
+          if(!p)return l;
+          // Force-merge — backend already maps stage from metadata.stage.
+          return {...l,...p};
+        }));
+      }).catch(()=>{});
     };
     window.addEventListener('fm:demo-tour-ready',handler);
     window.addEventListener('fm:demo-tour-refresh',refreshHandler);

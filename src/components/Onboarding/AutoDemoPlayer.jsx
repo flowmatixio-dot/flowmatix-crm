@@ -82,7 +82,9 @@ const STEPS = [
     id: "calendar",
     view: "appointments",
     label: { de: "Termin landet im Kalender", en: "Appointment lands in the calendar", tr: "Randevu takvime düşer" },
-    duration: 5000,
+    duration: 6000,
+    // Auto-opens the appointment detail drawer for the demo tour appointment
+    onEnter: "openAppointmentDetail",
   },
   {
     id: "pipeline",
@@ -113,7 +115,7 @@ const STEPS = [
 ];
 
 export default function AutoDemoPlayer({ onClose }) {
-  const { setView } = useApp();
+  const { setView, setSelAppt } = useApp();
   const lang = localStorage.getItem("fm_lang") || "de";
 
   // State machine: idle → preparing → running ↔ paused → completed → cleaning → idle
@@ -135,6 +137,8 @@ export default function AutoDemoPlayer({ onClose }) {
   useEffect(() => { setViewRef.current = setView; });
   const onCloseRef = useRef(onClose);
   useEffect(() => { onCloseRef.current = onClose; });
+  const setSelApptRef = useRef(setSelAppt);
+  useEffect(() => { setSelApptRef.current = setSelAppt; });
 
   // Centralized DOM cleanup — closes any popup/panel the player might
   // have opened. Called from every code path that ends/restarts a tour
@@ -142,6 +146,7 @@ export default function AutoDemoPlayer({ onClose }) {
   const closeOpenedUi = useCallback(() => {
     try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
     try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
+    try { setSelApptRef.current && setSelApptRef.current(null); } catch {}
   }, []);
 
   const cleanup = useCallback(async () => {
@@ -231,12 +236,32 @@ export default function AutoDemoPlayer({ onClose }) {
         try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
       }).catch(() => {});
     }
+    if (step.onEnter === "openAppointmentDetail") {
+      // Auto-open the appointment drawer for the demo tour appointment.
+      // selAppt is just the appointment id; the drawer fetches the rest
+      // from the appts store. The id was returned by run-tour as
+      // tourMeta.appointmentId. Slight delay so the calendar view has
+      // time to mount + render the cell first.
+      const apptId = (tourMeta && tourMeta.appointmentId) || null;
+      if (apptId) {
+        setTimeout(() => {
+          if (cancelledHook) return;
+          try { setSelApptRef.current && setSelApptRef.current(apptId); } catch {}
+        }, 800);
+      }
+    }
     if (step.onEnter === "openHotelAssign") {
       // Open the real "Hotel zuweisen" panel from ActionNeededView for
-      // the demo tour patient. ActionNeededView listens for this event
-      // and triggers the matching item.action() callback. Slight delay
-      // so the user first sees the action_needed view land.
+      // the demo tour patient. Step:
+      //  1. Force a fresh patient pull so the lead in myLeads has the
+      //     post-confirmBooking state (stage='booked', flightConfirmed,
+      //     bookedAt 2d ago) — without this the hotel-assign card never
+      //     renders and there is nothing to trigger.
+      //  2. Wait a beat for the action_needed view to mount + render.
+      //  3. Dispatch fm-trigger-action so ActionNeededView fires the
+      //     matching item.action() callback.
       const tourPatientId = (tourMeta && tourMeta.patientId) || null;
+      try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
       setTimeout(() => {
         if (cancelledHook) return;
         try {
@@ -244,7 +269,7 @@ export default function AutoDemoPlayer({ onClose }) {
             detail: { type: "hotel", patientId: tourPatientId },
           }));
         } catch {}
-      }, 1200);
+      }, 1500);
     }
     if (step.onEnter === "addPhotosSequentially") {
       const types = ["front", "top", "side"];
@@ -292,6 +317,11 @@ export default function AutoDemoPlayer({ onClose }) {
       // Same idea for the hotel-assign DOM panel: remove it on the way out.
       if (step.onEnter === "openHotelAssign") {
         try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
+      }
+      // Close the appointment drawer on the way out so the next view
+      // (pipeline) isn't covered.
+      if (step.onEnter === "openAppointmentDetail") {
+        try { setSelApptRef.current && setSelApptRef.current(null); } catch {}
       }
     };
   }, [state, stepIdx]);
