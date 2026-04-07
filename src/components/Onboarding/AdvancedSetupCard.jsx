@@ -24,9 +24,11 @@ import { navigateToSetupSection } from "../../lib/setupNav";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
 
+// Order matches the SettingsView tabs (top to bottom): general → team
+// → treatments → doctors → booking_rules → payments → drivers → ai →
+// automations → account/2FA → integrations → whatsapp → google_drive.
 // Each step has an optional `requires` (other key that must be true
-// before this step is clickable) and an optional `lockedHint` (shown
-// in the tooltip when the user clicks the locked card).
+// before this step is clickable) and an optional `lockedHint`.
 const ADVANCED_STEPS = [
   {
     key: "general",
@@ -36,25 +38,18 @@ const ADVANCED_STEPS = [
     sublabel: { de: "Klinik-Stammdaten, Adresse, Ansprechpartner", en: "Clinic basics, address, contact", tr: "Klinik bilgileri, adres, iletişim" },
   },
   {
+    key: "team",
+    section: "team",
+    icon: "👥",
+    label:    { de: "Team einrichten", en: "Set up team", tr: "Ekibi kur" },
+    sublabel: { de: "Koordinatoren, Ärzte einladen", en: "Invite coordinators & doctors", tr: "Koordinatörleri ve doktorları davet et" },
+  },
+  {
     key: "treatments",
     section: "treatments",
     icon: "💉",
     label:    { de: "Behandlungsarten", en: "Treatment types", tr: "Tedavi türleri" },
     sublabel: { de: "Preise, Dauer, Anzahlungs-Logik", en: "Prices, duration, deposit logic", tr: "Fiyatlar, süre, depozito" },
-  },
-  {
-    key: "ai_settings",
-    section: "ai_settings",
-    icon: "🤖",
-    label:    { de: "KI-Bot Einstellungen", en: "AI bot settings", tr: "AI bot ayarları" },
-    sublabel: { de: "Tonalität, Begrüßung, Sprachen, Foto-Anforderung", en: "Tone, greeting, languages, photo rules", tr: "Ton, karşılama, diller, fotoğraf kuralları" },
-  },
-  {
-    key: "booking_rules",
-    section: "booking_rules",
-    icon: "📅",
-    label:    { de: "Buchungsregeln konfigurieren", en: "Configure booking rules", tr: "Rezervasyon kurallarını yapılandır" },
-    sublabel: { de: "Vorlaufzeit, Zeitfenster, Pausen", en: "Lead time, slots, breaks", tr: "Ön süre, saatler, molalar" },
   },
   {
     key: "doctor_assignment",
@@ -64,6 +59,13 @@ const ADVANCED_STEPS = [
     sublabel: { de: "Round-Robin, Spezialisierung, Last", en: "Round-robin, specialty, load", tr: "Sırayla, uzmanlık, yük" },
   },
   {
+    key: "booking_rules",
+    section: "booking_rules",
+    icon: "📅",
+    label:    { de: "Buchungsregeln konfigurieren", en: "Configure booking rules", tr: "Rezervasyon kurallarını yapılandır" },
+    sublabel: { de: "Vorlaufzeit, Zeitfenster, Pausen", en: "Lead time, slots, breaks", tr: "Ön süre, saatler, molalar" },
+  },
+  {
     key: "payments",
     section: "payments",
     icon: "💳",
@@ -71,26 +73,18 @@ const ADVANCED_STEPS = [
     sublabel: { de: "Stripe, Anzahlungen, PayPal", en: "Stripe, deposits, PayPal", tr: "Stripe, depozitolar, PayPal" },
   },
   {
-    key: "two_factor",
-    section: "two_factor",
-    icon: "🔐",
-    label:    { de: "Zwei-Faktor-Authentifizierung", en: "Two-factor authentication", tr: "İki faktörlü kimlik doğrulama" },
-    sublabel: { de: "Konto mit Authenticator-App schützen", en: "Protect your account with an authenticator app", tr: "Hesabınızı authenticator uygulaması ile koruyun" },
+    key: "drivers",
+    section: "drivers",
+    icon: "🚗",
+    label:    { de: "Fahrer & Transfers einrichten", en: "Set up drivers & transfers", tr: "Sürücüler ve transferleri kur" },
+    sublabel: { de: "Automatisiere Flughafen- und Hotel-Transfers", en: "Automate airport & hotel transfers", tr: "Havalimanı ve otel transferlerini otomatikleştir" },
   },
   {
-    key: "team",
-    section: "team",
-    icon: "👥",
-    label:    { de: "Team einrichten", en: "Set up team", tr: "Ekibi kur" },
-    sublabel: { de: "Koordinatoren, Ärzte einladen", en: "Invite coordinators & doctors", tr: "Koordinatörleri ve doktorları davet et" },
-  },
-  {
-    key: "whatsapp",
-    section: "whatsapp",
-    icon: "💬",
-    label:    { de: "WhatsApp verbinden", en: "Connect WhatsApp", tr: "WhatsApp bağla" },
-    sublabel: { de: "Eigene Nummer für den Live-Betrieb", en: "Own number for live operation", tr: "Canlı kullanım için kendi numara" },
-    paidOnly: true,
+    key: "ai_settings",
+    section: "ai_settings",
+    icon: "🤖",
+    label:    { de: "KI-Bot Einstellungen", en: "AI bot settings", tr: "AI bot ayarları" },
+    sublabel: { de: "Tonalität, Begrüßung, Sprachen, Foto-Anforderung", en: "Tone, greeting, languages, photo rules", tr: "Ton, karşılama, diller, fotoğraf kuralları" },
   },
   {
     key: "automations",
@@ -102,6 +96,13 @@ const ADVANCED_STEPS = [
     lockedHint: { de: "Erst WhatsApp verbinden", en: "Connect WhatsApp first", tr: "Önce WhatsApp bağlayın" },
   },
   {
+    key: "two_factor",
+    section: "two_factor",
+    icon: "🔐",
+    label:    { de: "Zwei-Faktor-Authentifizierung", en: "Two-factor authentication", tr: "İki faktörlü kimlik doğrulama" },
+    sublabel: { de: "Konto mit Authenticator-App schützen", en: "Protect your account with an authenticator app", tr: "Hesabınızı authenticator uygulaması ile koruyun" },
+  },
+  {
     key: "integrations",
     section: "integrations",
     icon: "🔌",
@@ -109,30 +110,19 @@ const ADVANCED_STEPS = [
     sublabel: { de: "n8n, Telegram, Webhooks", en: "n8n, Telegram, webhooks", tr: "n8n, Telegram, webhook'lar" },
   },
   {
+    key: "whatsapp",
+    section: "whatsapp",
+    icon: "💬",
+    label:    { de: "WhatsApp verbinden", en: "Connect WhatsApp", tr: "WhatsApp bağla" },
+    sublabel: { de: "Eigene Nummer für den Live-Betrieb", en: "Own number for live operation", tr: "Canlı kullanım için kendi numara" },
+    paidOnly: true,
+  },
+  {
     key: "google_drive",
     section: "google_drive",
     icon: "📁",
-    label:    { de: "Google Drive verbinden",     en: "Connect Google Drive",       tr: "Google Drive'ı bağla" },
-    sublabel: {
-      de: "Alle Patientenfotos und Daten werden automatisch gespeichert und organisiert – nichts geht verloren.",
-      en: "All patient photos and data are automatically saved and organized — nothing gets lost.",
-      tr: "Tüm hasta fotoğrafları ve verileri otomatik olarak kaydedilir ve düzenlenir — hiçbir şey kaybolmaz."
-    },
-  },
-  {
-    key: "drivers",
-    section: "drivers",
-    icon: "🚗",
-    label:    {
-      de: "Fahrer & Transfers einrichten",
-      en: "Set up drivers & transfers",
-      tr: "Sürücüler ve transferleri kur"
-    },
-    sublabel: {
-      de: "Automatisiere Flughafen- und Hotel-Transfers für deine Patienten.",
-      en: "Automate airport and hotel transfers for your patients.",
-      tr: "Hastalarınız için havalimanı ve otel transferlerini otomatikleştirin."
-    },
+    label:    { de: "Google Drive verbinden", en: "Connect Google Drive", tr: "Google Drive'ı bağla" },
+    sublabel: { de: "Patientenfotos automatisch sichern und organisieren", en: "Automatically save and organize patient photos", tr: "Hasta fotoğraflarını otomatik kaydet ve düzenle" },
   },
 ];
 
