@@ -45,8 +45,11 @@ const STEPS = [
   {
     id: "inbox_photos",
     view: "inbox",
-    label: { de: "Patient sendet 3 Fotos", en: "Patient sends 3 photos", tr: "Hasta 3 fotoğraf gönderdi" },
-    duration: 5000,
+    label: { de: "Patient sendet Fotos", en: "Patient sends photos", tr: "Hasta fotoğraf gönderiyor" },
+    // 3 photos × 1500ms gap = 4500ms + a tiny buffer to read the last one
+    duration: 6000,
+    // Animated photo arrival — handled by the playback effect via this hook id
+    onEnter: "addPhotosSequentially",
   },
   {
     id: "review",
@@ -174,10 +177,36 @@ export default function AutoDemoPlayer({ onClose }) {
       return;
     }
     setViewRef.current(step.view);
+
+    // Optional per-step onEnter hook. Used by the photos step to drop
+    // 3 photos into the conversation one by one (1500ms apart) so the
+    // user can SEE them arrive instead of all 3 popping in at once.
+    let cancelledHook = false;
+    if (step.onEnter === "addPhotosSequentially") {
+      (async () => {
+        const types = ["front", "top", "side"];
+        for (let i = 0; i < types.length; i++) {
+          if (cancelledHook) return;
+          // Stagger: first photo at +200ms, then 1500ms apart
+          await new Promise((r) => setTimeout(r, i === 0 ? 200 : 1500));
+          if (cancelledHook) return;
+          try {
+            await fmApi.apiFetch("/api/v1/clinic/mode/demo/tour-add-photo", {
+              method: "POST",
+              body: JSON.stringify({ photo_type: types[i] }),
+            });
+            // Tell the inbox/case-overview to re-pull so the new photo shows up
+            try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
+          } catch { /* non-fatal — keep playback going */ }
+        }
+      })();
+    }
+
     timerRef.current = setTimeout(() => {
       setStepIdx((i) => i + 1);
     }, step.duration);
     return () => {
+      cancelledHook = true;
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [state, stepIdx]);

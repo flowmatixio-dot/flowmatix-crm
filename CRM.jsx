@@ -706,8 +706,26 @@ export default function App() {
         });
       }).catch(()=>{});
     };
+    // Lightweight refresh: re-pull conversations so photoUrls etc. update
+    // for the currently-selected chat. Used during the photo animation.
+    const refreshHandler=()=>{
+      try{
+        useInboxStore.getState().fetchConversations(orgId).then(convs=>{
+          if(!convs)return;
+          const sc=useInboxStore.getState().selChat;
+          if(sc){
+            const fresh=convs.find(c=>(c.patientId||c.id)===(sc.patientId||sc.id));
+            if(fresh)useInboxStore.getState().setSelChat({...sc,...fresh});
+          }
+        }).catch(()=>{});
+      }catch{}
+    };
     window.addEventListener('fm:demo-tour-ready',handler);
-    return()=>window.removeEventListener('fm:demo-tour-ready',handler);
+    window.addEventListener('fm:demo-tour-refresh',refreshHandler);
+    return()=>{
+      window.removeEventListener('fm:demo-tour-ready',handler);
+      window.removeEventListener('fm:demo-tour-refresh',refreshHandler);
+    };
   },[user,activeClinicId]);
 
   /* Onboarding check */
