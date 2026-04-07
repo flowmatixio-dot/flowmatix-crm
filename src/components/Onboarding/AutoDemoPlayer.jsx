@@ -104,7 +104,7 @@ const STEPS = [
       en: "The confirmed appointment appears in the calendar instantly.",
       tr: "Onaylanan randevu takvimde anında görünür.",
     },
-    duration: 6000,
+    duration: 9000,
     onEnter: "openAppointmentDetail",
   },
   {
@@ -139,7 +139,7 @@ const STEPS = [
       en: "Medical and logistical steps are prepared centrally.",
       tr: "Tıbbi ve organizasyonel adımlar merkezi olarak hazırlanır.",
     },
-    duration: 7000,
+    duration: 10000,
     onEnter: "openOpPrepDetail",
   },
   {
@@ -194,8 +194,8 @@ export default function AutoDemoPlayer({ onClose }) {
   useEffect(() => { setSelLeadRef.current = setSelLead; });
 
   // Centralized DOM cleanup — closes any popup/panel the player might
-  // have opened. Called from every code path that ends/restarts a tour
-  // (cleanup-tour, replay, exit, unmount). Idempotent.
+  // have opened. Called from every code path that ends/restarts a tour.
+  // Idempotent.
   const closeOpenedUi = useCallback(() => {
     try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
     try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
@@ -204,7 +204,20 @@ export default function AutoDemoPlayer({ onClose }) {
     try { setSelLeadRef.current && setSelLeadRef.current(null); } catch {}
   }, []);
 
+  // cleanup() previously also wiped the demo tour DB rows. We no longer
+  // do that on tour completion / exit — the user wants the demo patient
+  // to stay around so they can keep clicking through the CRM and look
+  // at it themselves. Real cleanup happens server-side when the
+  // workspace transitions to 'active' (purchase webhook). For now this
+  // helper only closes opened UI panels.
   const cleanup = useCallback(async () => {
+    closeOpenedUi();
+  }, [closeOpenedUi]);
+
+  // Hard cleanup — only used by the orphan pass before a fresh REPLAY,
+  // because run-tour itself also runs the orphan-cleanup pass on the
+  // backend, but this gives us a clean slate for the new tour.
+  const hardCleanup = useCallback(async () => {
     closeOpenedUi();
     try {
       await fmApi.apiFetch("/api/v1/clinic/mode/demo/cleanup-tour", { method: "POST" });
@@ -472,8 +485,9 @@ export default function AutoDemoPlayer({ onClose }) {
   const handleReplay = useCallback(async () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     setState("cleaning");
-    await cleanup();
-    // Restart by triggering a fresh run-tour. Easiest way: bounce mount.
+    // Replay is the only client-initiated cleanup — wipe DB rows so
+    // the new tour starts from a clean state.
+    await hardCleanup();
     setStepIdx(0);
     setState("preparing");
     try {
@@ -486,7 +500,7 @@ export default function AutoDemoPlayer({ onClose }) {
       setError(e.message);
       setState("failed");
     }
-  }, [cleanup]);
+  }, [hardCleanup]);
 
   const handleExit = useCallback(async () => {
     if (timerRef.current) clearTimeout(timerRef.current);
