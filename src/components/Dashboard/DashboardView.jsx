@@ -20,18 +20,10 @@ export default function DashboardView() {
     activeClinicId, testInfo,
   } = useApp();
 
-  // "Trial überspringen" pill: hidden initially. Shows after the user
-  // has either watched the demo (demoTourSeen flag in localStorage,
-  // set when the player first opens) OR scrolled past the hero
-  // (IntersectionObserver on a sentinel placed right after the hero).
-  // Goal: avoid premature pricing pressure on first impression.
-  const [showSkipTrial, setShowSkipTrial] = useState(() => {
-    try { return localStorage.getItem("fm_demo_tour_seen") === "1"; } catch { return false; }
-  });
+  // Persist demo-tour-seen flag (used by PerformanceIndicator).
   useEffect(() => {
     if (demoTourOpen) {
       try { localStorage.setItem("fm_demo_tour_seen", "1"); } catch {}
-      setShowSkipTrial(true);
     }
   }, [demoTourOpen]);
 
@@ -224,17 +216,9 @@ export default function DashboardView() {
             })()}
           </h1>
         </div>
-        {showSkipTrial && workspaceState && workspaceState !== 'active' && workspaceState !== 'trial_expired' && workspaceState !== 'checkout_pending' && (
-          <button onClick={() => setShowPlanPicker(true)} style={{
-            padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-            background: "transparent",
-            border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.7)",
-            display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
-            transition: "all 0.2s",
-          }}>
-            {t("skip_trial") || "Trial überspringen"}
-          </button>
-        )}
+        {/* "Trial überspringen" pill removed — the global trial countdown
+            banner above the dashboard already has that CTA, so a second
+            instance was duplicate / pricing pressure. */}
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════

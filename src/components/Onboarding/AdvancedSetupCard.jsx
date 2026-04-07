@@ -66,6 +66,7 @@ const ADVANCED_STEPS = [
     icon: "📅",
     label:    { de: "Buchungsregeln konfigurieren", en: "Configure booking rules", tr: "Rezervasyon kurallarını yapılandır" },
     sublabel: { de: "Vorlaufzeit, Zeitfenster, Pausen", en: "Lead time, slots, breaks", tr: "Ön süre, saatler, molalar" },
+    priority: "optional",
   },
   {
     key: "payments",
@@ -109,14 +110,6 @@ const ADVANCED_STEPS = [
     icon: "🔐",
     label:    { de: "Zwei-Faktor-Authentifizierung", en: "Two-factor authentication", tr: "İki faktörlü kimlik doğrulama" },
     sublabel: { de: "Konto mit Authenticator-App schützen", en: "Protect your account with an authenticator app", tr: "Hesabınızı authenticator uygulaması ile koruyun" },
-    priority: "optional",
-  },
-  {
-    key: "integrations",
-    section: "integrations",
-    icon: "🔌",
-    label:    { de: "Integrationen verbinden", en: "Connect integrations", tr: "Entegrasyonları bağla" },
-    sublabel: { de: "n8n, Telegram, Webhooks", en: "n8n, Telegram, webhooks", tr: "n8n, Telegram, webhook'lar" },
     priority: "optional",
   },
   {
