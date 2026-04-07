@@ -34,7 +34,7 @@ const SECTION_TARGETS = {
   ai_settings:        { view: "settings",   settingsTab: "ai",                 scrollAnchor: "fm-section-ai" },
   booking_rules:      { view: "settings",   settingsTab: "booking_rules", scrollAnchor: "fm-section-booking-rules" },
   doctor_assignment:  { view: "settings",   settingsTab: "doctors",       scrollAnchor: "fm-section-doctors" },
-  payments:           { view: "payments",   settingsTab: null,            scrollAnchor: "fm-section-payments" },
+  payments:           { view: "settings",   settingsTab: "payments",      scrollAnchor: "fm-section-payments" },
   two_factor:         { view: "settings",   settingsTab: "account",       scrollAnchor: "fm-section-mfa" },
   team:               { view: "settings",   settingsTab: "team",          scrollAnchor: "fm-section-team" },
   automations:        { view: "automations",settingsTab: null,            scrollAnchor: "fm-section-automations" },
