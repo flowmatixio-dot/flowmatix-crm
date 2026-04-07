@@ -29,8 +29,18 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
+import { useInboxStore } from "../../stores/inboxStore";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
+
+// Local demo photo URLs — real patient sample photos served by the CRM
+// nginx (same origin), so they load instantly with zero external
+// dependency. Used for the photo step of the auto demo tour.
+const DEMO_PHOTO_URLS = {
+  front: "/demo-photo-front.jpg",
+  top:   "/demo-photo-top.jpg",
+  side:  "/demo-photo-side.jpg",
+};
 
 // 9-step playback sequence — each step navigates to the right view +
 // shows a descriptive overlay label so the user always knows what they
@@ -179,28 +189,41 @@ export default function AutoDemoPlayer({ onClose }) {
     setViewRef.current(step.view);
 
     // Optional per-step onEnter hook. Used by the photos step to drop
-    // 3 photos into the conversation one by one (~500ms apart) so the
-    // user can SEE them arrive instead of all 3 popping in at once.
-    // We fire the API call FIRST and only delay the next iteration —
-    // the first photo therefore lands as fast as the network permits.
+    // 3 photos into the case overview one by one — purely OPTIMISTIC:
+    // the player patches selChat.photoUrls locally so the thumbnails
+    // appear with zero network latency. Backend writes happen in the
+    // background (fire-and-forget) so cleanup-tour can still find them.
     let cancelledHook = false;
     if (step.onEnter === "addPhotosSequentially") {
-      (async () => {
-        const types = ["front", "top", "side"];
-        for (let i = 0; i < types.length; i++) {
+      const types = ["front", "top", "side"];
+      const stagger = 450; // ms between thumbnails
+      types.forEach((type, i) => {
+        setTimeout(() => {
           if (cancelledHook) return;
+          // Optimistic local update: append the photo URL to selChat.photoUrls
           try {
-            await fmApi.apiFetch("/api/v1/clinic/mode/demo/tour-add-photo", {
+            const store = useInboxStore.getState();
+            const sc = store.selChat;
+            if (sc) {
+              const existing = Array.isArray(sc.photoUrls) ? sc.photoUrls : [];
+              store.setSelChat({ ...sc, photoUrls: [...existing, DEMO_PHOTO_URLS[type]] });
+            }
+          } catch {}
+          // Background DB write — non-blocking, ignored on failure.
+          // Pass the URL so the DB row matches what we just rendered
+          // optimistically (otherwise a later refresh would replace
+          // our local SVG with a picsum image).
+          fmApi
+            .apiFetch("/api/v1/clinic/mode/demo/tour-add-photo", {
               method: "POST",
-              body: JSON.stringify({ photo_type: types[i] }),
-            });
-            // Tell the inbox/case-overview to re-pull so the new photo shows up
-            try { window.dispatchEvent(new CustomEvent("fm:demo-tour-refresh")); } catch {}
-          } catch { /* non-fatal — keep playback going */ }
-          if (cancelledHook) return;
-          if (i < types.length - 1) await new Promise((r) => setTimeout(r, 500));
-        }
-      })();
+              body: JSON.stringify({
+                photo_type: type,
+                url: window.location.origin + DEMO_PHOTO_URLS[type],
+              }),
+            })
+            .catch(() => {});
+        }, i * stagger);
+      });
     }
 
     timerRef.current = setTimeout(() => {
