@@ -136,13 +136,22 @@ export default function AutoDemoPlayer({ onClose }) {
   const onCloseRef = useRef(onClose);
   useEffect(() => { onCloseRef.current = onClose; });
 
+  // Centralized DOM cleanup — closes any popup/panel the player might
+  // have opened. Called from every code path that ends/restarts a tour
+  // (cleanup-tour, replay, exit, unmount). Idempotent.
+  const closeOpenedUi = useCallback(() => {
+    try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
+    try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
+  }, []);
+
   const cleanup = useCallback(async () => {
+    closeOpenedUi();
     try {
       await fmApi.apiFetch("/api/v1/clinic/mode/demo/cleanup-tour", { method: "POST" });
     } catch (e) {
       // non-fatal
     }
-  }, []);
+  }, [closeOpenedUi]);
   const cleanupRef = useRef(cleanup);
   useEffect(() => { cleanupRef.current = cleanup; });
 
@@ -174,6 +183,10 @@ export default function AutoDemoPlayer({ onClose }) {
     return () => {
       cancelled = true;
       if (timerRef.current) clearTimeout(timerRef.current);
+      // Player is unmounting (or about to remount). Make sure no popup
+      // or panel that we opened is left dangling on the screen.
+      try { window.dispatchEvent(new CustomEvent("fm-close-review")); } catch {}
+      try { document.getElementById("fm-hotel-assign")?.remove(); } catch {}
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
