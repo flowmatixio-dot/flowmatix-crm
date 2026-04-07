@@ -36,6 +36,7 @@ const ADVANCED_STEPS = [
     icon: "🏥",
     label:    { de: "Allgemein", en: "General", tr: "Genel" },
     sublabel: { de: "Klinik-Stammdaten, Adresse, Ansprechpartner", en: "Clinic basics, address, contact", tr: "Klinik bilgileri, adres, iletişim" },
+    priority: "recommended",
   },
   {
     key: "team",
@@ -43,6 +44,7 @@ const ADVANCED_STEPS = [
     icon: "👥",
     label:    { de: "Team einrichten", en: "Set up team", tr: "Ekibi kur" },
     sublabel: { de: "Koordinatoren, Ärzte einladen", en: "Invite coordinators & doctors", tr: "Koordinatörleri ve doktorları davet et" },
+    priority: "optional",
   },
   {
     key: "treatments",
@@ -78,6 +80,7 @@ const ADVANCED_STEPS = [
     icon: "🚗",
     label:    { de: "Fahrer & Transfers einrichten", en: "Set up drivers & transfers", tr: "Sürücüler ve transferleri kur" },
     sublabel: { de: "Automatisiere Flughafen- und Hotel-Transfers", en: "Automate airport & hotel transfers", tr: "Havalimanı ve otel transferlerini otomatikleştir" },
+    priority: "optional",
   },
   {
     key: "ai_settings",
@@ -108,6 +111,7 @@ const ADVANCED_STEPS = [
     icon: "🔌",
     label:    { de: "Integrationen verbinden", en: "Connect integrations", tr: "Entegrasyonları bağla" },
     sublabel: { de: "n8n, Telegram, Webhooks", en: "n8n, Telegram, webhooks", tr: "n8n, Telegram, webhook'lar" },
+    priority: "optional",
   },
   {
     key: "whatsapp",
@@ -270,12 +274,32 @@ export default function AdvancedSetupCard() {
         );
       })()}
 
-      {/* Detailed checklist — only rendered when expanded */}
+      {/* Detailed checklist — only rendered when expanded.
+          Three-tier priority styling (no red anywhere — would create
+          pressure / "broken system" perception):
+            COMPLETED   → green check, no badge
+            RECOMMENDED → soft orange highlight + "Für bessere Ergebnisse"
+            OPTIONAL    → neutral + "Optional" badge
+            (default)   → neutral, no badge */}
       {expanded && (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 8 }}>
         {visibleSteps.map((s) => {
           const done = !!flags[s.key];
           const locked = !done && !!s.requires && !flags[s.requires];
+          const isRecommended = !done && s.priority === "recommended";
+          const isOptional = !done && s.priority === "optional";
+
+          // Background / border by priority
+          let bgColor = "rgba(255,255,255,0.03)";
+          let borderColor = "rgba(255,255,255,0.06)";
+          if (done) {
+            bgColor = "rgba(16,185,129,0.05)";
+            borderColor = "rgba(16,185,129,0.18)";
+          } else if (isRecommended) {
+            bgColor = "rgba(255,138,42,0.05)";
+            borderColor = "rgba(255,138,42,0.18)";
+          }
+
           return (
             <button
               key={s.key}
@@ -287,8 +311,8 @@ export default function AdvancedSetupCard() {
                 gap: 12,
                 padding: "11px 14px",
                 borderRadius: 11,
-                background: done ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.03)",
-                border: done ? "1px solid rgba(16,185,129,0.18)" : "1px solid rgba(255,255,255,0.06)",
+                background: bgColor,
+                border: `1px solid ${borderColor}`,
                 color: done ? "#10b981" : locked ? "rgba(167,177,195,0.5)" : "rgba(232,238,252,0.85)",
                 fontSize: 13,
                 fontWeight: 600,
@@ -301,11 +325,11 @@ export default function AdvancedSetupCard() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateX(2px)";
-                if (!done && !locked) e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
+                if (!done && !locked && !isRecommended) e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "";
-                if (!done && !locked) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                if (!done && !locked && !isRecommended) e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
               }}
             >
               <span
@@ -316,7 +340,11 @@ export default function AdvancedSetupCard() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: done ? "rgba(16,185,129,0.18)" : "rgba(255,255,255,0.05)",
+                  background: done
+                    ? "rgba(16,185,129,0.18)"
+                    : isRecommended
+                      ? "rgba(255,138,42,0.12)"
+                      : "rgba(255,255,255,0.05)",
                   fontSize: 12,
                   flexShrink: 0,
                 }}
@@ -324,8 +352,30 @@ export default function AdvancedSetupCard() {
                 {done ? "✓" : locked ? "🔒" : s.icon}
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {s.label[lang] || s.label.de}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {s.label[lang] || s.label.de}
+                  </span>
+                  {isRecommended && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+                      background: "rgba(255,138,42,0.12)", color: "#ff8a2a",
+                      border: "1px solid rgba(255,138,42,0.25)",
+                      letterSpacing: 0.2, textTransform: "none", whiteSpace: "nowrap",
+                    }}>
+                      {T("Recommended for better results", "Für bessere Ergebnisse", "Daha iyi sonuçlar için")}
+                    </span>
+                  )}
+                  {isOptional && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+                      background: "rgba(255,255,255,0.04)", color: "rgba(167,177,195,0.6)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                      letterSpacing: 0.2, textTransform: "none", whiteSpace: "nowrap",
+                    }}>
+                      {T("Optional", "Optional", "İsteğe bağlı")}
+                    </span>
+                  )}
                 </div>
                 {!done && (
                   <div style={{ fontSize: 11, color: "rgba(167,177,195,0.55)", fontWeight: 500, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
