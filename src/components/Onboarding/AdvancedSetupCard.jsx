@@ -44,7 +44,6 @@ const ADVANCED_STEPS = [
     icon: "👥",
     label:    { de: "Team einrichten", en: "Set up team", tr: "Ekibi kur" },
     sublabel: { de: "Koordinatoren, Ärzte einladen", en: "Invite coordinators & doctors", tr: "Koordinatörleri ve doktorları davet et" },
-    priority: "optional",
   },
   {
     key: "treatments",
@@ -52,6 +51,7 @@ const ADVANCED_STEPS = [
     icon: "💉",
     label:    { de: "Behandlungsarten", en: "Treatment types", tr: "Tedavi türleri" },
     sublabel: { de: "Preise, Dauer, Anzahlungs-Logik", en: "Prices, duration, deposit logic", tr: "Fiyatlar, süre, depozito" },
+    priority: "optional",
   },
   {
     key: "doctor_assignment",
@@ -73,6 +73,7 @@ const ADVANCED_STEPS = [
     icon: "💳",
     label:    { de: "Zahlungen aktivieren", en: "Enable payments", tr: "Ödemeleri etkinleştir" },
     sublabel: { de: "Stripe, Anzahlungen, PayPal", en: "Stripe, deposits, PayPal", tr: "Stripe, depozitolar, PayPal" },
+    priority: "optional",
   },
   {
     key: "drivers",
@@ -80,7 +81,6 @@ const ADVANCED_STEPS = [
     icon: "🚗",
     label:    { de: "Fahrer & Transfers einrichten", en: "Set up drivers & transfers", tr: "Sürücüler ve transferleri kur" },
     sublabel: { de: "Automatisiere Flughafen- und Hotel-Transfers", en: "Automate airport & hotel transfers", tr: "Havalimanı ve otel transferlerini otomatikleştir" },
-    priority: "optional",
   },
   {
     key: "ai_settings",
@@ -96,7 +96,12 @@ const ADVANCED_STEPS = [
     label:    { de: "Automationen aktivieren", en: "Activate automations", tr: "Otomasyonları etkinleştir" },
     sublabel: { de: "Erinnerungen, Follow-ups, Nachsorge", en: "Reminders, follow-ups, aftercare", tr: "Hatırlatmalar, takipler, bakım" },
     requires: "whatsapp",
-    lockedHint: { de: "Erst WhatsApp verbinden", en: "Connect WhatsApp first", tr: "Önce WhatsApp bağlayın" },
+    // Special handling: this item must NEVER show as completed until
+    // WhatsApp is connected (which only happens after purchase). Even
+    // if backend reports automations.active = true, the renderer keeps
+    // it in "needs WhatsApp" state.
+    forceLockedUntilWhatsapp: true,
+    lockedHint: { de: "Verfügbar nach WhatsApp-Verbindung (nach Kauf)", en: "Available after WhatsApp connection (post-purchase)", tr: "WhatsApp bağlandıktan sonra (satın alma sonrası) kullanılabilir" },
   },
   {
     key: "two_factor",
@@ -104,6 +109,7 @@ const ADVANCED_STEPS = [
     icon: "🔐",
     label:    { de: "Zwei-Faktor-Authentifizierung", en: "Two-factor authentication", tr: "İki faktörlü kimlik doğrulama" },
     sublabel: { de: "Konto mit Authenticator-App schützen", en: "Protect your account with an authenticator app", tr: "Hesabınızı authenticator uygulaması ile koruyun" },
+    priority: "optional",
   },
   {
     key: "integrations",
@@ -127,6 +133,7 @@ const ADVANCED_STEPS = [
     icon: "📁",
     label:    { de: "Google Drive verbinden", en: "Connect Google Drive", tr: "Google Drive'ı bağla" },
     sublabel: { de: "Patientenfotos automatisch sichern und organisieren", en: "Automatically save and organize patient photos", tr: "Hasta fotoğraflarını otomatik kaydet ve düzenle" },
+    priority: "optional",
   },
 ];
 
@@ -275,10 +282,15 @@ export default function AdvancedSetupCard() {
       {expanded && (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 8 }}>
         {visibleSteps.map((s) => {
-          const done = !!flags[s.key];
-          const locked = !done && !!s.requires && !flags[s.requires];
-          const isRecommended = !done && s.priority === "recommended";
-          const isOptional = !done && s.priority === "optional";
+          // forceLockedUntilWhatsapp: even if the backend reports the
+          // item as done, keep it visually locked until WhatsApp is
+          // actually connected (e.g. automations only really run after
+          // the org has its own WhatsApp number post-purchase).
+          const blockedByWhatsapp = !!s.forceLockedUntilWhatsapp && !flags.whatsapp;
+          const done = !!flags[s.key] && !blockedByWhatsapp;
+          const locked = !done && (blockedByWhatsapp || (!!s.requires && !flags[s.requires]));
+          const isRecommended = !done && !locked && s.priority === "recommended";
+          const isOptional = !done && !locked && s.priority === "optional";
 
           // Background / border by priority
           let bgColor = "rgba(255,255,255,0.03)";
@@ -365,6 +377,16 @@ export default function AdvancedSetupCard() {
                       letterSpacing: 0.2, textTransform: "none", whiteSpace: "nowrap",
                     }}>
                       {T("Optional", "Optional", "İsteğe bağlı")}
+                    </span>
+                  )}
+                  {locked && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+                      background: "rgba(76,201,255,0.06)", color: "rgba(76,201,255,0.7)",
+                      border: "1px solid rgba(76,201,255,0.18)",
+                      letterSpacing: 0.2, textTransform: "none", whiteSpace: "normal",
+                    }}>
+                      {(s.lockedHint?.[lang] || s.lockedHint?.de || "")}
                     </span>
                   )}
                 </div>
