@@ -18,10 +18,10 @@ function getUrgency(createdAt) {
   return { color: 'rgba(76,201,255,0.6)', bg: 'rgba(76,201,255,0.05)', border: 'rgba(76,201,255,0.12)' };
 }
 
-function timeLabel(createdAt) {
+function timeLabel(createdAt, lang) {
   if (!createdAt) return '';
   const h = (Date.now() - new Date(createdAt).getTime()) / 3600000;
-  const l = (localStorage.getItem('fm_doctor_lang') || localStorage.getItem('fm_lang') || 'de');
+  const l = lang || (localStorage.getItem('fm_doctor_lang') || localStorage.getItem('fm_lang') || 'de');
   const since = { de: 'Seit', en: 'Since', tr: 'Beri' }[l] || 'Seit';
   if (h >= 1) return `${since} ${Math.floor(h)}h`.trim();
   return `${since} ${Math.floor(h * 60)}m`.trim();
@@ -37,7 +37,9 @@ const S = {
 export default function DoctorTasksView({ onLogout } = {}) {
   const ctx = useApp();
   const t = ctx?.t || (k => k);
-  const lang = localStorage.getItem('fm_doctor_lang') || localStorage.getItem('fm_lang') || 'de';
+  // Prefer React context lang (live updates on UI language switch);
+  // localStorage as fallback for standalone Doctor Portal usage.
+  const lang = ctx?.lang || localStorage.getItem('fm_doctor_lang') || localStorage.getItem('fm_lang') || 'de';
   const tl = (key) => dt(lang, key);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -259,7 +261,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
                   </div>
                 </div>
                 <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 5, background: urg.bg, color: urg.color, border: `1px solid ${urg.border}`, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                  {timeLabel(task.createdAt)}
+                  {timeLabel(task.createdAt, lang)}
                 </span>
               </div>
 
