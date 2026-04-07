@@ -85,7 +85,65 @@ function AccountSection({ t, showT, user }) {
     </div>
 
     <MfaSection t={t} showT={showT} />
+
+    <DataProcessingSection />
   </>;
+}
+
+function DataProcessingSection() {
+  // Inline language map — these strings are launch-blocker copy and we
+  // don't want to round-trip them through i18n.js for a single section.
+  const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+  const TR = (de, en, tr) => ({ de, en, tr }[lang] || de);
+
+  // Pick the localized PDF. Turkish falls back to the English DPA file.
+  const pdfHref = lang === "tr" ? "/legal/DPA-Turkisch.pdf" : lang === "en" ? "/legal/AVV-Englisch.pdf" : "/legal/AVV-Deutsch.pdf";
+  const pdfLabel = lang === "tr" ? "DPA-Turkisch.pdf" : lang === "en" ? "AVV-Englisch.pdf" : "AVV-Deutsch.pdf";
+
+  return <div id="fm-section-dpa" style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginTop: 20 }}>
+    <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.85)", marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+      <span style={{ fontSize: 16 }}>📄</span>
+      {TR("Auftragsverarbeitungsvertrag (AVV)", "Data Processing Agreement (DPA)", "Veri İşleme Sözleşmesi (DPA)")}
+    </div>
+    <div style={{ fontSize: 13, color: "rgba(167,177,195,0.7)", marginBottom: 16, lineHeight: 1.5 }}>
+      {TR(
+        "Gemäß Art. 28 DSGVO verarbeitet Flowmatix personenbezogene Daten Ihrer Patienten in Ihrem Auftrag. Der AVV regelt diese Verarbeitung rechtsverbindlich.",
+        "Under Art. 28 GDPR, Flowmatix processes your patients' personal data on your behalf. The DPA governs this processing in a legally binding manner.",
+        "GDPR Madde 28 uyarınca, Flowmatix hastalarınızın kişisel verilerini sizin adınıza işler. DPA, bu işlemeyi yasal olarak bağlayıcı bir şekilde düzenler."
+      )}
+    </div>
+    <a
+      href={pdfHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      download
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 18px",
+        borderRadius: 10,
+        background: "linear-gradient(135deg,rgba(76,201,255,.12),rgba(45,168,255,.08))",
+        border: "1px solid rgba(76,201,255,0.2)",
+        color: "#4cc9ff",
+        fontWeight: 700,
+        fontSize: 13,
+        textDecoration: "none",
+        fontFamily: "inherit"
+      }}
+    >
+      <span>⬇</span>
+      {TR("AVV herunterladen", "Download DPA", "DPA İndir")}
+      <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 500 }}>({pdfLabel})</span>
+    </a>
+    <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 12 }}>
+      {TR(
+        "Mit der Nutzung von Flowmatix gilt der AVV als anerkannt. Bei Fragen: legal@flowmatix.io",
+        "By using Flowmatix, the DPA is considered accepted. Questions: legal@flowmatix.io",
+        "Flowmatix kullanılarak DPA kabul edilmiş sayılır. Sorularınız için: legal@flowmatix.io"
+      )}
+    </div>
+  </div>;
 }
 
 function MfaSection({ t, showT }) {

@@ -16,6 +16,10 @@ export default class ErrorBoundary extends Component {
 
   render() {
     const t = this.props.t || (k => k);
+    // Vite injects DEV at build time. In production builds (npm run build)
+    // this resolves to false and Vite tree-shakes the stack-trace branch
+    // out of the bundle entirely — no leak of stack frames to end users.
+    const isDev = typeof import.meta !== "undefined" && import.meta.env && import.meta.env.DEV;
     if (this.state.hasError) {
       return <div style={{
         padding: 40, textAlign: "center", maxWidth: 500, margin: "80px auto",
@@ -24,8 +28,8 @@ export default class ErrorBoundary extends Component {
         <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
         <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: "#ef4444" }}>{t("something_went_wrong")}</div>
         <div style={{ fontSize: 14, color: "rgba(167,177,195,0.6)", marginBottom: 20, lineHeight: 1.5 }}>
-          {this.state.error?.message || t("unexpected_error")}
-          <pre style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", textAlign: "left", marginTop: 8, maxHeight: 100, overflow: "auto", whiteSpace: "pre-wrap" }}>{this.state.error?.stack}</pre>
+          {isDev ? (this.state.error?.message || t("unexpected_error")) : t("unexpected_error")}
+          {isDev && <pre style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", textAlign: "left", marginTop: 8, maxHeight: 100, overflow: "auto", whiteSpace: "pre-wrap" }}>{this.state.error?.stack}</pre>}
         </div>
         <button onClick={() => { this.setState({ hasError: false, error: null }); }} style={{
           padding: "10px 24px", borderRadius: 12, background: "rgba(76,201,255,0.08)",

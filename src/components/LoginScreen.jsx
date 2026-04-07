@@ -150,10 +150,30 @@ export default function LoginScreen({
         )}
       </div>
       {/* Footer */}
-      <div style={{ marginTop: 24, display: "flex", gap: 16, position: "relative", zIndex: 1 }}>
-        {[{ key: "footer_privacy", fb: "Privacy" }, { key: "footer_terms", fb: "Terms" }, { key: "footer_imprint", fb: "Imprint" }].map((l, i) =>
-          <span key={i} style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", cursor: "pointer", fontWeight: 500 }} onMouseEnter={e => e.currentTarget.style.color = "rgba(167,177,195,0.6)"} onMouseLeave={e => e.currentTarget.style.color = "rgba(167,177,195,0.75)"}>{(T[loginLang] || T.en)[l.key] || l.fb}</span>
-        )}
+      <div style={{ marginTop: 24, display: "flex", gap: 16, position: "relative", zIndex: 1, flexWrap: "wrap", justifyContent: "center", maxWidth: 480 }}>
+        {(() => {
+          // AVV/DPA file is locale-specific, the rest are static marketing pages
+          const avvHref = loginLang === "tr" ? "/legal/DPA-Turkisch.pdf" : loginLang === "en" ? "/legal/AVV-Englisch.pdf" : "/legal/AVV-Deutsch.pdf";
+          const links = [
+            { key: "footer_privacy", fb: "Privacy", href: "https://flowmatix.io/privacy-policy.html" },
+            { key: "footer_terms", fb: "Terms", href: "https://flowmatix.io/terms.html" },
+            { key: "footer_imprint", fb: "Imprint", href: "https://flowmatix.io/imprint.html" },
+            { key: "footer_dpa", fb: loginLang === "de" ? "AVV" : "DPA", href: avvHref },
+          ];
+          return links.map((l, i) => (
+            <a
+              key={i}
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", cursor: "pointer", fontWeight: 500, textDecoration: "none" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(76,201,255,0.9)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(167,177,195,0.75)")}
+            >
+              {(T[loginLang] || T.en)[l.key] || l.fb}
+            </a>
+          ));
+        })()}
       </div>
       <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.65)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix GmbH</div>
       <div style={{ marginTop: 12, fontSize: 12, color: "rgba(167,177,195,0.6)", position: "relative", zIndex: 1, textAlign: "center", maxWidth: 400 }}>{tl("accounts_created")} <a href="https://flowmatix.io" style={{ color: "rgba(76,201,255,0.4)" }}>flowmatix.io</a></div>
