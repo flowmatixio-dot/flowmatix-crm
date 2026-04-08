@@ -771,6 +771,7 @@ export default function App() {
     {id:"inbox",icon:"💬",l:t("inbox"),badge:unread||null},
     {id:"pipeline",icon:"📊",l:t("pipeline")},
     {id:"appointments",icon:"📅",l:t("appointments")},
+    {id:"patients_db",icon:"👥",l:t("patients")||"Patienten"},
     {id:"doctor_portal",icon:"⚕️",l:t("doctor_portal")||"Arzt-Portal"},
     {id:"op_prep",icon:"🏥",l:t("op_preparation")||"OP-Planung"},
     {id:"payments",icon:"💳",l:t("payments")||"Zahlungen",financeOnly:true},

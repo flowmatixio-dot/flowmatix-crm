@@ -108,6 +108,21 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
             setLang(lang);
             setLoginLang(lang);
           }
+          // Fresh signup → clear any stale localStorage flags from a
+          // previous test session in this browser. The dashboard's
+          // setup card and performance indicator both read these
+          // fm_setup_done_* keys; if we don't wipe them, a new clinic
+          // sees old green checkmarks from a previous user's progress.
+          try {
+            const keysToClear = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('fm_setup_done_') || k === 'fm_demo_tour_seen' || k === 'fm_advanced_setup_expanded')) {
+                keysToClear.push(k);
+              }
+            }
+            keysToClear.forEach((k) => localStorage.removeItem(k));
+          } catch {}
         }
       } catch (e) { console.warn('[trial-auth] Failed to parse:', e); }
       // Clean URL hash

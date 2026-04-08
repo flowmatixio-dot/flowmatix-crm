@@ -149,7 +149,7 @@ export const MODULE_ACCESS = {
   setup:          { admin: true, coordinator: false, doctor: false, finance: false },
   settings:       { admin: true, coordinator: false, doctor: false, finance: false },
   billing:        { admin: true, coordinator: false, doctor: false, finance: false },
-  patients_db:    { admin: true, coordinator: true, doctor: false, finance: false },
+  patients_db:    { admin: true, coordinator: false, doctor: false, finance: false },
   doctor_portal:  { admin: false, coordinator: false, doctor: true, finance: false },
   review_board:   { admin: true, coordinator: true, doctor: true,  finance: false },
   ai_control:     { admin: true, coordinator: false, doctor: false, finance: false },
