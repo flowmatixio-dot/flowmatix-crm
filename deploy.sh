@@ -31,8 +31,11 @@ fi
 echo ""
 
 # 4. Deploy
+# Use rsync --delete so old hashed asset files (index-XXXXX.js etc.) are
+# removed instead of accumulating. Without --delete the dist/assets folder
+# grew to 1645 files / 920MB before being noticed.
 echo "→ Deploying to server..."
-scp -r dist/* flowmatix:/opt/flowmatix/services/app/dist/
+rsync -az --delete dist/ flowmatix:/opt/flowmatix/services/app/dist/
 echo "✓ Files uploaded"
 echo ""
 
