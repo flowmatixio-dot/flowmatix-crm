@@ -91,7 +91,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => { setPromoModal(false); setGeneratedPromo(null); }}>
           <div style={{ background: '#1a1f2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 28, width: 380, boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>Promo-Code generieren</div>
-            <div style={{ fontSize: 12, color: '#8D93A6', marginBottom: 20 }}>Einmaliger Code — 30 Tage kostenlos, danach Setup Fee + Abo. Gültig 90 Tage.</div>
+            <div style={{ fontSize: 12, color: '#8D93A6', marginBottom: 20 }}>Einmaliger Code — Setup-Gebühr (1.990 €) entfällt, direkt ins Abo. Gültig 90 Tage.</div>
             {generatedPromo ? (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#10b981', marginBottom: 10 }}>CODE GENERIERT — KOPIEREN & PER MAIL SCHICKEN</div>
@@ -99,7 +99,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
                   <div style={{ flex: 1, padding: '12px 16px', borderRadius: 10, background: '#111827', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 18, fontWeight: 800, letterSpacing: '0.1em', fontFamily: 'monospace', textAlign: 'center' }}>{generatedPromo.code}</div>
                   <button onClick={() => navigator.clipboard.writeText(generatedPromo.code)} style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Kopieren</button>
                 </div>
-                <div style={{ fontSize: 10, color: '#8D93A6', marginTop: 8 }}>Klinik gibt den Code im CRM unter Abonnement ein → Stripe öffnet sich mit 30-Tage-Trial.</div>
+                <div style={{ fontSize: 10, color: '#8D93A6', marginTop: 8 }}>Klinik gibt den Code im CRM unter Abonnement ein → Stripe öffnet sich ohne Setup-Gebühr.</div>
               </div>
             ) : (
               <button onClick={async () => {
