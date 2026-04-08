@@ -399,9 +399,10 @@ export default function PatientPanel() {
       </div>
 
       {/* ═══════════════════════ TAB CONTENT ═══════════════════════ */}
-      {/* paddingBottom 100 leaves room for the floating Hilfe orb so the
-          GDPR export / delete buttons at the very bottom aren't covered */}
-      <div style={{flex:1,overflowY:"auto",padding:"20px 24px 100px"}}>
+      {/* paddingBottom 160 so the GDPR export + danger-zone sections at
+          the very bottom can scroll above the floating Hilfe orb and any
+          OS / browser bottom chrome */}
+      <div style={{flex:1,overflowY:"auto",padding:"20px 24px 160px"}}>
 
         {/* ═══ TIMELINE TAB — Accordion Redesign ═══ */}
         {patientTab==="timeline"&&<>
@@ -837,8 +838,9 @@ export default function PatientPanel() {
         }} style={{padding:"8px 16px",borderRadius:10,background:"rgba(76,201,255,0.1)",border:"1px solid rgba(76,201,255,0.3)",color:"#4cc9ff",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>⬇ {t("gdpr_export_btn") || "Patientendaten exportieren (JSON)"}</button>
       </div>
 
-      {/* ═══ GDPR DELETE — only admin ═══ */}
-      {user?.role === "admin" && <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)"}}>
+      {/* ═══ GDPR DELETE — admin only (any of: frontend "admin", backend
+              clinic_admin, platform_owner) ═══ */}
+      {(user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner") && <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)"}}>
         <div style={{fontSize:13,fontWeight:800,color:"#ef4444",marginBottom:8}}>{t("gdpr_danger_zone") || "Danger Zone"}</div>
         {!gdprConfirm ? (
           <button onClick={()=>setGdprConfirm(true)} style={{padding:"8px 16px",borderRadius:10,background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.3)",color:"#ef4444",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{t("gdpr_delete_btn") || "Patientendaten endgültig löschen (DSGVO Art. 17)"}</button>
