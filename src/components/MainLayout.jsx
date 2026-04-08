@@ -417,8 +417,16 @@ export default function MainLayout() {
           ctx.setWorkspaceState('checkout_pending');
           const res = await fmApi.startTrialActivation(plan, billingCycle, promoCode.trim() || null);
           if (res?.url) window.location.href = res.url;
-          else { ctx.setWorkspaceState('live_test'); ctx.showT?.(t("plan_checkout_error")||'Checkout failed'); }
+          else {
+            // Failure path: revert BOTH local state AND DB state — otherwise the
+            // customer is locked in checkout_pending and the green test banner stays hidden.
+            await fmApi.setWorkspaceState('live_test').catch(() => {});
+            ctx.setWorkspaceState('live_test');
+            ctx.showT?.(t("plan_checkout_error")||'Checkout failed');
+          }
         } catch (e) {
+          // Same as above for the catch path
+          await fmApi.setWorkspaceState('live_test').catch(() => {});
           ctx.setWorkspaceState('live_test');
           const msg = e.message || '';
           if (msg.includes('Ungültiger') || msg.includes('Promo')) setPromoError(msg);
