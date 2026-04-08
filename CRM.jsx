@@ -242,6 +242,29 @@ export default function App() {
   React.useEffect(()=>{if(userRole==="doctor"&&!canAccess(view)&&view!=="doctor_portal"&&view!=="support")setView("doctor_portal");},[userRole,view]);
   /* Google OAuth callback toast — google.ts redirects to /?google=success|error|denied */
   React.useEffect(()=>{try{const params=new URLSearchParams(window.location.search);const g=params.get("google");if(!g)return;params.delete("google");const newQs=params.toString();window.history.replaceState({},"",window.location.pathname+(newQs?"?"+newQs:""));if(g==="success"){const l=localStorage.getItem("fm_lang")||"de";const msg={de:"Google Drive erfolgreich verbunden",en:"Google Drive connected successfully",tr:"Google Drive başarıyla bağlandı"}[l]||"Google Drive verbunden";showT(msg);setView("dashboard");}else if(g==="error"||g==="denied"){const l=localStorage.getItem("fm_lang")||"de";const msg={de:"Google-Verbindung fehlgeschlagen",en:"Google connection failed",tr:"Google bağlantısı başarısız"}[l]||"Google connection failed";showT(msg,"error");}}catch(e){}},[]);
+
+  /* Stripe checkout cancel callback — Stripe redirects to /?subscription=cancelled
+     when the customer hits "back" or closes the checkout page. Without this handler
+     the org stays in workspace_state='checkout_pending' forever and the green test
+     banner disappears. We revert state immediately so the customer can keep testing. */
+  React.useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const cancelled = params.get("subscription") === "cancelled" || params.get("payment") === "cancelled";
+      if (!cancelled) return;
+      params.delete("subscription");
+      params.delete("payment");
+      const newQs = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (newQs ? "?" + newQs : ""));
+      // Revert workspace state so the green test banner re-appears
+      fmApi.setWorkspaceState('live_test').then(() => {
+        setWorkspaceState('live_test');
+        const l = localStorage.getItem("fm_lang") || "de";
+        const msg = { de: "Checkout abgebrochen — du kannst weiter testen", en: "Checkout cancelled — you can keep testing", tr: "Ödeme iptal edildi — test etmeye devam edebilirsin" }[l] || "Checkout cancelled";
+        showT(msg);
+      }).catch(() => {});
+    } catch {}
+  }, []);
   // Hard block: doctor can never see admin views — even during re-auth
   const effectiveView = (userRole==="doctor"&&!canAccess(view)&&view!=="doctor_portal"&&view!=="support") ? "doctor_portal" : view;
   const getClinicById=id=>clinics.find(c=>c.id===id);
