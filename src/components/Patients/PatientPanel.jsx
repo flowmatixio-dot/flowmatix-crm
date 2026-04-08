@@ -813,41 +813,38 @@ export default function PatientPanel() {
             <div style={{fontSize:11,color:"rgba(167,177,195,0.6)"}}>by <span style={{fontWeight:600,color:"rgba(167,177,195,0.6)"}}>{n.author}</span> · {timeAgo(n.time)}</div>
           </div>)}
         </div>}
-      </div>
-      {/* ═══ GDPR DATA EXPORT — Art. 15 + 20 ═══ */}
-      <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.15)"}}>
-        <div style={{fontSize:13,fontWeight:800,color:"#4cc9ff",marginBottom:6}}>{t("gdpr_data_export") || "Datenauskunft (DSGVO Art. 15/20)"}</div>
-        <div style={{fontSize:12,color:"rgba(167,177,195,0.65)",marginBottom:10,lineHeight:1.5}}>{t("gdpr_data_export_desc") || "Lädt alle gespeicherten Daten dieses Patienten als JSON herunter — für Auskunfts- oder Portabilitätsanfragen."}</div>
-        <button onClick={async()=>{
-          try {
-            const { apiFetch } = await import("../../api/client");
-            const data = await apiFetch(`/api/v1/crm/patients/${lead.id}/export`);
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `flowmatix-patient-${lead.id}-${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showT(t("gdpr_export_success") || "Daten heruntergeladen");
-          } catch (e) {
-            showT(e.message || "Fehler", "error");
-          }
-        }} style={{padding:"8px 16px",borderRadius:10,background:"rgba(76,201,255,0.1)",border:"1px solid rgba(76,201,255,0.3)",color:"#4cc9ff",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>⬇ {t("gdpr_export_btn") || "Patientendaten exportieren (JSON)"}</button>
-      </div>
 
-      {/* ═══ GDPR DELETE — admin only (any of: frontend "admin", backend
-              clinic_admin, platform_owner) ═══ */}
-      {(user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner") && <div style={{marginTop:24,padding:16,borderRadius:12,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)"}}>
-        <div style={{fontSize:13,fontWeight:800,color:"#ef4444",marginBottom:8}}>{t("gdpr_danger_zone") || "Danger Zone"}</div>
-        {!gdprConfirm ? (
-          <button onClick={()=>setGdprConfirm(true)} style={{padding:"8px 16px",borderRadius:10,background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.3)",color:"#ef4444",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{t("gdpr_delete_btn") || "Patientendaten endgültig löschen (DSGVO Art. 17)"}</button>
-        ) : (
-          <div>
-            <div style={{fontSize:12,color:"rgba(239,68,68,0.8)",marginBottom:10,lineHeight:1.5}}>{t("gdpr_delete_warning") || "Alle Daten dieses Patienten werden unwiderruflich gelöscht: Nachrichten, Fotos, Termine, Dateien. Diese Aktion kann nicht rückgängig gemacht werden."}</div>
-            <div style={{display:"flex",gap:8}}>
+        {/* ═══ GDPR Footer — compact, in scroll area so it scrolls with content ═══ */}
+        <div style={{marginTop:20,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
+          <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",fontWeight:600}}>DSGVO Art. 15 / 20</div>
+          <button onClick={async()=>{
+            try {
+              const { apiFetch } = await import("../../api/client");
+              const data = await apiFetch(`/api/v1/crm/patients/${lead.id}/export`);
+              const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `flowmatix-patient-${lead.id}-${new Date().toISOString().slice(0,10)}.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              showT(t("gdpr_export_success") || "Daten heruntergeladen");
+            } catch (e) {
+              showT(e.message || "Fehler", "error");
+            }
+          }} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>⬇ {t("gdpr_export_btn_short") || "Daten exportieren"}</button>
+        </div>
+
+        {/* GDPR DELETE — admin only, ultra compact */}
+        {(user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner") && <div style={{marginTop:8,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
+          <div style={{fontSize:11,color:"rgba(239,68,68,0.7)",fontWeight:700}}>{t("gdpr_danger_zone") || "Gefahrenzone"} · DSGVO Art. 17</div>
+          {!gdprConfirm ? (
+            <button onClick={()=>setGdprConfirm(true)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>{t("gdpr_delete_btn_short") || "Endgültig löschen"}</button>
+          ) : (
+            <div style={{display:"flex",gap:6,alignItems:"center"}}>
+              <span style={{fontSize:11,color:"rgba(239,68,68,0.85)",fontWeight:600}}>{t("gdpr_delete_confirm_short") || "Sicher?"}</span>
               <button disabled={gdprDeleting} onClick={async()=>{
                 setGdprDeleting(true);
                 try {
@@ -860,12 +857,12 @@ export default function PatientPanel() {
                   } else { showT(res?.error || "Fehler", "error"); }
                 } catch(e) { showT(e.message || "Fehler", "error"); }
                 setGdprDeleting(false); setGdprConfirm(false);
-              }} style={{padding:"8px 16px",borderRadius:10,background:"#ef4444",border:"none",color:"#fff",fontWeight:700,fontSize:12,cursor:gdprDeleting?"wait":"pointer",fontFamily:"inherit",opacity:gdprDeleting?0.6:1}}>{gdprDeleting ? "..." : (t("gdpr_confirm_delete") || "Endgültig löschen")}</button>
-              <button onClick={()=>setGdprConfirm(false)} style={{padding:"8px 16px",borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#a7b1c3",fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>{t("cancel") || "Abbrechen"}</button>
+              }} style={{padding:"6px 10px",borderRadius:8,background:"#ef4444",border:"none",color:"#fff",fontWeight:700,fontSize:11,cursor:gdprDeleting?"wait":"pointer",fontFamily:"inherit",opacity:gdprDeleting?0.6:1}}>{gdprDeleting ? "..." : "✓"}</button>
+              <button onClick={()=>setGdprConfirm(false)} style={{padding:"6px 10px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#a7b1c3",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>✕</button>
             </div>
-          </div>
-        )}
-      </div>}
+          )}
+        </div>}
+      </div>
     </div>
     {lightbox&&<PhotoLightbox photos={lightbox.photos} startIdx={lightbox.idx} onClose={()=>setLightbox(null)}/>}
     {showPlanBuilder&&<div style={{position:"fixed",inset:0,zIndex:10000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
