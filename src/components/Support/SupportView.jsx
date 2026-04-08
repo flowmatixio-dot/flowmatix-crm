@@ -33,13 +33,14 @@ export default function SupportView() {
       <Field label={t("describe_issue")} value={supportMsg} onChange={setSupportMsg} textarea placeholder={t("tell_what_happened")}/>
       <Btn color="#ff8a2a" icon="📨" label={t("submit")} onClick={async()=>{if(!supportMsg.trim())return;try{const{apiFetch}=await import("../../api/client");await apiFetch("/api/v1/clinic/support/report",{method:"POST",body:JSON.stringify({message:supportMsg})});showT(t("report_sent")||"Gesendet");setSupportMsg("");}catch(e){showT(t("error_generic")||"Fehler");}}}/>
     </Section>
-    <Section title={t("legal")}>
+    <Section title={({de:"Recht & Compliance",en:"Legal & Compliance",tr:"Hukuk & Uyum"}[lang]||"Legal & Compliance")}>
       <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
         {[
-          {label:t("privacy_policy"),icon:"🔒",url:"https://www.flowmatix.io/privacy-policy"},
-          {label:t("terms_service"),icon:"📄",url:"https://www.flowmatix.io/terms"},
-          {label:t("imprint"),icon:"🏢",url:"https://www.flowmatix.io/imprint"},
-          {label:t("avv_dpa"),icon:"📋",url:{de:"/legal/AVV-Deutsch.pdf",en:"/legal/AVV-Englisch.pdf",tr:"/legal/DPA-Turkisch.pdf"}},
+          {label:({de:"Datenschutzerklärung",en:"Privacy Policy",tr:"Gizlilik Politikası"}[lang]||"Privacy Policy"),icon:"🔒",url:"https://www.flowmatix.io/privacy-policy"},
+          {label:({de:"AGB",en:"Terms of Service",tr:"Kullanım Şartları"}[lang]||"Terms of Service"),icon:"📄",url:"https://www.flowmatix.io/terms"},
+          {label:({de:"Impressum",en:"Imprint",tr:"Künye"}[lang]||"Imprint"),icon:"🏢",url:"https://www.flowmatix.io/imprint"},
+          {label:({de:"AVV (Auftragsverarbeitungsvertrag)",en:"DPA (Data Processing Agreement)",tr:"DPA (Veri İşleme Sözleşmesi)"}[lang]||"DPA"),icon:"📋",url:{de:"/legal/AVV-Deutsch.pdf",en:"/legal/AVV-Englisch.pdf",tr:"/legal/DPA-Turkisch.pdf"}},
+          {label:({de:"DPIA (Datenschutz-Folgenabschätzung)",en:"DPIA (Data Protection Impact Assessment)",tr:"DPIA (Veri Koruma Etki Değerlendirmesi)"}[lang]||"DPIA"),icon:"📊",url:"/legal/DPIA-Deutsch.pdf"},
         ].map((l,i)=>{
           const href = typeof l.url === "object" ? (l.url[lang] || l.url.en) : l.url;
           return <a key={i} href={href} target="_blank" rel="noopener noreferrer" style={{padding:"8px 16px",borderRadius:10,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.7)",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:6,textDecoration:"none"}}>{l.icon} {l.label}</a>;

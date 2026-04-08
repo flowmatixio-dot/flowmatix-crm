@@ -814,54 +814,61 @@ export default function PatientPanel() {
           </div>)}
         </div>}
 
-        {/* ═══ GDPR Footer — compact, in scroll area so it scrolls with content ═══ */}
-        <div style={{marginTop:20,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
-          <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",fontWeight:600}}>DSGVO Art. 15 / 20</div>
-          <button onClick={async()=>{
-            try {
-              const { apiFetch } = await import("../../api/client");
-              const data = await apiFetch(`/api/v1/crm/patients/${lead.id}/export`);
-              const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `flowmatix-patient-${lead.id}-${new Date().toISOString().slice(0,10)}.json`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              showT(t("gdpr_export_success") || "Daten heruntergeladen");
-            } catch (e) {
-              showT(e.message || "Fehler", "error");
-            }
-          }} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>⬇ {t("gdpr_export_btn_short") || "Daten exportieren"}</button>
-        </div>
-
-        {/* GDPR DELETE — admin only, ultra compact */}
-        {(user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner") && <div style={{marginTop:8,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
-          <div style={{fontSize:11,color:"rgba(239,68,68,0.7)",fontWeight:700}}>{t("gdpr_danger_zone") || "Gefahrenzone"} · DSGVO Art. 17</div>
-          {!gdprConfirm ? (
-            <button onClick={()=>setGdprConfirm(true)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>{t("gdpr_delete_btn_short") || "Endgültig löschen"}</button>
-          ) : (
-            <div style={{display:"flex",gap:6,alignItems:"center"}}>
-              <span style={{fontSize:11,color:"rgba(239,68,68,0.85)",fontWeight:600}}>{t("gdpr_delete_confirm_short") || "Sicher?"}</span>
-              <button disabled={gdprDeleting} onClick={async()=>{
-                setGdprDeleting(true);
+        {/* ═══ GDPR Footer — compact, inline TR helper because t() falls
+              back to the key string when missing, breaking `t() || fallback` ═══ */}
+        {(() => {
+          const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+          const TR = (de, en, tr) => ({ de, en, tr }[ll] || de);
+          return <>
+            <div style={{marginTop:20,padding:"10px 12px",borderRadius:10,background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.06)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
+              <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",fontWeight:600}}>{TR("DSGVO Art. 15 / 20", "GDPR Art. 15 / 20", "KVKK Madde 11")}</div>
+              <button onClick={async()=>{
                 try {
                   const { apiFetch } = await import("../../api/client");
-                  const res = await apiFetch(`/api/v1/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
-                  if (res?.success) {
-                    showT(t("gdpr_deleted_success") || "Patientendaten gelöscht");
-                    setSelLead(null);
-                    setLeads(prev => prev.filter(l => l.id !== lead.id));
-                  } else { showT(res?.error || "Fehler", "error"); }
-                } catch(e) { showT(e.message || "Fehler", "error"); }
-                setGdprDeleting(false); setGdprConfirm(false);
-              }} style={{padding:"6px 10px",borderRadius:8,background:"#ef4444",border:"none",color:"#fff",fontWeight:700,fontSize:11,cursor:gdprDeleting?"wait":"pointer",fontFamily:"inherit",opacity:gdprDeleting?0.6:1}}>{gdprDeleting ? "..." : "✓"}</button>
-              <button onClick={()=>setGdprConfirm(false)} style={{padding:"6px 10px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#a7b1c3",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>✕</button>
+                  const data = await apiFetch(`/api/v1/crm/patients/${lead.id}/export`);
+                  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `flowmatix-patient-${lead.id}-${new Date().toISOString().slice(0,10)}.json`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  showT(TR("Daten heruntergeladen", "Data downloaded", "Veriler indirildi"));
+                } catch (e) {
+                  showT(e.message || TR("Fehler", "Error", "Hata"), "error");
+                }
+              }} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>⬇ {TR("Daten exportieren", "Export data", "Verileri dışa aktar")}</button>
             </div>
-          )}
-        </div>}
+
+            {/* GDPR DELETE — admin only, ultra compact */}
+            {(user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner") && <div style={{marginTop:8,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
+              <div style={{fontSize:11,color:"rgba(239,68,68,0.7)",fontWeight:700}}>{TR("Gefahrenzone", "Danger Zone", "Tehlikeli Bölge")} · {TR("DSGVO Art. 17", "GDPR Art. 17", "KVKK Madde 7")}</div>
+              {!gdprConfirm ? (
+                <button onClick={()=>setGdprConfirm(true)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>{TR("Endgültig löschen", "Delete permanently", "Kalıcı olarak sil")}</button>
+              ) : (
+                <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                  <span style={{fontSize:11,color:"rgba(239,68,68,0.85)",fontWeight:600}}>{TR("Sicher?", "Sure?", "Emin misiniz?")}</span>
+                  <button disabled={gdprDeleting} onClick={async()=>{
+                    setGdprDeleting(true);
+                    try {
+                      const { apiFetch } = await import("../../api/client");
+                      const res = await apiFetch(`/api/v1/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
+                      if (res?.success) {
+                        showT(TR("Patientendaten gelöscht", "Patient data deleted", "Hasta verileri silindi"));
+                        setSelLead(null);
+                        setLeads(prev => prev.filter(l => l.id !== lead.id));
+                      } else { showT(res?.error || TR("Fehler", "Error", "Hata"), "error"); }
+                    } catch(e) { showT(e.message || TR("Fehler", "Error", "Hata"), "error"); }
+                    setGdprDeleting(false); setGdprConfirm(false);
+                  }} style={{padding:"6px 10px",borderRadius:8,background:"#ef4444",border:"none",color:"#fff",fontWeight:700,fontSize:11,cursor:gdprDeleting?"wait":"pointer",fontFamily:"inherit",opacity:gdprDeleting?0.6:1}}>{gdprDeleting ? "..." : "✓"}</button>
+                  <button onClick={()=>setGdprConfirm(false)} style={{padding:"6px 10px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#a7b1c3",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>✕</button>
+                </div>
+              )}
+            </div>}
+          </>;
+        })()}
       </div>
     </div>
     {lightbox&&<PhotoLightbox photos={lightbox.photos} startIdx={lightbox.idx} onClose={()=>setLightbox(null)}/>}

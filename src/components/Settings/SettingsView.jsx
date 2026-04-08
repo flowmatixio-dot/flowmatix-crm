@@ -112,35 +112,60 @@ function DataProcessingSection() {
         "GDPR Madde 28 uyarınca, Flowmatix hastalarınızın kişisel verilerini sizin adınıza işler. DPA, bu işlemeyi yasal olarak bağlayıcı bir şekilde düzenler."
       )}
     </div>
-    <a
-      href={pdfHref}
-      target="_blank"
-      rel="noopener noreferrer"
-      download
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "10px 18px",
-        borderRadius: 10,
-        background: "linear-gradient(135deg,rgba(76,201,255,.12),rgba(45,168,255,.08))",
-        border: "1px solid rgba(76,201,255,0.2)",
-        color: "#4cc9ff",
-        fontWeight: 700,
-        fontSize: 13,
-        textDecoration: "none",
-        fontFamily: "inherit"
-      }}
-    >
-      <span>⬇</span>
-      {TR("AVV herunterladen", "Download DPA", "DPA İndir")}
-      <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 500 }}>({pdfLabel})</span>
-    </a>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <a
+        href={pdfHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "10px 18px",
+          borderRadius: 10,
+          background: "linear-gradient(135deg,rgba(76,201,255,.12),rgba(45,168,255,.08))",
+          border: "1px solid rgba(76,201,255,0.2)",
+          color: "#4cc9ff",
+          fontWeight: 700,
+          fontSize: 13,
+          textDecoration: "none",
+          fontFamily: "inherit"
+        }}
+      >
+        <span>⬇</span>
+        {TR("AVV herunterladen", "Download DPA", "DPA İndir")}
+        <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 500 }}>({pdfLabel})</span>
+      </a>
+      <a
+        href="/legal/DPIA-Deutsch.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "10px 18px",
+          borderRadius: 10,
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          color: "rgba(167,177,195,0.85)",
+          fontWeight: 700,
+          fontSize: 13,
+          textDecoration: "none",
+          fontFamily: "inherit"
+        }}
+      >
+        <span>📊</span>
+        {TR("DPIA herunterladen", "Download DPIA", "DPIA İndir")}
+      </a>
+    </div>
     <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 12 }}>
       {TR(
-        "Mit der Nutzung von Flowmatix gilt der AVV als anerkannt. Bei Fragen: legal@flowmatix.io",
-        "By using Flowmatix, the DPA is considered accepted. Questions: legal@flowmatix.io",
-        "Flowmatix kullanılarak DPA kabul edilmiş sayılır. Sorularınız için: legal@flowmatix.io"
+        "Mit der Nutzung von Flowmatix gilt der AVV als anerkannt. Die DPIA dokumentiert die Datenschutz-Folgenabschätzung nach Art. 35 DSGVO. Bei Fragen: legal@flowmatix.io",
+        "By using Flowmatix, the DPA is considered accepted. The DPIA documents the data protection impact assessment under Art. 35 GDPR. Questions: legal@flowmatix.io",
+        "Flowmatix kullanılarak DPA kabul edilmiş sayılır. DPIA, GDPR Madde 35 kapsamında veri koruma etki değerlendirmesini belgeler. Sorularınız için: legal@flowmatix.io"
       )}
     </div>
   </div>;
@@ -362,39 +387,53 @@ function IntegrationsSection({ t, clinic, showT }) {
     </div>}
     {isLive && gStatus.lastError && <div style={{marginTop:8,fontSize:12,color:"#ef4444"}}>{gStatus.lastError}</div>}
 
-    {/* ═══ GDPR Opt-In: Auto-Upload zu Google Drive — always shown for transparency ═══ */}
-    {isLive && <div style={{marginTop:16,padding:14,borderRadius:10,background:"rgba(251,191,36,0.03)",border:"1px solid rgba(251,191,36,0.15)"}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:6}}>
-        <div style={{fontSize:12,fontWeight:800,color:"#fbbf24",display:"flex",alignItems:"center",gap:6}}>⚠️ {t("drive_auto_upload_title") || "Auto-Upload zu Google Drive"}</div>
-        <label style={{display:"flex",alignItems:"center",gap:8,cursor:googleConnected?"pointer":"not-allowed",opacity:googleConnected?1:0.5}}>
-          <input
-            type="checkbox"
-            checked={!!gStatus?.driveAutoUpload}
-            disabled={loading || !googleConnected}
-            onChange={async (e) => {
-              const enabled = e.target.checked;
-              setLoading(true);
-              try {
-                const { apiFetch } = await import("../../api/client");
-                await apiFetch("/api/v1/auth/google/drive-auto-upload", { method: "PATCH", body: JSON.stringify({ enabled }) });
-                setGStatus(prev => ({ ...prev, driveAutoUpload: enabled }));
-                showT(enabled ? (t("drive_auto_upload_enabled") || "Auto-Upload aktiviert") : (t("drive_auto_upload_disabled") || "Auto-Upload deaktiviert"));
-              } catch (err) {
-                showT(err?.message || (t("error_generic") || "Fehler"), "error");
-              }
-              setLoading(false);
-            }}
-            style={{width:16,height:16,accentColor:"#10b981",cursor:googleConnected?"pointer":"not-allowed"}}
-          />
-          <span style={{fontSize:12,fontWeight:700,color:gStatus?.driveAutoUpload?"#10b981":"rgba(167,177,195,0.7)"}}>{gStatus?.driveAutoUpload?(t("on")||"AN"):(t("off")||"AUS")}</span>
-        </label>
-      </div>
-      <div style={{fontSize:11,color:"rgba(167,177,195,0.65)",lineHeight:1.5}}>
-        {googleConnected
-          ? (t("drive_auto_upload_desc_short") || "Wenn AN: Patientenfotos werden automatisch in Google Drive hochgeladen. Google ist ein US-Dienst — Sie brauchen einen DPA mit Google Workspace. Standard: AUS.")
-          : (t("drive_auto_upload_disconnected") || "Google ist nicht verbunden — Auto-Upload nicht möglich. Erst Google verbinden.")}
-      </div>
-    </div>}
+    {/* ═══ GDPR Opt-In: Auto-Upload zu Google Drive — always shown for transparency ═══
+        Inline TR helper instead of t() because t() returns the key string itself
+        when missing, which makes `t(key) || fallback` useless (key is truthy). */}
+    {isLive && (() => {
+      const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+      const TR = (de, en, tr) => ({ de, en, tr }[ll] || de);
+      return <div style={{marginTop:16,padding:14,borderRadius:10,background:"rgba(251,191,36,0.03)",border:"1px solid rgba(251,191,36,0.15)"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:6}}>
+          <div style={{fontSize:12,fontWeight:800,color:"#fbbf24",display:"flex",alignItems:"center",gap:6}}>⚠️ {TR("Auto-Upload zu Google Drive", "Auto-upload to Google Drive", "Google Drive'a otomatik yükleme")}</div>
+          <label style={{display:"flex",alignItems:"center",gap:8,cursor:googleConnected?"pointer":"not-allowed",opacity:googleConnected?1:0.5}}>
+            <input
+              type="checkbox"
+              checked={!!gStatus?.driveAutoUpload}
+              disabled={loading || !googleConnected}
+              onChange={async (e) => {
+                const enabled = e.target.checked;
+                setLoading(true);
+                try {
+                  const { apiFetch } = await import("../../api/client");
+                  await apiFetch("/api/v1/auth/google/drive-auto-upload", { method: "PATCH", body: JSON.stringify({ enabled }) });
+                  setGStatus(prev => ({ ...prev, driveAutoUpload: enabled }));
+                  showT(enabled ? TR("Auto-Upload aktiviert", "Auto-upload enabled", "Otomatik yükleme etkinleştirildi") : TR("Auto-Upload deaktiviert", "Auto-upload disabled", "Otomatik yükleme devre dışı"));
+                } catch (err) {
+                  showT(err?.message || TR("Fehler", "Error", "Hata"), "error");
+                }
+                setLoading(false);
+              }}
+              style={{width:16,height:16,accentColor:"#10b981",cursor:googleConnected?"pointer":"not-allowed"}}
+            />
+            <span style={{fontSize:12,fontWeight:700,color:gStatus?.driveAutoUpload?"#10b981":"rgba(167,177,195,0.7)"}}>{gStatus?.driveAutoUpload?TR("AN","ON","AÇIK"):TR("AUS","OFF","KAPALI")}</span>
+          </label>
+        </div>
+        <div style={{fontSize:11,color:"rgba(167,177,195,0.65)",lineHeight:1.5}}>
+          {googleConnected
+            ? TR(
+                "Wenn AN: Patientenfotos werden automatisch in Google Drive hochgeladen. Google ist ein US-Dienst — Sie brauchen einen DPA mit Google Workspace. Standard: AUS.",
+                "When ON: patient photos are automatically uploaded to Google Drive. Google is a US service — you need a DPA with Google Workspace. Default: OFF.",
+                "AÇIK olduğunda: hasta fotoğrafları otomatik olarak Google Drive'a yüklenir. Google bir ABD hizmetidir — Google Workspace ile bir DPA'ya ihtiyacınız var. Varsayılan: KAPALI."
+              )
+            : TR(
+                "Google ist nicht verbunden — Auto-Upload nicht möglich. Erst Google verbinden.",
+                "Google is not connected — auto-upload not available. Connect Google first.",
+                "Google bağlı değil — otomatik yükleme kullanılamıyor. Önce Google'ı bağlayın."
+              )}
+        </div>
+      </div>;
+    })()}
 
     {/* ═══ Analytics Provider Config ═══ */}
     <div style={{marginTop:20,padding:16,borderRadius:12,background:"var(--bg-card)",border:"1px solid var(--border-default)"}}>

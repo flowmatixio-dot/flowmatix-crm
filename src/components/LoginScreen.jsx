@@ -159,6 +159,7 @@ export default function LoginScreen({
             { key: "footer_terms", fb: "Terms", href: "https://flowmatix.io/terms.html" },
             { key: "footer_imprint", fb: "Imprint", href: "https://flowmatix.io/imprint.html" },
             { key: "footer_dpa", fb: loginLang === "de" ? "AVV" : "DPA", href: avvHref },
+            { key: "footer_dpia", fb: "DPIA", href: "/legal/DPIA-Deutsch.pdf" },
           ];
           return links.map((l, i) => (
             <a
