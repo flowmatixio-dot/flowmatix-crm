@@ -5,6 +5,7 @@ import { CONV_STATUS, STAGES, ROLES, ACTION_PERMS } from "../../data/constants";
 import { Stat, getAvatarGradient, getInitials } from "../shared/index";
 import ChannelBadge from "../Inbox/ChannelBadge";
 import NewLeadModal from "./NewLeadModal";
+import HardDeleteModal from "./HardDeleteModal";
 import { translateValue, fmLocale } from "../../utils/helpers";
 
 /* ═══════════════════════════════════════════════════════
@@ -283,7 +284,7 @@ function SkeletonRows({ count = 8, colCount = 7 }) {
 /* ═══════════════════════════════════════════════════════
    BULK ACTIONS BAR
    ═══════════════════════════════════════════════════════ */
-function BulkBar({ count, onClear, onExport, onAssignDoctor, onArchive, doctors }) {
+function BulkBar({ count, onClear, onExport, onAssignDoctor, onArchive, onBulkDelete, doctors, isAdmin }) {
   const { t } = useApp();
   const [showDocPicker, setShowDocPicker] = useState(false);
   return (
@@ -316,6 +317,19 @@ function BulkBar({ count, onClear, onExport, onAssignDoctor, onArchive, doctors 
           </div>
         )}
       </div>
+      {isAdmin && onBulkDelete && (
+        <button
+          onClick={onBulkDelete}
+          style={{
+            ...bulkBtnStyle,
+            background: "rgba(239,68,68,0.1)",
+            border: "1px solid rgba(239,68,68,0.3)",
+            color: "#ef4444",
+          }}
+        >
+          🗑 {t("bulk_delete_label") || "Endgültig löschen"}
+        </button>
+      )}
       <button onClick={onClear} style={{ ...bulkBtnStyle, color: "rgba(167,177,195,0.7)" }}>✕</button>
     </div>
   );
@@ -568,6 +582,30 @@ export default function PatientsPage() {
     const rows = filtered.filter(l => selected.has(l.id));
     handleExport(rows);
     setSelected(new Set());
+  };
+
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const handleBulkDeleteConfirm = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    try {
+      const { apiFetch } = await import("../../api/client");
+      const res = await apiFetch(`/api/v1/crm/patients/bulk-delete`, {
+        method: "POST",
+        body: JSON.stringify({ ids, confirm: "GDPR_DELETE" }),
+      });
+      if (res?.success) {
+        showT(`${res.deleted} ${t("patients_deleted_label") || "Patienten gelöscht"}`);
+        setLeads(prev => prev.filter(l => !selected.has(l.id)));
+        setSelected(new Set());
+        setBulkDeleteOpen(false);
+      } else {
+        showT(res?.error || (t("error_generic") || "Fehler"), "error");
+      }
+    } catch (e) {
+      showT(e?.message || (t("error_generic") || "Fehler"), "error");
+      throw e;
+    }
   };
 
   const handleBulkAssignDoctor = (doctor) => {
@@ -914,9 +952,22 @@ export default function PatientsPage() {
           onExport={handleBulkExport}
           onAssignDoctor={handleBulkAssignDoctor}
           onArchive={handleBulkArchive}
+          onBulkDelete={() => setBulkDeleteOpen(true)}
+          isAdmin={user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner"}
           doctors={filterOptions.doctors}
         />
       )}
+
+      {/* Bulk Hard-Delete Modal — same DELETE-confirmation pattern as
+          single-patient HardDeleteModal, but tells the user how many
+          will be deleted at once */}
+      <HardDeleteModal
+        open={bulkDeleteOpen}
+        lang={(localStorage.getItem("fm_lang") || "de").substring(0, 2)}
+        patientName={`${selected.size} Patienten`}
+        onClose={() => setBulkDeleteOpen(false)}
+        onConfirm={handleBulkDeleteConfirm}
+      />
 
       {/* New Lead Modal */}
       {showNewLead && (
