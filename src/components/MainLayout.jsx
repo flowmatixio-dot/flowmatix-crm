@@ -480,11 +480,12 @@ export default function MainLayout() {
             </div>
 
             {/* Promo Code — more visible pill so users actually notice it */}
+            {(() => {
+              const _lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+              const _T = (de, en, tr) => ({ de, en, tr }[_lang] || de);
+              return (
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-              {!showPromoInput ? (() => {
-                const _lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
-                const _T = (de, en, tr) => ({ de, en, tr }[_lang] || de);
-                return (
+              {!showPromoInput ? (
                   <button
                     onClick={() => setShowPromoInput(true)}
                     style={{
@@ -504,8 +505,7 @@ export default function MainLayout() {
                     <span style={{ fontSize: 13 }}>🎟️</span>
                     {_T("Promo-Code einlösen", "Redeem promo code", "Promosyon kodunu kullan")}
                   </button>
-                );
-              })() : (
+              ) : (
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexDirection: "column" }}>
                   <div style={{ display: "flex", gap: 8 }}>
                     <input
@@ -522,6 +522,8 @@ export default function MainLayout() {
                 </div>
               )}
             </div>
+              );
+            })()}
 
             {/* Plan Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
