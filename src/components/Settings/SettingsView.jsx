@@ -1382,16 +1382,12 @@ export default function SettingsView() {
     {/* ── 2FA Enforcement ── */}
     <div style={{marginTop:32,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
       <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)",marginBottom:6}}>🔐 {t("mfa_enforce_title") || "Zwei-Faktor-Authentifizierung erzwingen"}</div>
-      <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:6}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen. Bestehende Nutzer ohne 2FA werden beim nächsten Login zur Einrichtung gezwungen — sie können sich nicht ohne 2FA einloggen."}</div>
-      <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",lineHeight:1.5,marginBottom:14,fontStyle:"italic"}}>{t("mfa_enforce_doctor_note") || "Hinweis: Ärzte sind hier ausgeschlossen — sie melden sich über Magic Links per E-Mail oder WhatsApp an und nutzen das Arzt-Portal ohne klassischen Login."}</div>
+      <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:14}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen. Bestehende Nutzer ohne 2FA werden beim nächsten Login zur Einrichtung gezwungen — sie können sich nicht ohne 2FA einloggen."}</div>
       {[
         {role:"clinic_admin", label: t("role_admin") || "Admin"},
+        {role:"clinic_doctor", label: t("role_doctor") || "Arzt"},
         {role:"clinic_coordinator", label: t("role_coordinator") || "Koordinator"},
         {role:"clinic_finance", label: t("role_finance") || "Finanzen"},
-        // clinic_doctor intentionally excluded — doctors authenticate via
-        // magic links from email/WhatsApp notifications, not via password
-        // login. They have no 2FA setup UI in their portal, so enforcing
-        // 2FA on them would lock them out completely.
       ].map(r => {
         const required = (c.mfaRequiredRoles || []).includes(r.role);
         return (
