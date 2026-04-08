@@ -34,8 +34,20 @@ echo ""
 # Use rsync --delete so old hashed asset files (index-XXXXX.js etc.) are
 # removed instead of accumulating. Without --delete the dist/assets folder
 # grew to 1645 files / 920MB before being noticed.
+#
+# --exclude protects manually-placed files on the server that aren't part
+# of the Vite build (PWA install pages, debug pages, the ASMED PDF that
+# was uploaded directly to the server). If you ever need to actually
+# remove one of these, do it manually on the server.
 echo "→ Deploying to server..."
-rsync -az --delete dist/ flowmatix:/opt/flowmatix/services/app/dist/
+rsync -az --delete \
+  --exclude='app-install.html' \
+  --exclude='clear-cache.html' \
+  --exclude='index-backup.html' \
+  --exclude='install.html' \
+  --exclude='Flowmatix_Anschreiben_ASMED.pdf' \
+  --exclude='.DS_Store' \
+  dist/ flowmatix:/opt/flowmatix/services/app/dist/
 echo "✓ Files uploaded"
 echo ""
 
