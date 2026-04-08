@@ -4,7 +4,7 @@ import { Section, Field, Toggle } from "../shared/index";
 import HintBox from "../shared/HintBox.jsx";
 import { ROLES, PERM_LABELS, MODULE_ACCESS } from "../../data/constants";
 import { consumePendingSettingsTab, consumeHighlightAnchor, isFromSetup, clearFromSetup } from "../../lib/setupNav";
-import { getGoogleStatus, getGoogleConnectUrlSafe, disconnectGoogle, getAnalyticsConfig, updateAnalyticsConfig, disconnectAnalytics, updateClinicSettings, isAuthenticated, inviteTeamMember, removeTeamMember, updateTeamMember, fetchTeam, updatePassword, setupMfa, verifyMfa, disableMfa, getMe } from "../../api/client";
+import { getGoogleStatus, getGoogleConnectUrlSafe, disconnectGoogle, updateClinicSettings, isAuthenticated, inviteTeamMember, removeTeamMember, updateTeamMember, fetchTeam, updatePassword, setupMfa, verifyMfa, disableMfa, getMe } from "../../api/client";
 import WhatsAppSetup from "../SetupGuide/WhatsAppSetup";
 import BotProfile from "../SetupGuide/BotProfile";
 import FAQKnowledgeBase from "../SetupGuide/FAQKnowledgeBase";
@@ -330,22 +330,11 @@ function MfaSection({ t, showT }) {
 function IntegrationsSection({ t, clinic, showT }) {
   const [gStatus, setGStatus] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [aConfig, setAConfig] = useState(null);
-  const [aProvider, setAProvider] = useState("ga4");
-  const [aFields, setAFields] = useState({});
-  const [aSaving, setASaving] = useState(false);
   const orgId = clinic?.orgId || clinic?.id;
 
   useEffect(() => {
     if (isAuthenticated() && orgId) {
       getGoogleStatus(orgId).then(setGStatus).catch(() => {});
-    }
-    if (isAuthenticated()) {
-      getAnalyticsConfig().then(c => {
-        setAConfig(c);
-        if (c?.provider) setAProvider(c.provider);
-        if (c) setAFields(c);
-      }).catch(() => {});
     }
   }, [orgId]);
 
@@ -365,42 +354,22 @@ function IntegrationsSection({ t, clinic, showT }) {
     setLoading(false);
   };
 
-  const handleAnalyticsSave = async () => {
-    setASaving(true);
-    try {
-      const payload = { provider: aProvider, ...aFields };
-      const result = await updateAnalyticsConfig(payload);
-      setAConfig(result);
-      showT(t("analytics_connected"));
-    } catch { showT(t("error_saving_analytics")); }
-    setASaving(false);
-  };
-
-  const handleAnalyticsDisconnect = async () => {
-    setASaving(true);
-    try {
-      await disconnectAnalytics();
-      setAConfig(null);
-      setAFields({});
-      showT(t("analytics_disconnected"));
-    } catch { showT(t("error_disconnecting_analytics")); }
-    setASaving(false);
-  };
-
   const isLive = isAuthenticated() && gStatus;
   const googleConnected = isLive && gStatus.connected;
-  const analyticsConnected = !!aConfig?.connected;
 
+  // Analytics-Anbieter section was removed: the backend stored the
+  // GA4/Plausible/Matomo IDs in organizations.metadata but nothing
+  // ever read them — no tracking script injection, no API fetch, no
+  // display in AnalyticsView. Keeping a UI section that doesn't do
+  // anything is misleading. Bring it back as a real feature when
+  // there's an actual reader (GA4 Reporting API or tag injection).
   const integrations = [
     { name: "WhatsApp", status: clinic?.connection_status === "connected", icon: "💬" },
     { name: "Google Calendar", status: googleConnected && gStatus.hasCalendar, icon: "📅" },
     { name: "Google Drive", status: googleConnected && gStatus.hasDrive, icon: "📁" },
     { name: "Google Sheets", status: googleConnected && gStatus.hasSheets, icon: "📝" },
-    { name: "Analytics", status: analyticsConnected, icon: "📊" },
     { name: "Stripe Payments", status: false, icon: "💳" },
   ];
-
-  const inp={width:"100%",padding:"8px 12px",borderRadius:8,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:13,outline:"none",boxSizing:"border-box"};
 
   return <Section title={t("integrations") || "Integrationen"}>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
@@ -465,52 +434,6 @@ function IntegrationsSection({ t, clinic, showT }) {
       </div>;
     })()}
 
-    {/* ═══ Analytics Provider Config ═══ */}
-    <div style={{marginTop:20,padding:16,borderRadius:12,background:"var(--bg-card)",border:"1px solid var(--border-default)"}}>
-      <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>{t("analytics_provider") || "Analytics-Anbieter"}</div>
-      <div style={{marginBottom:12}}>
-        <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("provider")}</div>
-        <select value={aProvider} onChange={e=>{setAProvider(e.target.value);setAFields({});}} style={{...inp,cursor:"pointer"}}>
-          <option value="ga4">Google Analytics 4 (GA4)</option>
-          <option value="plausible">Plausible</option>
-          <option value="matomo">Matomo</option>
-        </select>
-      </div>
-      {aProvider==="ga4"&&<div>
-        <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("measurement_id") || "Mess-ID"}</div>
-        <input value={aFields.measurementId||""} onChange={e=>setAFields(f=>({...f,measurementId:e.target.value}))} placeholder="G-XXXXXXXXXX" style={inp}/>
-      </div>}
-      {aProvider==="plausible"&&<>
-        <div style={{marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("site_domain")}</div>
-          <input value={aFields.siteDomain||""} onChange={e=>setAFields(f=>({...f,siteDomain:e.target.value}))} placeholder="clinic.example.com" style={inp}/>
-        </div>
-        <div>
-          <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("api_key")}</div>
-          <input value={aFields.apiKey||""} onChange={e=>setAFields(f=>({...f,apiKey:e.target.value}))} placeholder="plausible-api-key" style={inp}/>
-        </div>
-      </>}
-      {aProvider==="matomo"&&<>
-        <div style={{marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("site_url")}</div>
-          <input value={aFields.siteUrl||""} onChange={e=>setAFields(f=>({...f,siteUrl:e.target.value}))} placeholder="https://matomo.example.com" style={inp}/>
-        </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-          <div>
-            <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("site_id")}</div>
-            <input value={aFields.siteId||""} onChange={e=>setAFields(f=>({...f,siteId:e.target.value}))} placeholder="1" style={inp}/>
-          </div>
-          <div>
-            <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("api_token")}</div>
-            <input value={aFields.apiToken||""} onChange={e=>setAFields(f=>({...f,apiToken:e.target.value}))} placeholder="matomo-token" style={inp}/>
-          </div>
-        </div>
-      </>}
-      <div style={{display:"flex",gap:8,marginTop:12}}>
-        <button onClick={handleAnalyticsSave} disabled={aSaving} style={{padding:"8px 18px",borderRadius:10,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>{aSaving?(t("saving")||"Speichern..."):(t("save_analytics")||"Analytics speichern")}</button>
-        {analyticsConnected&&<button onClick={handleAnalyticsDisconnect} disabled={aSaving} style={{padding:"8px 18px",borderRadius:10,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>{t("disconnect_analytics")}</button>}
-      </div>
-    </div>
   </Section>;
 }
 
