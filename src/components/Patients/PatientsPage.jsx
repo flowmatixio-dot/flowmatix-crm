@@ -376,6 +376,7 @@ export default function PatientsPage() {
   const [sortDir, setSortDir] = useState("desc");
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   // Advanced filters
@@ -584,7 +585,6 @@ export default function PatientsPage() {
     setSelected(new Set());
   };
 
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const handleBulkDeleteConfirm = async () => {
     const ids = Array.from(selected);
     if (ids.length === 0) return;

@@ -19,6 +19,9 @@ export default class ErrorBoundary extends Component {
     // Vite injects DEV at build time. In production builds (npm run build)
     // this resolves to false and Vite tree-shakes the stack-trace branch
     // out of the bundle entirely — no leak of stack frames to end users.
+    // Vite injects DEV at build time. In production builds (npm run build)
+    // this resolves to false and Vite tree-shakes the stack-trace branch
+    // out of the bundle entirely — no leak of stack frames to end users.
     const isDev = typeof import.meta !== "undefined" && import.meta.env && import.meta.env.DEV;
     if (this.state.hasError) {
       return <div style={{
