@@ -868,6 +868,18 @@ export default function PatientPanel() {
             setHardDeleteOpen(false);
             setSelLead(null);
             setLeads(prev => prev.filter(l => l.id !== lead.id));
+            // Also drop the patient from the inbox store — its conversations
+            // and messages are gone server-side, but the inbox keeps its
+            // own zustand state and would otherwise still show the row.
+            try {
+              useInboxStore.getState().setMsgs(prev => {
+                const next = {};
+                for (const [cid, list] of Object.entries(prev || {})) {
+                  next[cid] = (list || []).filter(c => c.patientId !== lead.id && c.leadId !== lead.id);
+                }
+                return next;
+              });
+            } catch {}
           } else {
             showT(res?.error || ({de:"Fehler",en:"Error",tr:"Hata"}[lang] || "Error"), "error");
           }

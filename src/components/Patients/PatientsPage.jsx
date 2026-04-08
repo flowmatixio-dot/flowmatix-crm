@@ -601,7 +601,20 @@ export default function PatientsPage() {
         const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
         const tt = (de, en, tr) => ({ de, en, tr }[ll] || de);
         showT(`${res.deleted} ${tt("Patienten gelöscht", "patients deleted", "hasta silindi")}`);
-        setLeads(prev => prev.filter(l => !selected.has(l.id)));
+        const deletedSet = selected; // capture before clearing
+        setLeads(prev => prev.filter(l => !deletedSet.has(l.id)));
+        // Wipe the deleted patients from the inbox store too — same
+        // reason as in PatientPanel: inbox has its own state and would
+        // otherwise still render rows for patients that no longer exist.
+        try {
+          useInboxStore.getState().setMsgs(prev => {
+            const next = {};
+            for (const [cid, list] of Object.entries(prev || {})) {
+              next[cid] = (list || []).filter(c => !deletedSet.has(c.patientId) && !deletedSet.has(c.leadId));
+            }
+            return next;
+          });
+        } catch {}
         setSelected(new Set());
         setBulkDeleteOpen(false);
       } else {
