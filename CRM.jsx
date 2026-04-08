@@ -154,8 +154,30 @@ export default function App() {
   }, []);
   const [pendingApps, setPendingApps] = React.useState(0);
 
-  /* i18n helper */
-  const t = (key) => (T[lang]||T.en)[key] || (T.en)[key] || key;
+  /* i18n helper.
+   *
+   * Returns "" (empty string) instead of the key itself when a
+   * translation is missing. This is critical for the very common
+   * pattern across the codebase:
+   *
+   *     {t("some_label") || "fallback in code"}
+   *
+   * Previously t() returned the literal key string ("some_label"),
+   * which is truthy, so the fallback after `||` was never reached
+   * and users saw raw i18n keys like "bulk_delete_label" rendered
+   * on screen.
+   *
+   * Returning "" instead of `key`:
+   *  - `t("missing") || "fallback"` → "fallback"   ✓ (was "missing")
+   *  - `\`${t("missing")} text\``  → " text"       ✓ (was "missing text")
+   *  - `t("missing") + " items"`   → " items"      ✓ (was "missing items")
+   *  - bare `{t("missing")}`        → ""            (was "missing")
+   *
+   * The bare-render case is the only behavioural change: a missing
+   * key now renders as empty space instead of leaking the key. That's
+   * a strict improvement — leaking i18n keys to end users was a bug.
+   */
+  const t = (key) => (T[lang]||T.en)[key] || (T.en)[key] || "";
 
   const showT = useCallback(m=>{showToast(m);},[showToast]);
 

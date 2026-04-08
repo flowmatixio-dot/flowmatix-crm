@@ -287,6 +287,8 @@ function SkeletonRows({ count = 8, colCount = 7 }) {
    ═══════════════════════════════════════════════════════ */
 function BulkBar({ count, onClear, onExport, onAssignDoctor, onArchive, onBulkDelete, doctors, isAdmin }) {
   const { t } = useApp();
+  const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+  const TR = (de, en, tr) => ({ de, en, tr }[ll] || de);
   const [showDocPicker, setShowDocPicker] = useState(false);
   return (
     <div style={{
@@ -328,7 +330,7 @@ function BulkBar({ count, onClear, onExport, onAssignDoctor, onArchive, onBulkDe
             color: "#ef4444",
           }}
         >
-          🗑 {t("bulk_delete_label") || "Endgültig löschen"}
+          🗑 {TR("Endgültig löschen", "Delete permanently", "Kalıcı olarak sil")}
         </button>
       )}
       <button onClick={onClear} style={{ ...bulkBtnStyle, color: "rgba(167,177,195,0.7)" }}>✕</button>
@@ -596,15 +598,21 @@ export default function PatientsPage() {
         body: JSON.stringify({ ids, confirm: "GDPR_DELETE" }),
       });
       if (res?.success) {
-        showT(`${res.deleted} ${t("patients_deleted_label") || "Patienten gelöscht"}`);
+        const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+        const tt = (de, en, tr) => ({ de, en, tr }[ll] || de);
+        showT(`${res.deleted} ${tt("Patienten gelöscht", "patients deleted", "hasta silindi")}`);
         setLeads(prev => prev.filter(l => !selected.has(l.id)));
         setSelected(new Set());
         setBulkDeleteOpen(false);
       } else {
-        showT(res?.error || (t("error_generic") || "Fehler"), "error");
+        const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+        const tt = (de, en, tr) => ({ de, en, tr }[ll] || de);
+        showT(res?.error || tt("Fehler", "Error", "Hata"), "error");
       }
     } catch (e) {
-      showT(e?.message || (t("error_generic") || "Fehler"), "error");
+      const ll = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
+      const tt = (de, en, tr) => ({ de, en, tr }[ll] || de);
+      showT(e?.message || tt("Fehler", "Error", "Hata"), "error");
       throw e;
     }
   };
