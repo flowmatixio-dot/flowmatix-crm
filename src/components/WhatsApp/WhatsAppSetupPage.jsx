@@ -79,6 +79,21 @@ export default function WhatsAppSetupPage() {
       failed_desc: "Bitte versuche es erneut.",
       retry: "Erneut versuchen",
       other_number: "Andere Nummer verwenden",
+      hint_sep: "Du hast zwei Möglichkeiten",
+      hint_c1_badge: "Am häufigsten",
+      hint_c1_title: "Bestehende Nummer verbinden",
+      hint_c1_desc: "Behalte deine bestehende Nummer — und automatisiere alle Anfragen. Deine Patienten schreiben weiterhin an die gewohnte Nummer, Flowmatix übernimmt den Rest.",
+      hint_c1_p1: "Gleiche Nummer, gewohnter Chat für Patienten",
+      hint_c1_p2: "Begleitete Einrichtung durch unser Team",
+      hint_c1_p3: "KI antwortet 24/7 auf deiner Nummer",
+      hint_c1_warn: "Nach Eingabe erhältst du einen SMS-Code zur Bestätigung deiner Nummer. Nach der Verbindung kann die Nummer nicht mehr parallel in der WhatsApp App genutzt werden. Bestehende Chats werden nicht übernommen.",
+      hint_c2_badge: "EMPFOHLEN",
+      hint_c2_title: "Eigene neue Nummer verwenden",
+      hint_c2_desc: "Besorg dir eine neue SIM-Karte oder eSIM für eine dedizierte Nummer. Du registrierst und besitzt die Nummer — Flowmatix übernimmt API-Aktivierung und Setup.",
+      hint_c2_p1: "Kein bestehender Chatverlauf betroffen",
+      hint_c2_p2: "Professionelle Klinik-Nummer von Tag 1",
+      hint_c2_p3: "Ideal, wenn die bisherige Nummer privat bleiben soll",
+      hint_c2_info: "Du besorgst die Nummer, wir übernehmen die komplette technische Einrichtung.",
     },
     en: {
       title: "Connect WhatsApp",
@@ -108,6 +123,21 @@ export default function WhatsAppSetupPage() {
       failed_desc: "Please try again.",
       retry: "Try again",
       other_number: "Use different number",
+      hint_sep: "You have two options",
+      hint_c1_badge: "Most common",
+      hint_c1_title: "Connect your existing number",
+      hint_c1_desc: "Keep your existing number — and automate all inquiries. Your patients keep messaging the same number, Flowmatix handles the rest.",
+      hint_c1_p1: "Same number, familiar chat for patients",
+      hint_c1_p2: "Guided setup by our team",
+      hint_c1_p3: "AI responds 24/7 on your number",
+      hint_c1_warn: "After entering your number, you will receive an SMS code to confirm it. Once connected, the number can no longer be used in the WhatsApp app simultaneously. Existing chats will not be transferred.",
+      hint_c2_badge: "RECOMMENDED",
+      hint_c2_title: "Use your own new number",
+      hint_c2_desc: "Get a new SIM card or eSIM for a dedicated number. You register and own the number — Flowmatix handles API activation and setup.",
+      hint_c2_p1: "No existing chat history affected",
+      hint_c2_p2: "Professional clinic number from day 1",
+      hint_c2_p3: "Ideal if your current number should stay private",
+      hint_c2_info: "You get the number, we handle the complete technical setup.",
     },
     tr: {
       title: "WhatsApp Bağla",
@@ -137,6 +167,21 @@ export default function WhatsAppSetupPage() {
       failed_desc: "Lütfen tekrar deneyin.",
       retry: "Tekrar dene",
       other_number: "Farklı numara kullan",
+      hint_sep: "İki seçeneğiniz var",
+      hint_c1_badge: "En yaygın",
+      hint_c1_title: "Mevcut numaranızı bağlayın",
+      hint_c1_desc: "Mevcut numaranızı koruyun — ve tüm sorguları otomatikleştirin. Hastalarınız alışık oldukları numaraya yazmaya devam eder, Flowmatix gerisini halleder.",
+      hint_c1_p1: "Aynı numara, hastalar için alışık sohbet",
+      hint_c1_p2: "Ekibimiz tarafından yönlendirilmiş kurulum",
+      hint_c1_p3: "Yapay zeka numaranızda 7/24 yanıt verir",
+      hint_c1_warn: "Numaranızı girdikten sonra onaylamak için bir SMS kodu alacaksınız. Bağlandıktan sonra numara WhatsApp uygulamasında eş zamanlı kullanılamaz. Mevcut sohbetler aktarılmaz.",
+      hint_c2_badge: "ÖNERİLEN",
+      hint_c2_title: "Kendi yeni numaranızı kullanın",
+      hint_c2_desc: "Özel bir numara için yeni bir SIM kart veya eSIM alın. Numarayı siz kaydedip sahiplenirsiniz — Flowmatix API aktivasyonu ve kurulumu üstlenir.",
+      hint_c2_p1: "Mevcut sohbet geçmişi etkilenmez",
+      hint_c2_p2: "1. günden itibaren profesyonel klinik numarası",
+      hint_c2_p3: "Mevcut numaranızın özel kalmasını istiyorsanız ideal",
+      hint_c2_info: "Siz numarayı alırsınız, biz teknik kurulumun tamamını üstleniriz.",
     },
   };
   const tx = TX[l] || TX.de;
@@ -316,21 +361,58 @@ export default function WhatsAppSetupPage() {
   /* ══════════════════════════════════════════════ */
   /*  STATE: not_connected (default)                */
   /* ══════════════════════════════════════════════ */
+  const hintCardBase = { padding: 22, borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", position: "relative" };
+  const hintBulletLi = { fontSize: 13, color: "rgba(232,238,252,0.85)", marginBottom: 8, paddingLeft: 22, position: "relative", lineHeight: 1.45 };
+  const hintCheckMark = { position: "absolute", left: 0, top: 0, color: "#10b981", fontWeight: 800 };
+
   return (
-    <div style={wrap}>
-      <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, textAlign: "center" }}>{tx.title}</h2>
-      <p style={{ color: "rgba(232,238,252,0.9)", marginBottom: 24, fontSize: 14, textAlign: "center" }}>{tx.desc}</p>
-      <div style={cd}>
-        <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.9)", textAlign: "center" }}>{tx.phone_label}</div>
-        <input id="wa-phone" type="tel" placeholder={tx.phone_hint} defaultValue={ob.phone_number || n?.phone || ""} style={ip} />
-        <button id="wa-connect-btn" style={{ ...bt, background: "#10b981", color: "#fff", marginTop: 16 }} onClick={() => {
-          const ph = document.getElementById("wa-phone")?.value;
-          if (!ph || ph.replace(/[^0-9+]/g, "").length < 8) return;
-          const b = document.getElementById("wa-connect-btn");
-          if (b) { b.textContent = tx.connecting; b.disabled = true; b.style.opacity = "0.7"; }
-          api("submit-number", { phone: ph.trim() }).then(go);
-        }}>{tx.btn}</button>
-        <div style={{ marginTop: 14, fontSize: 12, color: "rgba(232,238,252,0.3)", lineHeight: 1.5, textAlign: "center" }}>{tx.micro}</div>
+    <div style={{ maxWidth: 920, margin: "0 auto", padding: "32px 16px 48px" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, textAlign: "center" }}>{tx.title}</h2>
+        <p style={{ color: "rgba(232,238,252,0.9)", marginBottom: 24, fontSize: 14, textAlign: "center" }}>{tx.desc}</p>
+        <div style={cd}>
+          <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.9)", textAlign: "center" }}>{tx.phone_label}</div>
+          <input id="wa-phone" type="tel" placeholder={tx.phone_hint} defaultValue={ob.phone_number || n?.phone || ""} style={ip} />
+          <button id="wa-connect-btn" style={{ ...bt, background: "#10b981", color: "#fff", marginTop: 16 }} onClick={() => {
+            const ph = document.getElementById("wa-phone")?.value;
+            if (!ph || ph.replace(/[^0-9+]/g, "").length < 8) return;
+            const b = document.getElementById("wa-connect-btn");
+            if (b) { b.textContent = tx.connecting; b.disabled = true; b.style.opacity = "0.7"; }
+            api("submit-number", { phone: ph.trim() }).then(go);
+          }}>{tx.btn}</button>
+          <div style={{ marginTop: 14, fontSize: 12, color: "rgba(232,238,252,0.3)", lineHeight: 1.5, textAlign: "center" }}>{tx.micro}</div>
+        </div>
+      </div>
+
+      {/* ── Two-Options Hint Cards ── */}
+      <div style={{ marginTop: 32, textAlign: "center", fontSize: 12, fontWeight: 700, color: "rgba(232,238,252,0.5)", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 14 }}>{tx.hint_sep}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        {/* Card 1 — Existing number */}
+        <div style={hintCardBase}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(232,238,252,0.5)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>{tx.hint_c1_badge}</div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>📞 {tx.hint_c1_title}</div>
+          <p style={{ fontSize: 13, color: "rgba(232,238,252,0.7)", lineHeight: 1.5, marginBottom: 14, marginTop: 0 }}>{tx.hint_c1_desc}</p>
+          <ul style={{ listStyle: "none", padding: 0, margin: "0 0 14px 0" }}>
+            <li style={hintBulletLi}><span style={hintCheckMark}>✓</span>{tx.hint_c1_p1}</li>
+            <li style={hintBulletLi}><span style={hintCheckMark}>✓</span>{tx.hint_c1_p2}</li>
+            <li style={{ ...hintBulletLi, marginBottom: 0 }}><span style={hintCheckMark}>✓</span>{tx.hint_c1_p3}</li>
+          </ul>
+          <div style={{ fontSize: 11, padding: "10px 12px", borderRadius: 8, background: "rgba(255,138,42,0.05)", border: "1px solid rgba(255,138,42,0.15)", color: "rgba(232,238,252,0.7)", lineHeight: 1.55 }}>⚠️ {tx.hint_c1_warn}</div>
+        </div>
+
+        {/* Card 2 — New number (recommended) */}
+        <div style={{ ...hintCardBase, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.2)" }}>
+          <div style={{ position: "absolute", top: -10, right: 16, fontSize: 10, fontWeight: 800, color: "#fff", background: "#10b981", padding: "4px 10px", borderRadius: 8, letterSpacing: 0.8 }}>{tx.hint_c2_badge}</div>
+          <div style={{ height: 10 }} />
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>📱 {tx.hint_c2_title}</div>
+          <p style={{ fontSize: 13, color: "rgba(232,238,252,0.7)", lineHeight: 1.5, marginBottom: 14, marginTop: 0 }}>{tx.hint_c2_desc}</p>
+          <ul style={{ listStyle: "none", padding: 0, margin: "0 0 14px 0" }}>
+            <li style={hintBulletLi}><span style={hintCheckMark}>✓</span>{tx.hint_c2_p1}</li>
+            <li style={hintBulletLi}><span style={hintCheckMark}>✓</span>{tx.hint_c2_p2}</li>
+            <li style={{ ...hintBulletLi, marginBottom: 0 }}><span style={hintCheckMark}>✓</span>{tx.hint_c2_p3}</li>
+          </ul>
+          <div style={{ fontSize: 11, padding: "10px 12px", borderRadius: 8, background: "rgba(76,201,255,0.05)", border: "1px solid rgba(76,201,255,0.15)", color: "rgba(232,238,252,0.7)", lineHeight: 1.55 }}>ℹ️ {tx.hint_c2_info}</div>
+        </div>
       </div>
     </div>
   );
