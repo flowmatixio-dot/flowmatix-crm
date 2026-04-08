@@ -192,6 +192,7 @@ function FilterDropdown({ label, icon, options, value, onChange, multi }) {
    COLUMN CHOOSER
    ═══════════════════════════════════════════════════════ */
 function ColumnChooser({ columns, visibleCols, setVisibleCols }) {
+  const { t } = useApp();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
