@@ -4,6 +4,7 @@ import { Btn, Stat, IC, Field, Section, Toggle, getAvatarGradient, getInitials }
 import { timeAgo, translateValue, fmLocale } from "../../utils/helpers";
 import { CONV_STATUS, APPT_C, TL, MSG_TEMPLATES, DRIVER_STATUS } from "../../data/constants";
 import TreatmentPlanBuilder from "./TreatmentPlanBuilder";
+import HardDeleteModal from "./HardDeleteModal";
 import { useInboxStore } from "../../stores";
 import { authPhotoUrl } from "../../api/client";
 
@@ -247,6 +248,7 @@ export default function PatientPanel() {
   const [detailNotes, setDetailNotes] = useState(null);
   const [gdprConfirm, setGdprConfirm] = useState(false);
   const [gdprDeleting, setGdprDeleting] = useState(false);
+  const [hardDeleteOpen, setHardDeleteOpen] = useState(false);
   useEffect(() => { import("../../api/client").then(m => m.getStaff()).then(r => setStaffList(r?.staff || [])).catch(() => {}); }, []);
   useEffect(() => {
     if (!selLead) return;
@@ -842,35 +844,39 @@ export default function PatientPanel() {
               }} style={{padding:"6px 12px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.2)",color:"#4cc9ff",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>⬇ {TR("Daten exportieren", "Export data", "Verileri dışa aktar")}</button>
             </div>
 
-            {/* GDPR DELETE — admin only, ultra compact */}
+            {/* GDPR DELETE — admin only. Compact card; modal handles the
+                two-step confirmation flow (type DELETE) for safety. */}
             {(user?.role === "admin" || user?.role === "clinic_admin" || user?.role === "platform_owner" || user?.apiRole === "clinic_admin" || user?.apiRole === "platform_owner") && <div style={{marginTop:8,padding:"10px 12px",borderRadius:10,background:"rgba(239,68,68,0.04)",border:"1px solid rgba(239,68,68,0.12)",display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:8}}>
               <div style={{fontSize:11,color:"rgba(239,68,68,0.7)",fontWeight:700}}>{TR("Gefahrenzone", "Danger Zone", "Tehlikeli Bölge")} · {TR("DSGVO Art. 17", "GDPR Art. 17", "KVKK Madde 7")}</div>
-              {!gdprConfirm ? (
-                <button onClick={()=>setGdprConfirm(true)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>{TR("Endgültig löschen", "Delete permanently", "Kalıcı olarak sil")}</button>
-              ) : (
-                <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                  <span style={{fontSize:11,color:"rgba(239,68,68,0.85)",fontWeight:600}}>{TR("Sicher?", "Sure?", "Emin misiniz?")}</span>
-                  <button disabled={gdprDeleting} onClick={async()=>{
-                    setGdprDeleting(true);
-                    try {
-                      const { apiFetch } = await import("../../api/client");
-                      const res = await apiFetch(`/api/v1/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
-                      if (res?.success) {
-                        showT(TR("Patientendaten gelöscht", "Patient data deleted", "Hasta verileri silindi"));
-                        setSelLead(null);
-                        setLeads(prev => prev.filter(l => l.id !== lead.id));
-                      } else { showT(res?.error || TR("Fehler", "Error", "Hata"), "error"); }
-                    } catch(e) { showT(e.message || TR("Fehler", "Error", "Hata"), "error"); }
-                    setGdprDeleting(false); setGdprConfirm(false);
-                  }} style={{padding:"6px 10px",borderRadius:8,background:"#ef4444",border:"none",color:"#fff",fontWeight:700,fontSize:11,cursor:gdprDeleting?"wait":"pointer",fontFamily:"inherit",opacity:gdprDeleting?0.6:1}}>{gdprDeleting ? "..." : "✓"}</button>
-                  <button onClick={()=>setGdprConfirm(false)} style={{padding:"6px 10px",borderRadius:8,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#a7b1c3",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>✕</button>
-                </div>
-              )}
+              <button onClick={()=>setHardDeleteOpen(true)} style={{padding:"6px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.25)",color:"#ef4444",fontWeight:700,fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>{TR("Endgültig löschen", "Delete permanently", "Kalıcı olarak sil")}</button>
             </div>}
           </>;
         })()}
       </div>
     </div>
+    <HardDeleteModal
+      open={hardDeleteOpen}
+      lang={lang}
+      patientName={[lead.firstName, lead.lastName].filter(Boolean).join(' ') || lead.phone || ''}
+      onClose={() => setHardDeleteOpen(false)}
+      onConfirm={async () => {
+        const { apiFetch } = await import("../../api/client");
+        try {
+          const res = await apiFetch(`/api/v1/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
+          if (res?.success) {
+            showT(({de:"Patientendaten gelöscht",en:"Patient data deleted",tr:"Hasta verileri silindi"}[lang] || "Patient data deleted"));
+            setHardDeleteOpen(false);
+            setSelLead(null);
+            setLeads(prev => prev.filter(l => l.id !== lead.id));
+          } else {
+            showT(res?.error || ({de:"Fehler",en:"Error",tr:"Hata"}[lang] || "Error"), "error");
+          }
+        } catch (e) {
+          showT(e.message || ({de:"Fehler",en:"Error",tr:"Hata"}[lang] || "Error"), "error");
+          throw e; // keep modal open on failure so user sees toast
+        }
+      }}
+    />
     {lightbox&&<PhotoLightbox photos={lightbox.photos} startIdx={lightbox.idx} onClose={()=>setLightbox(null)}/>}
     {showPlanBuilder&&<div style={{position:"fixed",inset:0,zIndex:10000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}>
       <div style={{width:"90vw",maxWidth:960,maxHeight:"90vh",overflow:"auto",borderRadius:16,background:"#0f1623",border:"1px solid rgba(255,255,255,0.08)",boxShadow:"0 20px 60px rgba(0,0,0,0.5)"}}>

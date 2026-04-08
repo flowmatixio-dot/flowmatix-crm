@@ -10,6 +10,7 @@ import BotProfile from "../SetupGuide/BotProfile";
 import FAQKnowledgeBase from "../SetupGuide/FAQKnowledgeBase";
 import TreatmentTypes from "../SetupGuide/TreatmentTypes";
 import CalendarSettings from "../SetupGuide/CalendarSettings";
+import DpaGeneratorModal from "./DpaGeneratorModal";
 const AutomationsView = lazy(() => import("../Automations/AutomationsView"));
 const SubscriptionView = lazy(() => import("../Subscription/SubscriptionView"));
 const AnalyticsView = lazy(() => import("../Analytics/AnalyticsView"));
@@ -95,6 +96,8 @@ function DataProcessingSection() {
   // don't want to round-trip them through i18n.js for a single section.
   const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
   const TR = (de, en, tr) => ({ de, en, tr }[lang] || de);
+  const { clinic } = useApp();
+  const [dpaModalOpen, setDpaModalOpen] = useState(false);
 
   // Pick the localized PDF. Turkish falls back to the English DPA file.
   const pdfHref = lang === "tr" ? "/legal/DPA-Turkisch.pdf" : lang === "en" ? "/legal/AVV-Englisch.pdf" : "/legal/AVV-Deutsch.pdf";
@@ -113,6 +116,26 @@ function DataProcessingSection() {
       )}
     </div>
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <button
+        onClick={() => setDpaModalOpen(true)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "10px 18px",
+          borderRadius: 10,
+          background: "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))",
+          border: "1px solid rgba(76,201,255,0.3)",
+          color: "#4cc9ff",
+          fontWeight: 800,
+          fontSize: 13,
+          cursor: "pointer",
+          fontFamily: "inherit"
+        }}
+      >
+        <span>✏️</span>
+        {TR("AVV mit Klinik-Daten erstellen", "Generate DPA with clinic data", "Klinik verileriyle DPA oluştur")}
+      </button>
       <a
         href={pdfHref}
         target="_blank"
@@ -124,9 +147,9 @@ function DataProcessingSection() {
           gap: 8,
           padding: "10px 18px",
           borderRadius: 10,
-          background: "linear-gradient(135deg,rgba(76,201,255,.12),rgba(45,168,255,.08))",
-          border: "1px solid rgba(76,201,255,0.2)",
-          color: "#4cc9ff",
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          color: "rgba(167,177,195,0.85)",
           fontWeight: 700,
           fontSize: 13,
           textDecoration: "none",
@@ -134,7 +157,7 @@ function DataProcessingSection() {
         }}
       >
         <span>⬇</span>
-        {TR("AVV herunterladen", "Download DPA", "DPA İndir")}
+        {TR("Leere Vorlage herunterladen", "Download blank template", "Boş şablonu indir")}
         <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 500 }}>({pdfLabel})</span>
       </a>
       <a
@@ -161,6 +184,13 @@ function DataProcessingSection() {
         {TR("DPIA herunterladen", "Download DPIA", "DPIA İndir")}
       </a>
     </div>
+
+    <DpaGeneratorModal
+      open={dpaModalOpen}
+      lang={lang}
+      initialClinicName={clinic?.name || ""}
+      onClose={() => setDpaModalOpen(false)}
+    />
     <div style={{ fontSize: 11, color: "rgba(167,177,195,0.5)", marginTop: 12 }}>
       {TR(
         "Mit der Nutzung von Flowmatix gilt der AVV als anerkannt. Die DPIA dokumentiert die Datenschutz-Folgenabschätzung nach Art. 35 DSGVO. Bei Fragen: legal@flowmatix.io",
