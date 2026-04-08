@@ -91,8 +91,8 @@ const ALL_COLUMNS_DEF = [
   { id: "phone",       labelKey: "col_phone",           labelFb: "Telefon",       default: true,  sortable: false, width: "1.1fr" },
   { id: "status",      labelKey: "col_status",          labelFb: "Status",        default: true,  sortable: true,  width: "0.8fr" },
   { id: "doctor",      labelKey: "col_doctor",          labelFb: "Arzt",          default: true,  sortable: true,  width: "1fr" },
-  { id: "nextAppt",    labelKey: "col_next_appointment",labelFb: "Nächster Termin",default: true,  sortable: true,  width: "1fr" },
-  { id: "grafts",      labelKey: "grafts_label",        labelFb: "Grafts",        default: true,  sortable: true,  width: "0.6fr" },
+  { id: "nextAppt",    labelKey: "col_next_appointment",labelFb: "Nächster Termin",default: true,  sortable: true,  width: "1.2fr" },
+  { id: "grafts",      labelKey: "grafts_label",        labelFb: "Grafts",        default: true,  sortable: true,  width: "0.9fr" },
   { id: "treatment",   labelKey: "col_treatment",       labelFb: "Behandlung",    default: false, sortable: true,  width: "0.9fr" },
   { id: "country",     labelKey: "col_country",         labelFb: "Land",          default: false, sortable: true,  width: "0.7fr" },
   { id: "source",      labelKey: "col_source",          labelFb: "Quelle",        default: false, sortable: true,  width: "0.8fr" },
@@ -884,7 +884,7 @@ export default function PatientsPage() {
                       </div>
                     );
                   case "grafts":
-                    return <div key={col.id} style={{ fontSize: 11, color: grafts ? "#10b981" : "rgba(167,177,195,0.6)", fontWeight: grafts ? 700 : 400 }}>{grafts ? Number(grafts).toLocaleString("de-DE") : "—"}</div>;
+                    return <div key={col.id} style={{ fontSize: 11, color: grafts ? "#10b981" : "rgba(167,177,195,0.6)", fontWeight: grafts ? 700 : 400, textAlign: "left", paddingLeft: 0 }}>{grafts ? Number(grafts).toLocaleString("de-DE") : "—"}</div>;
                   case "treatment":
                     return <div key={col.id} style={{ fontSize: 11, color: "rgba(232,238,252,0.95)" }}>{lead.treatment || "—"}</div>;
                   case "country":
