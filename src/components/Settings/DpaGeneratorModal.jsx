@@ -199,7 +199,7 @@ export default function DpaGeneratorModal({ open, onClose, lang = "de", initialC
         </div>
         <p style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", lineHeight: 1.5, margin: "8px 0 18px" }}>
           {TR(
-            "Tragen Sie Ihre Klinik-Daten ein. Wir füllen die Vorlage aus und öffnen den Druck-Dialog. Wählen Sie dort „Als PDF speichern".",
+            'Tragen Sie Ihre Klinik-Daten ein. Wir füllen die Vorlage aus und öffnen den Druck-Dialog. Wählen Sie dort „Als PDF speichern".',
             "Enter your clinic data. We'll fill the template and open the print dialog — choose 'Save as PDF' there.",
             "Klinik verilerinizi girin. Şablonu dolduracağız ve yazdırma iletişim kutusunu açacağız — orada 'PDF olarak kaydet' seçin."
           )}
