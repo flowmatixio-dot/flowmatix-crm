@@ -966,6 +966,7 @@ export default function App() {
     loginLang={authState.loginLang} setLoginLang={authState.setLoginLang}
     handleLogin={handleLogin} handleMagicLink={handleMagicLink} handleForgotPw={handleForgotPw}
     mfaCode={authState.mfaCode} setMfaCode={authState.setMfaCode} handleMfaLogin={authState.handleMfaLogin}
+    mfaSetupData={authState.mfaSetupData} handleMfaSetupConfirm={authState.handleMfaSetupConfirm}
   />;
 
   /* Auth callback screens (shown even when user is set) */
@@ -984,6 +985,7 @@ export default function App() {
     loginLang={authState.loginLang} setLoginLang={authState.setLoginLang}
     handleLogin={handleLogin} handleMagicLink={handleMagicLink} handleForgotPw={handleForgotPw}
     mfaCode={authState.mfaCode} setMfaCode={authState.setMfaCode} handleMfaLogin={authState.handleMfaLogin}
+    mfaSetupData={authState.mfaSetupData} handleMfaSetupConfirm={authState.handleMfaSetupConfirm}
   />;
 
   /* Main app */

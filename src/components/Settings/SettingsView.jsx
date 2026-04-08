@@ -1084,6 +1084,7 @@ export default function SettingsView() {
     <Field label={t("email") || "E-Mail"} value={c.clinicEmail || ""} onChange={v=>up("clinicEmail",v)}/>
     <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={["Europe/Berlin","Europe/Istanbul","Europe/London","Europe/Paris","Europe/Rome","Europe/Madrid","Europe/Lisbon","Europe/Amsterdam","Europe/Vienna","Europe/Zurich","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Tokyo"]}/>
     <Field label={t("google_maps_link")} value={c.googleMapsLink || ""} onChange={v=>up("googleMapsLink",v)} placeholder="https://maps.google.com/..." hint={t("google_maps_hint")}/>
+    <Field label={t("privacy_url_label") || "Datenschutz-URL deiner Klinik"} value={c.privacyUrl || ""} onChange={v=>up("privacyUrl",v)} placeholder="https://deine-klinik.de/datenschutz" hint={t("privacy_url_hint") || "Wird im KI-Disclaimer beim ersten Patientenkontakt verlinkt. Leer lassen wenn du keine eigene Datenschutzseite hast."}/>
     </>}
 
 
@@ -1377,6 +1378,36 @@ export default function SettingsView() {
     {settingsTab === "team" && <>
     <HintBox id="settings_team">{t("hint_settings_team")}</HintBox>
     <TeamAccessSection clinic={clinic} showT={showT} t={t} setClinics={setClinics} />
+
+    {/* ── 2FA Enforcement ── */}
+    <div style={{marginTop:32,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
+      <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)",marginBottom:6}}>🔐 {t("mfa_enforce_title") || "Zwei-Faktor-Authentifizierung erzwingen"}</div>
+      <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:6}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen. Bestehende Nutzer ohne 2FA werden beim nächsten Login zur Einrichtung gezwungen — sie können sich nicht ohne 2FA einloggen."}</div>
+      <div style={{fontSize:11,color:"rgba(167,177,195,0.55)",lineHeight:1.5,marginBottom:14,fontStyle:"italic"}}>{t("mfa_enforce_doctor_note") || "Hinweis: Ärzte sind hier ausgeschlossen — sie melden sich über Magic Links per E-Mail oder WhatsApp an und nutzen das Arzt-Portal ohne klassischen Login."}</div>
+      {[
+        {role:"clinic_admin", label: t("role_admin") || "Admin"},
+        {role:"clinic_coordinator", label: t("role_coordinator") || "Koordinator"},
+        {role:"clinic_finance", label: t("role_finance") || "Finanzen"},
+        // clinic_doctor intentionally excluded — doctors authenticate via
+        // magic links from email/WhatsApp notifications, not via password
+        // login. They have no 2FA setup UI in their portal, so enforcing
+        // 2FA on them would lock them out completely.
+      ].map(r => {
+        const required = (c.mfaRequiredRoles || []).includes(r.role);
+        return (
+          <label key={r.role} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",cursor:"pointer"}}>
+            <input type="checkbox" checked={required} onChange={(e)=>{
+              const cur = c.mfaRequiredRoles || [];
+              const next = e.target.checked ? [...cur, r.role] : cur.filter(x => x !== r.role);
+              up("mfaRequiredRoles", next);
+            }} style={{accentColor:"#FF8C42"}} />
+            <span style={{color:"rgba(232,238,252,0.85)",fontSize:14}}>{r.label}</span>
+            {required && <span style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:99,background:"rgba(255,140,66,0.15)",border:"1px solid rgba(255,140,66,0.3)",color:"#FF8C42",letterSpacing:0.5}}>{t("mfa_required") || "PFLICHT"}</span>}
+          </label>
+        );
+      })}
+      <div style={{marginTop:14,padding:"10px 12px",background:"rgba(255,107,107,0.06)",border:"1px solid rgba(255,107,107,0.18)",borderRadius:8,fontSize:11.5,color:"rgba(255,170,170,0.85)",lineHeight:1.5}}>⚠️ {t("mfa_warning") || "Achtung: Aktiviere diese Option NUR wenn du selbst bereits 2FA eingerichtet hast (Einstellungen → Mein Account → 2FA aktivieren). Sonst sperrst du dich selbst aus."}</div>
+    </div>
     </>}
 
 

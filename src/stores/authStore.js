@@ -12,10 +12,11 @@ export const useAuthStore = create((set, get) => ({
   loginEmail: '',
   loginPass: '',
   loginErr: '',
-  loginMode: 'password', // password | magic | forgot | sent | mfa
+  loginMode: 'password', // password | magic | forgot | sent | mfa | mfa-setup
   showPass: false,
   mfaToken: null,
   mfaCode: '',
+  mfaSetupData: null, // { otpauthUri, secret, email } during enforced enrollment
   loginLang: (() => {
     try {
       const p = new URLSearchParams(window.location.search).get('lang');
@@ -46,6 +47,7 @@ export const useAuthStore = create((set, get) => ({
   setShowPass: (showPass) => set({ showPass }),
   setMfaToken: (mfaToken) => set({ mfaToken }),
   setMfaCode: (mfaCode) => set({ mfaCode }),
+  setMfaSetupData: (mfaSetupData) => set({ mfaSetupData }),
   setLoginLang: (loginLang) => set({ loginLang }),
   setAuthCallbackMode: (authCallbackMode) => set({ authCallbackMode }),
   setAuthCallbackErr: (authCallbackErr) => set({ authCallbackErr }),

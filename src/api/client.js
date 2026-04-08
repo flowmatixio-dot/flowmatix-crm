@@ -208,6 +208,27 @@ export async function loginMfa(mfaToken, code) {
   return data;
 }
 
+// Enforced MFA enrollment — used when login returned requiresMfaSetup.
+// Step 1: get the otpauth URI + secret to render as QR code.
+export async function enrollMfaWithToken(setupToken) {
+  return apiFetch('/api/v1/auth/mfa/enroll-with-token', {
+    method: 'POST',
+    body: JSON.stringify({ setupToken }),
+  });
+}
+
+// Step 2: confirm enrollment by verifying the 6-digit TOTP code.
+// On success, persists the secret and returns full session tokens.
+export async function confirmMfaWithToken(setupToken, totpCode) {
+  const data = await apiFetch('/api/v1/auth/mfa/confirm-with-token', {
+    method: 'POST',
+    body: JSON.stringify({ setupToken, totpCode }),
+  });
+  setTokens(data.accessToken, data.refreshToken);
+  sessionStorage.setItem('fm_api_user', JSON.stringify(data.user));
+  return data;
+}
+
 export async function logout() {
   try {
     await apiFetch('/api/v1/auth/logout', { method: 'POST' });
@@ -970,6 +991,16 @@ export async function updatePatient(id, data) {
   return apiFetch(`/api/v1/crm/patients/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(data),
+  });
+}
+
+// GDPR Art. 17 hard-delete — permanently removes ALL patient data.
+// Requires confirm: 'GDPR_DELETE' to prevent accidental calls.
+// Only clinic_admin / platform_owner role can execute (backend enforces).
+export async function gdprDeletePatient(id) {
+  return apiFetch(`/api/v1/crm/patients/${id}/gdpr`, {
+    method: 'DELETE',
+    body: JSON.stringify({ confirm: 'GDPR_DELETE' }),
   });
 }
 
