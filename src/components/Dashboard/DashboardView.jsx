@@ -299,6 +299,12 @@ export default function DashboardView() {
         const clinicCode = (activeClinicId || '').substring(0, 8).toUpperCase();
         const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${clinicCode}`;
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
+        const msgUsed = ti?.session?.messagesCount || 0;
+        const msgLimit = ti?.limits?.maxMessages || ti?.session?.messageLimit || 50;
+        const msgRemaining = Math.max(0, msgLimit - msgUsed);
+        const pct = Math.min(100, Math.round((msgUsed / msgLimit) * 100));
+        // Color shifts as the customer gets close to the limit
+        const counterColor = msgRemaining <= 5 ? "#ef4444" : msgRemaining <= 15 ? "#fbbf24" : "#10b981";
         return (
           <div style={{
             padding: "20px 24px", borderRadius: 16,
@@ -309,13 +315,16 @@ export default function DashboardView() {
             <div style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 240 }}>
                 <div style={{ width: 12, height: 12, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
                       {T("Test the bot live yourself", "Bot live selbst testen", "Botu canlı kendiniz test edin")}
                     </div>
                     <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
                       {T("TEST MODE", "TESTMODUS", "TEST MODU")}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 4, background: `${counterColor}1a`, color: counterColor, border: `1px solid ${counterColor}40`, letterSpacing: 0.3 }}>
+                      {msgUsed} / {msgLimit} {T("msgs", "Nachr.", "msj")}
                     </span>
                   </div>
                   <div style={{ fontSize: 12, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>
@@ -324,6 +333,15 @@ export default function DashboardView() {
                       "Schicke eine WhatsApp-Nachricht — dein Bot antwortet sofort. Keine Einrichtung nötig.",
                       "Bir WhatsApp mesajı gönderin — botunuz anında yanıtlar. Kurulum gerekmez."
                     )}
+                  </div>
+                  {/* Mini progress bar — gives a visual sense of remaining test budget */}
+                  <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, maxWidth: 360 }}>
+                    <div style={{ flex: 1, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                      <div style={{ width: `${pct}%`, height: "100%", background: counterColor, transition: "width 0.3s, background 0.3s" }} />
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(200,215,240,0.55)", whiteSpace: "nowrap" }}>
+                      {msgRemaining} {T("left", "übrig", "kaldı")}
+                    </span>
                   </div>
                 </div>
               </div>
