@@ -152,14 +152,15 @@ export default function LoginScreen({
       {/* Footer */}
       <div style={{ marginTop: 24, display: "flex", gap: 16, position: "relative", zIndex: 1, flexWrap: "wrap", justifyContent: "center", maxWidth: 480 }}>
         {(() => {
-          // AVV/DPA file is locale-specific, the rest are static marketing pages
+          // AVV/DPA + DPIA files are locale-specific, the rest are static marketing pages
           const avvHref = loginLang === "tr" ? "/legal/DPA-Turkisch.pdf" : loginLang === "en" ? "/legal/AVV-Englisch.pdf" : "/legal/AVV-Deutsch.pdf";
+          const dpiaHref = loginLang === "tr" ? "/legal/DPIA-Turkisch.pdf" : loginLang === "en" ? "/legal/DPIA-English.pdf" : "/legal/DPIA-Deutsch.pdf";
           const links = [
             { key: "footer_privacy", fb: "Privacy", href: "https://flowmatix.io/privacy-policy.html" },
             { key: "footer_terms", fb: "Terms", href: "https://flowmatix.io/terms.html" },
             { key: "footer_imprint", fb: "Imprint", href: "https://flowmatix.io/imprint.html" },
             { key: "footer_dpa", fb: loginLang === "de" ? "AVV" : "DPA", href: avvHref },
-            { key: "footer_dpia", fb: "DPIA", href: "/legal/DPIA-Deutsch.pdf" },
+            { key: "footer_dpia", fb: "DPIA", href: dpiaHref },
           ];
           return links.map((l, i) => (
             <a

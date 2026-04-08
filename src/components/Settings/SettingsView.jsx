@@ -161,7 +161,7 @@ function DataProcessingSection() {
         <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 500 }}>({pdfLabel})</span>
       </a>
       <a
-        href="/legal/DPIA-Deutsch.pdf"
+        href={lang === "tr" ? "/legal/DPIA-Turkisch.pdf" : lang === "en" ? "/legal/DPIA-English.pdf" : "/legal/DPIA-Deutsch.pdf"}
         target="_blank"
         rel="noopener noreferrer"
         download

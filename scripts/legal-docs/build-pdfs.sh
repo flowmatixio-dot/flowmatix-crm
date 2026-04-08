@@ -7,9 +7,9 @@ set -e
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
 CRM_OUT="$SRC_DIR/../../public/legal"
-WEB_OUT="$SRC_DIR/../../../Website/legal"
+DESKTOP_OUT="$HOME/Desktop/Flowmatix-Legal-PDFs"
 
-mkdir -p "$CRM_OUT" "$WEB_OUT"
+mkdir -p "$CRM_OUT" "$DESKTOP_OUT"
 
 # Map: html-source → output-pdf-name
 declare -a DOCS=(
@@ -17,6 +17,8 @@ declare -a DOCS=(
   "avv-en.html|AVV-Englisch.pdf"
   "avv-tr.html|DPA-Turkisch.pdf"
   "dpia-de.html|DPIA-Deutsch.pdf"
+  "dpia-en.html|DPIA-English.pdf"
+  "dpia-tr.html|DPIA-Turkisch.pdf"
 )
 
 for entry in "${DOCS[@]}"; do
@@ -37,9 +39,9 @@ for entry in "${DOCS[@]}"; do
     --print-to-pdf="$CRM_OUT/$out" \
     "file://$src_path" 2>/dev/null
 
-  # Copy to website too
-  cp "$CRM_OUT/$out" "$WEB_OUT/$out"
-  echo "✓ $out written to CRM/public/legal/ and Website/legal/"
+  # Copy to user's Desktop folder so Bastian can upload them himself
+  cp "$CRM_OUT/$out" "$DESKTOP_OUT/$out"
+  echo "✓ $out written to CRM/public/legal/ and ~/Desktop/Flowmatix-Legal-PDFs/"
 done
 
 echo ""

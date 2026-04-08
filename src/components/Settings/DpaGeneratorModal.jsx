@@ -108,29 +108,46 @@ export default function DpaGeneratorModal({ open, onClose, lang = "de", initialC
         // Inline the CSS so the print window doesn't need to fetch it
         .replace(/<link\s+rel="stylesheet"\s+href="legal\.css"\s*\/?>/, `<style>${css}</style>`);
 
-      // Open in a new window and trigger print as soon as it's ready
-      const printWin = window.open("", "_blank", "width=900,height=1100");
-      if (!printWin) {
-        setError(TR(
-          "Pop-up blockiert. Bitte erlauben Sie Pop-ups für diese Seite und versuchen Sie es erneut.",
-          "Pop-up blocked. Please allow pop-ups for this site and try again.",
-          "Açılır pencere engellendi. Lütfen bu site için açılır pencerelere izin verin ve tekrar deneyin."
-        ));
-        setBusy(false);
-        return;
+      // Render into a hidden iframe instead of a popup window. This avoids
+      // the broken on-screen layout (the user previously saw a 900px-wide
+      // window with the right side cut off because tables overflowed) and
+      // also bypasses popup blockers entirely. The iframe is sized to the
+      // page so the print preview matches the final A4 layout exactly.
+      const existing = document.getElementById("fm-dpa-print-frame");
+      if (existing) existing.remove();
+      const iframe = document.createElement("iframe");
+      iframe.id = "fm-dpa-print-frame";
+      iframe.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+      document.body.appendChild(iframe);
+
+      const idoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!idoc) throw new Error("iframe_doc_unavailable");
+      idoc.open();
+      idoc.write(filled);
+      idoc.close();
+
+      // Wait for the iframe document to fully render (fonts, layout) then
+      // trigger the print dialog. The browser will use the @page rules
+      // from the inlined CSS to render A4.
+      const triggerPrint = () => {
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        } catch (err) {
+          setError(TR("Druck fehlgeschlagen. Versuchen Sie es erneut.", "Print failed. Please try again.", "Yazdırma başarısız oldu. Lütfen tekrar deneyin."));
+        }
+        // Cleanup the iframe a few seconds after the print dialog opens.
+        // We can't reliably detect dialog close, so we just remove it
+        // after a delay long enough for the user to interact with it.
+        setTimeout(() => { try { iframe.remove(); } catch {} }, 60000);
+      };
+
+      if (iframe.contentDocument?.readyState === "complete") {
+        setTimeout(triggerPrint, 300);
+      } else {
+        iframe.addEventListener("load", () => setTimeout(triggerPrint, 300));
       }
-      printWin.document.open();
-      printWin.document.write(filled);
-      printWin.document.close();
 
-      // Wait for the document to render, then trigger print dialog
-      printWin.addEventListener("load", () => {
-        setTimeout(() => {
-          try { printWin.focus(); printWin.print(); } catch {}
-        }, 250);
-      });
-
-      // Close modal — user is now in the print dialog
       setBusy(false);
       onClose?.();
     } catch (e) {

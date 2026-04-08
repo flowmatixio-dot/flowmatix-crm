@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Datenschutz-Folgenabschätzung — Flowmatix</title>
+<link rel="stylesheet" href="legal.css">
+</head>
+<body>
+
+<header class="cover">
+  <div class="brand">FLOWMATIX</div>
+  <h1>Datenschutz-Folgenabschätzung (DPIA)</h1>
+  <p class="subtitle">gemäß Art. 35 DSGVO</p>
+  <p class="meta">Version 1.0 · Stand: April 2026 · Verantwortlich: Bastian Barkowski</p>
+</header>
+
+<h2>1. Zusammenfassung</h2>
+<p>Diese Datenschutz-Folgenabschätzung dokumentiert die Risiken und Schutzmaßnahmen der durch Flowmatix bereitgestellten Verarbeitung personenbezogener Daten von Patienten und Interessenten von Haartransplantations-Kliniken. Die Verarbeitung umfasst <strong>besondere Kategorien personenbezogener Daten</strong> nach Art. 9 DSGVO (Gesundheitsdaten) sowie den Einsatz <strong>automatisierter Entscheidungsfindung mit KI</strong> (Anthropic Claude), und erfüllt damit zwei der in Art. 35 Abs. 3 DSGVO genannten Kriterien. Eine DPIA ist daher gesetzlich vorgeschrieben.</p>
+
+<div class="callout">
+  <strong>Ergebnis:</strong> Nach Bewertung aller Risiken und Maßnahmen wird das verbleibende Restrisiko als <strong>NIEDRIG bis MITTEL</strong> eingestuft. Die Verarbeitung kann unter Einhaltung der dokumentierten technischen und organisatorischen Maßnahmen rechtskonform durchgeführt werden.
+</div>
+
+<h2>2. Beschreibung der Verarbeitung</h2>
+
+<h3>2.1 Verantwortlicher</h3>
+<p>Verantwortlich nach Art. 4 Nr. 7 DSGVO sind die Klinik-Kunden von Flowmatix. Flowmatix selbst tritt als Auftragsverarbeiter nach Art. 4 Nr. 8 DSGVO auf. Diese DPIA wird vom Auftragsverarbeiter erstellt, um seine Klinik-Kunden bei deren eigener Compliance-Pflicht zu unterstützen.</p>
+
+<h3>2.2 Zweck und Rechtsgrundlage</h3>
+<table>
+  <tr><th>Zweck</th><th>Rechtsgrundlage</th></tr>
+  <tr><td>Patientenkommunikation via WhatsApp</td><td>Art. 6 Abs. 1 lit. b (Vertragsanbahnung), Art. 9 Abs. 2 lit. h (Gesundheitsversorgung)</td></tr>
+  <tr><td>Anamnese / Vorqualifizierung</td><td>Art. 9 Abs. 2 lit. a (ausdrückliche Einwilligung), Art. 9 Abs. 2 lit. h</td></tr>
+  <tr><td>KI-gestützte Bearbeitung (Claude)</td><td>Art. 9 Abs. 2 lit. a (ausdrückliche Einwilligung mit Anthropic-Disclosure)</td></tr>
+  <tr><td>Terminorganisation</td><td>Art. 6 Abs. 1 lit. b</td></tr>
+  <tr><td>Statistik / Reporting</td><td>Art. 6 Abs. 1 lit. f (berechtigtes Interesse)</td></tr>
+</table>
+
+<h3>2.3 Datenkategorien und Betroffene</h3>
+<p>Verarbeitet werden Stamm-, Kontakt-, Gesundheits-, Bild-, Termin-, Kommunikations- und Reisedaten von Patienten und Interessenten der jeweiligen Klinik (siehe AVV § 3 für vollständige Liste).</p>
+
+<h3>2.4 Technische Architektur (Kurzfassung)</h3>
+<ul>
+  <li><strong>Hosting:</strong> Hetzner Online GmbH, Falkenstein/Nürnberg, Deutschland (ISO 27001)</li>
+  <li><strong>Datenbank:</strong> PostgreSQL 16 mit Row-Level Security (RLS), Multi-Tenant-Trennung pro Klinik</li>
+  <li><strong>Frontend:</strong> React (Vite), TLS 1.3, Cloudflare CDN/WAF</li>
+  <li><strong>Backend:</strong> Fastify/TypeScript, BullMQ Queue, Redis</li>
+  <li><strong>WhatsApp-Provider:</strong> 360dialog GmbH (Berlin) → Meta Cloud API</li>
+  <li><strong>KI-Komponente:</strong> Anthropic Claude API (Sonnet 4.5), Zero Data Retention API Mode</li>
+  <li><strong>Authentifizierung:</strong> JWT mit Refresh-Token-Rotation, optional MFA (TOTP), bcrypt cost factor 12</li>
+</ul>
+
+<h2>3. Notwendigkeit und Verhältnismäßigkeit</h2>
+
+<h3>3.1 Notwendigkeit</h3>
+<p>Ohne automatisierte Vorqualifizierung müssten Kliniken jede Patientenanfrage manuell bearbeiten — bei einem typischen Volumen von 50–500 Anfragen pro Tag wäre dies wirtschaftlich nicht darstellbar. Die KI-gestützte Vorqualifizierung dient ausschließlich der Vorbereitung der ärztlichen Beurteilung und ersetzt diese nicht. Die Letztverantwortung für medizinische Entscheidungen verbleibt beim ärztlichen Personal der Klinik.</p>
+
+<h3>3.2 Datenminimierung</h3>
+<ul>
+  <li>Es werden nur Daten erhoben, die für die Vorqualifizierung und Terminbuchung erforderlich sind.</li>
+  <li>Patientenfotos werden nur in der vom behandelnden Arzt geforderten Anzahl erhoben.</li>
+  <li>Sensible Felder (z.B. Anamnese-JSON) sind in der Datenbank pseudonymisiert/verschlüsselt.</li>
+  <li>An Anthropic werden Nachrichteninhalte gesendet — explizit ohne Klar-Identifier (Telefonnummer, Name werden vor dem API-Call entfernt, soweit für die Antwort nicht erforderlich).</li>
+</ul>
+
+<h3>3.3 Speicherbegrenzung (Art. 5 Abs. 1 lit. e)</h3>
+<p>Die Plattform implementiert einen automatisierten Retention-Scanner, der Patientendaten nach Ablauf der konfigurierbaren Aufbewahrungsfrist (Standard: 10 Jahre gemäß § 630f BGB) anonymisiert. Patienten können jederzeit über das CRM eine sofortige Löschung anfordern (Hard Delete via DSGVO Art. 17).</p>
+
+<h2>4. Risikobewertung</h2>
+
+<h3>4.1 Identifizierte Risiken</h3>
+<table>
+  <tr><th style="width:40%;">Risiko</th><th>Eintrittswahrscheinlichkeit</th><th>Schadensschwere</th><th>Bewertung</th></tr>
+  <tr><td>Unbefugter Zugriff auf Patientendaten</td><td>Niedrig</td><td>Hoch</td><td>Mittel</td></tr>
+  <tr><td>Datenverlust durch System-Ausfall</td><td>Sehr niedrig</td><td>Mittel</td><td>Niedrig</td></tr>
+  <tr><td>Cross-Tenant-Datenleck (Klinik A sieht Daten von Klinik B)</td><td>Sehr niedrig</td><td>Sehr hoch</td><td>Mittel</td></tr>
+  <tr><td>Übertragung an US-Sub-Prozessoren (Anthropic, Cloudflare)</td><td>Hoch (kontinuierlich)</td><td>Mittel</td><td>Mittel</td></tr>
+  <tr><td>Fehlerhafte KI-Verarbeitung führt zu Falschinformation an Patient</td><td>Mittel</td><td>Mittel</td><td>Mittel</td></tr>
+  <tr><td>Patient widerruft Einwilligung — Daten werden nicht gelöscht</td><td>Niedrig</td><td>Hoch</td><td>Mittel</td></tr>
+  <tr><td>Mitarbeiter der Klinik missbraucht Zugriff</td><td>Niedrig</td><td>Hoch</td><td>Mittel</td></tr>
+  <tr><td>Phishing / Account-Übernahme bei Klinik-Mitarbeiter</td><td>Mittel</td><td>Hoch</td><td>Hoch</td></tr>
+  <tr><td>Ransomware / Erpressung</td><td>Niedrig</td><td>Sehr hoch</td><td>Mittel</td></tr>
+  <tr><td>Foto-Upload zu Google Drive ohne Klinik-Bewusstsein</td><td>Niedrig (jetzt opt-in)</td><td>Hoch</td><td>Niedrig</td></tr>
+</table>
+
+<h3>4.2 Maßnahmen zur Risikominderung</h3>
+
+<h4>Zugriffsschutz</h4>
+<ul>
+  <li>Multi-Faktor-Authentifizierung (TOTP) für alle Klinik-Konten verfügbar — Empfehlung: für Admin-Rollen verpflichtend</li>
+  <li>JWT mit kurzer Lebensdauer + Refresh-Token-Rotation</li>
+  <li>Bcrypt cost factor 12 für Passwort-Hashing</li>
+  <li>Rate-Limiting auf Login-Endpoints (5 Versuche / 15 Min)</li>
+  <li>Session-Revocation bei verdächtiger Aktivität</li>
+</ul>
+
+<h4>Mandantentrennung</h4>
+<ul>
+  <li>PostgreSQL Row-Level Security erzwingt organization_id-Check auf Datenbankebene</li>
+  <li>Anwendungs-Code nutzt Tenant-Context (AsyncLocalStorage)</li>
+  <li>Kein BYPASSRLS für den Application-User</li>
+  <li>Code-Reviews für alle Änderungen mit RLS-Bezug</li>
+</ul>
+
+<h4>Drittlandtransfers (Schrems II)</h4>
+<ul>
+  <li>EU-Standardvertragsklauseln (SCC 2021/914) mit allen US-Sub-Prozessoren</li>
+  <li>Anthropic: Zero Data Retention API Mode aktiviert — Daten werden nicht zum Training verwendet</li>
+  <li>Pseudonymisierung vor API-Aufruf an Anthropic (kein direkter Identifier)</li>
+  <li>Cloudflare: Nur Routing/CDN, keine Inhaltsdaten gespeichert</li>
+</ul>
+
+<h4>KI-Risiken</h4>
+<ul>
+  <li>Bot ist auf 512 Tokens limitiert → kein Halluzinieren von medizinischen Diagnosen</li>
+  <li>Strenge System-Prompts mit Verbot medizinischer Entscheidungen</li>
+  <li>Prompt-Injection-Schutz durch Wrapping in <code>&lt;patient_message&gt;</code> Tags</li>
+  <li>Bei photos-complete: automatische Übergabe an menschlichen Arzt-Reviewer</li>
+  <li>Bei Aggression / komplexen Fragen: automatischer Handover</li>
+  <li>Kein Bot-Antwort vor expliziter GDPR-Einwilligung</li>
+</ul>
+
+<h4>Verfügbarkeit und Wiederherstellung</h4>
+<ul>
+  <li>Tägliche, wöchentliche, monatliche Backups mit Off-Site-Replikation</li>
+  <li>RTO: 4h, RPO: 24h</li>
+  <li>24/7 Monitoring (Grafana, Prometheus, Loki, Uptime Kuma)</li>
+  <li>Disaster-Recovery-Plan dokumentiert und jährlich getestet</li>
+</ul>
+
+<h4>Audit-Trail</h4>
+<ul>
+  <li>Vollständiges Audit-Log aller Datenzugriffe (Art. 30 DSGVO „record of processing")</li>
+  <li>Lesezugriffe auf Patientenakten werden mit User, IP, Timestamp protokolliert</li>
+  <li>Audit-Log nicht durch Standard-User löschbar</li>
+</ul>
+
+<h4>Patientenrechte</h4>
+<ul>
+  <li>Daten-Export-Endpoint (Art. 15 + 20) — JSON-Download aller Patientendaten</li>
+  <li>Hard-Delete-Endpoint (Art. 17) — vollständige Löschung mit Confirm</li>
+  <li>Consent-Log dokumentiert jede Einwilligung mit Zeitstempel</li>
+  <li>Auto-Anonymisierung nach Retention-Zeitraum</li>
+</ul>
+
+<h2>5. Bewertung des Restrisikos</h2>
+
+<table>
+  <tr><th>Kategorie</th><th>Vor Maßnahmen</th><th>Nach Maßnahmen</th></tr>
+  <tr><td>Vertraulichkeit</td><td>Hoch</td><td>Niedrig</td></tr>
+  <tr><td>Integrität</td><td>Mittel</td><td>Niedrig</td></tr>
+  <tr><td>Verfügbarkeit</td><td>Mittel</td><td>Niedrig</td></tr>
+  <tr><td>Drittlandtransfer</td><td>Hoch</td><td>Mittel</td></tr>
+  <tr><td>KI-Halluzination</td><td>Mittel</td><td>Niedrig</td></tr>
+  <tr><td><strong>Gesamt</strong></td><td><strong>Hoch</strong></td><td><strong>Niedrig–Mittel</strong></td></tr>
+</table>
+
+<h2>6. Konsultation der Aufsichtsbehörde</h2>
+<p>Da das verbleibende Restrisiko als niedrig bis mittel eingestuft wird, ist eine vorherige Konsultation der Aufsichtsbehörde nach Art. 36 DSGVO <strong>nicht erforderlich</strong>. Die DPIA wird intern dokumentiert und auf Anfrage der Aufsichtsbehörde oder von Klinik-Kunden zur Verfügung gestellt.</p>
+
+<h2>7. Regelmäßige Überprüfung</h2>
+<p>Diese DPIA wird mindestens jährlich oder bei wesentlichen Änderungen der Verarbeitung überprüft und aktualisiert. Wesentliche Änderungen umfassen:</p>
+<ul>
+  <li>Einführung neuer Sub-Prozessoren</li>
+  <li>Änderung der Zwecke oder Datenkategorien</li>
+  <li>Wechsel des KI-Anbieters oder -Modells</li>
+  <li>Bekanntwerden neuer Risiken (z.B. Sicherheitslücken)</li>
+  <li>Änderungen der Rechtsprechung (z.B. Schrems III)</li>
+</ul>
+
+<h2>8. Verantwortlichkeiten</h2>
+<table>
+  <tr><th>Rolle</th><th>Verantwortung</th></tr>
+  <tr><td>Geschäftsführung Flowmatix</td><td>Bastian Barkowski — Gesamtverantwortung, Freigabe der DPIA</td></tr>
+  <tr><td>Datenschutzbeauftragter</td><td>privacy@flowmatix.io</td></tr>
+  <tr><td>Technische Umsetzung</td><td>Engineering Team (Bastian Barkowski)</td></tr>
+  <tr><td>Sub-Prozessoren-Management</td><td>privacy@flowmatix.io</td></tr>
+</table>
+
+<div class="signature-block">
+  <div class="sig">
+    <div class="role">Erstellt von</div>
+    <div class="name">Bastian Barkowski · Flowmatix</div>
+    <div style="font-size:8pt;color:#888;margin-top:1mm;">Hude, April 2026</div>
+  </div>
+  <div class="sig">
+    <div class="role">Nächste Überprüfung</div>
+    <div class="name">April 2027</div>
+    <div style="font-size:8pt;color:#888;margin-top:1mm;">oder bei wesentlicher Änderung</div>
+  </div>
+</div>
+
+<footer class="page-foot">Flowmatix · Datenschutz-Folgenabschätzung · Version 1.0 · April 2026 · privacy@flowmatix.io</footer>
+
+</body>
+</html>

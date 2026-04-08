@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Protection Impact Assessment — Flowmatix</title>
+<link rel="stylesheet" href="legal.css">
+</head>
+<body>
+
+<header class="cover">
+  <div class="brand">FLOWMATIX</div>
+  <h1>Data Protection Impact Assessment (DPIA)</h1>
+  <p class="subtitle">pursuant to Article 35 GDPR</p>
+  <p class="meta">Version 1.0 · April 2026 · Responsible: Bastian Barkowski</p>
+</header>
+
+<h2>1. Executive Summary</h2>
+<p>This Data Protection Impact Assessment documents the risks and protective measures of the processing of personal data of patients and prospective patients of hair transplant clinics provided by Flowmatix. The processing includes <strong>special categories of personal data</strong> under Art. 9 GDPR (health data) as well as the use of <strong>automated decision-making with AI</strong> (Anthropic Claude), thereby meeting two of the criteria listed in Art. 35(3) GDPR. A DPIA is therefore legally mandatory.</p>
+
+<div class="callout">
+  <strong>Result:</strong> After evaluating all risks and measures, the remaining residual risk is classified as <strong>LOW to MEDIUM</strong>. The processing can be carried out in compliance with the documented technical and organizational measures.
+</div>
+
+<h2>2. Description of Processing</h2>
+
+<h3>2.1 Controller</h3>
+<p>The controllers under Art. 4(7) GDPR are the clinic customers of Flowmatix. Flowmatix itself acts as a processor under Art. 4(8) GDPR. This DPIA is prepared by the processor to support its clinic customers in their own compliance obligations.</p>
+
+<h3>2.2 Purpose and Legal Basis</h3>
+<table>
+  <tr><th>Purpose</th><th>Legal basis</th></tr>
+  <tr><td>Patient communication via WhatsApp</td><td>Art. 6(1)(b) (contract initiation), Art. 9(2)(h) (healthcare)</td></tr>
+  <tr><td>Anamnesis / pre-qualification</td><td>Art. 9(2)(a) (explicit consent), Art. 9(2)(h)</td></tr>
+  <tr><td>AI-assisted processing (Claude)</td><td>Art. 9(2)(a) (explicit consent with Anthropic disclosure)</td></tr>
+  <tr><td>Appointment management</td><td>Art. 6(1)(b)</td></tr>
+  <tr><td>Statistics / reporting</td><td>Art. 6(1)(f) (legitimate interest)</td></tr>
+</table>
+
+<h3>2.3 Data Categories and Subjects</h3>
+<p>Master, contact, health, image, appointment, communication and travel data of patients and prospective patients of the respective clinic are processed (see DPA § 3 for the complete list).</p>
+
+<h3>2.4 Technical Architecture (summary)</h3>
+<ul>
+  <li><strong>Hosting:</strong> Hetzner Online GmbH, Falkenstein/Nuremberg, Germany (ISO 27001)</li>
+  <li><strong>Database:</strong> PostgreSQL 16 with Row-Level Security (RLS), multi-tenant separation per clinic</li>
+  <li><strong>Frontend:</strong> React (Vite), TLS 1.3, Cloudflare CDN/WAF</li>
+  <li><strong>Backend:</strong> Fastify/TypeScript, BullMQ Queue, Redis</li>
+  <li><strong>WhatsApp provider:</strong> 360dialog GmbH (Berlin) → Meta Cloud API</li>
+  <li><strong>AI component:</strong> Anthropic Claude API (Sonnet 4.5), Zero Data Retention API mode</li>
+  <li><strong>Authentication:</strong> JWT with refresh token rotation, optional MFA (TOTP), bcrypt cost factor 12</li>
+</ul>
+
+<h2>3. Necessity and Proportionality</h2>
+
+<h3>3.1 Necessity</h3>
+<p>Without automated pre-qualification, clinics would have to manually process every patient inquiry — at a typical volume of 50–500 inquiries per day, this would not be economically viable. AI-assisted pre-qualification serves only to prepare medical assessments and does not replace them. Final responsibility for medical decisions remains with the clinic's medical staff.</p>
+
+<h3>3.2 Data Minimization</h3>
+<ul>
+  <li>Only data necessary for pre-qualification and appointment booking is collected.</li>
+  <li>Patient photos are only collected in the number requested by the treating physician.</li>
+  <li>Sensitive fields (e.g. anamnesis JSON) are pseudonymized/encrypted in the database.</li>
+  <li>Message content is sent to Anthropic explicitly without clear identifiers.</li>
+</ul>
+
+<h3>3.3 Storage Limitation (Art. 5(1)(e))</h3>
+<p>The platform implements an automated retention scanner that anonymizes patient data after the configurable retention period (default: 10 years per § 630f BGB) has expired. Patients can request immediate deletion through the CRM at any time (Hard Delete via GDPR Art. 17).</p>
+
+<h2>4. Risk Assessment</h2>
+
+<h3>4.1 Identified Risks</h3>
+<table>
+  <tr><th style="width:40%;">Risk</th><th>Likelihood</th><th>Severity</th><th>Rating</th></tr>
+  <tr><td>Unauthorized access to patient data</td><td>Low</td><td>High</td><td>Medium</td></tr>
+  <tr><td>Data loss due to system failure</td><td>Very low</td><td>Medium</td><td>Low</td></tr>
+  <tr><td>Cross-tenant data leak</td><td>Very low</td><td>Very high</td><td>Medium</td></tr>
+  <tr><td>Transfer to US sub-processors (Anthropic, Cloudflare)</td><td>High (continuous)</td><td>Medium</td><td>Medium</td></tr>
+  <tr><td>Faulty AI processing leading to misinformation</td><td>Medium</td><td>Medium</td><td>Medium</td></tr>
+  <tr><td>Patient withdraws consent — data not deleted</td><td>Low</td><td>High</td><td>Medium</td></tr>
+  <tr><td>Clinic staff misuses access</td><td>Low</td><td>High</td><td>Medium</td></tr>
+  <tr><td>Phishing / account takeover of clinic staff</td><td>Medium</td><td>High</td><td>High</td></tr>
+  <tr><td>Ransomware / extortion</td><td>Low</td><td>Very high</td><td>Medium</td></tr>
+  <tr><td>Photo upload to Google Drive without clinic awareness</td><td>Low (now opt-in)</td><td>High</td><td>Low</td></tr>
+</table>
+
+<h3>4.2 Risk Mitigation Measures</h3>
+
+<h4>Access Protection</h4>
+<ul>
+  <li>Multi-factor authentication (TOTP) available for all clinic accounts — recommendation: mandatory for admin roles</li>
+  <li>JWT with short lifetime + refresh token rotation</li>
+  <li>Bcrypt cost factor 12 for password hashing</li>
+  <li>Rate limiting on login endpoints (5 attempts / 15 min)</li>
+  <li>Session revocation on suspicious activity</li>
+</ul>
+
+<h4>Tenant Separation</h4>
+<ul>
+  <li>PostgreSQL Row-Level Security enforces organization_id check at the database level</li>
+  <li>Application code uses tenant context (AsyncLocalStorage)</li>
+  <li>No BYPASSRLS for the application user</li>
+  <li>Code reviews for all changes with RLS impact</li>
+</ul>
+
+<h4>Third-Country Transfers (Schrems II)</h4>
+<ul>
+  <li>EU Standard Contractual Clauses (SCC 2021/914) with all US sub-processors</li>
+  <li>Anthropic: Zero Data Retention API mode active — data is not used for training</li>
+  <li>Pseudonymization before API call to Anthropic (no direct identifier)</li>
+  <li>Cloudflare: only routing/CDN, no content data stored</li>
+</ul>
+
+<h4>AI Risks</h4>
+<ul>
+  <li>Bot is limited to 512 tokens → no hallucination of medical diagnoses</li>
+  <li>Strict system prompts prohibiting medical decisions</li>
+  <li>Prompt injection protection via wrapping in <code>&lt;patient_message&gt;</code> tags</li>
+  <li>On photos-complete: automatic handover to human doctor reviewer</li>
+  <li>On aggression / complex questions: automatic handover</li>
+  <li>No bot response before explicit GDPR consent</li>
+</ul>
+
+<h4>Availability and Recovery</h4>
+<ul>
+  <li>Daily, weekly, monthly backups with off-site replication</li>
+  <li>RTO: 4h, RPO: 24h</li>
+  <li>24/7 monitoring (Grafana, Prometheus, Loki, Uptime Kuma)</li>
+  <li>Disaster recovery plan documented and tested annually</li>
+</ul>
+
+<h4>Audit Trail</h4>
+<ul>
+  <li>Complete audit log of all data accesses (Art. 30 GDPR record of processing)</li>
+  <li>Read accesses to patient records logged with user, IP, timestamp</li>
+  <li>Audit log not deletable by standard users</li>
+</ul>
+
+<h4>Data Subject Rights</h4>
+<ul>
+  <li>Data export endpoint (Art. 15 + 20) — JSON download of all patient data</li>
+  <li>Hard delete endpoint (Art. 17) — complete deletion with confirmation</li>
+  <li>Consent log documents every consent with timestamp</li>
+  <li>Auto-anonymization after retention period</li>
+</ul>
+
+<h2>5. Residual Risk Assessment</h2>
+
+<table>
+  <tr><th>Category</th><th>Before measures</th><th>After measures</th></tr>
+  <tr><td>Confidentiality</td><td>High</td><td>Low</td></tr>
+  <tr><td>Integrity</td><td>Medium</td><td>Low</td></tr>
+  <tr><td>Availability</td><td>Medium</td><td>Low</td></tr>
+  <tr><td>Third-country transfer</td><td>High</td><td>Medium</td></tr>
+  <tr><td>AI hallucination</td><td>Medium</td><td>Low</td></tr>
+  <tr><td><strong>Overall</strong></td><td><strong>High</strong></td><td><strong>Low–Medium</strong></td></tr>
+</table>
+
+<h2>6. Consultation of the Supervisory Authority</h2>
+<p>Since the remaining residual risk is classified as low to medium, prior consultation of the supervisory authority under Art. 36 GDPR is <strong>not required</strong>. The DPIA is documented internally and made available upon request from the supervisory authority or clinic customers.</p>
+
+<h2>7. Regular Review</h2>
+<p>This DPIA is reviewed and updated at least annually or upon material changes to the processing. Material changes include:</p>
+<ul>
+  <li>Engagement of new sub-processors</li>
+  <li>Change of purposes or data categories</li>
+  <li>Change of AI provider or model</li>
+  <li>Discovery of new risks (e.g. security vulnerabilities)</li>
+  <li>Changes in case law (e.g. Schrems III)</li>
+</ul>
+
+<h2>8. Responsibilities</h2>
+<table>
+  <tr><th>Role</th><th>Responsibility</th></tr>
+  <tr><td>Flowmatix Management</td><td>Bastian Barkowski — overall responsibility, DPIA approval</td></tr>
+  <tr><td>Data Protection Officer</td><td>privacy@flowmatix.io</td></tr>
+  <tr><td>Technical implementation</td><td>Engineering Team (Bastian Barkowski)</td></tr>
+  <tr><td>Sub-processor management</td><td>privacy@flowmatix.io</td></tr>
+</table>
+
+<div class="signature-block">
+  <div class="sig">
+    <div class="role">Created by</div>
+    <div class="name">Bastian Barkowski · Flowmatix</div>
+    <div style="font-size:8pt;color:#888;margin-top:1mm;">Hude, April 2026</div>
+  </div>
+  <div class="sig">
+    <div class="role">Next review</div>
+    <div class="name">April 2027</div>
+    <div style="font-size:8pt;color:#888;margin-top:1mm;">or upon material change</div>
+  </div>
+</div>
+
+<footer class="page-foot">Flowmatix · Data Protection Impact Assessment · Version 1.0 · April 2026 · privacy@flowmatix.io</footer>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Veri Koruma Etki Değerlendirmesi — Flowmatix</title>
+<link rel="stylesheet" href="legal.css">
+</head>
+<body>
+
+<header class="cover">
+  <div class="brand">FLOWMATIX</div>
+  <h1>Veri Koruma Etki Değerlendirmesi (DPIA)</h1>
+  <p class="subtitle">GDPR Madde 35 uyarınca</p>
+  <p class="meta">Versiyon 1.0 · Nisan 2026 · Sorumlu: Bastian Barkowski</p>
+</header>
+
+<h2>1. Yönetici Özeti</h2>
+<p>Bu Veri Koruma Etki Değerlendirmesi, Flowmatix tarafından sağlanan saç ekimi kliniklerinin hastalarının ve potansiyel hastalarının kişisel verilerinin işlenmesinin risklerini ve koruyucu önlemlerini belgelemektedir. İşleme, GDPR Madde 9 kapsamındaki <strong>özel kategorideki kişisel verileri</strong> (sağlık verileri) ve <strong>yapay zeka ile otomatik karar vermeyi</strong> (Anthropic Claude) içerir, böylece GDPR Madde 35(3)'te belirtilen iki kriteri karşılar. Bu nedenle bir DPIA yasal olarak zorunludur.</p>
+
+<div class="callout">
+  <strong>Sonuç:</strong> Tüm risklerin ve önlemlerin değerlendirilmesinden sonra, kalan artık risk <strong>DÜŞÜK ila ORTA</strong> olarak sınıflandırılır. Belgelenen teknik ve organizasyonel önlemlere uyularak işleme yasal olarak gerçekleştirilebilir.
+</div>
+
+<h2>2. İşlemenin Tanımı</h2>
+
+<h3>2.1 Veri Sorumlusu</h3>
+<p>GDPR Madde 4(7) kapsamındaki veri sorumluları, Flowmatix'in klinik müşterileridir. Flowmatix kendisi, GDPR Madde 4(8) kapsamında veri işleyen olarak hareket eder. Bu DPIA, klinik müşterilerini kendi uyum yükümlülüklerinde desteklemek için veri işleyen tarafından hazırlanır.</p>
+
+<h3>2.2 Amaç ve Hukuki Dayanak</h3>
+<table>
+  <tr><th>Amaç</th><th>Hukuki dayanak</th></tr>
+  <tr><td>WhatsApp üzerinden hasta iletişimi</td><td>Madde 6(1)(b) (sözleşme başlatma), Madde 9(2)(h) (sağlık hizmeti)</td></tr>
+  <tr><td>Anamnez / ön değerlendirme</td><td>Madde 9(2)(a) (açık rıza), Madde 9(2)(h)</td></tr>
+  <tr><td>Yapay zeka destekli işleme (Claude)</td><td>Madde 9(2)(a) (Anthropic açıklamasıyla açık rıza)</td></tr>
+  <tr><td>Randevu yönetimi</td><td>Madde 6(1)(b)</td></tr>
+  <tr><td>İstatistikler / raporlama</td><td>Madde 6(1)(f) (meşru menfaat)</td></tr>
+</table>
+
+<h3>2.3 Veri Kategorileri ve İlgili Kişiler</h3>
+<p>İlgili kliniğin hastalarının ve potansiyel hastalarının temel, iletişim, sağlık, görsel, randevu, iletişim ve seyahat verileri işlenir (tam liste için DPA § 3'e bakın).</p>
+
+<h3>2.4 Teknik Mimari (özet)</h3>
+<ul>
+  <li><strong>Barındırma:</strong> Hetzner Online GmbH, Falkenstein/Nürnberg, Almanya (ISO 27001)</li>
+  <li><strong>Veritabanı:</strong> PostgreSQL 16, Satır Düzeyi Güvenlik (RLS) ile, klinik başına çok kiracılı ayrım</li>
+  <li><strong>Frontend:</strong> React (Vite), TLS 1.3, Cloudflare CDN/WAF</li>
+  <li><strong>Backend:</strong> Fastify/TypeScript, BullMQ Queue, Redis</li>
+  <li><strong>WhatsApp sağlayıcısı:</strong> 360dialog GmbH (Berlin) → Meta Cloud API</li>
+  <li><strong>AI bileşeni:</strong> Anthropic Claude API (Sonnet 4.5), Sıfır Veri Saklama API modu</li>
+  <li><strong>Kimlik doğrulama:</strong> Yenileme jetonu rotasyonlu JWT, isteğe bağlı MFA (TOTP), bcrypt maliyet faktörü 12</li>
+</ul>
+
+<h2>3. Gereklilik ve Orantılılık</h2>
+
+<h3>3.1 Gereklilik</h3>
+<p>Otomatik ön değerlendirme olmadan, klinikler her hasta sorgusunu manuel olarak işlemek zorunda kalır — günde 50–500 sorgu gibi tipik bir hacimde, bu ekonomik olarak uygulanabilir olmaz. Yapay zeka destekli ön değerlendirme yalnızca tıbbi değerlendirmeleri hazırlamaya hizmet eder ve onların yerine geçmez. Tıbbi kararların nihai sorumluluğu kliniğin tıbbi personelinde kalır.</p>
+
+<h3>3.2 Veri Minimizasyonu</h3>
+<ul>
+  <li>Yalnızca ön değerlendirme ve randevu rezervasyonu için gerekli veriler toplanır.</li>
+  <li>Hasta fotoğrafları yalnızca tedavi eden hekim tarafından istenen sayıda toplanır.</li>
+  <li>Hassas alanlar (örn. anamnez JSON) veritabanında takma adlandırılır/şifrelenir.</li>
+  <li>Mesaj içeriği Anthropic'e açık tanımlayıcılar olmadan gönderilir.</li>
+</ul>
+
+<h3>3.3 Saklama Sınırlaması (Madde 5(1)(e))</h3>
+<p>Platform, yapılandırılabilir saklama süresi (varsayılan: § 630f BGB uyarınca 10 yıl) sona erdikten sonra hasta verilerini anonimleştiren otomatik bir saklama tarayıcısı uygular. Hastalar istedikleri zaman CRM aracılığıyla derhal silme talep edebilirler (GDPR Madde 17 uyarınca Hard Delete).</p>
+
+<h2>4. Risk Değerlendirmesi</h2>
+
+<h3>4.1 Tanımlanan Riskler</h3>
+<table>
+  <tr><th style="width:40%;">Risk</th><th>Olasılık</th><th>Şiddet</th><th>Derecelendirme</th></tr>
+  <tr><td>Hasta verilerine yetkisiz erişim</td><td>Düşük</td><td>Yüksek</td><td>Orta</td></tr>
+  <tr><td>Sistem arızası nedeniyle veri kaybı</td><td>Çok düşük</td><td>Orta</td><td>Düşük</td></tr>
+  <tr><td>Kiracılar arası veri sızıntısı</td><td>Çok düşük</td><td>Çok yüksek</td><td>Orta</td></tr>
+  <tr><td>ABD alt işleyicilerine aktarım (Anthropic, Cloudflare)</td><td>Yüksek (sürekli)</td><td>Orta</td><td>Orta</td></tr>
+  <tr><td>Hatalı yapay zeka işlemi yanlış bilgiye yol açar</td><td>Orta</td><td>Orta</td><td>Orta</td></tr>
+  <tr><td>Hasta onayı geri çeker — veriler silinmez</td><td>Düşük</td><td>Yüksek</td><td>Orta</td></tr>
+  <tr><td>Klinik personeli erişimi kötüye kullanır</td><td>Düşük</td><td>Yüksek</td><td>Orta</td></tr>
+  <tr><td>Klinik personelinin kimlik avı / hesap ele geçirme</td><td>Orta</td><td>Yüksek</td><td>Yüksek</td></tr>
+  <tr><td>Fidye yazılımı / şantaj</td><td>Düşük</td><td>Çok yüksek</td><td>Orta</td></tr>
+  <tr><td>Klinik bilgisi olmadan Google Drive'a fotoğraf yükleme</td><td>Düşük (artık opt-in)</td><td>Yüksek</td><td>Düşük</td></tr>
+</table>
+
+<h3>4.2 Risk Azaltma Önlemleri</h3>
+
+<h4>Erişim Koruması</h4>
+<ul>
+  <li>Tüm klinik hesapları için çok faktörlü kimlik doğrulama (TOTP) mevcut — öneri: yönetici rolleri için zorunlu</li>
+  <li>Kısa ömürlü JWT + yenileme jetonu rotasyonu</li>
+  <li>Şifre hashleme için bcrypt maliyet faktörü 12</li>
+  <li>Giriş uç noktalarında hız sınırlama (5 deneme / 15 dakika)</li>
+  <li>Şüpheli etkinlikte oturum iptali</li>
+</ul>
+
+<h4>Kiracı Ayrımı</h4>
+<ul>
+  <li>PostgreSQL Satır Düzeyi Güvenlik, veritabanı düzeyinde organization_id kontrolünü zorlar</li>
+  <li>Uygulama kodu kiracı bağlamı (AsyncLocalStorage) kullanır</li>
+  <li>Uygulama kullanıcısı için BYPASSRLS yok</li>
+  <li>RLS etkisi olan tüm değişiklikler için kod incelemeleri</li>
+</ul>
+
+<h4>Üçüncü Ülke Aktarımları (Schrems II)</h4>
+<ul>
+  <li>Tüm ABD alt işleyicileriyle AB Standart Sözleşme Hükümleri (SCC 2021/914)</li>
+  <li>Anthropic: Sıfır Veri Saklama API modu aktif — veriler eğitim için kullanılmaz</li>
+  <li>Anthropic API çağrısı öncesi takma adlandırma (doğrudan tanımlayıcı yok)</li>
+  <li>Cloudflare: yalnızca yönlendirme/CDN, içerik verisi saklanmaz</li>
+</ul>
+
+<h4>Yapay Zeka Riskleri</h4>
+<ul>
+  <li>Bot 512 token ile sınırlıdır → tıbbi tanıların halüsinasyonu yok</li>
+  <li>Tıbbi kararları yasaklayan katı sistem komutları</li>
+  <li><code>&lt;patient_message&gt;</code> etiketleriyle sarmalanarak komut enjeksiyonu koruması</li>
+  <li>Fotoğraf tamamlandığında: insan doktor incelemecisine otomatik devir</li>
+  <li>Saldırganlık / karmaşık sorularda: otomatik devir</li>
+  <li>Açık GDPR onayı olmadan bot yanıtı yok</li>
+</ul>
+
+<h4>Kullanılabilirlik ve Kurtarma</h4>
+<ul>
+  <li>Saha dışı çoğaltma ile günlük, haftalık, aylık yedeklemeler</li>
+  <li>RTO: 4 saat, RPO: 24 saat</li>
+  <li>7/24 izleme (Grafana, Prometheus, Loki, Uptime Kuma)</li>
+  <li>Felaket kurtarma planı belgelenmiş ve yıllık olarak test edilmiştir</li>
+</ul>
+
+<h4>Denetim İzi</h4>
+<ul>
+  <li>Tüm veri erişimlerinin tam denetim günlüğü (GDPR Madde 30 işleme kayıtları)</li>
+  <li>Hasta kayıtlarına okuma erişimi kullanıcı, IP, zaman damgası ile kaydedilir</li>
+  <li>Standart kullanıcılar denetim günlüğünü silemez</li>
+</ul>
+
+<h4>İlgili Kişi Hakları</h4>
+<ul>
+  <li>Veri dışa aktarma uç noktası (Madde 15 + 20) — tüm hasta verilerinin JSON indirme</li>
+  <li>Hard delete uç noktası (Madde 17) — onay ile tam silme</li>
+  <li>Onay günlüğü her onayı zaman damgasıyla belgeler</li>
+  <li>Saklama süresinden sonra otomatik anonimleştirme</li>
+</ul>
+
+<h2>5. Artık Risk Değerlendirmesi</h2>
+
+<table>
+  <tr><th>Kategori</th><th>Önlemler öncesi</th><th>Önlemler sonrası</th></tr>
+  <tr><td>Gizlilik</td><td>Yüksek</td><td>Düşük</td></tr>
+  <tr><td>Bütünlük</td><td>Orta</td><td>Düşük</td></tr>
+  <tr><td>Kullanılabilirlik</td><td>Orta</td><td>Düşük</td></tr>
+  <tr><td>Üçüncü ülke aktarımı</td><td>Yüksek</td><td>Orta</td></tr>
+  <tr><td>Yapay zeka halüsinasyonu</td><td>Orta</td><td>Düşük</td></tr>
+  <tr><td><strong>Genel</strong></td><td><strong>Yüksek</strong></td><td><strong>Düşük–Orta</strong></td></tr>
+</table>
+
+<h2>6. Denetim Otoritesi ile İstişare</h2>
+<p>Kalan artık risk düşük ila orta olarak sınıflandırıldığından, GDPR Madde 36 uyarınca denetim otoritesi ile önceden istişare <strong>gerekli değildir</strong>. DPIA dahili olarak belgelenir ve denetim otoritesinden veya klinik müşterilerinden gelen talep üzerine sağlanır.</p>
+
+<h2>7. Düzenli İnceleme</h2>
+<p>Bu DPIA en az yılda bir veya işlemede önemli değişiklikler olduğunda gözden geçirilir ve güncellenir. Önemli değişiklikler şunları içerir:</p>
+<ul>
+  <li>Yeni alt işleyicilerin devreye alınması</li>
+  <li>Amaçların veya veri kategorilerinin değişmesi</li>
+  <li>Yapay zeka sağlayıcısı veya modelinin değişmesi</li>
+  <li>Yeni risklerin keşfi (örn. güvenlik açıkları)</li>
+  <li>İçtihat değişiklikleri (örn. Schrems III)</li>
+</ul>
+
+<h2>8. Sorumluluklar</h2>
+<table>
+  <tr><th>Rol</th><th>Sorumluluk</th></tr>
+  <tr><td>Flowmatix Yönetimi</td><td>Bastian Barkowski — genel sorumluluk, DPIA onayı</td></tr>
+  <tr><td>Veri Koruma Görevlisi</td><td>privacy@flowmatix.io</td></tr>
+  <tr><td>Teknik uygulama</td><td>Mühendislik Ekibi (Bastian Barkowski)</td></tr>
+  <tr><td>Alt işleyici yönetimi</td><td>privacy@flowmatix.io</td></tr>
+</table>
+
+<div class="signature-block">
+  <div class="sig">
+    <div class="role">Hazırlayan</div>
+    <div class="name">Bastian Barkowski · Flowmatix</div>
+    <div style="font-size:8pt;color:#888;margin-top:1mm;">Hude, Nisan 2026</div>
+  </div>
+  <div class="sig">
+    <div class="role">Sonraki inceleme</div>
+    <div class="name">Nisan 2027</div>
+    <div style="font-size:8pt;color:#888;margin-top:1mm;">veya önemli değişiklikte</div>
+  </div>
+</div>
+
+<footer class="page-foot">Flowmatix · Veri Koruma Etki Değerlendirmesi · Versiyon 1.0 · Nisan 2026 · privacy@flowmatix.io</footer>
+
+</body>
+</html>
