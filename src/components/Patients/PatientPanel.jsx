@@ -820,8 +820,8 @@ export default function PatientPanel() {
         <div style={{fontSize:12,color:"rgba(167,177,195,0.65)",marginBottom:10,lineHeight:1.5}}>{t("gdpr_data_export_desc") || "Lädt alle gespeicherten Daten dieses Patienten als JSON herunter — für Auskunfts- oder Portabilitätsanfragen."}</div>
         <button onClick={async()=>{
           try {
-            const { apiCall } = await import("../../api/client");
-            const data = await apiCall(`/crm/patients/${lead.id}/export`);
+            const { apiFetch } = await import("../../api/client");
+            const data = await apiFetch(`/api/v1/crm/patients/${lead.id}/export`);
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -851,8 +851,8 @@ export default function PatientPanel() {
               <button disabled={gdprDeleting} onClick={async()=>{
                 setGdprDeleting(true);
                 try {
-                  const { apiCall } = await import("../../api/client");
-                  const res = await apiCall(`/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
+                  const { apiFetch } = await import("../../api/client");
+                  const res = await apiFetch(`/api/v1/crm/patients/${lead.id}/gdpr`, { method: "DELETE", body: JSON.stringify({ confirm: "GDPR_DELETE" }) });
                   if (res?.success) {
                     showT(t("gdpr_deleted_success") || "Patientendaten gelöscht");
                     setSelLead(null);

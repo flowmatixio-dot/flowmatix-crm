@@ -362,6 +362,44 @@ function IntegrationsSection({ t, clinic, showT }) {
     </div>}
     {isLive && gStatus.lastError && <div style={{marginTop:8,fontSize:12,color:"#ef4444"}}>{gStatus.lastError}</div>}
 
+    {/* ═══ GDPR Opt-In: Auto-Upload zu Google Drive ═══ */}
+    {googleConnected && <div style={{marginTop:16,padding:16,borderRadius:12,background:"rgba(251,191,36,0.04)",border:"1px solid rgba(251,191,36,0.18)"}}>
+      <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+        <span style={{fontSize:20,lineHeight:1}}>⚠️</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:13,fontWeight:800,color:"#fbbf24",marginBottom:4}}>{t("drive_auto_upload_title") || "Patientenfotos automatisch in Google Drive sichern"}</div>
+          <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.5,marginBottom:10}}>
+            {t("drive_auto_upload_desc") || "Wenn aktiviert, werden alle eingehenden Patientenfotos und Dokumente automatisch in den verbundenen Google Drive Ordner Ihrer Klinik hochgeladen."}
+          </div>
+          <div style={{fontSize:11,color:"rgba(239,68,68,0.85)",lineHeight:1.5,marginBottom:12,padding:"8px 10px",borderRadius:8,background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)"}}>
+            ⚠ {t("drive_auto_upload_warning") || "DSGVO-Hinweis: Google Drive ist ein US-basierter Dienst. Patientenfotos sind besondere Daten nach Art. 9 DSGVO. Sie sind als Verantwortlicher dafür zuständig, dass Sie einen wirksamen DPA mit Google haben (Google Workspace) und die Patienten der Übermittlung zugestimmt haben. Standardmäßig ist diese Funktion AUS."}
+          </div>
+          <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+            <input
+              type="checkbox"
+              checked={!!gStatus?.driveAutoUpload}
+              disabled={loading}
+              onChange={async (e) => {
+                const enabled = e.target.checked;
+                setLoading(true);
+                try {
+                  const { apiFetch } = await import("../../api/client");
+                  await apiFetch("/api/v1/auth/google/drive-auto-upload", { method: "PATCH", body: JSON.stringify({ enabled }) });
+                  setGStatus(prev => ({ ...prev, driveAutoUpload: enabled }));
+                  showT(enabled ? (t("drive_auto_upload_enabled") || "Auto-Upload aktiviert") : (t("drive_auto_upload_disabled") || "Auto-Upload deaktiviert"));
+                } catch (err) {
+                  showT(err?.message || (t("error_generic") || "Fehler"), "error");
+                }
+                setLoading(false);
+              }}
+              style={{width:18,height:18,accentColor:"#10b981",cursor:"pointer"}}
+            />
+            <span style={{fontSize:13,fontWeight:600,color:"rgba(232,238,252,0.9)"}}>{t("drive_auto_upload_toggle") || "Auto-Upload aktivieren (auf eigene Verantwortung)"}</span>
+          </label>
+        </div>
+      </div>
+    </div>}
+
     {/* ═══ Analytics Provider Config ═══ */}
     <div style={{marginTop:20,padding:16,borderRadius:12,background:"var(--bg-card)",border:"1px solid var(--border-default)"}}>
       <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>{t("analytics_provider") || "Analytics-Anbieter"}</div>
