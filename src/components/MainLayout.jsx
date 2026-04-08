@@ -511,14 +511,14 @@ export default function MainLayout() {
                     <input
                       value={promoCode}
                       onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError(''); }}
-                      placeholder="TRIAL-XXXX"
+                      placeholder="WAIVE-XXXX"
                       maxLength={12}
                       style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: `1px solid ${promoError ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`, color: "#fff", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em", width: 160, outline: "none" }}
                     />
                     <button onClick={() => { setShowPromoInput(false); setPromoCode(''); setPromoError(''); }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "rgba(167,177,195,0.5)", fontSize: 11, cursor: "pointer", padding: "8px 12px", fontFamily: "inherit" }}>✕</button>
                   </div>
                   {promoError && <div style={{ fontSize: 11, color: "#ef4444" }}>{promoError}</div>}
-                  {promoCode && !promoError && <div style={{ fontSize: 11, color: "#10b981" }}>30 Tage kostenlos — Setup Fee + Abo nach Trial</div>}
+                  {promoCode && !promoError && <div style={{ fontSize: 11, color: "#10b981" }}>{_T("Setup-Gebühr (1.990 €) entfällt — direkt ins Abo", "Setup fee (€1,990) waived — straight to subscription", "Kurulum ücreti (1.990 €) iptal — doğrudan aboneliğe")}</div>}
                 </div>
               )}
             </div>
