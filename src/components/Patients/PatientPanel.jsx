@@ -399,7 +399,9 @@ export default function PatientPanel() {
       </div>
 
       {/* ═══════════════════════ TAB CONTENT ═══════════════════════ */}
-      <div style={{flex:1,overflowY:"auto",padding:"20px 24px"}}>
+      {/* paddingBottom 100 leaves room for the floating Hilfe orb so the
+          GDPR export / delete buttons at the very bottom aren't covered */}
+      <div style={{flex:1,overflowY:"auto",padding:"20px 24px 100px"}}>
 
         {/* ═══ TIMELINE TAB — Accordion Redesign ═══ */}
         {patientTab==="timeline"&&<>
