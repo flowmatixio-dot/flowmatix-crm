@@ -9,18 +9,39 @@ import react from "@vitejs/plugin-react";
 // after the calendar chunk loaded crashed with
 //   TypeError: t is not a function
 // (where `t` is the minified hook dispatcher) when it tried to render.
-// Removing the calendar split fixes the duplicate-React issue.
 //
-// vendor-react still gets its own chunk so the React runtime is
-// loaded once and reused for everything.
+// The fix: split fullcalendar via a function-form manualChunks that
+// EXPLICITLY excludes @fullcalendar/react (and react/react-dom). The
+// non-React calendar packages are huge and worth splitting.
 export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-zustand': ['zustand'],
+        manualChunks(id) {
+          // Keep React + react-dom + react-router in one stable chunk so
+          // there is exactly one copy of the React runtime.
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/') ||
+            id.includes('node_modules/react-router') ||
+            id.includes('node_modules/@remix-run/router')
+          ) {
+            return 'vendor-react';
+          }
+          // Zustand standalone — no React deps, very small.
+          if (id.includes('node_modules/zustand')) {
+            return 'vendor-zustand';
+          }
+          // FullCalendar non-react packages only. @fullcalendar/react
+          // stays in the main bundle so the React runtime is shared.
+          if (
+            id.includes('node_modules/@fullcalendar/') &&
+            !id.includes('node_modules/@fullcalendar/react')
+          ) {
+            return 'vendor-fullcalendar';
+          }
         },
       },
     },
