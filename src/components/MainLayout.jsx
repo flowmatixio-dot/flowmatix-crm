@@ -1212,7 +1212,7 @@ export default function MainLayout() {
         </div></div>
     </div>
     {/* Tour disabled — not in production v368 */}
-    {IS_CLIENT_MODE && user && <AISupportWidget />}
+    {IS_CLIENT_MODE && user && !showWaSupport && <AISupportWidget />}
     </ErrorBoundary>
   );
 }
