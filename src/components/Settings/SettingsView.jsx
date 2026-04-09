@@ -1378,32 +1378,6 @@ export default function SettingsView() {
     {settingsTab === "team" && <>
     <HintBox id="settings_team">{t("hint_settings_team")}</HintBox>
     <TeamAccessSection clinic={clinic} showT={showT} t={t} setClinics={setClinics} />
-
-    {/* ── 2FA Enforcement ── */}
-    <div style={{marginTop:32,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
-      <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)",marginBottom:6}}>🔐 {t("mfa_enforce_title") || "Zwei-Faktor-Authentifizierung erzwingen"}</div>
-      <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:14}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen. Bestehende Nutzer ohne 2FA werden beim nächsten Login zur Einrichtung gezwungen — sie können sich nicht ohne 2FA einloggen."}</div>
-      {[
-        {role:"clinic_admin", label: t("role_admin") || "Admin"},
-        {role:"clinic_doctor", label: t("role_doctor") || "Arzt"},
-        {role:"clinic_coordinator", label: t("role_coordinator") || "Koordinator"},
-        {role:"clinic_finance", label: t("role_finance") || "Finanzen"},
-      ].map(r => {
-        const required = (c.mfaRequiredRoles || []).includes(r.role);
-        return (
-          <label key={r.role} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",cursor:"pointer"}}>
-            <input type="checkbox" checked={required} onChange={(e)=>{
-              const cur = c.mfaRequiredRoles || [];
-              const next = e.target.checked ? [...cur, r.role] : cur.filter(x => x !== r.role);
-              up("mfaRequiredRoles", next);
-            }} style={{accentColor:"#FF8C42"}} />
-            <span style={{color:"rgba(232,238,252,0.85)",fontSize:14}}>{r.label}</span>
-            {required && <span style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:99,background:"rgba(255,140,66,0.15)",border:"1px solid rgba(255,140,66,0.3)",color:"#FF8C42",letterSpacing:0.5}}>{t("mfa_required") || "PFLICHT"}</span>}
-          </label>
-        );
-      })}
-      <div style={{marginTop:14,padding:"10px 12px",background:"rgba(255,107,107,0.06)",border:"1px solid rgba(255,107,107,0.18)",borderRadius:8,fontSize:11.5,color:"rgba(255,170,170,0.85)",lineHeight:1.5}}>⚠️ {t("mfa_warning") || "Achtung: Aktiviere diese Option NUR wenn du selbst bereits 2FA eingerichtet hast (Einstellungen → Mein Account → 2FA aktivieren). Sonst sperrst du dich selbst aus."}</div>
-    </div>
     </>}
 
 
@@ -1472,7 +1446,35 @@ export default function SettingsView() {
     </>}
 
     {/* ═══ ACCOUNT / PASSWORD ═══ */}
-    {settingsTab === "account" && <AccountSection t={t} showT={showT} user={user} />}
+    {settingsTab === "account" && <>
+    <AccountSection t={t} showT={showT} user={user} />
+
+    {/* ── 2FA Enforcement (admin only) ── */}
+    {isAdmin && <div style={{marginTop:32,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
+      <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)",marginBottom:6}}>🔐 {t("mfa_enforce_title") || "Zwei-Faktor-Authentifizierung erzwingen"}</div>
+      <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:14}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen."}</div>
+      {[
+        {role:"clinic_admin", label: t("role_admin") || "Admin"},
+        {role:"clinic_doctor", label: t("role_doctor") || "Arzt"},
+        {role:"clinic_coordinator", label: t("role_coordinator") || "Koordinator"},
+        {role:"clinic_finance", label: t("role_finance") || "Finanzen"},
+      ].map(r => {
+        const required = (c.mfaRequiredRoles || []).includes(r.role);
+        return (
+          <label key={r.role} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",cursor:"pointer"}}>
+            <input type="checkbox" checked={required} onChange={(e)=>{
+              const cur = c.mfaRequiredRoles || [];
+              const next = e.target.checked ? [...cur, r.role] : cur.filter(x => x !== r.role);
+              up("mfaRequiredRoles", next);
+            }} style={{accentColor:"#FF8C42"}} />
+            <span style={{color:"rgba(232,238,252,0.85)",fontSize:14}}>{r.label}</span>
+            {required && <span style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:99,background:"rgba(255,140,66,0.15)",border:"1px solid rgba(255,140,66,0.3)",color:"#FF8C42",letterSpacing:0.5}}>{t("mfa_required") || "PFLICHT"}</span>}
+          </label>
+        );
+      })}
+      <div style={{marginTop:14,padding:"10px 12px",background:"rgba(255,107,107,0.06)",border:"1px solid rgba(255,107,107,0.18)",borderRadius:8,fontSize:11.5,color:"rgba(255,170,170,0.85)",lineHeight:1.5}}>⚠️ {t("mfa_warning") || "Achtung: Aktiviere diese Option NUR wenn du selbst bereits 2FA eingerichtet hast (oben unter 2FA aktivieren). Sonst sperrst du dich selbst aus."}</div>
+    </div>}
+    </>}
 
     {/* ═══ AUDIT LOG ═══ */}
     {settingsTab === "audit_log" && <Suspense fallback={<div style={{padding:40,textAlign:"center",color:"rgba(167,177,195,0.6)"}}>...</div>}><AuditLogView /></Suspense>}
