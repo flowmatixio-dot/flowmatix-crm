@@ -345,8 +345,7 @@ export default function RevenueView() {
     {/* ═══ EXPORTS TAB ═══ */}
     {tab === "exports" && <>
       {/* Google Sheets Export */}
-      {isAuthenticated() && <div style={{ padding: 24, borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)", marginBottom: 20, position: "relative", opacity: isCorePlan ? 0.45 : 1, pointerEvents: isCorePlan ? "none" : "auto" }}>
-        {isCorePlan && <div style={{ position: "absolute", top: 10, right: 14, background: "rgba(255,138,42,0.12)", border: "1px solid rgba(255,138,42,0.25)", borderRadius: 8, padding: "3px 10px", fontSize: 10, fontWeight: 800, color: "#ff8a2a", letterSpacing: "0.05em", zIndex: 2 }}>PRO</div>}
+      {isAuthenticated() && <div style={{ padding: 24, borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)", marginBottom: 20, position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: 28 }}>{"📊"}</span>
           <div>
