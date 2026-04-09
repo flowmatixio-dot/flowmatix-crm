@@ -74,6 +74,7 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
             fmApi.setTokens(res.accessToken, res.refreshToken);
             if (res.user) sessionStorage.setItem('fm_api_user', JSON.stringify(res.user));
             sessionStorage.setItem('fm_login_at', String(Date.now()));
+            sessionStorage.setItem('fm_show_pw_change', '1');
             window.history.replaceState(null, '', '/dashboard');
             window.location.reload();
           } else {

@@ -96,8 +96,17 @@ export default function MainLayout() {
   const [pwForm, setPwForm] = React.useState({ current: '', newPw: '', confirm: '' });
   const [pwLoading, setPwLoading] = React.useState(false);
   const [pwToast, setPwToast] = React.useState(null);
+  const [pwResetHint, setPwResetHint] = React.useState(false);
   // 2FA state for account modal
   const [mfaState, setMfaState] = React.useState({ enabled: null, step: 'idle', qrUrl: '', secret: '', code: '', error: '', loading: false });
+  // Auto-open account modal after magic-link login (password reset flow)
+  React.useEffect(() => {
+    if (sessionStorage.getItem('fm_show_pw_change') === '1') {
+      sessionStorage.removeItem('fm_show_pw_change');
+      setShowPwModal(true);
+      setPwResetHint(true);
+    }
+  }, []);
   const handlePwChange = async () => {
     if (pwForm.newPw.length < 8) { setPwToast({ msg: t('pw_min_8') || 'Mindestens 8 Zeichen', type: 'error' }); setTimeout(() => setPwToast(null), 3000); return; }
     if (pwForm.newPw !== pwForm.confirm) { setPwToast({ msg: t('pw_mismatch') || 'Passwörter stimmen nicht überein', type: 'error' }); setTimeout(() => setPwToast(null), 3000); return; }
@@ -980,6 +989,12 @@ export default function MainLayout() {
           return <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'var(--overlay-heavy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setShowPwModal(false); setMfaState(s => ({ ...s, step: 'idle', code: '', error: '' })); }}>
             <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-modal)', border: '1px solid var(--border-default)', borderRadius: 16, padding: 28, width: 400, maxWidth: '90vw', maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
               <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'👤'} {t('my_account') || 'Mein Konto'}</div>
+
+              {/* ── Password Reset Hint ── */}
+              {pwResetHint && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(76,201,255,0.06)', border: '1px solid rgba(76,201,255,0.15)', marginBottom: 16, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
+                <div style={{ fontSize: 12, color: 'rgba(200,215,240,0.8)', lineHeight: 1.5 }}>{t('pw_reset_hint') || 'Sie haben sich über einen Reset-Link eingeloggt. Bitte setzen Sie jetzt ein neues Passwort, damit Sie sich beim nächsten Mal normal einloggen können.'}</div>
+              </div>}
 
               {/* ── Password Section ── */}
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
