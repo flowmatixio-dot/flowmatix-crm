@@ -932,7 +932,7 @@ export default function MainLayout() {
                   {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
                   <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
                   {/* Language picker inside menu */}
-                  <div style={{ padding: "4px 12px", display: "flex", gap: 4 }}>
+                  <div style={{ padding: "4px 12px", display: "flex", gap: 4, flexWrap: "wrap", maxWidth: 200 }}>
                     {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "var(--info-subtle)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
                   </div>
                   <div style={{ height: 1, background: "var(--border-subtle)", margin: "4px 0" }} />
