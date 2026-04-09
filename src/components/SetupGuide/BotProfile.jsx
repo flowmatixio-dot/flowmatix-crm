@@ -43,12 +43,28 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
   const handleImage = (type) => (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Size check: max 5MB (WhatsApp/360dialog limit)
+    if (file.size > 5 * 1024 * 1024) {
+      showT(t("image_too_large") || "Bild zu groß — max. 5 MB erlaubt.");
+      e.target.value = "";
+      return;
+    }
+    // Dimension check: max 640x640 for WhatsApp profile photo
+    const img = new Image();
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target.result;
       if (type === "logo") {
-        setWaLogoPreview(dataUrl);
-        update("logoUrl", dataUrl);
+        img.onload = () => {
+          if (img.width > 640 || img.height > 640) {
+            showT(t("image_too_large_dim") || "Bild zu groß — max. 640×640 Pixel für WhatsApp-Profilbild.");
+            e.target.value = "";
+            return;
+          }
+          setWaLogoPreview(dataUrl);
+          update("logoUrl", dataUrl);
+        };
+        img.src = dataUrl;
       } else {
         setWaBannerPreview(dataUrl);
         update("bannerUrl", dataUrl);
