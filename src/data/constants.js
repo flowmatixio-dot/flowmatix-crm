@@ -169,11 +169,11 @@ export const ROLES = {
 
 // Module-level permissions: which roles can access which views
 export const MODULE_ACCESS = {
-  dashboard:      { admin: true, coordinator: true, doctor: false, finance: true },
+  dashboard:      { admin: true, coordinator: true, doctor: true, finance: true },
   support:        { admin: true, coordinator: true, doctor: true, finance: true },
   action_needed:  { admin: true, coordinator: true, doctor: false, finance: false },
-  inbox:          { admin: true, coordinator: true, doctor: false, finance: false },
-  patients:       { admin: true, coordinator: true, doctor: false, finance: false },
+  inbox:          { admin: true, coordinator: true, doctor: true, finance: false },
+  patients:       { admin: true, coordinator: true, doctor: true, finance: false },
   pipeline:       { admin: true, coordinator: true, doctor: false, finance: false },
   appointments:   { admin: true, coordinator: true, doctor: true,  finance: false },
   op_prep:        { admin: true, coordinator: true, doctor: true,  finance: false },
