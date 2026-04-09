@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
 import { getNow } from "../../utils/demoTime";
-import { fmLocale } from "../../utils/helpers";
+import { fmLocale, translateValue } from "../../utils/helpers";
 import ConsentTracker from "../Files/ConsentTracker";
 import HintBox from "../shared/HintBox.jsx";
 
@@ -415,7 +415,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
                           {f.l}
                         </div>
                         <div style={{ fontSize: 12, color: "rgba(232,238,252,0.92)", fontWeight: 600, lineHeight: 1.35 }}>
-                          {v}
+                          {translateValue(v)}
                         </div>
                       </div>
                     );

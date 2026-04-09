@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import * as fmApi from '../../api/client.js';
 import { useApp } from '../../context/AppContext';
 import { dt } from './doctorI18n';
+import { translateValue } from '../../utils/helpers';
 
 // Fallback techniques if API has none
 const FALLBACK_TECHNIQUES = [
@@ -255,7 +256,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
                     <div style={{ fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
                     <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.6)', marginTop: 1, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                       {intake.treatment && <span style={{ padding: '1px 6px', borderRadius: 4, background: 'rgba(76,201,255,0.06)', border: '1px solid rgba(76,201,255,0.1)', color: 'rgba(76,201,255,0.7)', fontWeight: 600, fontSize: 10 }}>{intake.treatment}</span>}
-                      {intake.concern && <span>{intake.concern}</span>}
+                      {intake.concern && <span>{translateValue(intake.concern)}</span>}
                       {photos.length > 0 && <span>📷 {photos.length}</span>}
                     </div>
                   </div>
@@ -297,9 +298,9 @@ export default function DoctorTasksView({ onLogout } = {}) {
                 {/* Context note */}
                 {!isPickup && (intake.hair_loss_duration || intake.previous_treatments || intake.medications) && (
                   <div style={{ background: 'rgba(255,255,255,0.015)', borderRadius: 7, padding: '8px 10px', marginBottom: 12, fontSize: 11, color: 'rgba(167,177,195,0.6)', lineHeight: 1.5 }}>
-                    {intake.hair_loss_duration && <span>{tl('hair_loss_since')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{intake.hair_loss_duration}</strong> · </span>}
-                    {intake.previous_treatments && intake.previous_treatments !== 'none' && intake.previous_treatments !== 'keine' && <span>{tl('previous_treatments')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{intake.previous_treatments}</strong> · </span>}
-                    {intake.medications && intake.medications !== 'none' && intake.medications !== 'keine' && <span>{tl('medications')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{intake.medications}</strong></span>}
+                    {intake.hair_loss_duration && <span>{tl('hair_loss_since')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{translateValue(intake.hair_loss_duration)}</strong> · </span>}
+                    {intake.previous_treatments && intake.previous_treatments !== 'none' && intake.previous_treatments !== 'keine' && <span>{tl('previous_treatments')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{translateValue(intake.previous_treatments)}</strong> · </span>}
+                    {intake.medications && intake.medications !== 'none' && intake.medications !== 'keine' && <span>{tl('medications')}: <strong style={{ color: 'rgba(232,238,252,0.95)' }}>{translateValue(intake.medications)}</strong></span>}
                   </div>
                 )}
 
