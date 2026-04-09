@@ -1450,7 +1450,7 @@ export default function SettingsView() {
     <AccountSection t={t} showT={showT} user={user} />
 
     {/* ── 2FA Enforcement (admin only) ── */}
-    {isAdmin && <div style={{marginTop:32,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
+    {(user?.role === 'clinic_admin' || user?.role === 'platform_owner' || user?.apiRole === 'clinic_admin') && <div style={{marginTop:32,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
       <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)",marginBottom:6}}>🔐 {t("mfa_enforce_title") || "Zwei-Faktor-Authentifizierung erzwingen"}</div>
       <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:14}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen."}</div>
       {[
