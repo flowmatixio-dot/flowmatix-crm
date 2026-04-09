@@ -96,6 +96,8 @@ export default function MainLayout() {
   const [pwForm, setPwForm] = React.useState({ current: '', newPw: '', confirm: '' });
   const [pwLoading, setPwLoading] = React.useState(false);
   const [pwToast, setPwToast] = React.useState(null);
+  // 2FA state for account modal
+  const [mfaState, setMfaState] = React.useState({ enabled: null, step: 'idle', qrUrl: '', secret: '', code: '', error: '', loading: false });
   const handlePwChange = async () => {
     if (pwForm.newPw.length < 8) { setPwToast({ msg: t('pw_min_8') || 'Mindestens 8 Zeichen', type: 'error' }); setTimeout(() => setPwToast(null), 3000); return; }
     if (pwForm.newPw !== pwForm.confirm) { setPwToast({ msg: t('pw_mismatch') || 'Passwörter stimmen nicht überein', type: 'error' }); setTimeout(() => setPwToast(null), 3000); return; }
@@ -930,7 +932,7 @@ export default function MainLayout() {
                     <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>{user.email || (isAdmin ? "Admin" : clinic?.name)}</div>
                   </div>
                   {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
-                  <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
+                  <button onClick={() => { setShowPwModal(true); setMfaState(s => ({ ...s, enabled: null })); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>👤 {t("my_account") || "Mein Konto"}</button>
                   {/* Language picker inside menu */}
                   <div style={{ padding: "4px 12px", display: "flex", gap: 4 }}>
                     {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "var(--info-subtle)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
@@ -946,32 +948,110 @@ export default function MainLayout() {
         </div>
 
         {/* Password Change Modal */}
-        {showPwModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'var(--overlay-heavy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPwModal(false)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-modal)', border: '1px solid var(--border-default)', borderRadius: 16, padding: 28, width: 380, maxWidth: '90vw' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
+        {showPwModal && (() => {
+          // Load MFA status on open
+          if (mfaState.enabled === null) {
+            fmApi.getMe().then(r => setMfaState(s => ({ ...s, enabled: !!r?.user?.mfa_enabled }))).catch(() => setMfaState(s => ({ ...s, enabled: false })));
+          }
+          const mfaSetup = async () => {
+            setMfaState(s => ({ ...s, loading: true, error: '' }));
+            try {
+              const res = await fmApi.setupMfa();
+              setMfaState(s => ({ ...s, step: 'setup', qrUrl: res.qrCodeUrl || res.qr_code_url || '', secret: res.secret || '', loading: false }));
+            } catch (e) { setMfaState(s => ({ ...s, error: e.message, loading: false })); }
+          };
+          const mfaVerify = async () => {
+            setMfaState(s => ({ ...s, loading: true, error: '' }));
+            try {
+              await fmApi.verifyMfa(mfaState.code);
+              setMfaState(s => ({ ...s, enabled: true, step: 'idle', code: '', loading: false }));
+              setPwToast({ msg: t('mfa_setup_complete') || '2FA aktiviert!' }); setTimeout(() => setPwToast(null), 3000);
+            } catch (e) { setMfaState(s => ({ ...s, error: e.message || 'Invalid code', loading: false })); }
+          };
+          const mfaDisable = async () => {
+            setMfaState(s => ({ ...s, loading: true, error: '' }));
+            try {
+              await fmApi.disableMfa(mfaState.code);
+              setMfaState(s => ({ ...s, enabled: false, step: 'idle', code: '', loading: false }));
+              setPwToast({ msg: t('mfa_disabled_success') || '2FA deaktiviert' }); setTimeout(() => setPwToast(null), 3000);
+            } catch (e) { setMfaState(s => ({ ...s, error: e.message, loading: false })); }
+          };
+          const inp = { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
+          return <div style={{ position: 'fixed', inset: 0, zIndex: 99990, background: 'var(--overlay-heavy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setShowPwModal(false); setMfaState(s => ({ ...s, step: 'idle', code: '', error: '' })); }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-modal)', border: '1px solid var(--border-default)', borderRadius: 16, padding: 28, width: 400, maxWidth: '90vw', maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>{'👤'} {t('my_account') || 'Mein Konto'}</div>
+
+              {/* ── Password Section ── */}
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>{'🔑'} {t('change_password') || 'Passwort ändern'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>Aktuelles Passwort <span style={{ fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
-                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('current_password') || 'Aktuelles Passwort'}</label>
+                  <input type="password" value={pwForm.current} onChange={e => setPwForm(p => ({ ...p, current: e.target.value }))} style={inp} />
                 </div>
                 <div>
                   <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('new_password') || 'Neues Passwort'}</label>
-                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} placeholder="Mindestens 8 Zeichen" />
+                  <input type="password" value={pwForm.newPw} onChange={e => setPwForm(p => ({ ...p, newPw: e.target.value }))} style={inp} placeholder={t('pw_min_8') || 'Mindestens 8 Zeichen'} />
                 </div>
                 <div>
                   <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('confirm_password') || 'Passwort bestätigen'}</label>
-                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                  <input type="password" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} onKeyDown={e => e.key === 'Enter' && handlePwChange()} style={inp} />
                 </div>
               </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 14, justifyContent: 'flex-end' }}>
+                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'var(--brand-muted)' : 'var(--brand)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : (t('save') || 'Speichern')}</button>
+              </div>
+
+              {/* ── 2FA Section ── */}
+              <div style={{ height: 1, background: 'var(--border-subtle)', margin: '20px 0' }} />
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>{'🔐'} {t('mfa_title') || 'Zwei-Faktor-Authentifizierung (2FA)'}</div>
+
+              {mfaState.enabled === null && <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>...</div>}
+
+              {mfaState.enabled && mfaState.step === 'idle' && <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#10b981' }}>{t('mfa_active') || '2FA ist aktiv'}</span>
+                </div>
+                <button onClick={() => setMfaState(s => ({ ...s, step: 'disable', code: '', error: '' }))} style={{ padding: '6px 16px', borderRadius: 8, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444', fontWeight: 600, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>{t('mfa_disable') || '2FA deaktivieren'}</button>
+              </div>}
+
+              {!mfaState.enabled && mfaState.step === 'idle' && <div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>{t('mfa_description') || 'Schütze dein Konto mit einer Authenticator-App (Google Authenticator, Authy, etc.)'}</div>
+                <button onClick={mfaSetup} disabled={mfaState.loading} style={{ padding: '8px 20px', borderRadius: 8, background: 'rgba(76,201,255,0.08)', border: '1px solid rgba(76,201,255,0.2)', color: '#4cc9ff', fontWeight: 600, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>{mfaState.loading ? '...' : (t('mfa_enable') || '2FA aktivieren')}</button>
+              </div>}
+
+              {mfaState.step === 'setup' && <div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{t('mfa_scan_qr') || 'QR-Code mit Authenticator-App scannen:'}</div>
+                {mfaState.qrUrl && <div style={{ textAlign: 'center', margin: '12px 0' }}><img src={mfaState.qrUrl} alt="2FA QR" width={160} height={160} style={{ borderRadius: 8 }} /></div>}
+                {mfaState.secret && <div style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 12, wordBreak: 'break-all' }}>{t('mfa_scan_secret') || 'Manuell:'} <code style={{ background: 'var(--bg-input)', padding: '2px 6px', borderRadius: 4 }}>{mfaState.secret}</code></div>}
+                <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4, display: 'block' }}>{t('mfa_enter_code') || '6-stelliger Code'}</label>
+                <input type="text" inputMode="numeric" maxLength={6} value={mfaState.code} onChange={e => setMfaState(s => ({ ...s, code: e.target.value.replace(/\D/g, '') }))} onKeyDown={e => e.key === 'Enter' && mfaState.code.length === 6 && mfaVerify()} style={{ ...inp, letterSpacing: 6, fontSize: 18, fontWeight: 700, textAlign: 'center' }} placeholder="000000" />
+                {mfaState.error && <div style={{ marginTop: 8, fontSize: 12, color: 'var(--error)' }}>{mfaState.error}</div>}
+                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                  <button onClick={() => setMfaState(s => ({ ...s, step: 'idle', code: '', error: '' }))} style={{ flex: 1, padding: '8px', borderRadius: 8, background: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
+                  <button onClick={mfaVerify} disabled={mfaState.loading || mfaState.code.length !== 6} style={{ flex: 1, padding: '8px', borderRadius: 8, background: mfaState.code.length === 6 ? 'var(--brand)' : 'var(--bg-input)', border: 'none', color: mfaState.code.length === 6 ? '#fff' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: mfaState.code.length === 6 ? 'pointer' : 'default', fontFamily: 'inherit' }}>{mfaState.loading ? '...' : (t('confirm') || 'Bestätigen')}</button>
+                </div>
+              </div>}
+
+              {mfaState.step === 'disable' && <div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{t('mfa_enter_code') || 'Code aus Authenticator-App eingeben:'}</div>
+                <input type="text" inputMode="numeric" maxLength={6} value={mfaState.code} onChange={e => setMfaState(s => ({ ...s, code: e.target.value.replace(/\D/g, '') }))} onKeyDown={e => e.key === 'Enter' && mfaState.code.length === 6 && mfaDisable()} style={{ ...inp, letterSpacing: 6, fontSize: 18, fontWeight: 700, textAlign: 'center' }} placeholder="000000" />
+                {mfaState.error && <div style={{ marginTop: 8, fontSize: 12, color: 'var(--error)' }}>{mfaState.error}</div>}
+                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                  <button onClick={() => setMfaState(s => ({ ...s, step: 'idle', code: '', error: '' }))} style={{ flex: 1, padding: '8px', borderRadius: 8, background: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
+                  <button onClick={mfaDisable} disabled={mfaState.loading || mfaState.code.length !== 6} style={{ flex: 1, padding: '8px', borderRadius: 8, background: mfaState.code.length === 6 ? 'rgba(239,68,68,0.12)' : 'var(--bg-input)', border: mfaState.code.length === 6 ? '1px solid rgba(239,68,68,0.3)' : 'none', color: mfaState.code.length === 6 ? '#ef4444' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: mfaState.code.length === 6 ? 'pointer' : 'default', fontFamily: 'inherit' }}>{mfaState.loading ? '...' : (t('mfa_disable') || 'Deaktivieren')}</button>
+                </div>
+              </div>}
+
               {pwToast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: pwToast.type === 'error' ? 'var(--error-subtle)' : 'var(--success-subtle)', color: pwToast.type === 'error' ? 'var(--error)' : 'var(--success)', fontSize: 12, fontWeight: 600 }}>{pwToast.msg}</div>}
-              <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-                <button onClick={() => setShowPwModal(false)} style={{ background: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('cancel') || 'Abbrechen'}</button>
-                <button onClick={handlePwChange} disabled={pwLoading} style={{ background: pwLoading ? 'var(--brand-muted)' : 'var(--brand)', border: 'none', color: '#fff', borderRadius: 8, padding: '8px 20px', cursor: pwLoading ? 'wait' : 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>{pwLoading ? '...' : 'Speichern'}</button>
+
+              <div style={{ height: 1, background: 'var(--border-subtle)', margin: '20px 0' }} />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button onClick={() => { setShowPwModal(false); setMfaState(s => ({ ...s, step: 'idle', code: '', error: '' })); }} style={{ background: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>{t('close') || 'Schließen'}</button>
               </div>
             </div>
-          </div>
-        )}
+          </div>;
+        })()}
 
         {/* ── Trial Countdown Banner ── */}
         {IS_CLIENT_MODE && trialCountdown && !demoMode && ctx.workspaceState !== 'active' && ctx.workspaceState !== 'trial_expired' && (
