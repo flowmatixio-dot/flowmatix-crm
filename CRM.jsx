@@ -432,7 +432,7 @@ export default function App() {
     if(!patientId)return;
     clearTimeout(_syncTimers.current[patientId]);
     _syncTimers.current[patientId]=setTimeout(()=>{
-      fmApi.syncPatientCardToDrive(patientId).then(r=>{if(r?.success)console.log("[sync] Patient card synced to Drive:",patientId);}).catch(()=>{});
+      fmApi.syncPatientCardToDrive(patientId).catch(()=>{});
     },3000);
   };
 
@@ -448,15 +448,10 @@ export default function App() {
     fmApi.updatePatient(lid,{conv_status:st,control_mode:controlMode}).catch(err=>console.warn("updatePatient convStatus failed:",err));
   };
   const handleDrop=st=>{if(dragItem){moveLead(dragItem,st);setDragItem(null);}};
-  const updateAppt=(id,data)=>{console.log("[CRM] updateAppt called:",id,JSON.stringify(data));setAppts(p=>p.map(a=>a.id===id?{...a,...data}:a));showT("Updated");fmApi.updateAppointment(id,data).then(r=>console.log("[CRM] updateAppt SUCCESS:",r)).catch(err=>{console.error("[CRM] updateAppt FAILED:",err);showT("Speichern fehlgeschlagen: "+err.message);});};
+  const updateAppt=(id,data)=>{setAppts(p=>p.map(a=>a.id===id?{...a,...data}:a));showT("Updated");fmApi.updateAppointment(id,data).catch(err=>{console.error("[CRM] updateAppt FAILED:",err);showT("Speichern fehlgeschlagen: "+err.message);});};
   const openPatient=(lid)=>{setSelLead(lid);const l=leads.find(x=>x.id===lid);if(l)logAction("patient_opened",l.name,`Viewed profile (${l.treatment})`);};
   const openPatientPhotos=(lid)=>{const l=leads.find(x=>x.id===lid);if(l)logAction("photos_viewed",l.name,`Viewed ${l.photoUrls?.length||0} photos`);};
   const browserNotify=(title,body)=>{if("Notification" in window && Notification.permission==="granted"){new Notification(title,{body,icon:"/Flowmatix-Logo.png"});}};
-  const completeOnboarding=(clinicId,showToastMsg)=>{
-    setClinics(cs=>cs.map(c=>c.id===clinicId?{...c,setupStatus:"live"}:c));
-    if(showToastMsg)showT(showToastMsg);
-    fmApi.updateClinicSettings({onboarding_completed:true,setup_status:"live"}).catch(e=>{console.error('[CRM] completeOnboarding failed:',e.message||e);});
-  };
   const markNotifsRead=()=>{
     setClinics(cs=>cs.map(c=>c.id===activeClinicId?{...c,notifications:(c.notifications||[]).map(n=>({...n,read:true}))}:c));
     myNotifs.forEach(n=>readNotifIdsRef.current.add(n.id));
@@ -789,15 +784,6 @@ export default function App() {
     };
   },[user,activeClinicId]);
 
-  /* Onboarding check */
-  // Setup wizard only when workspace is ACTIVE (paid) and setup is incomplete
-  const needsOnboarding=clinic&&!onboardingDismissed&&workspaceState==='active'&&(!clinic.clinicEmail||clinic.clinicEmail==="info@hairclinicturkiye.com"||!clinic.waName);
-  const onboardingSteps=clinic?[
-    {key:"clinic",label:t("ob_clinic"),done:!!clinic.clinicEmail&&!!clinic.address&&!!clinic.phone},
-    {key:"wa",label:t("ob_whatsapp"),done:!!clinic.waName},
-    {key:"ai",label:t("ob_ai"),done:!!clinic.aiConfig?.responseTone},
-  ]:[];
-
   /* ═══ NAV ═══ */
   const nav=isOperator&&!IS_CLIENT_MODE?[
     {id:"operator",icon:"📊",l:"Overview"},
@@ -902,7 +888,6 @@ export default function App() {
     myNotifs, unreadNotifs, myFiles, myAutomations, totalActions: totalActionsWithDb,
     usageMetrics: crmData.usageMetrics, todayMetrics: crmData.todayMetrics,
     searchResults, flightAlerts: crmData.flightAlerts, flightMatches: crmData.flightMatches,
-    needsOnboarding, onboardingSteps,
     chatEnd,
     t, getCS, getClinicById, getLeadById, getStageById, showT,
     logAction, getLeadScore: crmData.getLeadScore, getSLA: crmData.getSLA, getAiSuggestions: crmData.getAiSuggestions,
@@ -922,7 +907,7 @@ export default function App() {
     exportRevenue: businessLogic.exportRevenue,
     browserNotify, estimateRevenue: businessLogic.estimateRevenue, getWeekRevenue: businessLogic.getWeekRevenue,
     createInvoice: businessLogic.createInvoice,
-    completeOnboarding, handleLogout, handleLogin, handleMagicLink,
+    handleLogout, handleLogin, handleMagicLink,
     handleForgotPw, handleSetPassword, handlePasswordReset,
     SystemStatus, CalMonth, CalDay, nav: filteredNav, userRole, canAccess,
     demoMode, toggleDemoMode, demoLoading,

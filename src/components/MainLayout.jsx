@@ -38,7 +38,6 @@ import OpPrepView from "./OpPrep/OpPrepView";
 import ReviewBoard from "./DoctorTasks/ReviewBoard";
 import DoctorTasksView from "./DoctorTasks/DoctorTasksView";
 import ArchiveView from "./Archive/ArchiveView";
-import OnboardingWizard from "./Onboarding/OnboardingWizard";
 import AutoDemoPlayer from "./Onboarding/AutoDemoPlayer";
 import { isFromSetup, clearFromSetup } from "../lib/setupNav";
 import PaymentsView from "./Finance/PaymentsView";
@@ -69,7 +68,6 @@ export default function MainLayout() {
     myNotifs, unreadNotifs, myFiles, myAutomations, totalActions,
     usageMetrics, todayMetrics,
     searchResults, flightAlerts, flightMatches,
-    needsOnboarding, completeOnboarding,
     t, getCS, getClinicById, getLeadById, getStageById, showT,
     logAction, getLeadScore, getSLA, getAiSuggestions,
     moveLead, addTL, setConvStatus, handleDrop, updateAppt,
@@ -277,14 +275,6 @@ export default function MainLayout() {
     return () => clearInterval(iv);
   }, [ctx.workspaceState]);
 
-  // ── Onboarding Wizard (ONLY after payment — workspace_state === 'active') ──
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  useEffect(() => {
-    const wsActive = ctx.workspaceState === 'active';
-    if (needsOnboarding && isAdmin && IS_CLIENT_MODE && !demoMode && wsActive) setShowOnboarding(true);
-    else if (demoMode || !wsActive) setShowOnboarding(false);
-  }, [needsOnboarding, isAdmin, demoMode, ctx.workspaceState]);
-
   // ── Redirect legacy billing confirm to plan picker ──
   useEffect(() => {
     if (ctx.showBillingConfirm) {
@@ -323,11 +313,6 @@ export default function MainLayout() {
         </div>
       </div>
     )}
-
-    {showOnboarding && <OnboardingWizard onComplete={() => {
-      setShowOnboarding(false);
-      completeOnboarding(ctx.activeClinicId, t("onboarding_complete") || "Setup abgeschlossen!");
-    }} onSkip={() => setShowOnboarding(false)} />}
 
     {/* AutoDemoPlayer overlay — mounted globally so it survives view changes
         triggered by the player itself (it calls setView to walk through CRM) */}

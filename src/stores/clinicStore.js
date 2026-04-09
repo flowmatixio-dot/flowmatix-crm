@@ -172,15 +172,4 @@ export const useClinicStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Complete onboarding for a clinic.
-   */
-  completeOnboarding: (clinicId) => {
-    set((s) => ({
-      clinics: s.clinics.map((c) =>
-        c.id === clinicId ? { ...c, setupStatus: 'live' } : c
-      ),
-    }));
-    fmApi.updateClinicSettings({ onboarding_completed: true, setup_status: 'live' }).catch(e => { console.error("[store] API sync failed:", e.message || e); });
-  },
 }));
