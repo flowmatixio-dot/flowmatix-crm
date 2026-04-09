@@ -204,8 +204,7 @@ export default function AutomationsView() {
                 if (res.success) {
                   showT(`✓ ${res.submitted} ${t("auto_templates_submitted") || "submitted"}, ${res.already_exists} ${t("auto_templates_already") || "already existing"}`);
                 } else {
-                  showT(`${res.submitted} ${t("auto_templates_submitted") || "submitted"}, ${res.errors} ${t("auto_templates_errors") || "errors — details in console"}`);
-                  console.log("[template-submit]", res.details);
+                  showT(`${res.submitted} ${t("auto_templates_submitted") || "submitted"}, ${res.errors} ${t("auto_templates_errors") || "errors"}`);
                 }
               } catch (e) {
                 showT((t("auto_save_error_prefix") || "Error: ") + (e.message || (t("auto_submission_failed") || "Submission failed")));

@@ -261,14 +261,12 @@ export default function AppointmentsPage() {
   }, []);
 
   const handleEventDrop = useCallback((info) => {
-    console.log("[DRAG] eventDrop fired, type:", info.event.extendedProps?.type, "id:", info.event.extendedProps?.appt?.id);
     const props = info.event.extendedProps;
-    if (props.type !== "appointment") { console.log("[DRAG] reverted: type is", props.type); info.revert(); return; }
+    if (props.type !== "appointment") { info.revert(); return; }
     const newStart = info.event.start;
-    if (!newStart) { console.log("[DRAG] reverted: no start"); info.revert(); return; }
+    if (!newStart) { info.revert(); return; }
     const date = newStart.toISOString().slice(0, 10);
     const time = `${String(newStart.getHours()).padStart(2, "0")}:${String(newStart.getMinutes()).padStart(2, "0")}`;
-    console.log("[DRAG] calling updateAppt:", props.appt.id, date, time);
     updateAppt(props.appt.id, { date, time });
     showT(t("appt_updated") || "Updated");
   }, [updateAppt, showT]);
