@@ -92,13 +92,20 @@ export default function MainLayout() {
   const [promoLoading, setPromoLoading] = React.useState(false);
   const [promoError, setPromoError] = React.useState('');
   const [showPromoInput, setShowPromoInput] = React.useState(false);
-  // WhatsApp support float — visible for admins in first 30 days
-  const [showWaSupport] = React.useState(() => {
-    if (effectiveRole !== 'admin') return false;
-    let firstSeen = localStorage.getItem('fm_first_login');
-    if (!firstSeen) { firstSeen = String(Date.now()); localStorage.setItem('fm_first_login', firstSeen); }
-    return (Date.now() - Number(firstSeen)) < 30 * 24 * 60 * 60 * 1000;
-  });
+  // WhatsApp support float — visible for admins, 30 day timer starts at activation (purchase)
+  const [showWaSupport, setShowWaSupport] = React.useState(false);
+  React.useEffect(() => {
+    if (effectiveRole !== 'admin') return;
+    // Start timer when workspace becomes active (= purchased)
+    if (ctx.workspaceState === 'active') {
+      let activatedAt = localStorage.getItem('fm_activated_at');
+      if (!activatedAt) { activatedAt = String(Date.now()); localStorage.setItem('fm_activated_at', activatedAt); }
+      setShowWaSupport((Date.now() - Number(activatedAt)) < 30 * 24 * 60 * 60 * 1000);
+    } else {
+      // Trial / live_test — always show
+      setShowWaSupport(true);
+    }
+  }, [effectiveRole, ctx.workspaceState]);
   const [showPwModal, setShowPwModal] = React.useState(false);
   const [pwForm, setPwForm] = React.useState({ current: '', newPw: '', confirm: '' });
   const [pwLoading, setPwLoading] = React.useState(false);
