@@ -1084,7 +1084,7 @@ export default function MainLayout() {
 
         {/* ── WhatsApp Support Float (30 days) ── */}
         {showWaSupport && <a
-          href="https://wa.me/4917664189746?text=Hallo%2C%20ich%20brauche%20Hilfe%20bei%20der%20Einrichtung%20meiner%20Klinik."
+          href="https://wa.me/4917664189746?text=Hi%2C%20I%20need%20help%20setting%20up%20my%20clinic%20on%20Flowmatix."
           target="_blank" rel="noopener noreferrer"
           title={t('wa_support_tooltip') || 'Benötigen Sie direkten Support? Schreiben Sie uns auf WhatsApp.'}
           style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, width: 56, height: 56, borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', cursor: 'pointer', textDecoration: 'none', transition: 'transform .2s' }}
