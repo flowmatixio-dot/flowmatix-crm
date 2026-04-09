@@ -1402,7 +1402,7 @@ export default function SettingsView() {
           </label>
         );
       })}
-      <div style={{marginTop:14,padding:"10px 12px",background:"rgba(255,107,107,0.06)",border:"1px solid rgba(255,107,107,0.18)",borderRadius:8,fontSize:11.5,color:"rgba(255,170,170,0.85)",lineHeight:1.5}}>⚠️ {t("mfa_warning") || "Achtung: Aktiviere diese Option NUR wenn du selbst bereits 2FA eingerichtet hast (Einstellungen → Mein Account → 2FA aktivieren). Sonst sperrst du dich selbst aus."}</div>
+      <div style={{marginTop:14,padding:"10px 12px",background:"rgba(255,107,107,0.06)",border:"1px solid rgba(255,107,107,0.18)",borderRadius:8,fontSize:11.5,color:"rgba(255,170,170,0.85)",lineHeight:1.5}}>⚠️ {t("mfa_warning") || "Achtung: Aktiviere diese Option NUR wenn du selbst bereits 2FA eingerichtet hast (⚙️ Zahnrad-Menü oben rechts → Mein Konto → 2FA aktivieren). Sonst sperrst du dich selbst aus."}</div>
     </div>
     </>}
 
