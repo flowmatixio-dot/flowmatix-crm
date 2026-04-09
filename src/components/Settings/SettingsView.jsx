@@ -1079,7 +1079,7 @@ export default function SettingsView() {
       <Field label={t("postal_code") || "Postleitzahl"} value={c.postalCode || ""} onChange={v=>up("postalCode",v)}/>
       <Field label={t("city") || "Stadt"} value={c.city || ""} onChange={v=>up("city",v)}/>
     </div>
-    <Field label={t("country") || "Land"} value={c.country || "DE"} onChange={v=>up("country",v)} options={["DE","TR","AT","CH","NL","BE","GB","US","AE","SA","FR","IT","ES","PT","PL","RO","GR","CZ","SE","NO","DK","FI","IE","HR","BG","HU","RS","BA","AL","XK","MK","ME","RU","UA","KZ","AZ","GE","IL","QA","KW","BH","OM","JO","LB","IQ","IR","EG","MA","TN","DZ","LY","NG","KE","ZA","IN","PK","BD","CN","JP","KR","TH","VN","MY","ID","PH","AU","NZ","CA","MX","BR","AR","CL","CO","PE"]}/>
+    <Field label={t("country") || "Land"} value={c.country ?? ""} onChange={v=>up("country",v)} placeholder="z.B. Deutschland, Turkey, UAE"/>
     <Field label={t("phone") || "Telefon"} value={c.phone || ""} onChange={v=>up("phone",v)}/>
     <Field label={t("email") || "E-Mail"} value={c.clinicEmail || ""} onChange={v=>up("clinicEmail",v)}/>
     <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={["Europe/Berlin","Europe/Istanbul","Europe/London","Europe/Paris","Europe/Rome","Europe/Madrid","Europe/Lisbon","Europe/Amsterdam","Europe/Vienna","Europe/Zurich","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Tokyo"]}/>
