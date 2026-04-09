@@ -919,7 +919,7 @@ export default function MainLayout() {
             {isOperator && <ThemeToggle />}
             {/* User menu (gear icon trigger) */}
             {(() => {
-              const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
+              const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }, { code: "ar", flag: "🇸🇦", label: "العربية" }, { code: "es", flag: "🇪🇸", label: "Español" }, { code: "fr", flag: "🇫🇷", label: "Français" }, { code: "it", flag: "🇮🇹", label: "Italiano" }, { code: "pt", flag: "🇧🇷", label: "Português" }, { code: "ru", flag: "🇷🇺", label: "Русский" }, { code: "nl", flag: "🇳🇱", label: "Nederlands" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
               return <div style={{ position: "relative" }} data-gear-menu>
                 <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid var(--border-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--text-muted)" }}>
                   ⚙️
