@@ -184,12 +184,12 @@ export default function AutomationsView() {
                   <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)" }}>{tpl.desc}</div>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-                {["de", "en", "tr"].map(l => {
+              <div style={{ display: "flex", gap: 3, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: 260 }}>
+                {["en", "de", "tr", "ar", "es", "fr", "it", "pt", "ru", "nl"].map(l => {
                   const st = tplStatuses[`${tpl.tplKey}_${l}`] || 'draft';
                   const colors = { approved: { bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)", color: "#10b981" }, pending: { bg: "rgba(251,191,36,0.12)", border: "rgba(251,191,36,0.3)", color: "#fbbf24" }, rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", color: "#ef4444" }, error: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)", color: "#ef4444" }, draft: { bg: "rgba(167,177,195,0.06)", border: "rgba(167,177,195,0.15)", color: "rgba(167,177,195,0.7)" } };
                   const c = colors[st] || colors.draft;
-                  return <span key={l} title={st} style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: c.bg, border: `1px solid ${c.border}`, color: c.color }}>{l.toUpperCase()}</span>;
+                  return <span key={l} title={`${l.toUpperCase()}: ${st}`} style={{ padding: "2px 5px", borderRadius: 4, fontSize: 8, fontWeight: 700, background: c.bg, border: `1px solid ${c.border}`, color: c.color, lineHeight: 1 }}>{l.toUpperCase()}</span>;
                 })}
               </div>
             </div>
