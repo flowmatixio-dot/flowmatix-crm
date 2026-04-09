@@ -919,7 +919,7 @@ export default function MainLayout() {
             {isOperator && <ThemeToggle />}
             {/* User menu (gear icon trigger) */}
             {(() => {
-              const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }, { code: "ar", flag: "🇸🇦", label: "العربية" }, { code: "es", flag: "🇪🇸", label: "Español" }, { code: "fr", flag: "🇫🇷", label: "Français" }, { code: "it", flag: "🇮🇹", label: "Italiano" }, { code: "pt", flag: "🇧🇷", label: "Português" }, { code: "ru", flag: "🇷🇺", label: "Русский" }, { code: "nl", flag: "🇳🇱", label: "Nederlands" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
+              const LANGS = IS_CLIENT_MODE ? [{ code: "de", flag: "🇩🇪", label: "Deutsch" }, { code: "en", flag: "🇬🇧", label: "English" }, { code: "tr", flag: "🇹🇷", label: "Türkçe" }] : [{ code: "en", flag: "🇬🇧", label: "English" }, { code: "de", flag: "🇩🇪", label: "Deutsch" }];
               return <div style={{ position: "relative" }} data-gear-menu>
                 <button onClick={e => { const dd = e.currentTarget.nextSibling; dd.style.display = dd.style.display === "none" ? "block" : "none"; }} style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "1px solid var(--border-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "var(--text-muted)" }}>
                   ⚙️
@@ -932,7 +932,7 @@ export default function MainLayout() {
                   {effectiveRole !== "doctor" && <button onClick={() => setView("settings")} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>⚙️ {t("settings_label")}</button>}
                   <button onClick={() => { setShowPwModal(true); document.querySelector('[data-gear-menu] > div:last-child').style.display = 'none'; }} style={{ width: "100%", padding: "7px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "transparent", border: "none", color: "var(--text-muted)", textAlign: "left", fontFamily: "inherit" }}>🔑 {t("change_password") || "Passwort ändern"}</button>
                   {/* Language picker inside menu */}
-                  <div style={{ padding: "4px 12px", display: "flex", gap: 4, flexWrap: "wrap", maxWidth: 200 }}>
+                  <div style={{ padding: "4px 12px", display: "flex", gap: 4 }}>
                     {LANGS.map(l => <button key={l.code} onClick={() => { ctx.setLang(l.code); ctx.setLoginLang?.(l.code); try { localStorage.setItem("fm_lang", l.code); } catch {} window.location.reload(); }} title={l.label} style={{ width: 28, height: 28, borderRadius: 6, background: lang === l.code ? "var(--info-subtle)" : "transparent", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>{l.flag}</button>)}
                   </div>
                   <div style={{ height: 1, background: "var(--border-subtle)", margin: "4px 0" }} />
