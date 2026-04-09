@@ -426,31 +426,6 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     } catch (e) { setAuthLoading(false); setAuthCallbackErr(e.message || "Could not update password."); }
   };
 
-  /* MFA Login — verify TOTP code after password was accepted */
-  const handleMfaLogin = async () => {
-    if (!mfaCode || mfaCode.length !== 6) { setLoginErr("Enter 6-digit code"); return; }
-    setAuthLoading(true); setLoginErr("");
-    try {
-      const res = await fmApi.apiFetch('/api/v1/auth/mfa/login', {
-        method: 'POST',
-        body: JSON.stringify({ mfaToken, code: mfaCode }),
-      });
-      if (res?.accessToken && res?.refreshToken) {
-        fmApi.setTokens(res.accessToken, res.refreshToken);
-        if (res.user) sessionStorage.setItem('fm_api_user', JSON.stringify(res.user));
-        sessionStorage.setItem('fm_login_at', String(Date.now()));
-        window.location.reload();
-      } else {
-        setLoginErr("Invalid code"); setAuthLoading(false);
-      }
-    } catch (e) {
-      setLoginErr(e.message || "Invalid code"); setAuthLoading(false);
-    }
-  };
-
-  /* MFA Setup Confirm — during enforced enrollment */
-  const handleMfaSetupConfirm = async () => {};
-
   /* Password reset via API */
   const handlePasswordReset = async () => {
     if (!resetEmail.trim()) { showToast("Enter email address"); return; }
