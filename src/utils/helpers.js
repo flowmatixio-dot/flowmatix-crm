@@ -102,6 +102,42 @@ export function fmLocale() { return DATE_LOCALES[(localStorage.getItem("fm_lang"
 
 /* ═══ Translate country names + common values (DE/EN/TR) ═══ */
 const TRANSLATE_MAP = {
+  // Hair loss terms
+  "geheimratsecken": { en: "receding hairline", de: "Geheimratsecken", tr: "saç çizgisi gerilmesi" },
+  "receding hairline": { en: "receding hairline", de: "Geheimratsecken", tr: "saç çizgisi gerilmesi" },
+  "geheimratsecken + dünnes deckhaar": { en: "receding hairline + thin coverage", de: "Geheimratsecken + dünnes Deckhaar", tr: "saç çizgisi gerilmesi + ince saç örtüsü" },
+  "dünnes deckhaar": { en: "thin coverage hair", de: "dünnes Deckhaar", tr: "ince saç örtüsü" },
+  "dünnes haar": { en: "thin hair", de: "dünnes Haar", tr: "ince saç" },
+  "lichtes haar": { en: "thinning hair", de: "lichtes Haar", tr: "seyrelmiş saç" },
+  "haarausfall": { en: "hair loss", de: "Haarausfall", tr: "saç dökülmesi" },
+  "hair loss": { en: "hair loss", de: "Haarausfall", tr: "saç dökülmesi" },
+  "saç dökülmesi": { en: "hair loss", de: "Haarausfall", tr: "saç dökülmesi" },
+  "kahle stellen": { en: "bald spots", de: "kahle Stellen", tr: "kel bölgeler" },
+  "bald spots": { en: "bald spots", de: "kahle Stellen", tr: "kel bölgeler" },
+  "glatze": { en: "bald", de: "Glatze", tr: "kel" },
+  "tonsur": { en: "crown bald spot", de: "Tonsur", tr: "tepe bölgesi kelliği" },
+  "oberkopf": { en: "top of head", de: "Oberkopf", tr: "baş üstü" },
+  "stirn": { en: "forehead", de: "Stirn", tr: "alın" },
+  "haaransatz": { en: "hairline", de: "Haaransatz", tr: "saç çizgisi" },
+  "spenderbereich": { en: "donor area", de: "Spenderbereich", tr: "donör bölgesi" },
+  // Medications
+  "finasterid": { en: "finasteride", de: "Finasterid", tr: "finasterid" },
+  "finasteride": { en: "finasteride", de: "Finasterid", tr: "finasterid" },
+  "minoxidil": { en: "minoxidil", de: "Minoxidil", tr: "minoksidil" },
+  "prp": { en: "PRP", de: "PRP", tr: "PRP" },
+  "biotin": { en: "biotin", de: "Biotin", tr: "biotin" },
+  "keine bekannt": { en: "none known", de: "keine bekannt", tr: "bilinen yok" },
+  "none known": { en: "none known", de: "keine bekannt", tr: "bilinen yok" },
+  "keine medikamente": { en: "no medications", de: "keine Medikamente", tr: "ilaç yok" },
+  "no medications": { en: "no medications", de: "keine Medikamente", tr: "ilaç yok" },
+  // Androgenetic alopecia
+  "androgenetische alopezie": { en: "androgenetic alopecia", de: "androgenetische Alopezie", tr: "androgenetik alopesi" },
+  "androgenetic alopecia": { en: "androgenetic alopecia", de: "androgenetische Alopezie", tr: "androgenetik alopesi" },
+  // Blood thinners
+  "blutverdünner": { en: "blood thinners", de: "Blutverdünner", tr: "kan sulandırıcı" },
+  "blood thinners": { en: "blood thinners", de: "Blutverdünner", tr: "kan sulandırıcı" },
+  "aspirin": { en: "aspirin", de: "Aspirin", tr: "aspirin" },
+  // Basics
   "keine": { en: "none", de: "keine", tr: "yok" },
   "none": { en: "none", de: "keine", tr: "yok" },
   "no": { en: "no", de: "nein", tr: "hayır" },
@@ -255,7 +291,32 @@ const TRANSLATE_MAP = {
 
 /* Word/phrase dictionary for dynamic free-text translation */
 const WORD_MAP = {
-  // Hair / medical terms
+  // Hair / medical terms — German specific
+  "geheimratsecken": { en: "receding hairline", de: "Geheimratsecken", tr: "saç çizgisi gerilmesi" },
+  "deckhaar": { en: "coverage hair", de: "Deckhaar", tr: "örtü saçı" },
+  "dünnes": { en: "thin", de: "dünnes", tr: "ince" },
+  "dünner": { en: "thinner", de: "dünner", tr: "daha ince" },
+  "lichtes": { en: "thinning", de: "lichtes", tr: "seyrelmiş" },
+  "haarausfall": { en: "hair loss", de: "Haarausfall", tr: "saç dökülmesi" },
+  "kahle": { en: "bald", de: "kahle", tr: "kel" },
+  "stellen": { en: "spots", de: "Stellen", tr: "bölgeler" },
+  "oberkopf": { en: "top of head", de: "Oberkopf", tr: "baş üstü" },
+  "hinterkopf": { en: "back of head", de: "Hinterkopf", tr: "ense" },
+  "stirn": { en: "forehead", de: "Stirn", tr: "alın" },
+  "schläfen": { en: "temples", de: "Schläfen", tr: "şakaklar" },
+  "blutverdünner": { en: "blood thinners", de: "Blutverdünner", tr: "kan sulandırıcı" },
+  "finasterid": { en: "finasteride", de: "Finasterid", tr: "finasterid" },
+  "schilddrüse": { en: "thyroid", de: "Schilddrüse", tr: "tiroid" },
+  "täglich": { en: "daily", de: "täglich", tr: "günlük" },
+  "monate": { en: "months", de: "Monate", tr: "ay" },
+  "jahre": { en: "years", de: "Jahre", tr: "yıl" },
+  "seit": { en: "since", de: "seit", tr: "dan beri" },
+  "keine": { en: "none", de: "keine", tr: "yok" },
+  "bekannt": { en: "known", de: "bekannt", tr: "bilinen" },
+  "vorhanden": { en: "present", de: "vorhanden", tr: "mevcut" },
+  "behandlung": { en: "treatment", de: "Behandlung", tr: "tedavi" },
+  "alopezie": { en: "alopecia", de: "Alopezie", tr: "alopesi" },
+  "androgenetische": { en: "androgenetic", de: "androgenetische", tr: "androgenetik" },
   "frontal": { en: "frontal", de: "frontal", tr: "ön" },
   "hair": { en: "hair", de: "Haar", tr: "saç" },
   "thinning": { en: "thinning", de: "Ausdünnung", tr: "incelme" },
