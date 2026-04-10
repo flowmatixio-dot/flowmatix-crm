@@ -56,7 +56,6 @@ export const usePatientStore = create((set, get) => ({
         if (['termin_bestaetigt', 'termin_reserviert', 'termin_gebucht'].includes(s)) return 'booked';
         // deposit_paid WITHOUT termin = still waiting, not booked yet
         if (cs === 'deposit_paid') return 'contacted';
-        if (cs === 'booking_pending') return 'contacted';
         if (s === 'angebot_gesendet' && cs !== 'deposit_paid' && cs !== 'booking_pending' && cs !== 'needs_medical_review') return 'booked';
         if (s === 'abgeschlossen') return 'done';
         if (s === 'storniert') return 'cancelled';
