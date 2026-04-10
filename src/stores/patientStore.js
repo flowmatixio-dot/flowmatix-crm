@@ -54,9 +54,11 @@ export const usePatientStore = create((set, get) => ({
         if (s === 'new' && (hasPhotos || hasReview || needsReview || isCollecting)) return 'contacted';
         // termin stages always = booked (even with deposit_paid)
         if (['termin_bestaetigt', 'termin_reserviert', 'termin_gebucht'].includes(s)) return 'booked';
+        // booking_pending = doctor review done, offer sent → advance to booked
+        if (cs === 'booking_pending') return 'booked';
         // deposit_paid WITHOUT termin = still waiting, not booked yet
         if (cs === 'deposit_paid') return 'contacted';
-        if (s === 'angebot_gesendet' && cs !== 'deposit_paid' && cs !== 'booking_pending' && cs !== 'needs_medical_review') return 'booked';
+        if (s === 'angebot_gesendet' && cs !== 'deposit_paid' && cs !== 'needs_medical_review') return 'booked';
         if (s === 'abgeschlossen') return 'done';
         if (s === 'storniert') return 'cancelled';
         if (['neue_anfrage', 'anfrage_neu', 'new_inquiry'].includes(s)) return 'new';
