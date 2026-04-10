@@ -45,7 +45,7 @@ function AccountSection({ t, showT, user, clinic: c, updateClinic: up }) {
   };
 
   const inp = { width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated, rgba(255,255,255,0.04))", border: "1px solid var(--border-strong, rgba(255,255,255,0.08))", color: "var(--text-primary, #e8eefc)", fontFamily: "inherit", fontSize: 14, outline: "none", boxSizing: "border-box" };
-  const roleLabel = { clinic_admin: "Admin", clinic_coordinator: t("role_coordinator") || "Coordinator", clinic_doctor: t("role_doctor") || "Doctor", clinic_finance: t("role_finance") || "Finance", platform_owner: "Platform Owner" }[user?.apiRole || user?.role] || user?.apiRole || "—";
+  const roleLabel = { clinic_owner: t("role_owner") || "Inhaber", clinic_admin: "Admin", clinic_coordinator: t("role_coordinator") || "Coordinator", clinic_doctor: t("role_doctor") || "Doctor", clinic_finance: t("role_finance") || "Finance", platform_owner: "Platform Owner" }[user?.apiRole || user?.role] || user?.apiRole || "—";
 
   return <>
     <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 20, color: "rgba(232,238,252,0.9)" }}>{t("account")}</div>
@@ -88,7 +88,7 @@ function AccountSection({ t, showT, user, clinic: c, updateClinic: up }) {
     <MfaSection t={t} showT={showT} />
 
     {/* ── 2FA Enforcement (admin only) ── */}
-    {c && up && (user?.role === 'clinic_admin' || user?.role === 'platform_owner' || user?.apiRole === 'clinic_admin') && <div style={{marginTop:20,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
+    {c && up && (user?.role === 'clinic_owner' || user?.role === 'clinic_admin' || user?.role === 'platform_owner' || user?.apiRole === 'clinic_admin' || user?.apiRole === 'clinic_owner') && <div style={{marginTop:20,padding:20,background:"rgba(255,140,66,0.04)",border:"1px solid rgba(255,140,66,0.18)",borderRadius:14}}>
       <div style={{fontSize:14,fontWeight:800,color:"rgba(232,238,252,0.95)",marginBottom:6}}>🔐 {t("mfa_enforce_title") || "Zwei-Faktor-Authentifizierung erzwingen"}</div>
       <div style={{fontSize:12,color:"rgba(167,177,195,0.7)",lineHeight:1.6,marginBottom:14}}>{t("mfa_enforce_desc") || "Bestimme welche Rollen beim Login zwingend 2FA einrichten müssen."}</div>
       {[
@@ -633,6 +633,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
   };
 
   const ROLE_META = {
+    owner:       { label: t("role_owner") || "Inhaber", color: "#f97316", icon: "🏠", desc: t("role_owner_desc") || "Vollzugriff — alle Standorte" },
     admin:       { label: "Admin", color: "#4cc9ff", icon: "👑", desc: t("role_full_access") },
     coordinator: { label: t("role_coordinator"), color: "#a78bfa", icon: "📋", desc: t("role_coordinator_desc") },
     doctor:      { label: t("role_doctor"), color: "#10b981", icon: "⚕️", desc: t("role_doctor_desc") },
@@ -640,6 +641,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
   };
 
   const mapApiRole = (r) => {
+    if (r === "clinic_owner") return "owner";
     if (r === "clinic_admin" || r === "admin" || r === "platform_owner") return "admin";
     if (r === "clinic_doctor") return "doctor";
     if (r === "clinic_finance") return "finance";
@@ -742,7 +744,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
           </div>
           <div style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", marginBottom: 8 }}>{t("role_label")}</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8 }}>
               {Object.entries(ROLE_META).map(([key, meta]) => (
                 <div key={key} onClick={() => setInvRole(key)} style={{
                   padding: "10px 12px", borderRadius: 10, cursor: "pointer", textAlign: "center",
