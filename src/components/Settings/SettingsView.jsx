@@ -532,39 +532,34 @@ function LocationsManagerSection({ clinic, setClinics, showT, t }) {
         {t("locations_hint") || "Patienten wählen beim ersten Bot-Kontakt ihren Wunschstandort. Bot verwendet automatisch Adresse und Google Maps-Link des gewählten Standorts."}
       </div>
       {locs.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 12 }}>
           {locs.map(loc => (
-            <div key={loc} style={{ borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 10px" }}>
-                <span style={{ fontSize: 12, color: "rgba(232,238,252,0.85)", fontWeight: 600, flex: 1 }}>
-                  📍 {loc}
-                  {locAddrs[loc] && <span style={{ fontSize: 10, color: "rgba(167,177,195,0.5)", fontWeight: 400, marginLeft: 6 }}>{locAddrs[loc]}</span>}
-                </span>
-                <button
-                  onClick={() => setExpandedLoc(expandedLoc === loc ? null : loc)}
-                  title="Adresse & Google Maps"
-                  style={{ border: "none", cursor: "pointer", fontSize: 11, padding: "2px 7px", borderRadius: 4, fontFamily: "inherit",
-                    color: (locAddrs[loc] || gmLinks[loc]) ? "#4cc9ff" : "rgba(167,177,195,0.4)",
-                    background: (locAddrs[loc] || gmLinks[loc]) ? "rgba(76,201,255,0.08)" : "transparent" }}
-                >{expandedLoc === loc ? "▲" : "✎"}</button>
-                <button onClick={() => remove(loc)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1, fontFamily: "inherit" }}>✕</button>
+            <div key={loc} style={{ borderRadius: 10, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)", padding: "10px 12px" }}>
+              {/* Location name + remove */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                <span style={{ fontSize: 13, color: "rgba(232,238,252,0.9)", fontWeight: 700, flex: 1 }}>📍 {loc}</span>
+                <button onClick={() => remove(loc)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.4)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1, fontFamily: "inherit" }} title="Standort entfernen">✕</button>
               </div>
-              {expandedLoc === loc && (
-                <div style={{ padding: "0 10px 10px", display: "flex", flexDirection: "column", gap: 6 }}>
-                  <input
-                    defaultValue={locAddrs[loc] || ""}
-                    onBlur={e => saveAddress(loc, e.target.value.trim())}
-                    placeholder="Adresse (z.B. 219-229 Khuất Duy Tiến, Đại Mỗ, Hà Nội)"
-                    style={{ ...inp, width: "100%", padding: "7px 10px", fontSize: 12, boxSizing: "border-box" }}
-                  />
-                  <input
-                    defaultValue={gmLinks[loc] || ""}
-                    onBlur={e => saveGmLink(loc, e.target.value.trim())}
-                    placeholder="Google Maps Review URL (https://g.page/r/...)"
-                    style={{ ...inp, width: "100%", padding: "7px 10px", fontSize: 12, boxSizing: "border-box" }}
-                  />
-                </div>
-              )}
+              {/* Address */}
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>🏥 Adresse</div>
+              <input
+                key={`addr-${loc}`}
+                defaultValue={locAddrs[loc] || ""}
+                onBlur={e => saveAddress(loc, e.target.value.trim())}
+                placeholder="z.B. 219-229 Khuất Duy Tiến, Đại Mỗ, Hà Nội"
+                style={{ ...inp, width: "100%", padding: "7px 10px", fontSize: 12, boxSizing: "border-box", marginBottom: 8 }}
+              />
+              {/* Google Maps Review Link */}
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>⭐ Google Maps Bewertungslink</div>
+              <input
+                key={`gm-${loc}`}
+                defaultValue={gmLinks[loc] || ""}
+                onBlur={e => saveGmLink(loc, e.target.value.trim())}
+                placeholder="https://g.page/r/... (Link aus Google Business Profile kopieren)"
+                style={{ ...inp, width: "100%", padding: "7px 10px", fontSize: 12, boxSizing: "border-box",
+                  borderColor: gmLinks[loc] ? "rgba(76,201,255,0.3)" : "rgba(255,255,255,0.08)" }}
+              />
+              {gmLinks[loc] && <div style={{ fontSize: 10, color: "#10b981", marginTop: 4 }}>✓ Link gespeichert — Bot nennt diesen Link nach Behandlung</div>}
             </div>
           ))}
         </div>
