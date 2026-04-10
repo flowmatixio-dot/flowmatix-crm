@@ -834,6 +834,17 @@ export default function PatientsPage() {
           </div>
         ) : paged.map((lead) => {
           const sm = STATUS_MAP[lead.stage] || { label: lead.stage, color: "#6b7280" };
+          const opBadge = (() => {
+            if (lead.convStatus === "human_takeover") return { label: t("help_needed"), color: "#ef4444", bg: "rgba(239,68,68,0.12)" };
+            if (lead.convStatus === "needs_medical_review" || lead.convStatus === "waiting_for_clinic_reply") return { label: t("review_label"), color: "#f59e0b", bg: "rgba(245,158,11,0.12)" };
+            if (lead.convStatus === "deposit_paid" || lead.financials?.depositStatus === "paid") return { label: t("paid_label"), color: "#10b981", bg: "rgba(16,185,129,0.12)" };
+            if (lead.convStatus === "booking_pending") return { label: t("booking_pending") || "Buchung offen", color: "#a78bfa", bg: "rgba(167,139,250,0.12)" };
+            if (lead.convStatus === "collecting_photos") return { label: t("collecting_photos") || "Fotos sammeln", color: "#4cc9ff", bg: "rgba(76,201,255,0.12)" };
+            if (lead.stage === "contacted" && (lead.photoUrls || []).length > 0 && !lead.reviewData) return { label: t("photos_received_badge") || "Fotos erhalten", color: "#4cc9ff", bg: "rgba(76,201,255,0.12)" };
+            if (lead.stage === "new") return { label: t("ai_active_label") || "KI Aktiv", color: "#4cc9ff", bg: "rgba(76,201,255,0.12)" };
+            if (lead.convStatus === "ai_active" && lead.stage === "contacted") return { label: t("in_progress_badge") || "In Bearbeitung", color: "#4cc9ff", bg: "rgba(76,201,255,0.12)" };
+            return null;
+          })();
           const grafts = lead.grafts || lead.reviewData?.grafts;
           const appt = nextAppt[lead.id];
           const fin = getFinancials(lead);
@@ -888,11 +899,17 @@ export default function PatientsPage() {
                     return <div key={col.id} style={{ color: "rgba(167,177,195,0.7)", fontSize: 11 }}>{lead.phone || lead.from || "—"}</div>;
                   case "status":
                     return (
-                      <div key={col.id}>
+                      <div key={col.id} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                         <span style={{
                           padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 700,
                           background: `${sm.color}15`, color: sm.color, border: `1px solid ${sm.color}25`,
                         }}>{sm.label}</span>
+                        {opBadge && (
+                          <span style={{
+                            padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700,
+                            background: opBadge.bg, color: opBadge.color, alignSelf: "flex-start",
+                          }}>{opBadge.label}</span>
+                        )}
                       </div>
                     );
                   case "doctor":
