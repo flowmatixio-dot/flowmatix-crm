@@ -467,6 +467,7 @@ function IntegrationsSection({ t, clinic, showT }) {
 function LocationsManagerSection({ clinic, setClinics, showT, t }) {
   const [locs, setLocs] = useState(clinic?.aiConfig?.locations || []);
   const [gmLinks, setGmLinks] = useState(clinic?.locationGoogleMapsLinks || {});
+  const [locAddrs, setLocAddrs] = useState(clinic?.locationAddresses || {});
   const [newLoc, setNewLoc] = useState("");
   const [saving, setSaving] = useState(false);
   const [expandedLoc, setExpandedLoc] = useState(null);
@@ -491,6 +492,16 @@ function LocationsManagerSection({ clinic, setClinics, showT, t }) {
     } catch (e) { showT("Fehler beim Speichern"); }
   };
 
+  const saveAddress = async (loc, addr) => {
+    const updated = { ...locAddrs, [loc]: addr };
+    if (!addr) delete updated[loc];
+    setLocAddrs(updated);
+    try {
+      await updateClinicSettings({ locationAddresses: updated });
+      setClinics(cs => cs.map(cl => cl.id === clinic?.id ? { ...cl, locationAddresses: updated } : cl));
+    } catch (e) { showT("Fehler beim Speichern"); }
+  };
+
   const add = () => {
     const v = newLoc.trim();
     if (!v || locs.includes(v)) return;
@@ -504,11 +515,10 @@ function LocationsManagerSection({ clinic, setClinics, showT, t }) {
     const updatedLocs = locs.filter(l => l !== loc);
     setLocs(updatedLocs);
     saveLocs(updatedLocs);
-    // also remove its google maps link
-    const updatedGm = { ...gmLinks };
-    delete updatedGm[loc];
-    setGmLinks(updatedGm);
-    updateClinicSettings({ locationGoogleMapsLinks: updatedGm }).catch(() => {});
+    const updatedGm = { ...gmLinks }; delete updatedGm[loc];
+    const updatedAddr = { ...locAddrs }; delete updatedAddr[loc];
+    setGmLinks(updatedGm); setLocAddrs(updatedAddr);
+    updateClinicSettings({ locationGoogleMapsLinks: updatedGm, locationAddresses: updatedAddr }).catch(() => {});
   };
 
   const inp = { background: "var(--bg-input,rgba(255,255,255,0.04))", border: "1px solid var(--border-input,rgba(255,255,255,0.08))", color: "var(--text-primary,rgba(232,238,252,0.9))", borderRadius: 8, outline: "none", fontFamily: "inherit" };
@@ -519,25 +529,34 @@ function LocationsManagerSection({ clinic, setClinics, showT, t }) {
         📍 {t("locations_title") || "Standorte"}
       </div>
       <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginBottom: 12, lineHeight: 1.5 }}>
-        {t("locations_hint") || "Patienten wählen beim ersten Bot-Kontakt ihren Wunschstandort. Nur sichtbar wenn mindestens ein Standort eingetragen ist."}
+        {t("locations_hint") || "Patienten wählen beim ersten Bot-Kontakt ihren Wunschstandort. Bot verwendet automatisch Adresse und Google Maps-Link des gewählten Standorts."}
       </div>
       {locs.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
           {locs.map(loc => (
             <div key={loc} style={{ borderRadius: 8, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.12)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 10px" }}>
-                <span style={{ fontSize: 12, color: "rgba(232,238,252,0.85)", fontWeight: 600, flex: 1 }}>📍 {loc}</span>
+                <span style={{ fontSize: 12, color: "rgba(232,238,252,0.85)", fontWeight: 600, flex: 1 }}>
+                  📍 {loc}
+                  {locAddrs[loc] && <span style={{ fontSize: 10, color: "rgba(167,177,195,0.5)", fontWeight: 400, marginLeft: 6 }}>{locAddrs[loc]}</span>}
+                </span>
                 <button
                   onClick={() => setExpandedLoc(expandedLoc === loc ? null : loc)}
-                  title="Google Maps Link"
-                  style={{ border: "none", cursor: "pointer", fontSize: 12, padding: "2px 6px", borderRadius: 4, fontFamily: "inherit",
-                    color: gmLinks[loc] ? "#4cc9ff" : "rgba(167,177,195,0.4)",
-                    background: gmLinks[loc] ? "rgba(76,201,255,0.08)" : "transparent" }}
-                >🗺</button>
+                  title="Adresse & Google Maps"
+                  style={{ border: "none", cursor: "pointer", fontSize: 11, padding: "2px 7px", borderRadius: 4, fontFamily: "inherit",
+                    color: (locAddrs[loc] || gmLinks[loc]) ? "#4cc9ff" : "rgba(167,177,195,0.4)",
+                    background: (locAddrs[loc] || gmLinks[loc]) ? "rgba(76,201,255,0.08)" : "transparent" }}
+                >{expandedLoc === loc ? "▲" : "✎"}</button>
                 <button onClick={() => remove(loc)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1, fontFamily: "inherit" }}>✕</button>
               </div>
               {expandedLoc === loc && (
-                <div style={{ padding: "0 10px 10px" }}>
+                <div style={{ padding: "0 10px 10px", display: "flex", flexDirection: "column", gap: 6 }}>
+                  <input
+                    defaultValue={locAddrs[loc] || ""}
+                    onBlur={e => saveAddress(loc, e.target.value.trim())}
+                    placeholder="Adresse (z.B. 219-229 Khuất Duy Tiến, Đại Mỗ, Hà Nội)"
+                    style={{ ...inp, width: "100%", padding: "7px 10px", fontSize: 12, boxSizing: "border-box" }}
+                  />
                   <input
                     defaultValue={gmLinks[loc] || ""}
                     onBlur={e => saveGmLink(loc, e.target.value.trim())}
