@@ -25,7 +25,7 @@ const SECTION_TARGETS = {
   // Required setup
   clinic:    { view: "settings",       settingsTab: "general",            scrollAnchor: "fm-section-clinic" },
   treatment: { view: "settings",       settingsTab: "clinic_treatments",  scrollAnchor: "fm-section-treatments" },
-  doctor:    { view: "settings",       settingsTab: "doctors",            scrollAnchor: "fm-section-doctors" },
+  doctor:    { view: "settings",       settingsTab: "team",               scrollAnchor: "fm-section-team" },
   whatsapp:  { view: "whatsapp_setup", settingsTab: null,                 scrollAnchor: "fm-section-whatsapp" },
 
   // Advanced setup
