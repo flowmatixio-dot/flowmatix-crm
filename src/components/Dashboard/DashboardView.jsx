@@ -365,20 +365,8 @@ export default function DashboardView() {
       {/* ── System performance indicator ── */}
       <PerformanceIndicator />
 
-      {/* ── "System ist bereit" tile (was the urgent SetupCard) ── */}
-      <SetupCard />
-
-      {/* Connection text — bridges the "system ready" state and the
-          upgrade card so the user understands the link between
-          optimisations and bookings. Sits directly above the upgrade
-          card and below "System ist bereit". */}
-      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginBottom: 10, marginTop: 4, paddingLeft: 4 }}>
-        {T(
-          "Optimize your system for more bookings:",
-          "Optimiere dein System für mehr Buchungen:",
-          "Daha fazla rezervasyon için sisteminizi optimize edin:"
-        )}
-      </div>
+      {/* ── Optional optimization (was the Volles Potenzial card) ── */}
+      <AdvancedSetupCard />
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
