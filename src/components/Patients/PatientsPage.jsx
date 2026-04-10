@@ -391,6 +391,7 @@ export default function PatientsPage() {
   const [filterDeposit, setFilterDeposit] = useState(""); // "paid" | "pending" | ""
   const [filterApptToday, setFilterApptToday] = useState(false);
   const [filterApptWeek, setFilterApptWeek] = useState(false);
+  const [filterLocation, setFilterLocation] = useState("");
 
   // Visible columns
   const [visibleCols, setVisibleCols] = useState(() =>
@@ -416,6 +417,9 @@ export default function PatientsPage() {
       sources: [...sources].filter(Boolean),
     };
   }, [myLeads]);
+
+  // Location options from clinic config (only shown for multi-location clinics)
+  const locationOptions = useMemo(() => (clinic?.aiConfig?.locations || []).map(l => ({ value: l, label: l })), [clinic]);
 
   // Stats — same logic as PipelineView column counts
   const stats = useMemo(() => {
@@ -486,6 +490,7 @@ export default function PatientsPage() {
     if (filterDeposit === "pending") list = list.filter(l => l.convStatus !== "deposit_paid" && l.financials?.depositStatus !== "paid");
     if (filterApptToday) list = list.filter(l => { const a = nextAppt[l.id]; return a && isToday(a.date); });
     if (filterApptWeek) list = list.filter(l => { const a = nextAppt[l.id]; return a && isThisWeek(a.date); });
+    if (filterLocation) list = list.filter(l => l.intake?.preferred_location === filterLocation || l.metadata?.preferred_location === filterLocation);
 
     // Sort
     list = [...list].sort((a, b) => {
@@ -571,7 +576,7 @@ export default function PatientsPage() {
   }, [paged, selected]);
 
   // Active filter count
-  const activeFilterCount = [filterDoctor, filterTreatment, filterCountry.length > 0, filterSource.length > 0, filterPhotos, filterDeposit, filterApptToday, filterApptWeek].filter(Boolean).length;
+  const activeFilterCount = [filterDoctor, filterTreatment, filterCountry.length > 0, filterSource.length > 0, filterPhotos, filterDeposit, filterApptToday, filterApptWeek, filterLocation].filter(Boolean).length;
 
   // Export
   const handleExport = (leads) => {
@@ -773,6 +778,9 @@ export default function PatientsPage() {
           <FilterDropdown label={t("col_source") || "Quelle"} icon="📥" options={filterOptions.sources.map(s => ({ value: s, label: SOURCE_MAP[s]?.label || s }))} value={filterSource} onChange={setFilterSource} multi />
           <FilterDropdown label={t("col_photos") || "Fotos"} icon="📷" options={[{ value: "with", label: t("filter_with_photos") || "Mit Fotos" }, { value: "without", label: t("filter_without_photos") || "Ohne Fotos" }]} value={filterPhotos} onChange={setFilterPhotos} />
           <FilterDropdown label={t("filter_deposit") || "Anzahlung"} icon="💰" options={[{ value: "paid", label: t("filter_deposit_paid") || "Bezahlt" }, { value: "pending", label: t("filter_deposit_pending") || "Offen" }]} value={filterDeposit} onChange={setFilterDeposit} />
+          {locationOptions.length > 0 && (
+            <FilterDropdown label="Standort" icon="📍" options={locationOptions} value={filterLocation} onChange={setFilterLocation} />
+          )}
 
           {/* Quick toggles */}
           <button onClick={() => setFilterApptToday(!filterApptToday)} style={{
@@ -789,7 +797,7 @@ export default function PatientsPage() {
           }}>{"\uD83D\uDCC5"} {t("this_week_label") || "Diese Woche"}</button>
 
           {activeFilterCount > 0 && (
-            <button onClick={() => { setFilterDoctor(""); setFilterTreatment(""); setFilterCountry([]); setFilterSource([]); setFilterPhotos(""); setFilterDeposit(""); setFilterApptToday(false); setFilterApptWeek(false); }} style={{
+            <button onClick={() => { setFilterDoctor(""); setFilterTreatment(""); setFilterCountry([]); setFilterSource([]); setFilterPhotos(""); setFilterDeposit(""); setFilterApptToday(false); setFilterApptWeek(false); setFilterLocation(""); }} style={{
               padding: "6px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
               background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", color: "#ef4444",
               marginLeft: "auto",

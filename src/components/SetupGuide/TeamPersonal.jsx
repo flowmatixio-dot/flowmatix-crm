@@ -74,6 +74,15 @@ function StaffPanel() {
       </div>
     </div>
     <Field label={t("specialty")} value={form.specialty} onChange={v=>setForm(f=>({...f,specialty:v}))} placeholder="FUE Specialist, PRP Expert..." />
+    {(clinic?.aiConfig?.locations || []).length > 0 && (
+      <div style={{marginBottom:12}}>
+        <div style={{fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>📍 Standort</div>
+        <select value={form.location||""} onChange={e=>setForm(f=>({...f,location:e.target.value||null}))} style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:13,outline:"none"}}>
+          <option value="">— Kein Standort —</option>
+          {(clinic.aiConfig.locations).map(loc=><option key={loc} value={loc}>{loc}</option>)}
+        </select>
+      </div>
+    )}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
       <Field label={t("email")} value={form.email} onChange={v=>setForm(f=>({...f,email:v}))} placeholder="arzt@klinik.com" />
       <div>
@@ -128,9 +137,10 @@ function StaffPanel() {
         <div style={{width:44,height:44,borderRadius:12,background:"linear-gradient(135deg,#10b981,#059669)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,color:"var(--text-primary)",fontSize:16}}>{(s.first_name||"?")[0]}</div>
         <div style={{flex:1}}>
           <div style={{fontWeight:700,fontSize:14}}>{s.title?s.title+" ":""}{s.first_name} {s.last_name}</div>
-          <div style={{fontSize:12,color:"var(--text-muted)",display:"flex",gap:8}}>
+          <div style={{fontSize:12,color:"var(--text-muted)",display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
             <span>{ROLES.find(r=>r.v===s.role)?.l||s.role}</span>
             {s.specialty&&<span>{"·"} {s.specialty}</span>}
+            {s.metadata?.location&&<span style={{padding:"1px 7px",borderRadius:4,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:10,fontWeight:700}}>📍 {s.metadata.location}</span>}
           </div>
         </div>
         <div style={{display:"flex",gap:6}}>

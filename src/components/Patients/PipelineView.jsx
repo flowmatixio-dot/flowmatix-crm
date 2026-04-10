@@ -51,6 +51,8 @@ export default function PipelineView() {
   const depositBeforeAppt = clinic?.deposit_before_appointment !== false;
   const [showCancelled, setShowCancelled] = useState(false);
   const [pipeTab, setPipeTab] = useState("active");
+  const [filterLocation, setFilterLocation] = useState("");
+  const locationOptions = clinic?.aiConfig?.locations || [];
 
   const goToChat = (leadId) => {
     const clinicId = activeClinicId || myLeads[0]?.clinic || null;
@@ -86,6 +88,21 @@ export default function PipelineView() {
         ))}
       </div>
 
+      {/* Location filter — only shown for multi-location clinics */}
+      {locationOptions.length > 0 && (
+        <div style={{ display: "flex", gap: 6, marginBottom: 12, alignItems: "center" }}>
+          <span style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", fontWeight: 600 }}>📍</span>
+          {["", ...locationOptions].map(loc => (
+            <button key={loc || "_all"} onClick={() => setFilterLocation(loc)} style={{
+              padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+              background: filterLocation === loc ? "rgba(76,201,255,0.1)" : "rgba(255,255,255,0.02)",
+              border: `1px solid ${filterLocation === loc ? "rgba(76,201,255,0.2)" : "rgba(255,255,255,0.05)"}`,
+              color: filterLocation === loc ? "#4cc9ff" : "rgba(167,177,195,0.65)",
+            }}>{loc || "Alle Standorte"}</button>
+          ))}
+        </div>
+      )}
+
       {/* ═══ AKTIV TAB ═══ */}
       {pipeTab === "active" && <>
       {/* Legend */}
@@ -117,7 +134,7 @@ export default function PipelineView() {
             }
             return l.stage;
           };
-          const items = myLeads.filter(l => !ARCHIVE_STAGES.includes(l.stage) && l.conversation_state !== "resolved" && effectiveStage(l) === col.id)
+          const items = myLeads.filter(l => !ARCHIVE_STAGES.includes(l.stage) && l.conversation_state !== "resolved" && effectiveStage(l) === col.id && (!filterLocation || l.intake?.preferred_location === filterLocation || l.metadata?.preferred_location === filterLocation))
             .sort((a, b) => {
               // Handover patients always on top (most urgent)
               const aHO = a.convStatus === "human_takeover" ? 1 : 0;

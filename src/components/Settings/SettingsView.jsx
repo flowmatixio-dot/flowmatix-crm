@@ -884,6 +884,7 @@ function DoctorCapabilities({ clinic, showT }) {
                   </div>
                 )}
                 <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(232,238,252,0.9)" }}>{name}</span>
+                {doc.metadata?.location && <span style={{ padding: "1px 7px", borderRadius: 4, background: "rgba(76,201,255,0.08)", border: "1px solid rgba(76,201,255,0.15)", color: "#4cc9ff", fontSize: 10, fontWeight: 700 }}>📍 {doc.metadata.location}</span>}
               </div>
               {!isEditing ? (
                 <button onClick={() => { setEditId(doc.id); setEditTypes([...(types.length ? types : treatments)]); }} style={{
