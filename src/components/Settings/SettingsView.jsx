@@ -463,6 +463,80 @@ function IntegrationsSection({ t, clinic, showT }) {
   </Section>;
 }
 
+/* ═══ Standort-Manager ═══ */
+function LocationsManagerSection({ clinic, setClinics, showT, t }) {
+  const [locs, setLocs] = useState(clinic?.aiConfig?.locations || []);
+  const [newLoc, setNewLoc] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const save = async (updated) => {
+    setSaving(true);
+    try {
+      await updateClinicSettings({ aiConfig: { locations: updated } });
+      setClinics(cs => cs.map(cl => cl.id === clinic?.id ? { ...cl, aiConfig: { ...(cl.aiConfig || {}), locations: updated } } : cl));
+      showT(t("saved") || "Gespeichert");
+    } catch (e) { showT("Fehler beim Speichern"); }
+    setSaving(false);
+  };
+
+  const add = () => {
+    const v = newLoc.trim();
+    if (!v || locs.includes(v)) return;
+    const updated = [...locs, v];
+    setLocs(updated);
+    setNewLoc("");
+    save(updated);
+  };
+
+  const remove = (loc) => {
+    const updated = locs.filter(l => l !== loc);
+    setLocs(updated);
+    save(updated);
+  };
+
+  const inp = { background: "var(--bg-input,rgba(255,255,255,0.04))", border: "1px solid var(--border-input,rgba(255,255,255,0.08))", color: "var(--text-primary,rgba(232,238,252,0.9))", borderRadius: 8, outline: "none", fontFamily: "inherit" };
+
+  return (
+    <div style={{ marginTop: 24 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+        📍 {t("locations_title") || "Standorte"}
+      </div>
+      <div style={{ fontSize: 12, color: "rgba(167,177,195,0.6)", marginBottom: 12, lineHeight: 1.5 }}>
+        {t("locations_hint") || "Patienten wählen beim ersten Bot-Kontakt ihren Wunschstandort. Nur sichtbar wenn mindestens ein Standort eingetragen ist."}
+      </div>
+      {locs.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+          {locs.map(loc => (
+            <div key={loc} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 8, background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.15)" }}>
+              <span style={{ fontSize: 12, color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>📍 {loc}</span>
+              <button onClick={() => remove(loc)} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1, fontFamily: "inherit" }}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+      {locs.length === 0 && (
+        <div style={{ fontSize: 12, color: "rgba(167,177,195,0.4)", marginBottom: 12, fontStyle: "italic" }}>
+          {t("no_locations") || "Noch keine Standorte — Standort-Auswahl im Bot deaktiviert"}
+        </div>
+      )}
+      <div style={{ display: "flex", gap: 8 }}>
+        <input
+          value={newLoc}
+          onChange={e => setNewLoc(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && add()}
+          placeholder={t("add_location_placeholder") || "Standort eingeben (Enter zum Hinzufügen)"}
+          style={{ ...inp, flex: 1, padding: "9px 13px", fontSize: 13 }}
+        />
+        <button onClick={add} disabled={saving || !newLoc.trim()} style={{
+          padding: "9px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+          background: "rgba(76,201,255,0.1)", border: "1px solid rgba(76,201,255,0.25)", color: "#4cc9ff",
+          opacity: (!newLoc.trim() || saving) ? 0.4 : 1,
+        }}>+ {t("add") || "Hinzufügen"}</button>
+      </div>
+    </div>
+  );
+}
+
 /* ═══ Team & Access Management ═══ */
 function TeamAccessSection({ clinic, showT, t, setClinics }) {
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -472,6 +546,8 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
   const [sending, setSending] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editRole, setEditRole] = useState("");
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
   const [team, setTeam] = useState(clinic?.team || []);
 
   const plan = clinic?.plan || "core";
@@ -533,6 +609,18 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
       setEditingId(null);
       await refreshTeam();
     } catch (e) { showT(e.message || (t("auto_error") || "Error")); }
+  };
+
+  const handleSaveEdit = async (userId) => {
+    try {
+      const patch = { role: `clinic_${editRole}` };
+      if (editName.trim()) patch.name = editName.trim();
+      if (editEmail.trim()) patch.email = editEmail.trim().toLowerCase();
+      await updateTeamMember(userId, patch);
+      showT(t("saved") || "Gespeichert");
+      setEditingId(null);
+      await refreshTeam();
+    } catch (e) { showT(e.message || "Fehler beim Speichern"); }
   };
 
   const handleDeactivate = async (userId, userName) => {
@@ -654,11 +742,19 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
               }}>
                 {/* Name */}
                 <div>
-                  <div style={{ fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{member.name || "—"}</div>
-                  {isCurrentUser && <span style={{ fontSize: 9, color: "#4cc9ff", fontWeight: 700 }}>{t("you_label")}</span>}
+                  {isEditing
+                    ? <input value={editName} onChange={e => setEditName(e.target.value)} style={{ ...inp, padding: "4px 8px", fontSize: 12, width: "100%", boxSizing: "border-box" }} placeholder="Name" />
+                    : <><div style={{ fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{member.name || "—"}</div>
+                       {isCurrentUser && <span style={{ fontSize: 9, color: "#4cc9ff", fontWeight: 700 }}>{t("you_label")}</span>}</>
+                  }
                 </div>
                 {/* Email */}
-                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", overflow: "hidden", textOverflow: "ellipsis" }}>{member.email}</div>
+                <div style={{ fontSize: 12, color: "rgba(167,177,195,0.7)", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {isEditing
+                    ? <input value={editEmail} onChange={e => setEditEmail(e.target.value)} style={{ ...inp, padding: "4px 8px", fontSize: 11, width: "100%", boxSizing: "border-box" }} placeholder="E-Mail" />
+                    : member.email
+                  }
+                </div>
                 {/* Role */}
                 <div>
                   {isEditing ? (
@@ -697,10 +793,10 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                         padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "#10b981",
                       }}>📧 {t("reinvite") || "Erneut einladen"}</button>
-                      <button onClick={() => { setEditingId(member.id); setEditRole(role); }} style={{
+                      <button onClick={() => { setEditingId(member.id); setEditRole(role); setEditName(member.name || ""); setEditEmail(member.email || ""); }} style={{
                         padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
-                      }}>{t("role_label")}</button>
+                      }}>✏️ {t("edit") || "Bearbeiten"}</button>
                       <button onClick={() => { if (confirm(`${member.name || member.email} wirklich entfernen?`)) handleDeactivate(member.id, member.name); }} style={{
                         padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.08)", color: "rgba(239,68,68,0.5)",
@@ -709,7 +805,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                   )}
                   {isEditing && (
                     <>
-                      <button onClick={() => handleRoleChange(member.id, editRole)} style={{
+                      <button onClick={() => handleSaveEdit(member.id)} style={{
                         padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.12)", color: "#10b981",
                       }}>{t("save") || "Speichern"}</button>
@@ -1383,6 +1479,9 @@ export default function SettingsView() {
       </div>
       <BotProfile clinic={clinic} updateClinic={(patch) => { Object.entries(patch).forEach(([k,v]) => up(k,v)); }} showT={showT} t={t} />
     </div>
+
+    {/* Standort-Manager */}
+    <LocationsManagerSection clinic={clinic} setClinics={setClinics} showT={showT} t={t} />
 
     {/* Knowledge Base / FAQ */}
     <div style={{ marginTop: 24 }}>
