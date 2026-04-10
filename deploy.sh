@@ -77,7 +77,7 @@ fi
 
 echo ""
 echo "→ Purging Cloudflare cache..."
-CF_RESULT=$(ssh flowmatix 'source /opt/flowmatix/.env 2>/dev/null; if [ -n "$CLOUDFLARE_ZONE_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json" -d "{\"purge_everything\":true}" | grep -o "\"success\":[a-z]*"; else echo "SKIP"; fi' 2>/dev/null || echo "SKIP")
+CF_RESULT=$(ssh flowmatix 'CF_TOKEN=$(grep "^CLOUDFLARE_API_TOKEN=" /opt/flowmatix/.env | cut -d= -f2- | tr -d "\r\n "); CF_ZONE=$(grep "^CLOUDFLARE_ZONE_ID=" /opt/flowmatix/.env | cut -d= -f2- | tr -d "\r\n "); if [ -n "$CF_ZONE" ] && [ -n "$CF_TOKEN" ]; then curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE}/purge_cache" -H "Authorization: Bearer ${CF_TOKEN}" -H "Content-Type: application/json" -d "{\"purge_everything\":true}" | grep -o "\"success\":[a-z]*"; else echo "SKIP"; fi' 2>/dev/null || echo "SKIP")
 if [ "$CF_RESULT" = "SKIP" ]; then
   echo "⚠ Cloudflare credentials not found — skipping cache purge"
 else

@@ -433,9 +433,11 @@ export default function PatientPanel() {
               {(fields.email || lead.email) && <DataField label="E-Mail" value={fields.email || lead.email} />}
               {isDrHaiLe ? <>
                 <DataField label="Behandlung" value={translateValue(fields.treatment || lead.treatment)} />
-                <DataField label="Standort" value={translateValue(fields.preferred_location)} />
+                <DataField label="Alter" value={fields.age} />
                 <DataField label="Anliegen" value={translateValue(fields.concerns || fields.concern)} />
+                <DataField label="Details" value={translateValue(fields.concern_detail)} />
                 <DataField label="Voroperation" value={translateValue(fields.previous_surgery)} />
+                <DataField label="Standort" value={translateValue(fields.preferred_location)} />
               </> : <>
                 <DataField label={t("concern") || "Anliegen"} value={translateValue(fields.concern)} />
                 {fields.desired_result && <DataField label={t("desired_result") || "Gewünschtes Ergebnis"} value={translateValue(fields.desired_result)} />}
