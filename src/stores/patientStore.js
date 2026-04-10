@@ -51,7 +51,7 @@ export const usePatientStore = create((set, get) => ({
         // Handover: patient stays in current stage — do NOT move
         if (isHandover) return s === 'new' ? 'new' : s;
         // Review done → Gebucht (caseStatus or convStatus signal)
-        if (cs === 'booking_pending' || p.caseStatus === 'arzt_review_done') return 'booked';
+        if (cs === 'booking_pending') return 'booked';
         // new → contacted (Arzt-Review): patient has photos, review, or needs attention
         if (s === 'new' && (hasPhotos || hasReview || needsReview || isCollecting)) return 'contacted';
         // termin stages always = booked (even with deposit_paid)
