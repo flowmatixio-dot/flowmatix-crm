@@ -446,10 +446,10 @@ export default function PatientPanel() {
             </div>
           </Accordion>
 
-          {/* ── SECTION 2: Medical Data ── */}
-          <Accordion
+          {/* ── SECTION 2: Medical Data — hidden for isDrHaiLe unless photos exist ── */}
+          {(!isDrHaiLe || (lead.photoUrls||[]).length > 0) && <Accordion
             icon={"🏥"}
-            title={t("medical_data") || "Medizinische Daten"}
+            title={isDrHaiLe ? (t("patient_photos") || "Patientenfotos") : (t("medical_data") || "Medizinische Daten")}
             defaultOpen={true}
             badge={
               !isDrHaiLe && (fields.diabetes || fields.allergies || fields.blood_thinners || fields.medical_conditions) ?
@@ -495,11 +495,12 @@ export default function PatientPanel() {
                 </div>
               </div>
             )}
-          </Accordion>
+          </Accordion>}
 
           {/* ── SECTION 3: Treatment Plan ── */}
-          {rd && !needsReview && <Accordion icon={"📋"} title={t("treatment_plan_title") || "Behandlungsplan"} defaultOpen={false}>
+          {(isDrHaiLe ? true : (rd && !needsReview)) && <Accordion icon={"📋"} title={t("treatment_plan_title") || "Behandlungsplan"} defaultOpen={isDrHaiLe}>
             {isDrHaiLe ? (() => {
+              if (!rd) return <div style={{padding:"16px 0",textAlign:"center",color:"rgba(167,177,195,0.4)",fontSize:13}}>Kein Arzt-Review vorhanden</div>;
               const decisionColor = rd.decision === 'suitable' ? '#22c55e' : rd.decision === 'needs_adjustment' ? '#f59e0b' : rd.decision === 'not_suitable' ? '#ef4444' : '#6b7280';
               const decisionLabel = rd.decision === 'suitable' ? 'Geeignet' : rd.decision === 'needs_adjustment' ? 'Anpassung nötig' : rd.decision === 'not_suitable' ? 'Nicht geeignet' : rd.decision || '—';
               const dur = Number(rd.duration_minutes || 0);
