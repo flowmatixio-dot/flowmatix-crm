@@ -417,15 +417,27 @@ export default function PatientsPage() {
     };
   }, [myLeads]);
 
-  // Stats
-  const stats = useMemo(() => ({
-    total: myLeads.length,
-    leads: myLeads.filter(l => l.stage === "new").length,
-    contacted: myLeads.filter(l => l.stage === "contacted").length,
-    booked: myLeads.filter(l => l.stage === "booked").length,
-    done: myLeads.filter(l => l.stage === "done").length,
-    cancelled: myLeads.filter(l => l.stage === "cancelled").length,
-  }), [myLeads]);
+  // Stats — same logic as PipelineView column counts
+  const stats = useMemo(() => {
+    const ARCHIVE_STAGES = ["cancelled", "archived", "storniert", "abgeschlossen", "canceled"];
+    const today = new Date().toISOString().slice(0, 10);
+    const effectiveStage = (l) => {
+      if (l.stage === "booked") {
+        const bd = l.booking?.date || l.metadata?.booking?.date || l.appointmentDate;
+        if (bd && new Date(bd) < new Date(today)) return "done";
+      }
+      return l.stage;
+    };
+    const active = myLeads.filter(l => !ARCHIVE_STAGES.includes(l.stage) && l.conversation_state !== "resolved");
+    return {
+      total: active.length,
+      leads: active.filter(l => effectiveStage(l) === "new").length,
+      contacted: active.filter(l => effectiveStage(l) === "contacted").length,
+      booked: active.filter(l => effectiveStage(l) === "booked").length,
+      done: active.filter(l => effectiveStage(l) === "done").length,
+      cancelled: myLeads.filter(l => l.stage === "cancelled").length,
+    };
+  }, [myLeads]);
 
   // Next appointment per patient
   const nextAppt = useMemo(() => {
