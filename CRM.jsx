@@ -640,7 +640,7 @@ export default function App() {
 
   /* Polling: refresh conversations every 30s + patients every 10s */
   useEffect(()=>{
-    if(!user||!activeClinicId)return;if(user.apiRole==="clinic_doctor")return;
+    if(!user||!activeClinicId)return;
     const orgId=user.orgId||user.clinicId;
     if(!orgId)return;
     const iv=setInterval(()=>{

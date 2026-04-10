@@ -23,7 +23,8 @@ export function useCrmData({
   useEffect(() => {
     if (!user) return;
     if (user.apiRole === "clinic_doctor") {
-      // Doctor: only load appointments (for calendar)
+      // Doctor: load patients + appointments (inbox + calendar)
+      usePatientStore.getState().fetchPatients();
       useAppointmentStore.getState().fetchAppointments();
       return;
     }
