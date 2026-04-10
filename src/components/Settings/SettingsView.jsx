@@ -548,6 +548,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
   const [editRole, setEditRole] = useState("");
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
+  const [editLocation, setEditLocation] = useState("");
   const [team, setTeam] = useState(clinic?.team || []);
 
   const plan = clinic?.plan || "core";
@@ -616,6 +617,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
       const patch = { role: `clinic_${editRole}` };
       if (editName.trim()) patch.name = editName.trim();
       if (editEmail.trim()) patch.email = editEmail.trim().toLowerCase();
+      patch.location = editLocation || null;
       await updateTeamMember(userId, patch);
       showT(t("saved") || "Gespeichert");
       setEditingId(null);
@@ -745,6 +747,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                   {isEditing
                     ? <input value={editName} onChange={e => setEditName(e.target.value)} style={{ ...inp, padding: "4px 8px", fontSize: 12, width: "100%", boxSizing: "border-box" }} placeholder="Name" />
                     : <><div style={{ fontWeight: 600, color: "rgba(232,238,252,0.85)" }}>{member.name || "—"}</div>
+                       {member.location && <span style={{ fontSize: 9, color: "#4cc9ff", fontWeight: 700 }}>📍 {member.location}</span>}
                        {isCurrentUser && <span style={{ fontSize: 9, color: "#4cc9ff", fontWeight: 700 }}>{t("you_label")}</span>}</>
                   }
                 </div>
@@ -770,15 +773,22 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                     </span>
                   )}
                 </div>
-                {/* Status */}
+                {/* Status / Location when editing */}
                 <div>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
-                    background: member.lastLogin ? "rgba(16,185,129,0.08)" : "rgba(167,177,195,0.06)",
-                    color: member.lastLogin ? "#10b981" : "rgba(167,177,195,0.75)",
-                  }}>
-                    {member.lastLogin ? (t("member_active") || "Active") : (t("member_invited") || "Invited")}
-                  </span>
+                  {isEditing && (clinic?.aiConfig?.locations || []).length > 0 ? (
+                    <select value={editLocation} onChange={e => setEditLocation(e.target.value)} style={{ ...inp, padding: "4px 8px", fontSize: 11, cursor: "pointer", width: "100%" }}>
+                      <option value="">— Standort —</option>
+                      {(clinic.aiConfig.locations).map(loc => <option key={loc} value={loc}>{loc}</option>)}
+                    </select>
+                  ) : !isEditing ? (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4,
+                      background: member.lastLogin ? "rgba(16,185,129,0.08)" : "rgba(167,177,195,0.06)",
+                      color: member.lastLogin ? "#10b981" : "rgba(167,177,195,0.75)",
+                    }}>
+                      {member.lastLogin ? (t("member_active") || "Active") : (t("member_invited") || "Invited")}
+                    </span>
+                  ) : null}
                 </div>
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 6 }}>
@@ -793,7 +803,7 @@ function TeamAccessSection({ clinic, showT, t, setClinics }) {
                         padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "#10b981",
                       }}>📧 {t("reinvite") || "Erneut einladen"}</button>
-                      <button onClick={() => { setEditingId(member.id); setEditRole(role); setEditName(member.name || ""); setEditEmail(member.email || ""); }} style={{
+                      <button onClick={() => { setEditingId(member.id); setEditRole(role); setEditName(member.name || ""); setEditEmail(member.email || ""); setEditLocation(member.location || ""); }} style={{
                         padding: "5px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)",
                       }}>✏️ {t("edit") || "Bearbeiten"}</button>
