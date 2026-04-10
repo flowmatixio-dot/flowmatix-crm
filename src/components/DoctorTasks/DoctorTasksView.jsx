@@ -22,7 +22,11 @@ const COSMETIC_CATEGORIES = [
   { emoji: '🧍', name: 'Body Aesthetics', vi: 'Thẩm mỹ thân', defaultDuration: 210, defaultBuffer: 45,
     treatments: ['Breast augmentation', 'Endoscopic abdominal contouring', 'Genital cosmetic surgery'] },
   { emoji: '🧴', name: 'Dermatology / Skin', vi: 'Da liễu', defaultDuration: 60, defaultBuffer: 15,
-    treatments: ['Skin rejuvenation (RBA / RF lifting)', 'Hyperhidrosis treatment (miraDry)', 'Fillers / injections', 'Microblading', 'Eyeliner tattoo', 'Lip tattoo', 'Hair loss treatment'] },
+    treatments: ['Skin rejuvenation (RBA / RF lifting)', 'Hyperhidrosis treatment (miraDry)', 'Fillers / injections', 'Hair loss treatment'] },
+  { emoji: '✏️', name: 'Permanent Makeup', vi: 'Phun xăm thẩm mỹ', defaultDuration: 90, defaultBuffer: 15,
+    treatments: ['Microblading', 'Eyeliner tattoo', 'Lip tattoo', 'Scalp micropigmentation'] },
+  { emoji: '🔬', name: 'Internal Medicine & Technology', vi: 'Nội khoa & Công nghệ cao', defaultDuration: 90, defaultBuffer: 20,
+    treatments: ['Hormone therapy consultation', 'IV therapy', 'Laser treatment', 'Advanced diagnostics'] },
 ];
 
 function getUrgency(createdAt) {
