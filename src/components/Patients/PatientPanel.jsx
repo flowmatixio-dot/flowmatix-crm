@@ -331,7 +331,7 @@ export default function PatientPanel() {
   const isBookedOrDone = lead.stage === "booked" || lead.stage === "done";
   const noFlightNeeded = lead.metadata?.noFlightNeeded;
   const noTransferNeeded = lead.metadata?.noTransferNeeded;
-  const showTravel = isBookedOrDone && !noFlightNeeded && !noTransferNeeded;
+  const showTravel = isBookedOrDone && !noFlightNeeded && !noTransferNeeded && !isDrHaiLe;
 
   return<div style={{position:"fixed",inset:0,zIndex:1000,display:"flex"}}><div onClick={()=>{setSelLead(null);setPatientTab("timeline");}} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}/>
     <div style={{position:"relative",marginLeft:"auto",width:"min(700px,90vw)",height:"100vh",background:"#131c2e",borderLeft:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",animation:"slI .25s ease",boxShadow:"-4px 0 12px rgba(0,0,0,0.2)"}}><style>{`@keyframes slI{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}`}</style>
@@ -361,7 +361,7 @@ export default function PatientPanel() {
           ...(depositEnabled&&depositBefore?[{id:"deposit",icon:"💰",label:t("step_deposit"),done:(invoices.filter(i=>i.leadId===lead.id&&i.status==="paid").length>0||lead.convStatus==="deposit_paid"||lead.stage==="booked"||lead.stage==="done")&&!lead.metadata?.depositPending}]:[]),
           {id:"booking",icon:"\u2705",label:t("step_booked"),done:lead.stage==="booked"||lead.stage==="done"},
           ...(depositEnabled&&!depositBefore?[{id:"deposit",icon:"💰",label:t("step_deposit"),done:(invoices.filter(i=>i.leadId===lead.id&&i.status==="paid").length>0||lead.convStatus==="deposit_paid"||lead.stage==="done")&&!lead.metadata?.depositPending}]:[]),
-          ...(!isLocal?[
+          ...(!isLocal&&!isDrHaiLe?[
             {id:"flight",icon:"✈️",label:t("step_flight"),done:!!lead.flightConfirmed?.date||!!(lead.metadata?.noFlightNeeded)},
             {id:"driver",icon:"\uD83D\uDE97",label:t("driver")||"Fahrer",done:!!lead.logistics?.driverName},
             {id:"hotel",icon:"\uD83C\uDFE8",label:t("hotel")||"Hotel",done:!!(lead.hotelInfo?.name||lead.hotel?.name)},
