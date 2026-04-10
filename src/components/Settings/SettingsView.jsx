@@ -1221,9 +1221,9 @@ export default function SettingsView() {
     { id: "audit_log", label: t("audit_log") || "Audit-Log", icon: "📋" },
   ];
 
-  return <div style={{display:"flex",minHeight:"calc(100vh - 120px)"}}>
+  return <div style={{display:"flex",minHeight:"100%"}}>
     {/* ── Settings Sidebar ── */}
-    <div style={{width:200,minWidth:200,borderRight:"1px solid rgba(255,255,255,0.04)",padding:"20px 0",flexShrink:0,position:"sticky",top:0,alignSelf:"flex-start",maxHeight:"calc(100vh - 120px)",overflowY:"auto"}}>
+    <div style={{width:200,minWidth:200,borderRight:"1px solid rgba(255,255,255,0.04)",padding:"20px 0",flexShrink:0,position:"sticky",top:0,alignSelf:"flex-start",height:"calc(100vh - 52px)",overflowY:"auto"}}>
       <div style={{padding:"0 16px 16px"}}>
         <div style={{fontSize:18,fontWeight:800,color:"rgba(232,238,252,0.95)",letterSpacing:"-0.02em"}}>{t("settings_title") || "Einstellungen"}</div>
         <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:2}}>{c.name}</div>
@@ -1245,7 +1245,7 @@ export default function SettingsView() {
     </div>
 
     {/* ── Settings Content ── */}
-    <div style={{flex:1,padding:"20px 32px",overflowY:"auto",position:"relative"}}>
+    <div style={{flex:1,padding:"20px 32px",position:"relative"}}>
 
     {/* Highlight flash for the active tab when arriving from a deep link */}
     {highlightFlash && (
@@ -1272,7 +1272,7 @@ export default function SettingsView() {
     <Field label={t("country") || "Land"} value={c.country ?? ""} onChange={v=>up("country",v)} placeholder="z.B. Deutschland, Turkey, UAE"/>
     <Field label={t("phone") || "Telefon"} value={c.phone || ""} onChange={v=>up("phone",v)}/>
     <Field label={t("email") || "E-Mail"} value={c.clinicEmail || ""} onChange={v=>up("clinicEmail",v)}/>
-    <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={["Europe/Berlin","Europe/Istanbul","Europe/London","Europe/Paris","Europe/Rome","Europe/Madrid","Europe/Lisbon","Europe/Amsterdam","Europe/Vienna","Europe/Zurich","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Tokyo"]}/>
+    <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={["Asia/Ho_Chi_Minh","Europe/Berlin","Europe/Istanbul","Europe/London","Europe/Paris","Europe/Rome","Europe/Madrid","Europe/Lisbon","Europe/Amsterdam","Europe/Vienna","Europe/Zurich","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Tokyo","Asia/Singapore","Asia/Bangkok","Asia/Seoul","Asia/Shanghai"]}/>
     <Field label={t("google_maps_link")} value={c.googleMapsLink || ""} onChange={v=>up("googleMapsLink",v)} placeholder="https://maps.google.com/..." hint={t("google_maps_hint")}/>
     <Field label={t("privacy_url_label") || "Datenschutz-URL deiner Klinik"} value={c.privacyUrl || ""} onChange={v=>up("privacyUrl",v)} placeholder="https://deine-klinik.de/datenschutz" hint={t("privacy_url_hint") || "Wird im KI-Disclaimer beim ersten Patientenkontakt verlinkt. Leer lassen wenn du keine eigene Datenschutzseite hast."}/>
     </>}
