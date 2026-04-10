@@ -161,6 +161,7 @@ export const MSG_TEMPLATES = [
 // Each role maps to allowed modules + actions
 
 export const ROLES = {
+  owner: { label: "role_owner", color: "#f97316", icon: "🏠", desc: "role_owner_desc" },
   admin: { label: "role_admin", color: "#4cc9ff", icon: "👑", desc: "role_admin_desc" },
   coordinator: { label: "role_coordinator", color: "#a78bfa", icon: "📋", desc: "role_coordinator_desc" },
   doctor: { label: "role_doctor", color: "#10b981", icon: "⚕️", desc: "role_doctor_desc" },
@@ -241,8 +242,8 @@ export const ACTION_PERMS = {
 export function hasModuleAccess(role, module, plan) {
   if (!role || !module) return false;
   let r = role.toLowerCase().replace("clinic_", "");
-  // Normalize: staff → coordinator (same access level)
   if (r === "staff") r = "coordinator";
+  if (r === "owner") r = "admin"; // owner has same access as admin
   return MODULE_ACCESS[module]?.[r] === true;
 }
 
@@ -252,6 +253,7 @@ export function hasPermission(role, action) {
   if (!role || !action) return false;
   let r = role.toLowerCase().replace("clinic_", "");
   if (r === "staff") r = "coordinator";
+  if (r === "owner") r = "admin";
   return ACTION_PERMS[action]?.[r] || false;
 }
 
@@ -260,6 +262,7 @@ export function getAllowedModules(role) {
   if (!role) return [];
   let r = role.toLowerCase().replace("clinic_", "");
   if (r === "staff") r = "coordinator";
+  if (r === "owner") r = "admin";
   return Object.entries(MODULE_ACCESS).filter(([, roles]) => roles[r] === true).map(([mod]) => mod);
 }
 

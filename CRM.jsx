@@ -196,7 +196,7 @@ export default function App() {
   enrichDemoDataRef.current = () => authState.user?.orgId || authState.user?.clinicId;
   const { user, handleLogout, handleLogin, handleMagicLink, handleForgotPw, handleSetPassword, handlePasswordReset } = authState;
 
-  const isAdmin=user?.apiRole==="platform_owner"||user?.apiRole==="admin"||(user?.role==="clinic_admin");
+  const isAdmin=user?.apiRole==="platform_owner"||user?.apiRole==="admin"||(user?.role==="clinic_admin")||(user?.role==="clinic_owner");
   const isOperator=user?.apiRole==="platform_owner";
   const activeClinicId=isAdmin&&!user?.orgId?adminClinic:(user?.orgId||user?.clinicId);
   const clinic=clinics.find(c=>c.id===activeClinicId);
