@@ -899,16 +899,17 @@ export default function PatientsPage() {
                     return <div key={col.id} style={{ color: "rgba(167,177,195,0.7)", fontSize: 11 }}>{lead.phone || lead.from || "—"}</div>;
                   case "status":
                     return (
-                      <div key={col.id} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                        <span style={{
-                          padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 700,
-                          background: `${sm.color}15`, color: sm.color, border: `1px solid ${sm.color}25`,
-                        }}>{sm.label}</span>
-                        {opBadge && (
+                      <div key={col.id}>
+                        {opBadge ? (
                           <span style={{
-                            padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700,
-                            background: opBadge.bg, color: opBadge.color, alignSelf: "flex-start",
+                            padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 700,
+                            background: opBadge.bg, color: opBadge.color,
                           }}>{opBadge.label}</span>
+                        ) : (
+                          <span style={{
+                            padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 700,
+                            background: `${sm.color}15`, color: sm.color, border: `1px solid ${sm.color}25`,
+                          }}>{sm.label}</span>
                         )}
                       </div>
                     );
