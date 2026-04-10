@@ -1267,7 +1267,26 @@ export default function SettingsView() {
     <Field label={t("country") || "Land"} value={c.country ?? ""} onChange={v=>up("country",v)} placeholder="z.B. Deutschland, Turkey, UAE"/>
     <Field label={t("phone") || "Telefon"} value={c.phone || ""} onChange={v=>up("phone",v)}/>
     <Field label={t("email") || "E-Mail"} value={c.clinicEmail || ""} onChange={v=>up("clinicEmail",v)}/>
-    <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={["Asia/Ho_Chi_Minh","Europe/Berlin","Europe/Istanbul","Europe/London","Europe/Paris","Europe/Rome","Europe/Madrid","Europe/Lisbon","Europe/Amsterdam","Europe/Vienna","Europe/Zurich","America/New_York","America/Los_Angeles","Asia/Dubai","Asia/Tokyo","Asia/Singapore","Asia/Bangkok","Asia/Seoul","Asia/Shanghai"]}/>
+    <Field label={t("timezone") || "Zeitzone"} value={c.timezone || "Europe/Berlin"} onChange={v=>up("timezone",v)} options={[
+      {value:"Asia/Ho_Chi_Minh", label:"Vietnam — Ho Chi Minh City / Hanoi (UTC+7)"},
+      {value:"Europe/Berlin",    label:"Deutschland — Berlin (UTC+1/2)"},
+      {value:"Europe/Istanbul",  label:"Türkei — Istanbul (UTC+3)"},
+      {value:"Europe/London",    label:"Großbritannien — London (UTC+0/1)"},
+      {value:"Europe/Paris",     label:"Frankreich — Paris (UTC+1/2)"},
+      {value:"Europe/Rome",      label:"Italien — Rom (UTC+1/2)"},
+      {value:"Europe/Madrid",    label:"Spanien — Madrid (UTC+1/2)"},
+      {value:"Europe/Amsterdam", label:"Niederlande — Amsterdam (UTC+1/2)"},
+      {value:"Europe/Vienna",    label:"Österreich — Wien (UTC+1/2)"},
+      {value:"Europe/Zurich",    label:"Schweiz — Zürich (UTC+1/2)"},
+      {value:"America/New_York", label:"USA — New York (UTC-5/4)"},
+      {value:"America/Los_Angeles",label:"USA — Los Angeles (UTC-8/7)"},
+      {value:"Asia/Dubai",       label:"Vereinigte Arabische Emirate — Dubai (UTC+4)"},
+      {value:"Asia/Tokyo",       label:"Japan — Tokyo (UTC+9)"},
+      {value:"Asia/Singapore",   label:"Singapur (UTC+8)"},
+      {value:"Asia/Bangkok",     label:"Thailand — Bangkok (UTC+7)"},
+      {value:"Asia/Seoul",       label:"Südkorea — Seoul (UTC+9)"},
+      {value:"Asia/Shanghai",    label:"China — Shanghai (UTC+8)"},
+    ]}/>
     <Field label={t("google_maps_link")} value={c.googleMapsLink || ""} onChange={v=>up("googleMapsLink",v)} placeholder="https://maps.google.com/..." hint={t("google_maps_hint")}/>
     <Field label={t("privacy_url_label") || "Datenschutz-URL deiner Klinik"} value={c.privacyUrl || ""} onChange={v=>up("privacyUrl",v)} placeholder="https://deine-klinik.de/datenschutz" hint={t("privacy_url_hint") || "Wird im KI-Disclaimer beim ersten Patientenkontakt verlinkt. Leer lassen wenn du keine eigene Datenschutzseite hast."}/>
     </>}
