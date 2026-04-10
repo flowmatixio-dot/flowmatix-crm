@@ -196,6 +196,7 @@ export default function PipelineView() {
                     depositRequired={depositRequired}
                     depositBeforeAppt={depositBeforeAppt}
                     goToChat={goToChat}
+                    clinic={clinic}
                     t={t}
                   />
                 ))}
@@ -255,7 +256,8 @@ export default function PipelineView() {
  * Individual patient card inside a pipeline column.
  * Neutral design with revenue display.
  */
-function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadScore, t, depositRequired, depositBeforeAppt, goToChat }) {
+function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadScore, t, depositRequired, depositBeforeAppt, goToChat, clinic }) {
+  const isDrHaiLe = clinic?.id === '880fd267-e64a-465f-9324-3aeb3df8569c';
   // Conversation status badge map (computed but used for reference)
   const _convMap = {
     ai_active: { color: "rgba(167,177,195,0.7)", icon: "BOT" },
@@ -316,7 +318,7 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
     opBadges.push({ label: t("review_label"), ...bs.orange });
   if (isLocal)
     opBadges.push({ label: t("local_patient"), ...bs.green });
-  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal) {
+  if ((lead.stage === "booked" || lead.stage === "done") && !isLocal && !isDrHaiLe) {
     const hasFlightData = !!(lead.flightConfirmed && lead.flightConfirmed.date);
     if (!hasFlightData) {
       // No flight yet → just waiting, grey info badge
@@ -473,8 +475,8 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
           if (depositRequired && !depositBeforeAppt) {
             baseSteps.push({ key: "deposit", done: (lead.convStatus === "deposit_paid" || !!lead.depositPaid || lead.stage === "done") && !lead.metadata?.depositPending, t: t("step_deposit") || "Anzahlung" });
           }
-          // Transfer steps — skip for local patients
-          if (!isLocal) {
+          // Transfer steps — skip for local patients and cosmetic clinics (Dr. Hải Lê)
+          if (!isLocal && !isDrHaiLe) {
             baseSteps.push(
               { key: "flight", done: !!(lead.flightConfirmed && lead.flightConfirmed.date) || !!(lead.metadata && lead.metadata.noFlightNeeded), t: t("step_flight") || "Flug" },
               { key: "driver", done: !!(lead.logistics?.driverName), t: t("driver") || "Fahrer" },
