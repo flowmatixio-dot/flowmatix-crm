@@ -295,7 +295,7 @@ export default function ActionNeededView() {
               }).then(() => {
                 showT((t("hotel_assigned_msg") || "Hotel {name} zugewiesen").replace("{name}", name) + " \u2705");
                 panel.remove();
-                window.dispatchEvent(new Event("resize"));
+                usePatientStore.getState().fetchPatients();
               }).catch(() => showT(t("error") || "Fehler"));
             });
           },

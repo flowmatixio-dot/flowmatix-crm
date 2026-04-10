@@ -112,7 +112,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
     if (!form.driverName?.trim()) { showToast(tl('error_enter_driver'), 'error'); return; }
     setSubmitting(task.id);
     try {
-      await fmApi.updateTask(task.id, { result: { driverName: form.driverName.trim(), driverPhone: form.driverPhone || '', vehicle: form.vehicle || '', notes: form.notes || '', assignedAt: new Date().toISOString() } });
+      await fmApi.updateTask(task.id, { status: 'completed', result: { driverName: form.driverName.trim(), driverPhone: form.driverPhone || '', vehicle: form.vehicle || '', notes: form.notes || '', assignedAt: new Date().toISOString() } });
       setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'completed', result: { driverName: form.driverName }, completedAt: new Date().toISOString() } : t));
       setFormData(prev => { const n = { ...prev }; delete n[task.id]; return n; });
       showToast(tl('review_saved'));
@@ -237,7 +237,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
           const photos = taskPhotos[task.id] || [];
           const intake = task.payload?.intake || {};
           const form = getForm(task.id);
-          const isPickup = task.type === 'airport_pickup';
+          const isPickup = task.type === 'airport_pickup' || task.type === 'driver_manual_assign';
           const flight = task.payload || {};
           const canSubmit = isPickup ? (form.driverName?.trim()) : (form.grafts && parseInt(form.grafts) > 0 && form.price && parseInt(form.price) > 0);
           const urg = getUrgency(task.createdAt);
