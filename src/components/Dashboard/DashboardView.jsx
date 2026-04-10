@@ -380,9 +380,6 @@ export default function DashboardView() {
         )}
       </div>
 
-      {/* ── Optional optimization (was the Volles Potenzial card) ── */}
-      <AdvancedSetupCard />
-
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
         <HintBox id="first_steps" style={{marginBottom:16}}>{t("hint_first_steps")}</HintBox>
