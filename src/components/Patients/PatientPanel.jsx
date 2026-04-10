@@ -304,6 +304,7 @@ export default function PatientPanel() {
   const intake = lead.intake || {};
   const extracted = lead.extractedFields || {};
   const rawFields = { ...extracted, ...intake };
+  const isDrHaiLe = clinic?.id === '880fd267-e64a-465f-9324-3aeb3df8569c';
 
   // Auto-translate intake fields to CRM language (always translate — patient.language is often wrong)
   const crmLang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
@@ -426,14 +427,21 @@ export default function PatientPanel() {
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 16px"}}>
               <DataField label={t("name") || "Name"} value={lead.name} />
               <DataField label={t("phone") || "Telefon"} value={lead.phone} />
-              <DataField label={t("age") || "Alter"} value={fields.age} />
+              {!isDrHaiLe && <DataField label={t("age") || "Alter"} value={fields.age} />}
               <DataField label={t("country") || "Land"} value={translateValue(lead.country)} />
               <DataField label={t("language") || "Sprache"} value={lead.language} />
               {(fields.email || lead.email) && <DataField label="E-Mail" value={fields.email || lead.email} />}
-              <DataField label={t("concern") || "Anliegen"} value={translateValue(fields.concern)} />
-              {fields.desired_result && <DataField label={t("desired_result") || "Gewünschtes Ergebnis"} value={translateValue(fields.desired_result)} />}
-              <DataField label={t("hair_loss_type") || "Haarausfall-Art"} value={translateValue(fields.hair_loss_type)} />
-              <DataField label={t("norwood_label") || "Norwood"} value={fields.norwood_scale || fields.norwood} />
+              {isDrHaiLe ? <>
+                <DataField label="Behandlung" value={translateValue(fields.treatment || lead.treatment)} />
+                <DataField label="Standort" value={translateValue(fields.preferred_location)} />
+                <DataField label="Anliegen" value={translateValue(fields.concerns || fields.concern)} />
+                <DataField label="Voroperation" value={translateValue(fields.previous_surgery)} />
+              </> : <>
+                <DataField label={t("concern") || "Anliegen"} value={translateValue(fields.concern)} />
+                {fields.desired_result && <DataField label={t("desired_result") || "Gewünschtes Ergebnis"} value={translateValue(fields.desired_result)} />}
+                <DataField label={t("hair_loss_type") || "Haarausfall-Art"} value={translateValue(fields.hair_loss_type)} />
+                <DataField label={t("norwood_label") || "Norwood"} value={fields.norwood_scale || fields.norwood} />
+              </>}
               <DataField label={translateValue("DSGVO")} value={lead.consentGiven || lead.consent?.timestamp || lead.consents?.data_privacy?.signed ? ("\u2705 " + (lead.consents?.data_privacy?.method || "WhatsApp") + (lead.consents?.data_privacy?.signedAt ? " · " + new Date(lead.consents.data_privacy.signedAt).toLocaleDateString(fmLocale()) : "")) : ("\u26A0\uFE0F " + (t("gdpr_not_granted") || "Not granted"))} />
             </div>
           </Accordion>
@@ -444,12 +452,12 @@ export default function PatientPanel() {
             title={t("medical_data") || "Medizinische Daten"}
             defaultOpen={true}
             badge={
-              (fields.diabetes || fields.allergies || fields.blood_thinners || fields.medical_conditions) ?
+              !isDrHaiLe && (fields.diabetes || fields.allergies || fields.blood_thinners || fields.medical_conditions) ?
                 <span style={{padding:"2px 8px",borderRadius:6,fontSize:10,fontWeight:700,background:"rgba(239,68,68,0.1)",color:"#ef4444"}}>{t("medical_flags") || "Flags"}</span>
                 : null
             }
           >
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 16px"}}>
+            {!isDrHaiLe && <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 16px"}}>
               <DataField label={t("previous_treatments") || "Vorh. Behandlung"} value={translateValue(fields.previous_treatments)} />
               <DataField label={t("medications") || "Medikamente"} value={translateValue(fields.medications)} />
               <DataField label={t("allergies") || "Allergien"} value={translateValue(fields.allergies)} flagged={isFlagged("allergies", fields.allergies)} />
@@ -458,7 +466,7 @@ export default function PatientPanel() {
               <DataField label={t("blood_thinners") || "Blutverdünner"} value={formatBool(fields.blood_thinners)} flagged={isFlagged("blood_thinners", fields.blood_thinners)} />
               <DataField label={t("blood_pressure") || "Blutdruck"} value={translateValue(fields.blood_pressure)} />
               <DataField label={t("diabetes") || "Diabetes"} value={translateValue(fields.diabetes)} flagged={isFlagged("diabetes", fields.diabetes)} />
-            </div>
+            </div>}
             {/* Patient photo thumbnails */}
             {(lead.photoUrls||[]).length > 0 && (
               <div style={{marginTop:14,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
@@ -491,7 +499,29 @@ export default function PatientPanel() {
 
           {/* ── SECTION 3: Treatment Plan ── */}
           {rd && !needsReview && <Accordion icon={"📋"} title={t("treatment_plan_title") || "Behandlungsplan"} defaultOpen={false}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 16px"}}>
+            {isDrHaiLe ? (() => {
+              const decisionColor = rd.decision === 'suitable' ? '#22c55e' : rd.decision === 'needs_adjustment' ? '#f59e0b' : rd.decision === 'not_suitable' ? '#ef4444' : '#6b7280';
+              const decisionLabel = rd.decision === 'suitable' ? 'Geeignet' : rd.decision === 'needs_adjustment' ? 'Anpassung nötig' : rd.decision === 'not_suitable' ? 'Nicht geeignet' : rd.decision || '—';
+              const dur = Number(rd.duration_minutes || 0);
+              const buf = Number(rd.buffer_minutes || 0);
+              return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 16px"}}>
+                <div style={{gridColumn:"1 / -1",display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{padding:"3px 10px",borderRadius:6,fontSize:11,fontWeight:700,background:`${decisionColor}20`,color:decisionColor,border:`1px solid ${decisionColor}40`}}>{decisionLabel}</span>
+                </div>
+                <DataField label="Behandlung" value={rd.treatment || lead.treatment} />
+                <DataField label={t("price_label") || "Preis"} value={rd.price} />
+                {(dur > 0) && <DataField label="Dauer" value={`${dur} min${buf > 0 ? ` + ${buf} min Puffer = ${dur + buf} min` : ''}`} />}
+                <DataField label={t("reviewed_by") || "Bewertet von"} value={rd.doctor || rd.doctorName || lead.reviewAssignedToName || "—"} />
+                <DataField label={t("op_date") || "Termin"} value={(()=>{
+                  const b = lead.booking;
+                  const a = lead.appointmentDate || lead.appointment?.scheduled_at;
+                  if (b && b.date) return `${new Date(b.date).toLocaleDateString(fmLocale(),{day:"2-digit",month:"2-digit",year:"numeric"})}${b.time ? " · " + b.time : ""}`;
+                  if (a) { const d = new Date(a); return d.toLocaleDateString(fmLocale(),{day:"2-digit",month:"2-digit",year:"numeric"}) + " · " + d.toLocaleTimeString(fmLocale(),{hour:"2-digit",minute:"2-digit"}); }
+                  return null;
+                })()} />
+                {rd.notes && <div style={{gridColumn:"1 / -1"}}><DataField label={t("notes") || "Notizen"} value={rd.notes} /></div>}
+              </div>;
+            })() : <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 16px"}}>
               <DataField label={t("technique") || "Technik"} value={rd.technique || lead.treatment} />
               <DataField label={t("grafts_label") || "Grafts"} value={rd.grafts} />
               <DataField label={t("price_label") || "Preis"} value={rd.price} />
@@ -507,7 +537,7 @@ export default function PatientPanel() {
               {rd.notes && <div style={{gridColumn:"1 / -1"}}>
                 <DataField label={t("notes") || "Notizen"} value={rd.notes} />
               </div>}
-            </div>
+            </div>}
             {/* PDF Download Button */}
             <div style={{marginTop:12,display:"flex",justifyContent:"flex-end"}}>
               <button onClick={async(e)=>{
