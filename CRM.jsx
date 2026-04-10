@@ -118,6 +118,8 @@ export default function App() {
   } = useBillingStore();
 
   /* ═══ REMAINING LOCAL STATE ═══ */
+  const [selectedLocation, setSelectedLocation] = React.useState('');
+  const locationFilterMounted = useRef(false);
   const [newFaqQ, setNewFaqQ] = React.useState("");
   const [newFaqA, setNewFaqA] = React.useState("");
   const [supportMsg, setSupportMsg] = React.useState("");
@@ -565,6 +567,17 @@ export default function App() {
     return()=>window.removeEventListener("fm:toast",handler);
   },[]);
 
+  /* Re-fetch all data when location filter changes (skip initial mount — useCrmData handles that) */
+  useEffect(()=>{
+    if(!locationFilterMounted.current){locationFilterMounted.current=true;return;}
+    if(!user)return;
+    const params=selectedLocation?{location:selectedLocation}:{};
+    usePatientStore.getState().fetchPatients(params);
+    useAppointmentStore.getState().fetchAppointments(params);
+    const orgId=user.orgId||user.clinicId;
+    if(orgId)useInboxStore.getState().fetchConversations(orgId,params);
+  },[selectedLocation]);
+
   /* Fetch pending applications count for operator badge */
   useEffect(()=>{
     if(!isOperator||!user)return;
@@ -911,6 +924,7 @@ export default function App() {
     exportRevenue: businessLogic.exportRevenue,
     browserNotify, estimateRevenue: businessLogic.estimateRevenue, getWeekRevenue: businessLogic.getWeekRevenue,
     createInvoice: businessLogic.createInvoice,
+    selectedLocation, setSelectedLocation,
     handleLogout, handleLogin, handleMagicLink,
     handleForgotPw, handleSetPassword, handlePasswordReset,
     SystemStatus, CalMonth, CalDay, nav: filteredNav, userRole, canAccess,

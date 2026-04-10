@@ -972,6 +972,7 @@ export async function getPatients(params = {}) {
   if (params.search) qs.set('search', params.search);
   if (params.page) qs.set('page', params.page);
   if (params.limit) qs.set('limit', params.limit);
+  if (params.location) qs.set('location', params.location);
   const q = qs.toString();
   return apiFetch(`/api/v1/crm/patients${q ? '?' + q : ''}`);
 }
@@ -1032,6 +1033,7 @@ export async function getAppointments(params = {}) {
   if (params.status) qs.set('status', params.status);
   if (params.page) qs.set('page', params.page);
   if (params.limit) qs.set('limit', params.limit);
+  if (params.location) qs.set('location', params.location);
   const q = qs.toString();
   return apiFetch(`/api/v1/crm/appointments${q ? '?' + q : ''}`);
 }
@@ -1214,6 +1216,7 @@ export async function getConversations(params = {}) {
   if (params.search) qs.set('search', params.search);
   if (params.page) qs.set('page', params.page);
   if (params.limit) qs.set('limit', params.limit);
+  if (params.location) qs.set('location', params.location);
   const q = qs.toString();
   return apiFetch(`/api/v1/crm/conversations${q ? '?' + q : ''}`);
 }
