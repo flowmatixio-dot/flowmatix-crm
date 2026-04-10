@@ -175,18 +175,35 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
         <FieldRow label={t("lbl_country") || "Country"} value={<span>{TV(lead.country) || "—"}{lead.country && clinic?.country && lead.country.toLowerCase() === clinic.country.toLowerCase() && <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}>{t("local_patient") || "LOKAL"}</span>}</span>} />
         <FieldRow label={t("lbl_language") || "Language"} value={(chat.lang || lead.language || "—").toUpperCase()} />
 
-        <SectionHeader label={t("section_medical") || "MEDICAL"} />
-        <FieldRow label={t("lbl_concern") || "Concern"} value={TV(intake.concern || lead.treatment) || "—"} />
-        <FieldRow label={t("lbl_grafts") || "Grafts"} value={reviewData.grafts || intake.grafts || "—"} />
-        <FieldRow label={t("lbl_hair_loss") || "Hair Loss"} value={TV(intake.hair_loss_type || intake.norwood) || "—"} />
-        {(intake.previous_treatments || intake.vorh_behandlung) && <FieldRow label={t("prev_treatment") || "Vorh. Behandlung"} value={TV(intake.previous_treatments || intake.vorh_behandlung)} />}
-        {(intake.medications || intake.medikamente) && <FieldRow label={t("lbl_medications") || "Medications"} value={TV(intake.medications || intake.medikamente)} />}
-        {(intake.allergies || intake.allergien) && (
-          <FieldRow label={t("lbl_allergies") || "Allergies"} value={TV(intake.allergies || intake.allergien)} valueColor={(intake.allergies || intake.allergien || "").toLowerCase().match(/^(no|none|nein|keine|-|—|yok|hayır)$/) ? undefined : "#ef4444"} />
-        )}
-        {(intake.medical_conditions || intake.medical_history) && (
-          <FieldRow label={t("lbl_med_history") || "Med. History"} value={TV(intake.medical_conditions || intake.medical_history)} valueColor={(intake.medical_conditions || intake.medical_history || "").toLowerCase().match(/^(no|none|nein|keine|-|—|yok|hayır)$/) ? undefined : "#f59e0b"} />
-        )}
+        {(() => {
+          const isDrHaiLe = clinic?.id === '880fd267-e64a-465f-9324-3aeb3df8569c';
+          if (isDrHaiLe) return <>
+            <SectionHeader label="ANLIEGEN" />
+            <FieldRow label="Behandlung" value={TV(intake.treatment || lead.treatment) || "—"} />
+            <FieldRow label="Anliegen" value={TV(intake.concerns || intake.concern) || "—"} />
+            {intake.concern_detail && <FieldRow label="Details" value={TV(intake.concern_detail)} />}
+            <FieldRow label="Voroperation" value={TV(intake.previous_surgery) || "—"} />
+            <FieldRow label="Standort" value={TV(intake.preferred_location) || "—"} />
+
+            <SectionHeader label="REVIEW" />
+            {reviewData.decision ? <>
+              <FieldRow label="Entscheidung" value={reviewData.decision === 'suitable' ? '✅ Geeignet' : reviewData.decision === 'needs_adjustment' ? '⚠️ Anpassung' : '❌ Nicht geeignet'} />
+              {reviewData.treatment && <FieldRow label="Behandlung" value={reviewData.treatment} />}
+              {(reviewData.duration_minutes > 0) && <FieldRow label="Dauer" value={`${reviewData.duration_minutes}${reviewData.buffer_minutes > 0 ? ` + ${reviewData.buffer_minutes} min` : ' min'}`} />}
+              {reviewData.doctor && <FieldRow label="Arzt" value={reviewData.doctor} />}
+            </> : <FieldRow label="Status" value="Kein Review" />}
+          </>;
+          return <>
+            <SectionHeader label={t("section_medical") || "MEDICAL"} />
+            <FieldRow label={t("lbl_concern") || "Concern"} value={TV(intake.concern || lead.treatment) || "—"} />
+            <FieldRow label={t("lbl_grafts") || "Grafts"} value={reviewData.grafts || intake.grafts || "—"} />
+            <FieldRow label={t("lbl_hair_loss") || "Hair Loss"} value={TV(intake.hair_loss_type || intake.norwood) || "—"} />
+            {(intake.previous_treatments || intake.vorh_behandlung) && <FieldRow label={t("prev_treatment") || "Vorh. Behandlung"} value={TV(intake.previous_treatments || intake.vorh_behandlung)} />}
+            {(intake.medications || intake.medikamente) && <FieldRow label={t("lbl_medications") || "Medications"} value={TV(intake.medications || intake.medikamente)} />}
+            {(intake.allergies || intake.allergien) && <FieldRow label={t("lbl_allergies") || "Allergies"} value={TV(intake.allergies || intake.allergien)} valueColor={(intake.allergies || intake.allergien || "").toLowerCase().match(/^(no|none|nein|keine|-|—|yok|hayır)$/) ? undefined : "#ef4444"} />}
+            {(intake.medical_conditions || intake.medical_history) && <FieldRow label={t("lbl_med_history") || "Med. History"} value={TV(intake.medical_conditions || intake.medical_history)} valueColor={(intake.medical_conditions || intake.medical_history || "").toLowerCase().match(/^(no|none|nein|keine|-|—|yok|hayır)$/) ? undefined : "#f59e0b"} />}
+          </>;
+        })()}
 
         <SectionHeader label={t("section_assessment") || "ASSESSMENT"} />
         <FieldRow label={t("lbl_status") || "Status"} value={assessmentStatus} valueColor={assessmentColor} />
@@ -205,7 +222,7 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
         <FieldRow label={t("lbl_status") || "Status"} value={consentStatus} valueColor={consentColor} />
 
         <SectionHeader label={t("section_booking") || "BOOKING"} />
-        <FieldRow label={t("treatment") || "Treatment"} value={graftsLabel} />
+        <FieldRow label={t("treatment") || "Treatment"} value={clinic?.id === '880fd267-e64a-465f-9324-3aeb3df8569c' ? (reviewData.treatment || lead.treatment || "—") : graftsLabel} />
         <FieldRow label={t("lbl_costs") || "Costs"} value={reviewData.price || lead.budget || "—"} />
 
         {/* STATUS section — tab-style stages */}
