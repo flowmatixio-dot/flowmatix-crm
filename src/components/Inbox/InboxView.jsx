@@ -547,6 +547,11 @@ export default function InboxView() {
                           <ConvBadge icon={cs.icon} label={cs.label} color={cs.color} />
                         )}
                       </>)}
+                      {lead?.intake?.preferred_location && (
+                        <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, background: "rgba(76,201,255,0.12)", color: "#4cc9ff", whiteSpace: "nowrap" }}>
+                          📍 {lead.intake.preferred_location}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

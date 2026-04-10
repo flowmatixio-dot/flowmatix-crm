@@ -694,6 +694,7 @@ export default function OpPrepView() {
         id: lead.id, name: lead.name, treatment: lead.treatment || "FUE Haar",
         grafts: lead.reviewData?.grafts || lead.grafts || "-",
         doctor: lead.assignedDoctor || lead.reviewData?.doctor || "-",
+        location: lead.intake?.preferred_location || null,
         opDate, daysUntil, missing, isReady, doneSteps, totalSteps,
         isUrgent: daysUntil !== null && daysUntil <= 3 && !isReady,
         isThisWeek: daysUntil !== null && daysUntil <= 7,
@@ -916,8 +917,9 @@ export default function OpPrepView() {
                 onMouseLeave={e => e.currentTarget.style.background = isUrgentRow ? "rgba(239,68,68,0.02)" : "transparent"}
               >
                 {/* Patient */}
-                <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700, color: "rgba(232,238,252,0.9)", fontSize: 13 }}>
-                  {item.name}
+                <div>
+                  <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700, color: "rgba(232,238,252,0.9)", fontSize: 13 }}>{item.name}</div>
+                  {item.location && <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 4, background: "rgba(76,201,255,0.12)", color: "#4cc9ff" }}>📍 {item.location}</span>}
                 </div>
                 {/* Treatment */}
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>

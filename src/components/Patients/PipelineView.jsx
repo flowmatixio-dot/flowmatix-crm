@@ -426,9 +426,14 @@ function PipelineCard({ lead, col, openPatient, setDragItem, invoices, getLeadSc
         </div>
       )}
 
-      {/* Third row: Country */}
-      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginBottom: 6, paddingLeft: 30 }}>
+      {/* Third row: Country + Location badge */}
+      <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginBottom: 6, paddingLeft: 30, display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
         {translateValue(lead.country) || ""}
+        {lead.intake?.preferred_location && (
+          <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, background: "rgba(76,201,255,0.12)", color: "#4cc9ff", whiteSpace: "nowrap" }}>
+            📍 {lead.intake.preferred_location}
+          </span>
+        )}
       </div>
 
       {/* Op badge (left) + Aging (right) */}

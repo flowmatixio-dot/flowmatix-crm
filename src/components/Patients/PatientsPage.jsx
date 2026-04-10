@@ -900,6 +900,11 @@ export default function PatientsPage() {
                           <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {lead.treatment || "—"}{lead.country ? ` · ${translateValue(lead.country)}` : ""}
                           </div>
+                          {lead.intake?.preferred_location && (
+                            <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 4, background: "rgba(76,201,255,0.12)", color: "#4cc9ff", display: "inline-block", marginTop: 2 }}>
+                              📍 {lead.intake.preferred_location}
+                            </span>
+                          )}
                         </div>
                       </div>
                     );

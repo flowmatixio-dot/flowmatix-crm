@@ -821,7 +821,7 @@ export default function MainLayout() {
           {sidebar && isAdmin && !isOperator && (clinic?.aiConfig?.locations?.length > 1) && (
             <div style={{ marginTop: 8 }}>
               <select value={selectedLocation} onChange={e => setSelectedLocation(e.target.value)} style={{ width: "100%", padding: "7px 10px", borderRadius: 10, background: selectedLocation ? "rgba(76,201,255,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${selectedLocation ? "rgba(76,201,255,0.25)" : "rgba(255,255,255,0.06)"}`, color: selectedLocation ? "#4cc9ff" : "rgba(167,177,195,0.7)", fontFamily: "inherit", fontSize: 11, outline: "none", cursor: "pointer", transition: "all .2s" }}>
-                <option value="">{lang === "de" ? "🏢 Alle Standorte" : lang === "tr" ? "🏢 Tüm Şubeler" : "🏢 All Locations"}</option>
+                <option value="">🏢 {t("all_locations") || "Alle Standorte"}</option>
                 {clinic.aiConfig.locations.map(loc => <option key={loc} value={loc}>📍 {loc}</option>)}
               </select>
             </div>
