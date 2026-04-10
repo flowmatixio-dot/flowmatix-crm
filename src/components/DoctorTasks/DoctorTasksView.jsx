@@ -11,6 +11,20 @@ const FALLBACK_TECHNIQUES = [
   { value: 'fue_sapphire', label: 'FUE Saphir' },
 ];
 
+// Dr. Hải Lê cosmetic clinic — treatment categories with scheduling defaults
+const COSMETIC_CATEGORIES = [
+  { emoji: '👁', name: 'Eye Aesthetics', vi: 'Thẩm mỹ mắt', defaultDuration: 120, defaultBuffer: 20,
+    treatments: ['Double eyelid surgery', 'Eyelid revision', 'Ptosis correction', 'Under-eye tightening', 'Eyebrow lifting'] },
+  { emoji: '👃', name: 'Nose Aesthetics', vi: 'Thẩm mỹ mũi', defaultDuration: 180, defaultBuffer: 30,
+    treatments: ['Structural rhinoplasty', 'Rib cartilage rhinoplasty', 'Nose correction (5D / 6D)', 'Nose augmentation'] },
+  { emoji: '🙂', name: 'Face Aesthetics', vi: 'Thẩm mỹ mặt', defaultDuration: 150, defaultBuffer: 30,
+    treatments: ['Chin augmentation (V-shape)', 'Cheekbone contouring', 'Facelift'] },
+  { emoji: '🧍', name: 'Body Aesthetics', vi: 'Thẩm mỹ thân', defaultDuration: 210, defaultBuffer: 45,
+    treatments: ['Breast augmentation', 'Endoscopic abdominal contouring', 'Genital cosmetic surgery'] },
+  { emoji: '🧴', name: 'Dermatology / Skin', vi: 'Da liễu', defaultDuration: 60, defaultBuffer: 15,
+    treatments: ['Skin rejuvenation (RBA / RF lifting)', 'Hyperhidrosis treatment (miraDry)', 'Fillers / injections', 'Microblading', 'Eyeliner tattoo', 'Lip tattoo', 'Hair loss treatment'] },
+];
+
 function getUrgency(createdAt) {
   if (!createdAt) return { color: 'rgba(76,201,255,0.5)', bg: 'rgba(76,201,255,0.04)', border: 'rgba(76,201,255,0.08)', label: '' };
   const h = (Date.now() - new Date(createdAt).getTime()) / 3600000;
@@ -51,6 +65,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
   const [tab, setTab] = useState('pending');
   const [taskPhotos, setTaskPhotos] = useState({});
   const [clinicConfig, setClinicConfig] = useState({});
+  const isDrHaiLe = clinicConfig?.id === '880fd267-e64a-465f-9324-3aeb3df8569c';
   const [techniques, setTechniques] = useState(FALLBACK_TECHNIQUES);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('fm_doctor_onboarded'));
   const [skippedIds, setSkippedIds] = useState(() => {
@@ -137,6 +152,29 @@ export default function DoctorTasksView({ onLogout } = {}) {
       console.error('[doctor] Submit failed:', e);
       if (e.message === 'DEMO_BLOCKED') { showToast(tl('demo_blocked') || 'Not available in demo mode', 'error'); }
       else if (e.message?.includes('Session expired') || e.message?.includes('Failed to fetch')) { showToast(tl('session_expired') || 'Session expired — please log in again', 'error'); setTimeout(() => window.location.reload(), 2000); }
+      else { showToast(tl('error_saving'), 'error'); }
+    }
+    setSubmitting(null);
+  };
+
+  const handleDrHaiLeSubmit = async (task, decision, computed = {}) => {
+    const form = getForm(task.id);
+    const duration = parseInt(form.duration_minutes !== undefined ? form.duration_minutes : (computed.duration_minutes || 0)) || undefined;
+    const buffer = parseInt(form.buffer_minutes !== undefined ? form.buffer_minutes : (computed.buffer_minutes || 0)) || undefined;
+    const treatment = form.treatment !== undefined ? form.treatment : (computed.treatment || '');
+    setSubmitting(task.id);
+    try {
+      const res = await fmApi.updateTask(task.id, {
+        result: { decision, treatment, price: form.price || '', notes: form.notes || '', duration_minutes: duration, buffer_minutes: buffer }
+      });
+      if (res?.error) { showToast(res.error, 'error'); setSubmitting(null); return; }
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'completed', result: { decision, treatment, price: form.price }, completedAt: new Date().toISOString() } : t));
+      setFormData(prev => { const n = { ...prev }; delete n[task.id]; return n; });
+      showToast(tl('review_saved'));
+    } catch (e) {
+      console.error('[doctor] DrHaiLe submit failed:', e);
+      if (e.message === 'DEMO_BLOCKED') { showToast(tl('demo_blocked') || 'Not available in demo mode', 'error'); }
+      else if (e.message?.includes('Session expired') || e.message?.includes('Failed to fetch')) { showToast(tl('session_expired') || 'Session expired', 'error'); setTimeout(() => window.location.reload(), 2000); }
       else { showToast(tl('error_saving'), 'error'); }
     }
     setSubmitting(null);
@@ -320,7 +358,68 @@ export default function DoctorTasksView({ onLogout } = {}) {
                       {submitting === task.id ? '...' : tl('assign_driver') || 'Fahrer zuweisen'}
                     </button>
                   </div>
-                ) : (
+                ) : isDrHaiLe ? (() => {
+                    const detectedCatIdx = COSMETIC_CATEGORIES.findIndex(c => {
+                      const it = (intake.treatment || '').toLowerCase();
+                      return c.vi.toLowerCase().includes(it) || it.includes(c.vi.toLowerCase());
+                    });
+                    const catIdx = Math.max(0, detectedCatIdx >= 0 ? detectedCatIdx : 0);
+                    const cat = COSMETIC_CATEGORIES[catIdx];
+                    const durVal = form.duration_minutes !== undefined ? form.duration_minutes : String(cat.defaultDuration);
+                    const bufVal = form.buffer_minutes !== undefined ? form.buffer_minutes : String(cat.defaultBuffer);
+                    const finalMin = (parseInt(durVal) || 0) + (parseInt(bufVal) || 0);
+                    const defaultTreatment = (() => { for (const c of COSMETIC_CATEGORIES) { if (c.treatments.includes(intake.treatment)) return intake.treatment; } return cat.treatments[0] || ''; })();
+                    const treatmentVal = form.treatment !== undefined ? form.treatment : defaultTreatment;
+                    return (
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>
+                        <div style={{ marginBottom: 10 }}>
+                          <label style={S.label}>Behandlung</label>
+                          <div style={{ position: 'relative' }}>
+                            <select value={treatmentVal} onChange={e => setForm(task.id, { treatment: e.target.value })} style={S.select}>
+                              {COSMETIC_CATEGORIES.map((c, ci) => (
+                                <optgroup key={ci} label={`${c.emoji} ${c.vi}`}>
+                                  {c.treatments.map(tr => <option key={tr} value={tr}>{tr}</option>)}
+                                </optgroup>
+                              ))}
+                            </select>
+                            <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(167,177,195,0.65)', fontSize: 9 }}>▼</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
+                          <div>
+                            <label style={S.label}>Dauer (min)</label>
+                            <input type="number" value={durVal} onChange={e => setForm(task.id, { duration_minutes: e.target.value })} style={S.input} min="10" />
+                          </div>
+                          <div>
+                            <label style={S.label}>Buffer (min)</label>
+                            <input type="number" value={bufVal} onChange={e => setForm(task.id, { buffer_minutes: e.target.value })} style={S.input} min="0" />
+                          </div>
+                          <div>
+                            <label style={S.label}>Final</label>
+                            <div style={{ ...S.input, background: 'rgba(76,201,255,0.04)', border: '1px solid rgba(76,201,255,0.12)', color: '#4cc9ff', fontWeight: 700, display: 'flex', alignItems: 'center' }}>{finalMin} min</div>
+                          </div>
+                        </div>
+                        <div style={{ marginBottom: 10 }}>
+                          <label style={S.label}>Preis (optional)</label>
+                          <input type="text" placeholder="z.B. 2.500 € oder 2.000–3.000 €" value={form.price || ''} onChange={e => setForm(task.id, { price: e.target.value })} style={S.input} />
+                        </div>
+                        <div style={{ marginBottom: 14 }}>
+                          <label style={S.label}>Kommentar (optional)</label>
+                          <textarea placeholder="Anmerkung für das Team..." value={form.notes || ''} onChange={e => setForm(task.id, { notes: e.target.value })} style={S.textarea} />
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                          {[
+                            { key: 'not_suitable', label: '✗ Nicht geeignet', color: '#ef4444', bg: 'rgba(239,68,68,0.06)', border: 'rgba(239,68,68,0.25)' },
+                            { key: 'needs_adjustment', label: '↻ Anpassung nötig', color: '#f59e0b', bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.25)' },
+                            { key: 'suitable', label: '✓ Geeignet', color: '#10b981', bg: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.25)' },
+                          ].map(btn => (
+                            <button key={btn.key} onClick={() => handleDrHaiLeSubmit(task, btn.key, { duration_minutes: durVal, buffer_minutes: bufVal, treatment: treatmentVal })} disabled={submitting === task.id} style={{ padding: '12px 6px', borderRadius: 10, border: `1px solid ${btn.border}`, background: btn.bg, color: btn.color, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: submitting === task.id ? 0.6 : 1 }}>{btn.label}</button>
+                          ))}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.6)', marginTop: 6, textAlign: 'center' }}>{tl('patient_auto_contacted') || 'Patient wird automatisch kontaktiert'}</div>
+                      </div>
+                    );
+                  })() : (
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
                       <div><label style={S.label}>{tl('grafts') || 'Grafts'} *</label><input type="number" placeholder="3000" value={form.grafts || ''} onChange={e => setForm(task.id, { grafts: e.target.value })} style={S.input} min="1" /></div>
@@ -380,6 +479,14 @@ export default function DoctorTasksView({ onLogout } = {}) {
                 <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.75)', marginTop: 2 }}>
                   {task.type === 'airport_pickup' ? (
                     <>{r.driverName && <span>{r.driverName}</span>}{task.payload?.flight_number && <span> · {task.payload.flight_number}</span>}</>
+                  ) : r.decision ? (
+                    <>
+                      <span style={{ fontWeight: 600, color: r.decision === 'suitable' ? '#10b981' : r.decision === 'needs_adjustment' ? '#f59e0b' : '#ef4444' }}>
+                        {r.decision === 'suitable' ? '✓ Geeignet' : r.decision === 'needs_adjustment' ? '↻ Anpassung nötig' : '✗ Nicht geeignet'}
+                      </span>
+                      {r.treatment && <span> · {r.treatment}</span>}
+                      {r.price && <span> · {r.price}</span>}
+                    </>
                   ) : (
                     <>{r.graftCount && <span style={{ fontWeight: 600, color: 'rgba(232,238,252,0.9)' }}>{r.graftCount.toLocaleString()} Grafts</span>}{r.price && <span> · €{r.price.toLocaleString()}</span>}{tech && <span> · {tech.label}</span>}</>
                   )}
