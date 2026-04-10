@@ -706,7 +706,11 @@ export default function App() {
         });
       }).catch(()=>{});
     },5000);
-    return()=>{clearInterval(iv);clearInterval(iv2);};
+    const iv3=setInterval(()=>{
+      if(demoMode)return;
+      useBillingStore.getState().fetchInvoices();
+    },60000);
+    return()=>{clearInterval(iv);clearInterval(iv2);clearInterval(iv3);};
   },[user,activeClinicId]);
 
   /* Demo tour: force-refresh conversations + patients the moment a tour
