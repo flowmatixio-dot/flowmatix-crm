@@ -44,9 +44,10 @@ export default function NewLeadModal({ onClose, onCreated, showT }) {
 
   const handleCreate = async () => {
     if (!name.trim()) { showT?.(t("enter_name") || "Name eingeben"); return; }
-    const limit = clinic?.patient_limit || (PLAN_LIMITS[clinic?.plan] || PLAN_LIMITS.core).patients || 1000;
+    const isUnlimited = clinic?.patient_limit === null || clinic?.patient_limit >= 99999;
+    const limit = isUnlimited ? null : (clinic?.patient_limit || (PLAN_LIMITS[clinic?.plan] || PLAN_LIMITS.core).patients || 1000);
     const currentCount = (leads || []).filter(l => !l.is_demo && !l.deleted_at).length;
-    if (limit && currentCount >= limit) { showT?.(t("patient_limit_reached") || "Patientenlimit erreicht"); return; }
+    if (!isUnlimited && limit && currentCount >= limit) { showT?.(t("patient_limit_reached") || "Patientenlimit erreicht"); return; }
     setSending(true);
     try {
       const data = {

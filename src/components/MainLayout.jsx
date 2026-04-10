@@ -911,13 +911,14 @@ export default function MainLayout() {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {/* Patient usage meter (hidden for doctor) */}
             {!isOperator && effectiveRole !== "doctor" && clinic && (() => {
-              const limit = clinic.patient_limit || (PLAN_LIMITS[clinic.plan] || PLAN_LIMITS.core).patients || 1000;
-              const pct = Math.round((myLeads.length / limit) * 100);
-              return <div onClick={() => setView("subscription")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, cursor: "pointer" }} title={`${myLeads.length} / ${limit} Patienten`}>
-                <div style={{ width: 40, height: 4, borderRadius: 2, background: "var(--progress-track)", overflow: "hidden" }}>
+              const isUnlimited = clinic.patient_limit === null || clinic.patient_limit >= 99999;
+              const limit = isUnlimited ? null : (clinic.patient_limit || (PLAN_LIMITS[clinic.plan] || PLAN_LIMITS.core).patients || 1000);
+              const pct = isUnlimited ? 0 : Math.round((myLeads.length / limit) * 100);
+              return <div onClick={() => setView("subscription")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, cursor: "pointer" }} title={isUnlimited ? `${myLeads.length} Patienten (unbegrenzt)` : `${myLeads.length} / ${limit} Patienten`}>
+                {!isUnlimited && <div style={{ width: 40, height: 4, borderRadius: 2, background: "var(--progress-track)", overflow: "hidden" }}>
                   <div style={{ height: 4, borderRadius: 2, width: `${Math.min(100, pct)}%`, background: pct > 80 ? "var(--error)" : pct > 50 ? "var(--warning)" : "var(--text-muted)", transition: "width 0.3s" }} />
-                </div>
-                <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600 }}>{myLeads.length}/{limit}</span>
+                </div>}
+                <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600 }}>{myLeads.length}{isUnlimited ? " / ∞" : `/${limit}`}</span>
               </div>;
             })()}
 
