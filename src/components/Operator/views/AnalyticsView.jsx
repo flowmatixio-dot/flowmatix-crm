@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import DataTable from '../shared/DataTable.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
@@ -19,7 +19,7 @@ export default function AnalyticsView() {
   const [daily, setDaily] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadAnalytics = useCallback(() => {
     setLoading(true);
     Promise.all([
       fmApi.getRevenue().catch(() => null),
@@ -40,6 +40,12 @@ export default function AnalyticsView() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [period]);
+
+  useEffect(() => {
+    loadAnalytics();
+    const iv = setInterval(loadAnalytics, 120000);
+    return () => clearInterval(iv);
+  }, [loadAnalytics]);
 
   const mrr = safeNum(revenue?.mrr) || safeNum(bizRev?.mrr_cents);
   const countByStatus = (revenue?.countByStatus && typeof revenue.countByStatus === 'object') ? revenue.countByStatus : {};

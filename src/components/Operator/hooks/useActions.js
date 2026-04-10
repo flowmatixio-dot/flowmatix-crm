@@ -75,7 +75,11 @@ export function useActions() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    const iv = setInterval(load, 60000);
+    return () => clearInterval(iv);
+  }, [load]);
 
   const actionRequired = clinics.filter(c => c.required_action && c.required_action !== 'NONE');
   const totalMrr = clinics.reduce((sum, c) => sum + (typeof c.mrr === 'number' ? c.mrr : 0), 0);

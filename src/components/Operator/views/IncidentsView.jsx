@@ -34,7 +34,13 @@ export default function IncidentsView() {
     }).catch(() => { setIncidents([]); setLoading(false); });
   }, [tab, sortBySeverity]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    if (tab === 'open') {
+      const iv = setInterval(load, 30000);
+      return () => clearInterval(iv);
+    }
+  }, [load, tab]);
 
   const resolve = async (id) => {
     try {

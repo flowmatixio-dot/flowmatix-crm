@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
 import DataTable from '../shared/DataTable.jsx';
@@ -22,7 +22,7 @@ export default function BillingView({ actions }) {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
+  const loadBilling = useCallback(() => {
     Promise.all([
       fmApi.getRevenue().catch(() => null),
       fmApi.getSubscriptions().catch(() => null),
@@ -35,6 +35,12 @@ export default function BillingView({ actions }) {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    loadBilling();
+    const iv = setInterval(loadBilling, 60000);
+    return () => clearInterval(iv);
+  }, [loadBilling]);
 
   const { clinics = [], totalMrr = 0 } = actions || {};
   const mrr = safeNum(revenue?.mrr);
