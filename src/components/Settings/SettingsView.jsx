@@ -530,7 +530,7 @@ function LocationsManagerSection({ clinic, setClinics, showT, t }) {
                 <button
                   onClick={() => setExpandedLoc(expandedLoc === loc ? null : loc)}
                   title="Google Maps Link"
-                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, padding: "2px 6px", borderRadius: 4, fontFamily: "inherit",
+                  style={{ border: "none", cursor: "pointer", fontSize: 12, padding: "2px 6px", borderRadius: 4, fontFamily: "inherit",
                     color: gmLinks[loc] ? "#4cc9ff" : "rgba(167,177,195,0.4)",
                     background: gmLinks[loc] ? "rgba(76,201,255,0.08)" : "transparent" }}
                 >🗺</button>
