@@ -389,7 +389,6 @@ export default function WhatsAppSetupPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {/* Card 1 — Existing number */}
         <div style={hintCardBase}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(232,238,252,0.5)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>{tx.hint_c1_badge}</div>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>📞 {tx.hint_c1_title}</div>
           <p style={{ fontSize: 13, color: "rgba(232,238,252,0.7)", lineHeight: 1.5, marginBottom: 14, marginTop: 0 }}>{tx.hint_c1_desc}</p>
           <ul style={{ listStyle: "none", padding: 0, margin: "0 0 14px 0" }}>
