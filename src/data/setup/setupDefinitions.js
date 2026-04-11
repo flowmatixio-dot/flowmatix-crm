@@ -28,8 +28,7 @@ export const SETUP_STEPS = [
   { id: "automations", icon: "⚙️", i18nKey: "sg_automations", tier: "recommended", desc: "Follow-ups und automatische Workflows aktivieren",                time: "2 Min.", action: "automations", order: 9 },
   { id: "invoicing",   icon: "🧾", i18nKey: "sg_rechnung",   tier: "recommended", desc: "Rechnungsdaten und Zahlungseinstellungen",                         time: "2 Min.", action: "setup",     order: 10 },
   // ── Optional ──
-  { id: "languages",   icon: "🌐", i18nKey: "sg_languages",  tier: "optional",    desc: "Aktiviere weitere Sprachen für internationale Patienten",           time: "1 Min.", action: "setup",     order: 11 },
-  { id: "flights",     icon: "✈️", i18nKey: "sg_flights",    tier: "optional",    desc: "Optional für internationale Patienten mit Flughafentransfer",       time: "1 Min.", action: "setup",     order: 12 },
+{ id: "flights",     icon: "✈️", i18nKey: "sg_flights",    tier: "optional",    desc: "Optional für internationale Patienten mit Flughafentransfer",       time: "1 Min.", action: "setup",     order: 12 },
 ];
 
 /**

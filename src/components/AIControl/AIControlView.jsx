@@ -138,14 +138,6 @@ export default function AIControlView() {
         <Btn color="#10b981" icon="+" label={t("add_faq")} onClick={()=>{if(newFaqQ&&newFaqA){upAi("faq",[...(ac.faq||[]),{q:newFaqQ,a:newFaqA}]);setNewFaqQ("");setNewFaqA("");}}}/>
       </div>
     </Section>
-    <Section title={t("allowed_languages")}>
-      <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-        {["English","Turkish","Arabic","French","German","Spanish","Japanese","Italian","Portuguese","Swedish","Dutch","Russian","Chinese"].map(l=>{
-          const active=(ac.allowedLangs||[]).includes(l);
-          return<button key={l} onClick={()=>upAi("allowedLangs",active?ac.allowedLangs.filter(x=>x!==l):[...(ac.allowedLangs||[]),l])} style={{padding:"6px 14px",borderRadius:10,background:active?"rgba(16,185,129,0.1)":"var(--bg-card)",border:`1px solid ${active?"rgba(16,185,129,0.25)":"var(--border-strong)"}`,color:active?"#10b981":"var(--text-muted)",fontWeight:600,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>{active?"✓ ":""}{l}</button>;
-        })}
-      </div>
-    </Section>
     <Section title={t("behavior")}>
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
         <Toggle value={ac.autoCollectPhotos} onChange={v=>upAi("autoCollectPhotos",v)} label={t("auto_collect_photos")}/>
