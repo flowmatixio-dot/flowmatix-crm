@@ -14,7 +14,7 @@ export const CONV_STATUS = {
   closed: { label: "conv_closed", color: "#6b7280", icon: "✕", desc: "conv_closed_desc" },
 };
 
-export const STAGES = [{ id: "new", label: "stage_new", color: "#4cc9ff", icon: "✦" },{ id: "contacted", label: "stage_contacted", color: "#fbbf24", icon: "◉" },{ id: "booked", label: "stage_booked", color: "#a78bfa", icon: "◈" },{ id: "done", label: "stage_done", color: "#10b981", icon: "✓" },{ id: "cancelled", label: "stage_cancelled", color: "#ef4444", icon: "✕" }];
+export const STAGES = [{ id: "new", label: "stage_new", color: "#4cc9ff", icon: "✦" },{ id: "contacted", label: "stage_contacted", color: "#fbbf24", icon: "◉" },{ id: "quoted", label: "stage_quoted", color: "#fb923c", icon: "◆" },{ id: "booked", label: "stage_booked", color: "#a78bfa", icon: "◈" },{ id: "done", label: "stage_done", color: "#10b981", icon: "✓" },{ id: "cancelled", label: "stage_cancelled", color: "#ef4444", icon: "✕" }];
 export const PLAN_C = { core: "#4cc9ff", pro: "#a78bfa", operations: "#ff8a2a", enterprise: "#10b981" };
 export const PLAN_PRICE = { core: "€690", pro: "€990", operations: "€1.490", enterprise: "€2.500+" };
 export const TEAM_LIMITS = {
