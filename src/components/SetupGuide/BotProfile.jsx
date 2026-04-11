@@ -199,7 +199,7 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
           <span style={{ color: "var(--text-faint)", fontSize: 12 }}>{"—"}</span>
           <input type="time" value={hours[row.key + "Close"] || "18:00"} onChange={e => update("hours", { ...hours, [row.key + "Close"]: e.target.value })} style={{ padding: "6px 10px", borderRadius: 8, background: "var(--bg-card-elevated)", border: "1px solid var(--border-strong)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 12 }} />
           <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--text-faint)", cursor: "pointer" }}>
-            <input type="checkbox" checked={hours[row.key + "Closed"] || false} onChange={e => update("hours", { ...hours, [row.key + "Closed"]: e.target.checked })} />
+            <input type="checkbox" checked={hours[row.key + "Closed"] ?? (row.key !== "weekdays")} onChange={e => update("hours", { ...hours, [row.key + "Closed"]: e.target.checked })} />
             {t("hours_closed")}
           </label>
         </div>;
