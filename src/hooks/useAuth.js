@@ -214,6 +214,7 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       setAuthLoading(false);
     }).catch(() => {
       fmApi.clearTokens();
+      setUser(null);
       setAuthLoading(false);
     });
     return () => window.removeEventListener("fm:session-expired", onSessionExpired);
