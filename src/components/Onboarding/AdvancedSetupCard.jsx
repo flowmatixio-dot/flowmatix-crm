@@ -140,7 +140,7 @@ export default function AdvancedSetupCard() {
   // Expanded by default — customer must see and complete this.
   // State persists in localStorage so collapsing is remembered.
   const [expanded, setExpanded] = useState(() => {
-    try { const v = localStorage.getItem("fm_advanced_setup_expanded"); return v === null ? true : v === "1"; } catch { return true; }
+    try { const v = localStorage.getItem("fm_advanced_setup_expanded"); return v === "1"; } catch { return false; }
   });
   const toggleExpanded = () => {
     setExpanded((prev) => {
