@@ -372,7 +372,7 @@ export default function WhatsAppSetupPage() {
         <p style={{ color: "rgba(232,238,252,0.9)", marginBottom: 24, fontSize: 14, textAlign: "center" }}>{tx.desc}</p>
         <div style={cd}>
           <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: "rgba(232,238,252,0.9)", textAlign: "center" }}>{tx.phone_label}</div>
-          <input id="wa-phone" type="tel" placeholder={tx.phone_hint} defaultValue={ob.phone_number || n?.phone || ""} style={ip} />
+          <input id="wa-phone" type="tel" placeholder={tx.phone_hint} defaultValue={ob.phone_number || ""} style={ip} />
           <button id="wa-connect-btn" style={{ ...bt, background: "#10b981", color: "#fff", marginTop: 16 }} onClick={() => {
             const ph = document.getElementById("wa-phone")?.value;
             if (!ph || ph.replace(/[^0-9+]/g, "").length < 8) return;
