@@ -82,7 +82,7 @@ export default function AuditLogView() {
       const qs = buildQuery();
       // We need raw text from this endpoint, not JSON. apiFetch json-parses
       // by default, so we use fetch directly with the same auth header.
-      const token = (() => { try { return localStorage.getItem("fm_access_token"); } catch { return null; } })();
+      const token = (() => { try { return sessionStorage.getItem("fm_access_token"); } catch { return null; } })();
       const res = await fetch(`https://api.flowmatix.io/api/v1/crm/audit-log/export?${qs}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         credentials: "include",
