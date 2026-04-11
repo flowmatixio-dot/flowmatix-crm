@@ -228,7 +228,7 @@ export default function DashboardView() {
           live above this; it has been moved below the live-test section
           to reduce perceived setup friction.
           ═══════════════════════════════════════════════════════════════ */}
-      {!demoTourOpen && (
+      {!demoTourOpen && workspaceState !== 'active' && (
         <div style={{
           padding: "32px 36px", borderRadius: 20,
           background: "linear-gradient(135deg, rgba(168,85,247,0.14), rgba(76,201,255,0.06))",
