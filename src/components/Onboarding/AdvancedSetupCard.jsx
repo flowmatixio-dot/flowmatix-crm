@@ -36,7 +36,6 @@ const ADVANCED_STEPS = [
     icon: "🏥",
     label:    { de: "Allgemein", en: "General", tr: "Genel" },
     sublabel: { de: "Klinik-Stammdaten, Adresse, Ansprechpartner", en: "Clinic basics, address, contact", tr: "Klinik bilgileri, adres, iletişim" },
-    priority: "recommended",
   },
   {
     key: "team",
@@ -138,11 +137,10 @@ export default function AdvancedSetupCard() {
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Collapsed by default — saves dashboard space and reduces setup
-  // pressure on first impression. State persists in localStorage so
-  // a user who expanded it once stays expanded across reloads.
+  // Expanded by default — customer must see and complete this.
+  // State persists in localStorage so collapsing is remembered.
   const [expanded, setExpanded] = useState(() => {
-    try { return localStorage.getItem("fm_advanced_setup_expanded") === "1"; } catch { return false; }
+    try { const v = localStorage.getItem("fm_advanced_setup_expanded"); return v === null ? true : v === "1"; } catch { return true; }
   });
   const toggleExpanded = () => {
     setExpanded((prev) => {
@@ -176,7 +174,7 @@ export default function AdvancedSetupCard() {
 
   if (loading || !status) return null;
 
-  // Build a unified done-flag map.
+  // Build a unified done-flag map. If all visible steps are done → hide card entirely.
   //
   // IMPORTANT: backend "done" flags are mostly seed-defaults — every
   // signed-up clinic gets agent_configured=true, ≥1 treatment, Dr. Demo,
@@ -210,6 +208,10 @@ export default function AdvancedSetupCard() {
   // Filter: hide paidOnly steps (e.g. whatsapp) until the workspace is active
   const visibleSteps = ADVANCED_STEPS.filter((s) => !s.paidOnly || planActive);
 
+  // Hide entire card when all visible steps are done
+  const allDone = visibleSteps.every((s) => !!flags[s.key] && !(s.forceLockedUntilWhatsapp && !flags.whatsapp));
+  if (allDone) return null;
+
   const handleClick = (s) => {
     // Locked if a prerequisite isn't met yet
     if (s.requires && !flags[s.requires]) {
@@ -229,16 +231,21 @@ export default function AdvancedSetupCard() {
       style={{
         padding: "20px 22px",
         borderRadius: 14,
-        // Dezenter — keine Pressure, keine Accent-Border
         background: "rgba(255,255,255,0.02)",
         border: "1px solid rgba(255,255,255,0.06)",
         marginBottom: 16,
       }}
     >
-      {/* Collapsible header — clicking toggles the checklist below.
-          Default state is collapsed so the dashboard stays focused on
-          the demo as the primary action. No "X/Y" counter — that
-          created a wizard / setup-progress feeling we want to avoid. */}
+      {/* Pulsing orange lamp at top */}
+      <style>{`@keyframes fmOrangePulse{0%{box-shadow:0 0 0 0 rgba(255,138,42,0.7);opacity:1}70%{box-shadow:0 0 0 10px rgba(255,138,42,0);opacity:0.6}100%{box-shadow:0 0 0 0 rgba(255,138,42,0);opacity:1}}`}</style>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff8a2a", animation: "fmOrangePulse 1.6s infinite", flexShrink: 0 }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#ff8a2a", letterSpacing: 0.3 }}>
+          {T("Action required — complete your setup", "Einrichtung erforderlich — bitte vervollständigen", "Kurulum gerekli — lütfen tamamlayın")}
+        </span>
+      </div>
+
+      {/* Collapsible header */}
       <button
         onClick={toggleExpanded}
         style={{
@@ -259,14 +266,6 @@ export default function AdvancedSetupCard() {
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(167,177,195,0.7)", letterSpacing: -0.05 }}>
               {T("🚀 Win more patients automatically", "🚀 Mehr Patienten automatisch gewinnen", "🚀 Otomatik olarak daha fazla hasta kazanın")}
-            </span>
-            <span style={{
-              fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
-              background: "rgba(255,255,255,0.04)", color: "rgba(167,177,195,0.6)",
-              border: "1px solid rgba(255,255,255,0.06)",
-              letterSpacing: 0.2, whiteSpace: "nowrap",
-            }}>
-              {T("Optional", "Optional", "İsteğe bağlı")}
             </span>
           </div>
           <div style={{ fontSize: 11, color: "rgba(167,177,195,0.45)", lineHeight: 1.5 }}>
@@ -384,16 +383,6 @@ export default function AdvancedSetupCard() {
                       letterSpacing: 0.2, textTransform: "none", whiteSpace: "nowrap",
                     }}>
                       {T("Recommended for better results", "Für bessere Ergebnisse", "Daha iyi sonuçlar için")}
-                    </span>
-                  )}
-                  {isOptional && (
-                    <span style={{
-                      fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
-                      background: "rgba(255,255,255,0.04)", color: "rgba(167,177,195,0.6)",
-                      border: "1px solid rgba(255,255,255,0.06)",
-                      letterSpacing: 0.2, textTransform: "none", whiteSpace: "nowrap",
-                    }}>
-                      {T("Optional", "Optional", "İsteğe bağlı")}
                     </span>
                   )}
                   {locked && (
