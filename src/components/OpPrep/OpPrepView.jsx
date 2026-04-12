@@ -17,8 +17,10 @@ function getReadiness(a, opts = {}) {
     { key: "photosComplete", label: _t("op_photos") || "Fotos" },
   ].filter(Boolean);
   const logistics = [
-    { key: "flightReceived", label: _t("op_flight_data") || "Flugdaten" },
-    { key: "driverAssigned", label: _t("op_driver") || "Fahrer" },
+    ...(!opts.isLocal ? [
+      { key: "flightReceived", label: _t("op_flight_data") || "Flugdaten" },
+      { key: "driverAssigned", label: _t("op_driver") || "Fahrer" },
+    ] : []),
     { key: "hotelBooked", label: _t("op_hotel") || "Hotel" },
     { key: "transferConfirmed", label: _t("op_transfer") || "Transfer" },
   ];
@@ -144,7 +146,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
   const dateStr = dt.toLocaleDateString(fmLocale(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const timeStr = localAppt.time || dt.toLocaleTimeString(fmLocale(), { hour: "2-digit", minute: "2-digit" });
   const doctor = localAppt.doctorName || localAppt.doctor || (t("op_not_assigned") || "Nicht zugewiesen");
-  const r = getReadiness(localAppt, { depositEnabled, t });
+  const r = getReadiness(localAppt, { depositEnabled, t, isLocal: !!(localAppt.noFlightNeeded || localAppt.noTransferNeeded) });
   const pctColor = r.pct <= 40 ? "rgba(245,158,11,0.8)" : r.pct <= 80 ? "#f59e0b" : "#10b981";
   const daysUntil = Math.ceil((dt - new Date()) / 86400000);
 
@@ -645,7 +647,7 @@ export default function OpPrepView() {
         { key: "deposit", done: lead.convStatus === "deposit_paid" || !!lead.depositPaid },
         { key: "flight", done: !!(lead.flightConfirmed?.date) || !!(lead.metadata?.noFlightNeeded) },
         { key: "hotel", done: !!(lead.hotelInfo?.name || lead.hotel?.name || lead.logistics?.hotelName) },
-        { key: "driver", done: !!(lead.logistics?.driverName) },
+        { key: "driver", done: !!(lead.logistics?.driverName) || !!(lead.metadata?.noFlightNeeded || lead.metadata?.noTransferNeeded) },
         { key: "bloodwork", done: !!lead.bloodworkDone },
         { key: "aftercare", done: !!lead.aftercarePrepped },
       ];
@@ -669,13 +671,17 @@ export default function OpPrepView() {
 
   const apiPrepData = useMemo(() => {
     if (!apiAppts) return [];
+    const leadMap = {};
+    (myLeads || []).forEach(l => { leadMap[l.id] = l; });
     const now = getNow();
     return apiAppts.map(a => {
+      const lead = leadMap[a.patientId || a.patient_id] || {};
+      const isLocal = !!(lead.metadata?.noFlightNeeded || lead.metadata?.noTransferNeeded || a.noFlightNeeded);
       const dt = new Date(a.scheduledAt || a.scheduled_at || a.date);
       const todayStr = now.toISOString().split('T')[0];
       const apptStr = dt.toISOString().split('T')[0];
       const daysUntil = Math.round((new Date(apptStr) - new Date(todayStr)) / 86400000);
-      const r = getReadiness(a, { depositEnabled: clinic?.depositPolicy && clinic.depositPolicy !== "none" && clinic?.booking_funnel !== "no_deposit", t });
+      const r = getReadiness(a, { depositEnabled: clinic?.depositPolicy && clinic.depositPolicy !== "none" && clinic?.booking_funnel !== "no_deposit", t, isLocal });
       let pName = getPatientName(a);
       let treat = a.treatment || a.treatmentType || a.treatment_type || "";
       treat = treat.replace(/hair\s*transplant(ation)?/gi, "").replace(/haartransplantation/gi, "").replace(/saç\s*ekimi/gi, "").replace(/transplant(ation)?/gi, "").trim();
