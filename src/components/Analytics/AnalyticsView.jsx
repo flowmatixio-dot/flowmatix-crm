@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { Stat } from "../shared/index";
+import * as fmApi from "../../api/client";
 
 const TREAT_PRICES = {
   "FUE": 3500, "DHI": 4500, "FUE Saphir": 4000,
@@ -202,6 +203,13 @@ export default function AnalyticsView() {
     return { totalValue, bookingsPending, evalsPending, activeLeads: activePipeline.length };
   }, [myLeads]);
 
+  const [recentVisitors, setRecentVisitors] = useState([]);
+  useEffect(() => {
+    fmApi.getRecentVisitors().then(rv => {
+      setRecentVisitors(Array.isArray(rv) ? rv : []);
+    }).catch(() => {});
+  }, []);
+
   const SOURCE_COLORS = { WhatsApp: "#25D366", Website: "#4cc9ff", Referral: "#a78bfa", Ads: "#f59e0b", Sonstige: "rgba(167,177,195,0.6)" };
   const cardStyle = { padding: 18, borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" };
 
@@ -297,6 +305,45 @@ export default function AnalyticsView() {
           <Stat label={t("stat_bookings_pending") || "Buchungen ausstehend"} value={pipelineStats.bookingsPending} color="#a78bfa" sub={pipelineStats.bookingsPending === 0 ? (t("no_data_yet") || "Keine offenen Buchungen") : undefined} />
           <Stat label={t("doctor_reviews_open") || "Arzt-Bewertungen offen"} value={pipelineStats.evalsPending} color={pipelineStats.evalsPending > 0 ? "#f59e0b" : "#10b981"} sub={pipelineStats.evalsPending === 0 ? (t("all_reviewed") || "Alle bewertet") : (t("action_needed_short") || "Aktion nötig")} />
         </div>
+      </SectionBlock>
+
+      {/* ═══ BLOCK 4: WEBSITE BESUCHER ═══ */}
+      <SectionBlock title="Website Besucher">
+        {recentVisitors.length === 0 ? (
+          <EmptyHint text="Keine Besucherdaten vorhanden" />
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  {["Zeit", "Ort", "Seite", "Gerät", "Dauer"].map(h => (
+                    <th key={h} style={{ textAlign: "left", padding: "6px 10px", fontSize: 10, fontWeight: 700, color: "rgba(167,177,195,0.5)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {recentVisitors.map((v, i) => {
+                  const cc = (v.country_code || "").toUpperCase();
+                  const flag = cc.length === 2 ? String.fromCodePoint(...[...cc].map(c => 0x1F1E6 - 65 + c.charCodeAt(0))) : "🌐";
+                  const loc = [flag, v.city, cc].filter(Boolean).join(" ");
+                  const page = v.pathname || "/";
+                  const isMobile = /mobile|android|iphone|ipad/i.test(v.user_agent || "");
+                  const dur = v.duration_seconds ? (v.duration_seconds >= 60 ? `${Math.floor(v.duration_seconds / 60)}m ${v.duration_seconds % 60}s` : `${v.duration_seconds}s`) : "—";
+                  const time = v.created_at ? new Date(v.created_at).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
+                  return (
+                    <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                      <td style={{ padding: "8px 10px", color: "rgba(167,177,195,0.75)" }}>{time}</td>
+                      <td style={{ padding: "8px 10px", color: "rgba(232,238,252,0.85)" }}>{loc || "—"}</td>
+                      <td style={{ padding: "8px 10px", color: "rgba(167,177,195,0.75)", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{page}</td>
+                      <td style={{ padding: "8px 10px", fontSize: 16 }}>{isMobile ? "📱" : "🖥️"}</td>
+                      <td style={{ padding: "8px 10px", color: "rgba(167,177,195,0.75)" }}>{dur}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </SectionBlock>
     </div>
   );
