@@ -248,38 +248,78 @@ export default function AnalyticsView() {
       </div>
       {/* ═══ 8. WEBSITE BESUCHER ═══ */}
       <SectionTitle sub="Marketing">Website Besucher</SectionTitle>
-      <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', marginBottom: 28 }}>
-        {recentVisitors.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 16 }}>Keine Daten</div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                {['Zeit', 'Ort', 'Seite', 'Gerät', 'Dauer'].map(h => (
-                  <th key={h} style={{ padding: '4px 10px 8px 0', textAlign: 'left', fontWeight: 700, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recentVisitors.map((v, i) => {
-                const flag = v.country && v.country.length === 2 ? String.fromCodePoint(...[...v.country.toUpperCase()].map(c => 0x1F1E0 + c.charCodeAt(0) - 65)) : '';
-                const isMobile = /mobile|android|iphone|ipad/i.test(v.user_agent || '');
-                const path = (() => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } })();
-                const ago = (() => { const d = Math.floor((Date.now() - new Date(v.created_at)) / 1000); return d < 60 ? `${d}s` : d < 3600 ? `${Math.floor(d/60)}min` : `${Math.floor(d/3600)}h`; })();
-                return (
-                  <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                    <td style={{ padding: '7px 10px 7px 0', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{ago}</td>
-                    <td style={{ padding: '7px 10px 7px 0', whiteSpace: 'nowrap' }}>{flag} {v.city ? `${v.city}, ` : ''}{COUNTRY_NAMES[v.country?.toUpperCase()] || v.country || '—'}</td>
-                    <td style={{ padding: '7px 10px 7px 0', color: 'var(--text-primary)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{path}</td>
-                    <td style={{ padding: '7px 10px 7px 0' }}>{isMobile ? '📱' : '🖥️'}</td>
-                    <td style={{ padding: '7px 0', color: v.duration_seconds ? '#22c55e' : 'var(--text-muted)' }}>{v.duration_seconds ? `${v.duration_seconds}s` : '—'}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+      <VisitorsByCountry visitors={recentVisitors} />
+    </div>
+  );
+}
+
+// ── Country flag from 2-letter ISO code ──
+function countryFlag(cc) {
+  if (!cc || cc.length !== 2) return '🌐';
+  return String.fromCodePoint(...[...cc.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
+// ── Website Besucher grouped by country ──
+function VisitorsByCountry({ visitors }) {
+  const [open, setOpen] = useState({});
+
+  if (!visitors.length) {
+    return (
+      <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', marginBottom: 28, textAlign: 'center', color: 'var(--text-muted)' }}>
+        Keine Daten
       </div>
+    );
+  }
+
+  // Group by country code
+  const groups = {};
+  visitors.forEach(v => {
+    const key = v.country?.toUpperCase() || 'XX';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(v);
+  });
+  const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+
+  return (
+    <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', marginBottom: 28, overflow: 'hidden' }}>
+      {sorted.map(([cc, rows], gi) => {
+        const flag = countryFlag(cc);
+        const name = COUNTRY_NAMES[cc] || cc;
+        const isOpen = !!open[cc];
+        return (
+          <div key={cc}>
+            {/* Country header row */}
+            <div onClick={() => setOpen(p => ({ ...p, [cc]: !p[cc] }))}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 20px', cursor: 'pointer', borderBottom: isOpen || gi < sorted.length - 1 ? '1px solid var(--border-subtle)' : 'none', background: isOpen ? 'var(--bg-hover)' : 'transparent', transition: 'background 0.15s' }}>
+              <span style={{ fontSize: 18, lineHeight: 1 }}>{flag}</span>
+              <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', flex: 1 }}>{name}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{rows.length} Besuch{rows.length !== 1 ? 'e' : ''}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 6 }}>{isOpen ? '▲' : '▼'}</span>
+            </div>
+            {/* Expanded visits */}
+            {isOpen && (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <tbody>
+                  {rows.map((v, i) => {
+                    const isMobile = /mobile|android|iphone|ipad/i.test(v.user_agent || '');
+                    const path = (() => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } })();
+                    const ago = (() => { const d = Math.floor((Date.now() - new Date(v.created_at)) / 1000); return d < 60 ? `${d}s` : d < 3600 ? `${Math.floor(d / 60)}min` : `${Math.floor(d / 3600)}h`; })();
+                    return (
+                      <tr key={i} style={{ borderBottom: i < rows.length - 1 ? '1px solid var(--border-subtle)' : 'none', background: 'var(--bg-section)' }}>
+                        <td style={{ padding: '6px 20px', color: 'var(--text-muted)', whiteSpace: 'nowrap', width: 60 }}>{ago}</td>
+                        <td style={{ padding: '6px 10px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{v.city || '—'}</td>
+                        <td style={{ padding: '6px 10px', color: 'var(--text-primary)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{path}</td>
+                        <td style={{ padding: '6px 10px', fontSize: 14 }}>{isMobile ? '📱' : '🖥️'}</td>
+                        <td style={{ padding: '6px 20px 6px 0', color: v.duration_seconds ? '#22c55e' : 'var(--text-muted)', textAlign: 'right' }}>{v.duration_seconds ? `${v.duration_seconds}s` : '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
