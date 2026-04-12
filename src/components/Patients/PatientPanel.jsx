@@ -362,14 +362,20 @@ export default function PatientPanel() {
           ...(depositEnabled&&depositBefore?[{id:"deposit",icon:"💰",label:t("step_deposit"),done:(invoices.filter(i=>i.leadId===lead.id&&i.status==="paid").length>0||lead.convStatus==="deposit_paid"||lead.stage==="booked"||lead.stage==="done")&&!lead.metadata?.depositPending}]:[]),
           {id:"booking",icon:"\u2705",label:t("step_booked"),done:lead.stage==="booked"||lead.stage==="done"},
           ...(depositEnabled&&!depositBefore?[{id:"deposit",icon:"💰",label:t("step_deposit"),done:(invoices.filter(i=>i.leadId===lead.id&&i.status==="paid").length>0||lead.convStatus==="deposit_paid"||lead.stage==="done")&&!lead.metadata?.depositPending}]:[]),
-          ...(!isLocal&&!isDrHaiLe?[
-            {id:"flight",icon:"✈️",label:t("step_flight"),done:!!lead.flightConfirmed?.date||!!(lead.metadata?.noFlightNeeded)},
-            {id:"driver",icon:"\uD83D\uDE97",label:t("driver")||"Fahrer",done:!!lead.logistics?.driverName},
+          ...(!isDrHaiLe?[
+            ...(isLocal?[
+              {id:"flight",icon:"✈️",label:t("step_flight"),done:false,skipped:true},
+              {id:"driver",icon:"\uD83D\uDE97",label:t("driver")||"Fahrer",done:false,skipped:true},
+            ]:[
+              {id:"flight",icon:"✈️",label:t("step_flight"),done:!!lead.flightConfirmed?.date},
+              {id:"driver",icon:"\uD83D\uDE97",label:t("driver")||"Fahrer",done:!!lead.logistics?.driverName},
+            ]),
             {id:"hotel",icon:"\uD83C\uDFE8",label:t("hotel")||"Hotel",done:!!(lead.hotelInfo?.name||lead.hotel?.name)},
           ]:[]),
         ];
-        const doneCount=steps.filter(s=>s.done).length;
-        const pct=Math.round(doneCount/steps.length*100);
+        const activeSteps=steps.filter(s=>!s.skipped);
+        const doneCount=activeSteps.filter(s=>s.done).length;
+        const pct=Math.round(doneCount/activeSteps.length*100);
         return<div style={{padding:"12px 24px",borderBottom:"1px solid rgba(255,255,255,0.06)",flexShrink:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
             <span style={{fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.6)",textTransform:"uppercase",letterSpacing:"0.1em"}}>{t("patient_journey")}</span>
@@ -380,8 +386,8 @@ export default function PatientPanel() {
           </div>
           <div style={{display:"flex",justifyContent:"space-between"}}>
             {steps.map((s,i)=>{const pending=s.id==="deposit"&&!s.done&&lead.reviewData&&lead.convStatus!=="resolved";return<div key={s.id} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,position:"relative"}}>
-              <div style={{width:28,height:28,borderRadius:8,background:s.done?"rgba(16,185,129,0.12)":pending?"rgba(251,191,36,0.12)":"rgba(255,255,255,0.04)",border:`1.5px solid ${s.done?"rgba(16,185,129,0.4)":pending?"rgba(251,191,36,0.5)":"rgba(255,255,255,0.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,transition:"all .3s",animation:pending?"fmDepPulse 2s infinite":"none"}}>{s.done?<span style={{color:"#10b981"}}>✓</span>:pending?<span style={{color:"#fbbf24"}}>💳</span>:<span style={{opacity:0.4}}>{s.icon}</span>}</div>
-              <span style={{fontSize:9,fontWeight:700,color:s.done?"#10b981":pending?"#fbbf24":"rgba(167,177,195,0.75)",textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</span>
+              <div style={{width:28,height:28,borderRadius:8,background:s.done?"rgba(16,185,129,0.12)":s.skipped?"rgba(255,255,255,0.02)":pending?"rgba(251,191,36,0.12)":"rgba(255,255,255,0.04)",border:`1.5px solid ${s.done?"rgba(16,185,129,0.4)":s.skipped?"rgba(255,255,255,0.04)":pending?"rgba(251,191,36,0.5)":"rgba(255,255,255,0.08)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,transition:"all .3s",animation:pending?"fmDepPulse 2s infinite":"none"}}>{s.done?<span style={{color:"#10b981"}}>✓</span>:s.skipped?<span style={{opacity:0.2,textDecoration:"line-through"}}>{s.icon}</span>:pending?<span style={{color:"#fbbf24"}}>💳</span>:<span style={{opacity:0.4}}>{s.icon}</span>}</div>
+              <span style={{fontSize:9,fontWeight:700,color:s.done?"#10b981":s.skipped?"rgba(167,177,195,0.2)":pending?"#fbbf24":"rgba(167,177,195,0.75)",textTransform:"uppercase",letterSpacing:"0.05em",textDecoration:s.skipped?"line-through":"none"}}>{s.skipped?<>{"N/A"}</>:s.label}</span>
               {i<steps.length-1&&<div style={{position:"absolute",top:14,left:"calc(100% + 2px)",width:20,height:1.5,background:steps[i+1]?.done?"rgba(16,185,129,0.3)":"rgba(255,255,255,0.06)"}}/>}
             </div>})}
           </div>
