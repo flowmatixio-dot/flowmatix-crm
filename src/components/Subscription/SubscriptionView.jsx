@@ -45,8 +45,8 @@ export default function SubscriptionView() {
   const planPrice = useMemo(() => {
     const raw = PLAN_PRICE[currentPlan];
     if (!raw) return 0;
-    const num = parseInt(String(raw).replace(/[^\d]/g, ""), 10);
-    return isNaN(num) ? 0 : num;
+    const num = Number.parseInt(String(raw).replaceAll(/[^\d]/g, ""), 10);
+    return Number.isNaN(num) ? 0 : num;
   }, [currentPlan]);
 
   const toggleAddon = async (addonId, addonName, isActive) => {
@@ -55,7 +55,7 @@ export default function SubscriptionView() {
       try {
         await removeAddon(addonId);
         setActiveAddons(prev => prev.filter(a => a !== addonId));
-        const deltaR = addonId.startsWith('patients_') ? parseInt(addonId.split('_')[1]) || 0 : 0;
+        const deltaR = addonId.startsWith('patients_') ? Number.parseInt(addonId.split('_')[1]) || 0 : 0;
         if (deltaR > 0) setClinics(cs => cs.map(cl => cl.id === c.id ? { ...cl, patient_limit: Math.max(0, (cl.patient_limit || 0) - deltaR) } : cl));
         showT(`${addonName} ${t("addon_removed_toast") || "entfernt"}`);
       } catch(e) { showT(e.message || t("error_generic") || 'Fehler'); }
@@ -64,7 +64,7 @@ export default function SubscriptionView() {
       try {
         await addAddon(addonId);
         setActiveAddons(prev => [...prev, addonId]);
-        const delta = addonId.startsWith('patients_') ? parseInt(addonId.split('_')[1]) || 0 : 0;
+        const delta = addonId.startsWith('patients_') ? Number.parseInt(addonId.split('_')[1]) || 0 : 0;
         if (delta > 0) setClinics(cs => cs.map(cl => cl.id === c.id ? { ...cl, patient_limit: (cl.patient_limit || 0) + delta } : cl));
         showT(`${addonName} ${t("addon_activated_toast") || "aktiviert"}`);
       } catch(e) { showT(e.message || t("error_generic") || 'Fehler'); }

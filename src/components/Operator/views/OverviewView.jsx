@@ -105,7 +105,7 @@ function fmt(n) {
 function timeAgo(ts) {
   if (!ts) return '—';
   const d = Date.now() - new Date(ts).getTime();
-  if (isNaN(d)) return '—';
+  if (Number.isNaN(d)) return '—';
   if (d < 60000) return 'just now';
   if (d < 3600000) return `${Math.floor(d / 60000)}m ago`;
   if (d < 86400000) return `${Math.floor(d / 3600000)}h ago`;
@@ -154,7 +154,7 @@ export default function OverviewView({ events, actions, navigateTo }) {
       type: safeStr(ev.type, 'UNKNOWN'),
       priority: safeStr(ev.priority, 'medium'),
       clinicName: safeStr(ev.org_name, 'System'),
-      detail: safeStr(ev.payload?.detail || ev.payload?.email || ev.payload?.error || (typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : ''), ''),
+      detail: safeStr(ev.payload?.detail || ev.payload?.email || ev.payload?.error || (typeof ev.type === 'string' ? ev.type.replaceAll(/_/g, ' ').toLowerCase() : ''), ''),
       timestamp: ev.created_at,
       cta: ev.payload?.error_type === 'BOT_ERROR' ? 'Impersonate'
         : ev.payload?.error_type === 'BOT_NO_RESPONSE' ? 'Check Bot'
@@ -202,7 +202,7 @@ export default function OverviewView({ events, actions, navigateTo }) {
 
   // ── Priority items (top 3 most urgent) ──
   const priorityItems = allActions.slice(0, 3).map(a => {
-    const cfg = PRIORITY_DESCRIPTIONS[a.type] || { title: a.type.replace(/_/g, ' '), desc: a.detail, icon: '📋' };
+    const cfg = PRIORITY_DESCRIPTIONS[a.type] || { title: a.type.replaceAll(/_/g, ' '), desc: a.detail, icon: '📋' };
     return { ...a, ...cfg };
   });
 
@@ -522,7 +522,7 @@ export default function OverviewView({ events, actions, navigateTo }) {
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{safeStr(ev.org_name, 'System')}</span>
                   {' — '}
-                  {typeof ev.type === 'string' ? ev.type.replace(/_/g, ' ').toLowerCase() : '—'}
+                  {typeof ev.type === 'string' ? ev.type.replaceAll(/_/g, ' ').toLowerCase() : '—'}
                 </span>
                 <span style={{ color: 'var(--text-faint)', fontSize: 10, flexShrink: 0, fontWeight: 500 }}>
                   {timeAgo(ev.created_at)}

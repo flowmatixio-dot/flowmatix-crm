@@ -13,14 +13,14 @@ const getRejectionReasons = (t) => [
 // Parse numeric value from string like "€3,200" or "3200"
 function parseNumeric(val) {
   if (!val) return "";
-  return String(val).replace(/[^0-9]/g, "");
+  return String(val).replaceAll(/[^0-9]/g, "");
 }
 
 // Calculate age from DOB string
 function calcAge(dob) {
   if (!dob) return null;
   const birth = new Date(dob);
-  if (isNaN(birth)) return null;
+  if (Number.isNaN(birth)) return null;
   const now = new Date();
   let age = now.getFullYear() - birth.getFullYear();
   if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;

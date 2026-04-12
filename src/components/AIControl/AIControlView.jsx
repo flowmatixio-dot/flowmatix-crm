@@ -147,7 +147,7 @@ export default function AIControlView() {
         <Toggle value={ac.autoCollectPhotos} onChange={v=>upAi("autoCollectPhotos",v)} label={t("auto_collect_photos")}/>
         <Toggle value={ac.autoQualify} onChange={v=>upAi("autoQualify",v)} label={t("auto_qualify_leads")}/>
         <div><div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("max_wait_handover")}</div>
-          <input id="maxWait" name="maxWait" type="number" value={ac.maxWaitBeforeHandover} onChange={e=>upAi("maxWaitBeforeHandover",parseInt(e.target.value)||5)} style={{width:80,padding:"8px 12px",borderRadius:10,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none"}}/></div>
+          <input id="maxWait" name="maxWait" type="number" value={ac.maxWaitBeforeHandover} onChange={e=>upAi("maxWaitBeforeHandover",Number.parseInt(e.target.value)||5)} style={{width:80,padding:"8px 12px",borderRadius:10,background:"var(--bg-card-elevated)",border:"1px solid var(--border-strong)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none"}}/></div>
       </div>
     </Section>
     {/* Webhook Controller */}

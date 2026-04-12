@@ -75,11 +75,11 @@ export default function WhatsAppEmbeddedSignup() {
   // ── Initial state fetch on mount ──
   useEffect(() => {
     if (!isConnected) fetchState();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line -- mount-only, intentional empty deps
 
   // ── Submit phone number ──
   const handleSubmitPhone = async () => {
-    const cleaned = phone.replace(/\s+/g, "");
+    const cleaned = phone.replaceAll(/\s+/g, "");
     if (!cleaned || cleaned.length < 8) {
       setError("Bitte eine gültige Telefonnummer eingeben.");
       return;
@@ -306,7 +306,7 @@ export default function WhatsAppEmbeddedSignup() {
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <input
                 value={otpCode}
-                onChange={e => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                onChange={e => setOtpCode(e.target.value.replaceAll(/\D/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
                 autoFocus

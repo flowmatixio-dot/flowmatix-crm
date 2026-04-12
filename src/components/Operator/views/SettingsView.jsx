@@ -196,7 +196,7 @@ export default function SettingsView() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             {editableSettings.map(([key, value]) => (
               <div key={key}>
-                <label style={labelStyle}>{key.replace(/_/g, ' ')}</label>
+                <label style={labelStyle}>{key.replaceAll(/_/g, ' ')}</label>
                 {typeof value === 'boolean' ? (
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                     <input type="checkbox" checked={value} onChange={e => handleSettingChange(key, e.target.checked)} style={{ width: 16, height: 16, accentColor: 'var(--brand)' }} />

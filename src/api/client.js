@@ -126,7 +126,7 @@ export async function apiFetch(path, options = {}) {
 
   // Auto-retry on 429 (rate limited)
   if (res.status === 429 && !options._is429Retry) {
-    const retryAfter = parseInt(res.headers.get('retry-after') || '3', 10);
+    const retryAfter = Number.parseInt(res.headers.get('retry-after') || '3', 10);
     await new Promise(r => setTimeout(r, retryAfter * 1000));
     return apiFetch(path, { ...options, _is429Retry: true });
   }

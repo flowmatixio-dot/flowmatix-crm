@@ -108,7 +108,7 @@ export default async function authRoutes(fastify) {
   // ── POST /api/v1/auth/logout ──────────────────────────────
   fastify.post('/logout', async (req, reply) => {
     // Try to invalidate Supabase session
-    const token = req.cookies?.fm_access || req.headers.authorization?.replace('Bearer ', '');
+    const token = req.cookies?.fm_access || req.headers.authorization?.replaceAll('Bearer ', '');
     if (token) {
       try {
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

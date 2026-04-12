@@ -8,7 +8,7 @@ export function safe(v) {
 // Safe number — extracts number from potentially nested API responses
 export function safeNum(v, fallback = 0) {
   if (typeof v === 'number') return v;
-  if (typeof v === 'string') { const n = parseFloat(v); return isNaN(n) ? fallback : n; }
+  if (typeof v === 'string') { const n = Number.parseFloat(v); return Number.isNaN(n) ? fallback : n; }
   if (typeof v === 'object' && v !== null) {
     // API might return { value: 42 } or { usage: 42 } or { count: 42 }
     for (const key of ['value', 'usage', 'count', 'total', 'amount']) {

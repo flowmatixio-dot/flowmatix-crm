@@ -505,7 +505,7 @@ export default function PatientPanel() {
                   const a = document.createElement("a");
                   a.style.display = "none";
                   a.href = url;
-                  a.download = `${t("patient_card_filename") || "Patientenkarte"}-${(lead.name || (t("patient") || "Patient")).replace(/\s/g, "-")}.pdf`;
+                  a.download = `${t("patient_card_filename") || "Patientenkarte"}-${(lead.name || (t("patient") || "Patient")).replaceAll(/\s/g, "-")}.pdf`;
                   document.body.appendChild(a);
                   a.click();
                   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
@@ -517,7 +517,7 @@ export default function PatientPanel() {
           {/* ── SECTION 4: Finance ── */}
           {rd && <Accordion icon={"💰"} title={t("finances_label") || "Finanzen"} defaultOpen={false}>
             {(()=>{
-              const fin=lead.financials||{treatmentPrice:parseInt(String(rd.price||"0").replace(/[^0-9]/g,"")||0),currency:"EUR",depositAmount:0,depositStatus:"pending",paymentStatus:"pending"};
+              const fin=lead.financials||{treatmentPrice:Number.parseInt(String(rd.price||"0").replaceAll(/[^0-9]/g,"")||0),currency:"EUR",depositAmount:0,depositStatus:"pending",paymentStatus:"pending"};
               const remaining=fin.paymentStatus==="paid"?0:fin.treatmentPrice-(fin.depositAmount||0);
               const psc=fin.paymentStatus==="paid"?"#10b981":fin.paymentStatus==="partial"?"#fbbf24":"rgba(167,177,195,0.7)";
               const leadInvs=invoices.filter(i=>i.leadId===lead.id);
@@ -711,8 +711,8 @@ export default function PatientPanel() {
         {/* ═══ INVOICES TAB ═══ */}
         {patientTab==="invoices"&&<div>
           <div style={{display:"flex",gap:8,marginBottom:16}}>
-            <button onClick={()=>{setInvoiceModal(lead.id);setInvAmount(String(lead.reviewData?.price||"").replace(/[^0-9]/g,"")||"");setInvItems(lead.treatment);setInvVat("19");setInvDeposit("");}} style={{padding:"10px 18px",borderRadius:10,background:"linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.08))",border:"1px solid rgba(16,185,129,0.25)",color:"#10b981",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8}}>{"\uD83E\uDDFE"} {t("create_invoice")}</button>
-            {lead.reviewData&&<button onClick={()=>{const amt=parseInt(lead.reviewData.price?.replace(/[^0-9]/g,""))||0;if(amt>0){const dep=Math.round(amt*0.25);generateDepositLink(lead.id,dep);}else showT(t("no_price_set"));}} style={{padding:"10px 18px",borderRadius:10,background:"rgba(167,107,255,0.08)",border:"1px solid rgba(167,107,255,0.2)",color:"#a78bfa",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8}}>{"\uD83D\uDCB3"} {t("deposit_link_25")}</button>}
+            <button onClick={()=>{setInvoiceModal(lead.id);setInvAmount(String(lead.reviewData?.price||"").replaceAll(/[^0-9]/g,"")||"");setInvItems(lead.treatment);setInvVat("19");setInvDeposit("");}} style={{padding:"10px 18px",borderRadius:10,background:"linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.08))",border:"1px solid rgba(16,185,129,0.25)",color:"#10b981",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8}}>{"\uD83E\uDDFE"} {t("create_invoice")}</button>
+            {lead.reviewData&&<button onClick={()=>{const amt=Number.parseInt(lead.reviewData.price?.replaceAll(/[^0-9]/g,""))||0;if(amt>0){const dep=Math.round(amt*0.25);generateDepositLink(lead.id,dep);}else showT(t("no_price_set"));}} style={{padding:"10px 18px",borderRadius:10,background:"rgba(167,107,255,0.08)",border:"1px solid rgba(167,107,255,0.2)",color:"#a78bfa",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8}}>{"\uD83D\uDCB3"} {t("deposit_link_25")}</button>}
           </div>
           {(()=>{const li=invoices.filter(i=>i.leadId===lead.id);
             if(li.length===0)return<div style={{textAlign:"center",padding:30,color:"rgba(167,177,195,0.6)"}}>

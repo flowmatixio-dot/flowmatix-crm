@@ -86,7 +86,7 @@ export default function DashboardView() {
     const rv = o.reduce((s, p) => {
       if (p.stage !== "booked") return s;
       let v = p.financials?.treatmentPrice || p.reviewData?.price || p.budget || 0;
-      if (typeof v === "string") v = parseInt(v.replace(/[^\d]/g, ""), 10) || 0;
+      if (typeof v === "string") v = Number.parseInt(v.replaceAll(/[^\d]/g, ""), 10) || 0;
       return s + (typeof v === "number" ? v : 0);
     }, 0);
     return { tl, tb, ac, rv };
@@ -117,7 +117,7 @@ export default function DashboardView() {
           nm: p.name || "Patient",
           cl: "#10b981",
           ic: "✈️",
-          sk: p.flightConfirmed.arrivalTime ? parseInt(p.flightConfirmed.arrivalTime.replace(":", ""), 10) || 9999 : 9999,
+          sk: p.flightConfirmed.arrivalTime ? Number.parseInt(p.flightConfirmed.arrivalTime.replaceAll(":", ""), 10) || 9999 : 9999,
           pid: p.id,
         });
       }

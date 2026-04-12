@@ -254,7 +254,7 @@ export function useBusinessLogic({
       // Demo mode — createStripeCheckoutLink (deposit) blocked
     } else {
       try {
-        const res = await fmApi.createStripeCheckoutLink?.({ leadId, amount, currency: 'eur', type: 'deposit', desc: `Deposit_${lead.name.replace(/\s/g, "_")}` });
+        const res = await fmApi.createStripeCheckoutLink?.({ leadId, amount, currency: 'eur', type: 'deposit', desc: `Deposit_${lead.name.replaceAll(/\s/g, "_")}` });
         link = res?.url;
       } catch { /* fallback below */ }
     }
@@ -284,7 +284,7 @@ export function useBusinessLogic({
       } catch { /* fallback below */ }
     }
     if (!link) link = `#PENDING-stripe-payment/${genId().substring(0, 8)}`;
-    const paymentCard = { type: "payment_card", amount: parseInt(amount), currency: "EUR", status: "pending", link, created: new Date().toISOString(), id: genId() };
+    const paymentCard = { type: "payment_card", amount: Number.parseInt(amount), currency: "EUR", status: "pending", link, created: new Date().toISOString(), id: genId() };
     setMsgs(prev => {
       const cm = [...(prev[activeClinicId] || [])];
       const idx = cm.findIndex(c => c.leadId === leadId);
@@ -335,12 +335,12 @@ export function useBusinessLogic({
         const rev = estimateRevenue(a); const lead = myAppts.find(l => l.id === a.leadId);
         const belegNr = `FM-${year}${monthStr}-${String(i + 1).padStart(3, "0")}`;
         const datum = a.date.split("-").reverse().join("").substring(0, 4);
-        return `${rev.toFixed(2).replace(".", ",")};"S";"EUR";"";"";"";"10000";"8400";"";"${datum}";"${belegNr}";"";"";"\${a.patient} - ${a.treatment}"`;
+        return `${rev.toFixed(2).replaceAll(".", ",")};"S";"EUR";"";"";"";"10000";"8400";"";"${datum}";"${belegNr}";"";"";"\${a.patient} - ${a.treatment}"`;
       });
       const csv = [header, ...rows].join("\n");
       const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
       const el = document.createElement("a"); el.href = URL.createObjectURL(blob);
-      el.download = `DATEV_Buchungen_${year}-${monthStr}_${clinic?.name?.replace(/\\s/g, "_") || "clinic"}.csv`; el.click();
+      el.download = `DATEV_Buchungen_${year}-${monthStr}_${clinic?.name?.replaceAll(/\\s/g, "_") || "clinic"}.csv`; el.click();
       logAction("datev_export", clinic?.name || "", "DATEV export: " + monthAppts.length + " bookings, " + MONTHS[month] + " " + year);
     } else {
       const header = "Date,Patient,Treatment,Doctor,Status,Revenue (EUR),Clinic,Invoice Nr";
@@ -354,7 +354,7 @@ export function useBusinessLogic({
       const csv = [header, ...rows].join("\n");
       const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
       const el = document.createElement("a"); el.href = URL.createObjectURL(blob);
-      el.download = `Revenue_${year}-${monthStr}_${clinic?.name?.replace(/\\s/g, "_") || "clinic"}.csv`; el.click();
+      el.download = `Revenue_${year}-${monthStr}_${clinic?.name?.replaceAll(/\\s/g, "_") || "clinic"}.csv`; el.click();
       logAction("revenue_export", clinic?.name || "", "CSV export: " + monthAppts.length + " bookings, €" + total);
     }
     showT(`${format === "datev" ? "DATEV" : "CSV"} exported — ${monthAppts.length} bookings`);
@@ -395,7 +395,7 @@ export function useBusinessLogic({
     let depositLink = "";
     if (hasDeposit) {
       try {
-        const res = await fmApi.createStripeCheckoutLink({ leadId: lid, amount: depositAmount, currency: "eur", type: "deposit", desc: `Deposit_${lead.name?.replace(/\s/g, "_") || "patient"}` });
+        const res = await fmApi.createStripeCheckoutLink({ leadId: lid, amount: depositAmount, currency: "eur", type: "deposit", desc: `Deposit_${lead.name?.replaceAll(/\s/g, "_") || "patient"}` });
         depositLink = res?.url || "";
       } catch (e) { console.error("[CRM] Stripe deposit link failed:", e); showT("Zahlungslink konnte nicht erstellt werden"); }
     }

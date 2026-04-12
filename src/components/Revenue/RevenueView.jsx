@@ -109,9 +109,9 @@ export default function RevenueView() {
 
   const handleCreateInvoice = () => {
     if (!newInvLead || !newInvNet) { showT(t("select_patient_amount")); return; }
-    const net = parseFloat(newInvNet);
-    if (isNaN(net) || net <= 0) { showT(t("enter_valid_amount")); return; }
-    createInvoice(newInvLead, newInvItems || "Treatment", net, parseInt(newInvVat) || 0);
+    const net = Number.parseFloat(newInvNet);
+    if (Number.isNaN(net) || net <= 0) { showT(t("enter_valid_amount")); return; }
+    createInvoice(newInvLead, newInvItems || "Treatment", net, Number.parseInt(newInvVat) || 0);
     setNewInvOpen(false); setNewInvLead(""); setNewInvItems(""); setNewInvNet(""); setNewInvVat("8");
   };
 
@@ -287,7 +287,7 @@ export default function RevenueView() {
               <option value="20">20%</option>
             </select>
             {newInvNet && <div style={{ fontSize: 11, color: "rgba(167,177,195,0.6)", marginTop: 6 }}>
-              {t("gross")}: €{(parseFloat(newInvNet || 0) * (1 + parseInt(newInvVat || 0) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              {t("gross")}: €{(Number.parseFloat(newInvNet || 0) * (1 + Number.parseInt(newInvVat || 0) / 100)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </div>}
           </div>
         </div>
@@ -453,13 +453,13 @@ function RevenueInsights({ myLeads, myAppts, invoices, patientsWithFinancials })
     const booked = myLeads.filter(l => l.stage === "booked");
     const bookedValue = booked.reduce((s, l) => {
       const p = l.financials?.treatmentPrice || l.budget || TREAT_PRICES[(l.treatment || "").split(" ")[0]] || 3000;
-      return s + (typeof p === "number" ? p : parseInt(String(p).replace(/[^\d]/g, ""), 10) || 3000);
+      return s + (typeof p === "number" ? p : Number.parseInt(String(p).replaceAll(/[^\d]/g, ""), 10) || 3000);
     }, 0);
     const depositsReceived = patientsWithFinancials.reduce((s, l) => s + (l.financials?.depositAmount || 0), 0);
     const outstanding = bookedValue - depositsReceived;
     const pipelineAll = myLeads.filter(l => l.stage !== "done").reduce((s, l) => {
       const p = l.financials?.treatmentPrice || l.budget || TREAT_PRICES[(l.treatment || "").split(" ")[0]] || 3000;
-      return s + (typeof p === "number" ? p : parseInt(String(p).replace(/[^\d]/g, ""), 10) || 3000);
+      return s + (typeof p === "number" ? p : Number.parseInt(String(p).replaceAll(/[^\d]/g, ""), 10) || 3000);
     }, 0);
     return { bookedValue, depositsReceived, outstanding: Math.max(0, outstanding), pipelineTotal: pipelineAll };
   }, [myLeads, patientsWithFinancials]);
@@ -500,7 +500,7 @@ function RevenueInsights({ myLeads, myAppts, invoices, patientsWithFinancials })
     myLeads.forEach(l => {
       const country = l.country || l.nationality || (t("rev_unknown") || "Unbekannt");
       const price = l.financials?.treatmentPrice || l.budget || TREAT_PRICES[(l.treatment || "").split(" ")[0]] || 3000;
-      const p = typeof price === "number" ? price : parseInt(String(price).replace(/[^\d]/g, ""), 10) || 3000;
+      const p = typeof price === "number" ? price : Number.parseInt(String(price).replaceAll(/[^\d]/g, ""), 10) || 3000;
       if (!map[country]) map[country] = { revenue: 0, count: 0 };
       map[country].revenue += p;
       map[country].count += 1;

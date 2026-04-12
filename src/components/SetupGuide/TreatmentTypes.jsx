@@ -51,8 +51,8 @@ export default function TreatmentTypes() {
     <Field label={t("treatment_name")} value={form.name} onChange={v=>setForm(f=>({...f,name:v}))} placeholder="FUE Hair Transplant" />
     <Field label={t("description")} value={form.description} onChange={v=>setForm(f=>({...f,description:v}))} placeholder="Beschreibung der Behandlung..." type="textarea" />
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-      <Field label={t("duration_min")} value={form.duration_minutes} onChange={v=>setForm(f=>({...f,duration_minutes:parseInt(v)||60}))} placeholder="60" type="number" />
-      <Field label={t("buffer_min")} value={form.buffer_minutes} onChange={v=>setForm(f=>({...f,buffer_minutes:parseInt(v)||0}))} placeholder="0" type="number" />
+      <Field label={t("duration_min")} value={form.duration_minutes} onChange={v=>setForm(f=>({...f,duration_minutes:Number.parseInt(v)||60}))} placeholder="60" type="number" />
+      <Field label={t("buffer_min")} value={form.buffer_minutes} onChange={v=>setForm(f=>({...f,buffer_minutes:Number.parseInt(v)||0}))} placeholder="0" type="number" />
       <Field label={t("currency")} value={form.currency} onChange={v=>setForm(f=>({...f,currency:v}))} placeholder="EUR" />
     </div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>

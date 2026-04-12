@@ -415,7 +415,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
                   { k: "smoker", l: t("smoker") || "Raucher" },
                   { k: "blood_thinners", l: t("blood_thinners") || "Blutverdünner" },
                 ].map(f => {
-                  const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
+                  const v = localAppt._intake[f.k] || localAppt._intake[f.k.replaceAll(/_/g, '')] || '';
                   if (!v || v === '—') return null;
                   return <div key={f.k} style={{ fontSize: 11 }}>
                     <span style={{ color: "rgba(167,177,195,0.6)" }}>{f.l}: </span>
@@ -684,7 +684,7 @@ export default function OpPrepView() {
       const r = getReadiness(a, { depositEnabled: clinic?.depositPolicy && clinic.depositPolicy !== "none" && clinic?.booking_funnel !== "no_deposit", t, isLocal });
       let pName = getPatientName(a);
       let treat = a.treatment || a.treatmentType || a.treatment_type || "";
-      treat = treat.replace(/hair\s*transplant(ation)?/gi, "").replace(/haartransplantation/gi, "").replace(/saç\s*ekimi/gi, "").replace(/transplant(ation)?/gi, "").trim();
+      treat = treat.replaceAll(/hair\s*transplant(ation)?/gi, "").replaceAll(/haartransplantation/gi, "").replaceAll(/saç\s*ekimi/gi, "").replaceAll(/transplant(ation)?/gi, "").trim();
       if (!treat) treat = "OP";
       if (treat.length > 12) treat = treat.substring(0, 10) + "\u2026";
       let doctor = a.doctorName || a.doctor || "-";

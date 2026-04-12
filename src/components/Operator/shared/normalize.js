@@ -4,12 +4,12 @@
 export function extractPct(val) {
   if (val === null || val === undefined) return null;
   if (typeof val === 'number') return val;
-  if (typeof val === 'string') { const n = parseFloat(val); return isNaN(n) ? null : n; }
+  if (typeof val === 'string') { const n = Number.parseFloat(val); return Number.isNaN(n) ? null : n; }
   if (typeof val === 'object') {
     // API returns { usagePercent: 45.2 } or { usage: 45 } or { percent: 45 } or { value: 45 }
     for (const key of ['usagePercent', 'usage_percent', 'percent', 'usage', 'value', 'pct']) {
       if (typeof val[key] === 'number') return val[key];
-      if (typeof val[key] === 'string') { const n = parseFloat(val[key]); if (!isNaN(n)) return n; }
+      if (typeof val[key] === 'string') { const n = Number.parseFloat(val[key]); if (!Number.isNaN(n)) return n; }
     }
   }
   return null;

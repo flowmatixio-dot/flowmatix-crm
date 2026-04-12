@@ -245,9 +245,9 @@ export default function MainLayout() {
         if (diff <= 0) { setTrialCountdown(null); return; }
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        if (days >= 2) setTrialCountdown((t("lt_trial_days")||"Trial ends in {n} days").replace("{n}",days));
-        else if (days >= 1) setTrialCountdown((t("lt_trial_dh")||"Trial ends in {n}d {h}h").replace("{n}",days).replace("{h}",hours));
-        else if (hours >= 1) setTrialCountdown((t("lt_trial_hours")||"Trial ends in {n} hours").replace("{n}",hours));
+        if (days >= 2) setTrialCountdown((t("lt_trial_days")||"Trial ends in {n} days").replaceAll("{n}",days));
+        else if (days >= 1) setTrialCountdown((t("lt_trial_dh")||"Trial ends in {n}d {h}h").replaceAll("{n}",days).replaceAll("{h}",hours));
+        else if (hours >= 1) setTrialCountdown((t("lt_trial_hours")||"Trial ends in {n} hours").replaceAll("{n}",hours));
         else setTrialCountdown(t("lt_trial_today")||'Trial ends today');
       }).catch(() => {});
     };
@@ -569,7 +569,7 @@ export default function MainLayout() {
             </div>
             <div>
               <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(167,177,195,0.7)", marginBottom: 6 }}>Total (Gross)</div>
-              <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", fontSize: 16, fontWeight: 800, color: "#10b981" }}>€{((parseInt(invAmount) || 0) + (parseInt(invAmount) || 0) * (parseInt(invVat) || 0) / 100).toLocaleString()}</div>
+              <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", fontSize: 16, fontWeight: 800, color: "#10b981" }}>€{((Number.parseInt(invAmount) || 0) + (Number.parseInt(invAmount) || 0) * (Number.parseInt(invVat) || 0) / 100).toLocaleString()}</div>
             </div>
           </div>
           {/* Deposit option */}
@@ -577,15 +577,15 @@ export default function MainLayout() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#a78bfa" }}>💳 Generate Stripe Deposit Link?</div>
               <div style={{ display: "flex", gap: 6 }}>
-                {[25, 50].map(pct => <button key={pct} onClick={() => setInvDeposit(String(Math.round((parseInt(invAmount) || 0) * pct / 100)))} style={{ padding: "4px 10px", borderRadius: 6, background: invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.3)" : "rgba(255,255,255,0.08)"}`, color: invDeposit === String(Math.round((parseInt(invAmount) || 0) * pct / 100)) ? "#a78bfa" : "rgba(167,177,195,0.7)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{pct}% — €{Math.round((parseInt(invAmount) || 0) * pct / 100)}</button>)}
+                {[25, 50].map(pct => <button key={pct} onClick={() => setInvDeposit(String(Math.round((Number.parseInt(invAmount) || 0) * pct / 100)))} style={{ padding: "4px 10px", borderRadius: 6, background: invDeposit === String(Math.round((Number.parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.15)" : "rgba(255,255,255,0.04)", border: `1px solid ${invDeposit === String(Math.round((Number.parseInt(invAmount) || 0) * pct / 100)) ? "rgba(167,107,255,0.3)" : "rgba(255,255,255,0.08)"}`, color: invDeposit === String(Math.round((Number.parseInt(invAmount) || 0) * pct / 100)) ? "#a78bfa" : "rgba(167,177,195,0.7)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{pct}% — €{Math.round((Number.parseInt(invAmount) || 0) * pct / 100)}</button>)}
               </div>
             </div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => {
-              const net = parseInt(invAmount) || 0; if (!net) { showT("Enter an amount"); return; }
-              const inv = createInvoice(lead.id, invItems, net, parseInt(invVat) || 0);
-              if (inv && invDeposit) { generateDepositLink(lead.id, parseInt(invDeposit)); }
+              const net = Number.parseInt(invAmount) || 0; if (!net) { showT("Enter an amount"); return; }
+              const inv = createInvoice(lead.id, invItems, net, Number.parseInt(invVat) || 0);
+              if (inv && invDeposit) { generateDepositLink(lead.id, Number.parseInt(invDeposit)); }
               if (inv) setInvoiceModal(null);
             }} style={{ flex: 1, padding: "12px 20px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>🧾 Create Invoice{invDeposit ? " + Deposit Link" : ""}</button>
             <button onClick={() => setInvoiceModal(null)} style={{ padding: "12px 20px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(167,177,195,0.6)", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>{ctx.t("cancel") || "Cancel"}</button>
@@ -594,7 +594,7 @@ export default function MainLayout() {
       </div>; })()}
 
       {/* ═══ PAYMENT LINK MODAL ═══ */}
-      {paymentModal && (() => { const lead = getLeadById(paymentModal.leadId); if (!lead) return null; const amt = parseInt(payAmount) || 0; return <div style={{ position: "fixed", inset: 0, zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {paymentModal && (() => { const lead = getLeadById(paymentModal.leadId); if (!lead) return null; const amt = Number.parseInt(payAmount) || 0; return <div style={{ position: "fixed", inset: 0, zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div onClick={() => setPaymentModal(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }} />
         <div style={{ position: "relative", width: "min(440px,90vw)", background: "#0d1220", border: "1px solid rgba(0,180,216,0.2)", borderRadius: 20, padding: 0, overflow: "hidden", animation: "slI .2s ease" }}>
           <div style={{ padding: "20px 24px", background: "linear-gradient(135deg,rgba(0,180,216,0.08),rgba(76,201,255,0.04))", borderBottom: "1px solid rgba(0,180,216,0.12)" }}>
@@ -618,7 +618,7 @@ export default function MainLayout() {
             </div>
             <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
               {[250, 500, 1000].map(a => <button key={a} onClick={() => setPayAmount(String(a))} style={{ flex: 1, padding: "8px 0", borderRadius: 8, background: payAmount === String(a) ? "rgba(0,180,216,0.12)" : "rgba(255,255,255,0.03)", border: `1px solid ${payAmount === String(a) ? "rgba(0,180,216,0.25)" : "rgba(255,255,255,0.06)"}`, color: payAmount === String(a) ? "#4cc9ff" : "rgba(167,177,195,0.7)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>€{a}</button>)}
-              {lead.reviewData?.price && <button onClick={() => { const p = parseInt(lead.reviewData.price.replace(/[^0-9]/g, "")) || 0; setPayAmount(String(Math.round(p * 0.25))); }} style={{ flex: 1, padding: "8px 0", borderRadius: 8, background: "rgba(167,107,255,0.08)", border: "1px solid rgba(167,107,255,0.15)", color: "#a78bfa", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>25%</button>}
+              {lead.reviewData?.price && <button onClick={() => { const p = Number.parseInt(lead.reviewData.price.replaceAll(/[^0-9]/g, "")) || 0; setPayAmount(String(Math.round(p * 0.25))); }} style={{ flex: 1, padding: "8px 0", borderRadius: 8, background: "rgba(167,107,255,0.08)", border: "1px solid rgba(167,107,255,0.15)", color: "#a78bfa", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>25%</button>}
             </div>
             <div style={{ padding: 14, borderRadius: 12, background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.1)", display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <div style={{ width: 40, height: 26, borderRadius: 5, background: "linear-gradient(135deg,#00B4D8,#4cc9ff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 800 }}>💳</div>
@@ -660,7 +660,7 @@ export default function MainLayout() {
         <nav style={{ flex: 1, padding: "8px 10px", overflowY: "auto" }}>{(() => {
           const navItems = [...nav];
           return navItems;
-        })().map((it, idx) => { if (it === "div") return <div key={idx} style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "10px 8px" }} />; const isOpSub = it.id.startsWith("op_") && it.id !== "op_prep"; const isActive = isOpSub ? (view === "operator" && opSubTab === it.id.replace("op_", "")) : (view === it.id); return <div key={it.id} data-tour={it.id} onClick={() => { if (isOpSub) { setView("operator"); setOpSubTab(it.id.replace("op_", "")); } else if (it.id === "operator") { setView("operator"); setOpSubTab("dashboard"); } else { setView(it.id); } setSelChat(null); if (it.id === "settings") setSettingsData(clinic ? { ...clinic } : null); if (it.id === "ai_control") setAiConfigData(clinic?.aiConfig ? { ...clinic.aiConfig } : null); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: sidebar ? "10px 14px" : "10px 0", justifyContent: sidebar ? "flex-start" : "center", borderRadius: 10, cursor: "pointer", marginBottom: 3, background: isActive ? (IS_CLIENT_MODE ? "rgba(76,201,255,0.08)" : "rgba(212,175,55,0.08)") : "transparent", borderLeft: isActive ? "3px solid " + (IS_CLIENT_MODE ? (it.color || "#4cc9ff") : (it.color || "#d4af37")) : "3px solid transparent", color: isActive ? "#fff" : it.color || "rgba(167,177,195,0.75)", fontWeight: isActive ? 700 : 500, fontSize: 14, transition: "all .2s cubic-bezier(.4,0,.2,1)", letterSpacing: isActive ? "0.01em" : "0" }}><span style={{ fontSize: 16, flexShrink: 0, opacity: isActive ? 1 : 0.7, transition: "opacity .2s" }}>{it.icon}</span>{sidebar && <span style={{ textTransform: "capitalize" }}>{it.l}</span>}{sidebar && it.badge && <span style={{ marginLeft: "auto", background: "#ff8a2a", color: "#fff", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 99, minWidth: 16, textAlign: "center" }}>{it.badge}</span>}</div>; })}</nav>
+        })().map((it, idx) => { if (it === "div") return <div key={idx} style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "10px 8px" }} />; const isOpSub = it.id.startsWith("op_") && it.id !== "op_prep"; const isActive = isOpSub ? (view === "operator" && opSubTab === it.id.replaceAll("op_", "")) : (view === it.id); return <div key={it.id} data-tour={it.id} onClick={() => { if (isOpSub) { setView("operator"); setOpSubTab(it.id.replaceAll("op_", "")); } else if (it.id === "operator") { setView("operator"); setOpSubTab("dashboard"); } else { setView(it.id); } setSelChat(null); if (it.id === "settings") setSettingsData(clinic ? { ...clinic } : null); if (it.id === "ai_control") setAiConfigData(clinic?.aiConfig ? { ...clinic.aiConfig } : null); }} style={{ display: "flex", alignItems: "center", gap: 12, padding: sidebar ? "10px 14px" : "10px 0", justifyContent: sidebar ? "flex-start" : "center", borderRadius: 10, cursor: "pointer", marginBottom: 3, background: isActive ? (IS_CLIENT_MODE ? "rgba(76,201,255,0.08)" : "rgba(212,175,55,0.08)") : "transparent", borderLeft: isActive ? "3px solid " + (IS_CLIENT_MODE ? (it.color || "#4cc9ff") : (it.color || "#d4af37")) : "3px solid transparent", color: isActive ? "#fff" : it.color || "rgba(167,177,195,0.75)", fontWeight: isActive ? 700 : 500, fontSize: 14, transition: "all .2s cubic-bezier(.4,0,.2,1)", letterSpacing: isActive ? "0.01em" : "0" }}><span style={{ fontSize: 16, flexShrink: 0, opacity: isActive ? 1 : 0.7, transition: "opacity .2s" }}>{it.icon}</span>{sidebar && <span style={{ textTransform: "capitalize" }}>{it.l}</span>}{sidebar && it.badge && <span style={{ marginLeft: "auto", background: "#ff8a2a", color: "#fff", fontSize: 10, fontWeight: 800, padding: "2px 7px", borderRadius: 99, minWidth: 16, textAlign: "center" }}>{it.badge}</span>}</div>; })}</nav>
         <div style={{ padding: sidebar ? "14px 16px" : "14px 10px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>{sidebar ? <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 32, height: 32, borderRadius: 10, background: getAvatarGradient(user.name), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>{getInitials(user.name)}</div><div><div style={{ fontWeight: 600, color: "rgba(232,238,252,0.95)", fontSize: 13 }}>{user.name}</div><div style={{ fontSize: 10, color: "rgba(167,177,195,0.75)", fontWeight: 500 }}>{isAdmin ? "Admin" : clinic?.name}</div></div></div><button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(167,177,195,0.7)", cursor: "pointer", fontSize: 13, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }} title="Logout">↗</button></div> : <div onClick={handleLogout} style={{ cursor: "pointer", textAlign: "center", color: "rgba(167,177,195,0.6)", fontSize: 13, width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>↗</div>}</div>
       </div>
 
@@ -671,7 +671,7 @@ export default function MainLayout() {
           const hash = window.location.hash;
           if (!hash.startsWith('#impersonate=')) return null;
           let info = {};
-          try { const decoded = atob(hash.replace('#impersonate=', '')); const p = new URLSearchParams(decoded); info = { user: p.get('user'), org: p.get('org'), operator: p.get('operator') === 'true', reason: decodeURIComponent(p.get('reason') || '') }; } catch { return null; }
+          try { const decoded = atob(hash.replaceAll('#impersonate=', '')); const p = new URLSearchParams(decoded); info = { user: p.get('user'), org: p.get('org'), operator: p.get('operator') === 'true', reason: decodeURIComponent(p.get('reason') || '') }; } catch { return null; }
           if (!info.operator) return null;
           return (
             <div style={{ background: "linear-gradient(90deg, #ff8a2a, #ef4444)", padding: "8px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 200 }}>
@@ -860,8 +860,8 @@ export default function MainLayout() {
         {!demoMode && ctx.workspaceState === 'live_test' && view === 'dashboard' && (() => {
           const ti = ctx.testInfo;
           const phoneDisplay = ti?.testPhone || '+1 639 526 4925';
-          const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
-          const waLink = `https://wa.me/${phoneClean.replace('+', '')}`;
+          const phoneClean = phoneDisplay.replaceAll(/[\s\-\(\)]/g, '');
+          const waLink = `https://wa.me/${phoneClean.replaceAll('+', '')}`;
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
           return (
             <div style={{ padding: "28px 32px", background: "linear-gradient(135deg, rgba(37,211,102,0.06), rgba(76,201,255,0.03))", borderBottom: "1px solid rgba(37,211,102,0.15)", flexShrink: 0 }}>

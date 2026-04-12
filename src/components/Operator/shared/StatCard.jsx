@@ -59,7 +59,7 @@ export default function StatCard({ label, value, sub, color = 'blue', icon, onCl
     return v;
   };
 
-  const numVal = typeof value === 'number' ? value : (typeof value === 'string' ? parseInt(value.replace(/[^0-9]/g, '')) : 0);
+  const numVal = typeof value === 'number' ? value : (typeof value === 'string' ? Number.parseInt(value.replaceAll(/[^0-9]/g, '')) : 0);
 
   return (
     <div onClick={onClick} className="dash-card"

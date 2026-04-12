@@ -453,7 +453,7 @@ export default function InboxView() {
                         const ts = ch.lastMessageAt || lastMsg?.timestamp || lastMsg?.time;
                         if (!ts) return "";
                         const d = new Date(ts);
-                        if (isNaN(d.getTime())) return lastMsg?.time || "";
+                        if (Number.isNaN(d.getTime())) return lastMsg?.time || "";
                         const mins = Math.floor((Date.now() - d.getTime()) / 60000);
                         if (mins < 1) return "jetzt";
                         if (mins < 60) return mins + "m";
@@ -691,7 +691,7 @@ export default function InboxView() {
                     <>
                       {startIdx > 0 && (
                         <button onClick={() => setMsgPage(p => ({ ...p, [pageKey]: (p[pageKey] || msgPageSize) + msgPageSize }))} style={{alignSelf:"center",padding:"6px 16px",borderRadius:8,background:"rgba(76,201,255,0.08)",border:"1px solid rgba(76,201,255,0.15)",color:"#4cc9ff",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
-                          ↑ {(t("load_older_messages") || "Ältere laden ({n})").replace("{n}", Math.min(startIdx, msgPageSize))}
+                          ↑ {(t("load_older_messages") || "Ältere laden ({n})").replaceAll("{n}", Math.min(startIdx, msgPageSize))}
                         </button>
                       )}
                       {visible.map((msg, i) => (

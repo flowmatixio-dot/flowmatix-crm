@@ -246,7 +246,7 @@ export default function DoctorSettingsModal({ doctor, onClose, onSave, t, todayB
           ].map(d => (
             <div key={d.key} style={{ textAlign: "center" }}>
               <div style={{ fontSize: 10, color: "rgba(167,177,195,0.6)", marginBottom: 4 }}>{d.label}</div>
-              <select value={opDurations[d.key]} onChange={e => setOpDurations(p => ({ ...p, [d.key]: parseInt(e.target.value) }))} style={{
+              <select value={opDurations[d.key]} onChange={e => setOpDurations(p => ({ ...p, [d.key]: Number.parseInt(e.target.value) }))} style={{
                 width: "100%", padding: "8px 4px", borderRadius: 8,
                 background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
                 color: "#fff", fontFamily: "inherit", fontSize: 14, fontWeight: 700,

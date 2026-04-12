@@ -75,7 +75,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
     fmApi.getClinicSettings().then(res => { if (res?.clinic) setClinicConfig(res.clinic); }).catch(() => {});
     fmApi.getTreatments().then(res => {
       const tt = res?.treatments;
-      if (tt?.length) setTechniques(tt.map(t => ({ value: t.slug || t.name?.toLowerCase().replace(/\s+/g, '_') || t.id, label: t.name || t.label })));
+      if (tt?.length) setTechniques(tt.map(t => ({ value: t.slug || t.name?.toLowerCase().replaceAll(/\s+/g, '_') || t.id, label: t.name || t.label })));
     }).catch(() => {});
   }, []);
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
     const token = sessionStorage.getItem('fm_access_token');
     if (!token) return;
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const wsHost = window.location.hostname.replace('app.', 'api.').replace('crm.', 'api.');
+    const wsHost = window.location.hostname.replaceAll('app.', 'api.').replaceAll('crm.', 'api.');
     let ws, pingIv, reconnectTo, failCount = 0;
     const connect = () => {
       const freshToken = sessionStorage.getItem('fm_access_token');
@@ -119,13 +119,13 @@ export default function DoctorTasksView({ onLogout } = {}) {
 
   const handleSubmit = async (task) => {
     const form = getForm(task.id);
-    const grafts = parseInt(form.grafts, 10);
-    const price = parseInt(form.price, 10);
+    const grafts = Number.parseInt(form.grafts, 10);
+    const price = Number.parseInt(form.price, 10);
     if (!grafts || grafts < 1) { showToast(tl('error_enter_grafts'), 'error'); return; }
     if (!price || price < 1) { showToast(tl('error_enter_price'), 'error'); return; }
     setSubmitting(task.id);
     try {
-      const res = await fmApi.updateTask(task.id, { result: { graftCount: grafts, price, technique: form.technique || 'fue', notes: form.notes || '', currency: 'EUR', depositRequested: form.depositRequested || false, depositAmount: form.depositRequested ? parseInt(form.depositAmount || '0') : 0 } });
+      const res = await fmApi.updateTask(task.id, { result: { graftCount: grafts, price, technique: form.technique || 'fue', notes: form.notes || '', currency: 'EUR', depositRequested: form.depositRequested || false, depositAmount: form.depositRequested ? Number.parseInt(form.depositAmount || '0') : 0 } });
       if (res?.error) { showToast(res.error, 'error'); setSubmitting(null); return; }
       setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'completed', result: { graftCount: grafts, price, technique: form.technique || 'fue', notes: form.notes }, completedAt: new Date().toISOString() } : t));
       setFormData(prev => { const n = { ...prev }; delete n[task.id]; return n; });
@@ -236,7 +236,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
           const form = getForm(task.id);
           const isPickup = task.type === 'airport_pickup';
           const flight = task.payload || {};
-          const canSubmit = isPickup ? (form.driverName?.trim()) : (form.grafts && parseInt(form.grafts) > 0 && form.price && parseInt(form.price) > 0);
+          const canSubmit = isPickup ? (form.driverName?.trim()) : (form.grafts && Number.parseInt(form.grafts) > 0 && form.price && Number.parseInt(form.price) > 0);
           const urg = getUrgency(task.createdAt);
           const name = `${task.patient?.firstName || '?'} ${task.patient?.lastName || ''}`.trim();
 
@@ -336,7 +336,7 @@ export default function DoctorTasksView({ onLogout } = {}) {
                           <span style={{ fontSize: 13 }}>💳</span>
                           <span style={{ fontWeight: 600, fontSize: 11, color: '#a78bfa' }}>{tl('request_deposit') || 'Anzahlung anfordern'}</span>
                         </div>
-                        <button onClick={() => { const nv = !form.depositRequested; const p = { depositRequested: nv }; if (nv && form.price) p.depositAmount = String(Math.max(Math.round(parseInt(form.price) * 0.25), 500)); setForm(task.id, p); }} style={{ width: 36, height: 20, borderRadius: 10, background: form.depositRequested ? '#a78bfa' : 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer', position: 'relative' }}>
+                        <button onClick={() => { const nv = !form.depositRequested; const p = { depositRequested: nv }; if (nv && form.price) p.depositAmount = String(Math.max(Math.round(Number.parseInt(form.price) * 0.25), 500)); setForm(task.id, p); }} style={{ width: 36, height: 20, borderRadius: 10, background: form.depositRequested ? '#a78bfa' : 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer', position: 'relative' }}>
                           <div style={{ width: 14, height: 14, borderRadius: 7, background: '#fff', position: 'absolute', top: 3, left: form.depositRequested ? 19 : 3, transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,0.3)' }} />
                         </button>
                       </div>

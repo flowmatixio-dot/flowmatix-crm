@@ -34,7 +34,7 @@ export default function ActionCard({ type, priority = 'medium', clinicName, deta
   const safeType = typeof type === 'string' ? type : 'UNKNOWN';
   const safePriority = typeof priority === 'string' ? priority : 'medium';
   const ps = PRIORITY_STYLES[safePriority] || PRIORITY_STYLES.medium;
-  const cfg = ACTION_LABELS[safeType] || { icon: '📋', label: safeType.replace(/_/g, ' ').toLowerCase(), desc: '' };
+  const cfg = ACTION_LABELS[safeType] || { icon: '📋', label: safeType.replaceAll(/_/g, ' ').toLowerCase(), desc: '' };
   const safeName = typeof clinicName === 'string' ? clinicName : 'System';
   const isCritical = safePriority === 'critical';
 
@@ -115,7 +115,7 @@ export default function ActionCard({ type, priority = 'medium', clinicName, deta
 
 function timeAgo(ts) {
   const d = Date.now() - new Date(ts).getTime();
-  if (isNaN(d) || d < 0) return '—';
+  if (Number.isNaN(d) || d < 0) return '—';
   if (d < 60000) return 'just now';
   if (d < 3600000) return `${Math.floor(d / 60000)}m ago`;
   if (d < 86400000) return `${Math.floor(d / 3600000)}h ago`;

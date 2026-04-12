@@ -17,7 +17,7 @@ test.describe('Performance', () => {
     page.on('response', async res => {
       if (res.url().includes('.js') && res.url().includes('/assets/')) {
         const headers = await res.allHeaders();
-        const size = parseInt(headers['content-length'] || '0');
+        const size = Number.parseInt(headers['content-length'] || '0');
         resources.push({ url: res.url(), size });
       }
     });

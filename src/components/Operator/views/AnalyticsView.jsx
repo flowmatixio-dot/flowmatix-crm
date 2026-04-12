@@ -74,7 +74,7 @@ export default function AnalyticsView() {
       biz('/whatsapp').catch(() => null),
       biz('/revenue').catch(() => null),
       biz('/clinics').catch(() => null),
-      fmApi.getPlatformMetrics(parseInt(period)).catch(() => null),
+      fmApi.getPlatformMetrics(Number.parseInt(period)).catch(() => null),
       fmApi.getRecentVisitors().catch(() => []),
       fmApi.getDailyVisitors().catch(() => []),
     ]).then(([rev, vis, fn, wa, br, cl, met, rv, dv]) => {
@@ -106,7 +106,7 @@ export default function AnalyticsView() {
   const totalMsgs = safeNum(waPerf?.messages_30d) || daily.reduce((s, d) => s + safeNum(d.messages), 0);
   const totalLeads = safeNum(funnel?.leads);
   // "Purchases" = new clinic signups, filtered by selected period
-  const periodDays = parseInt(period) || 30;
+  const periodDays = Number.parseInt(period) || 30;
   const periodDaily = daily.slice(-periodDays);
   const purchasesInPeriod = periodDaily.reduce((s, d) => s + safeNum(d.new_clinics), 0);
   const messagesInPeriod = periodDaily.reduce((s, d) => s + safeNum(d.messages), 0);
@@ -416,12 +416,12 @@ function SectionTitle({ children, sub }) {
 function FunnelSection({ funnel, visitors }) {
   const steps = [
     { label: 'Visitors', value: visitors || 0, color: '#8899b0' },
-    { label: 'Leads', value: parseInt(funnel.leads) || 0, color: '#5ee0ff' },
-    { label: 'WhatsApp', value: parseInt(funnel.wa_started) || 0, color: '#c4a6ff' },
-    { label: 'Intake', value: parseInt(funnel.intake_completed) || 0, color: '#ff8c2a' },
-    { label: 'Photos', value: parseInt(funnel.photos_received) || 0, color: '#ffcf40' },
-    { label: 'Quotes', value: parseInt(funnel.quotes_generated) || 0, color: '#22c55e' },
-    { label: 'Bookings', value: parseInt(funnel.bookings_created) || 0, color: '#22c55e' },
+    { label: 'Leads', value: Number.parseInt(funnel.leads) || 0, color: '#5ee0ff' },
+    { label: 'WhatsApp', value: Number.parseInt(funnel.wa_started) || 0, color: '#c4a6ff' },
+    { label: 'Intake', value: Number.parseInt(funnel.intake_completed) || 0, color: '#ff8c2a' },
+    { label: 'Photos', value: Number.parseInt(funnel.photos_received) || 0, color: '#ffcf40' },
+    { label: 'Quotes', value: Number.parseInt(funnel.quotes_generated) || 0, color: '#22c55e' },
+    { label: 'Bookings', value: Number.parseInt(funnel.bookings_created) || 0, color: '#22c55e' },
   ];
 
   const max = Math.max(1, ...steps.map(s => s.value));

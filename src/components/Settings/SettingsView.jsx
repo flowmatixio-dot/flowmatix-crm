@@ -796,7 +796,7 @@ export default function SettingsView() {
         <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:2}}>{c.name}</div>
       </div>
       {SETTINGS_TABS.map((tab, idx) => {
-        if (typeof tab === "string" && tab.startsWith("grp:")) return <div key={`grp-${idx}`} style={{ fontSize: 9, fontWeight: 800, color: "rgba(167,177,195,0.65)", padding: "14px 16px 4px", letterSpacing: "0.08em" }}>{tab.replace("grp:","")}</div>;
+        if (typeof tab === "string" && tab.startsWith("grp:")) return <div key={`grp-${idx}`} style={{ fontSize: 9, fontWeight: 800, color: "rgba(167,177,195,0.65)", padding: "14px 16px 4px", letterSpacing: "0.08em" }}>{tab.replaceAll("grp:","")}</div>;
         const isActive = settingsTab === tab.id;
         return <div key={tab.id} onClick={() => { setSettingsTab(tab.id); window.dispatchEvent(new Event("fm:scroll-top")); }} style={{
           display:"flex",alignItems:"center",gap:8,padding:"8px 16px",cursor:"pointer",
@@ -923,7 +923,7 @@ export default function SettingsView() {
         <div>
           <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("settings_min_lead_days") || "Minimum lead time (days)"}</div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <input type="number" min={0} max={30} value={c.minNoticeDays ?? 5} onChange={e => up("minNoticeDays", Math.max(0, Math.min(30, parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
+            <input type="number" min={0} max={30} value={c.minNoticeDays ?? 5} onChange={e => up("minNoticeDays", Math.max(0, Math.min(30, Number.parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
             <span style={{fontSize:13,color:"rgba(167,177,195,0.7)"}}>{t("settings_days_unit") || "days"}</span>
           </div>
           <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:6,lineHeight:1.5}}>
@@ -933,7 +933,7 @@ export default function SettingsView() {
         <div>
           <div style={{fontSize:12,fontWeight:700,color:"var(--text-muted)",marginBottom:6}}>{t("settings_checkin_offset_label") || "Patienten-Ankunft vor OP (Minuten)"}</div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <input type="number" min={0} max={180} value={c.checkinOffsetMinutes ?? 60} onChange={e => up("checkinOffsetMinutes", Math.max(0, Math.min(180, parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
+            <input type="number" min={0} max={180} value={c.checkinOffsetMinutes ?? 60} onChange={e => up("checkinOffsetMinutes", Math.max(0, Math.min(180, Number.parseInt(e.target.value) || 0)))} style={{width:80,padding:"10px 14px",borderRadius:10,background:"var(--bg-input)",border:"1px solid var(--border-input)",color:"var(--text-primary)",fontFamily:"inherit",fontSize:14,outline:"none",textAlign:"center"}} />
             <span style={{fontSize:13,color:"rgba(167,177,195,0.7)"}}>min</span>
           </div>
           <div style={{fontSize:11,color:"rgba(167,177,195,0.75)",marginTop:6,lineHeight:1.5}}>

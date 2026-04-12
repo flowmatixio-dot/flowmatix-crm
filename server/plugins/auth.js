@@ -56,7 +56,7 @@ async function authPlugin(fastify) {
   fastify.decorate('authenticate', async (req, reply) => {
     // Try cookie-based auth first, then fallback to Bearer token
     const cookieToken = req.cookies?.fm_access;
-    const bearerToken = req.headers.authorization?.replace('Bearer ', '');
+    const bearerToken = req.headers.authorization?.replaceAll('Bearer ', '');
     const token = cookieToken || bearerToken;
 
     if (!token) {

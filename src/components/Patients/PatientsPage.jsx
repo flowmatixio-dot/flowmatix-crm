@@ -75,7 +75,7 @@ function isThisWeek(dateStr) {
 
 function getFinancials(lead) {
   const fin = lead.financials || {};
-  const price = fin.treatmentPrice || parseInt(String(lead.reviewData?.price || "0").replace(/[^0-9]/g, "")) || 0;
+  const price = fin.treatmentPrice || Number.parseInt(String(lead.reviewData?.price || "0").replaceAll(/[^0-9]/g, "")) || 0;
   const deposit = fin.depositAmount || 0;
   const depositPaid = fin.depositStatus === "paid" || lead.convStatus === "deposit_paid";
   const remaining = fin.paymentStatus === "paid" ? 0 : price - deposit;
@@ -350,7 +350,7 @@ export default function PatientsPage() {
   const isLoading = initialLoad && myLeads.length === 0;
 
   // Role-based access
-  const role = (user?.apiRole || user?.role || "coordinator").toLowerCase().replace("clinic_", "");
+  const role = (user?.apiRole || user?.role || "coordinator").toLowerCase().replaceAll("clinic_", "");
   const canEdit = role === "admin" || role === "coordinator" || role === "platform_owner";
   const isDoctor = role === "doctor";
 
@@ -555,7 +555,7 @@ export default function PatientsPage() {
           l.country || "", l.assignedDoctor || l.reviewData?.doctor || "",
           l.source || "", fin.price || "", fin.deposit || "",
           l.lastAiInteraction ? new Date(l.lastAiInteraction).toLocaleDateString(fmLocale()) : "",
-        ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
+        ].map(v => `"${String(v).replaceAll(/"/g, '""')}"`).join(",");
       }).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);

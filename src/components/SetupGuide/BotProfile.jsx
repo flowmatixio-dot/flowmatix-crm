@@ -73,8 +73,8 @@ export default function BotProfile({ clinic, updateClinic, showT, t }) {
           for (const day of days) {
             businessHours.push({
               day_of_week: day,
-              open_time: (hours[key + "Open"] || "09:00").replace(":", ""),
-              close_time: (hours[key + "Close"] || "18:00").replace(":", ""),
+              open_time: (hours[key + "Open"] || "09:00").replaceAll(":", ""),
+              close_time: (hours[key + "Close"] || "18:00").replaceAll(":", ""),
             });
           }
         }

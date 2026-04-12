@@ -211,7 +211,7 @@ export const ACTION_PERMS = {
 // If plan is not Operations/Enterprise, all users get full access
 export function hasModuleAccess(role, module, plan) {
   if (!role || !module) return false;
-  let r = role.toLowerCase().replace("clinic_", "");
+  let r = role.toLowerCase().replaceAll("clinic_", "");
   // Normalize: staff → coordinator (same access level)
   if (r === "staff") r = "coordinator";
   return MODULE_ACCESS[module]?.[r] === true;
@@ -221,7 +221,7 @@ export function hasModuleAccess(role, module, plan) {
 // Returns true, false, or "assigned" (needs object-level check)
 export function hasPermission(role, action) {
   if (!role || !action) return false;
-  let r = role.toLowerCase().replace("clinic_", "");
+  let r = role.toLowerCase().replaceAll("clinic_", "");
   if (r === "staff") r = "coordinator";
   return ACTION_PERMS[action]?.[r] || false;
 }
@@ -229,7 +229,7 @@ export function hasPermission(role, action) {
 // Helper: get allowed modules for a role
 export function getAllowedModules(role) {
   if (!role) return [];
-  let r = role.toLowerCase().replace("clinic_", "");
+  let r = role.toLowerCase().replaceAll("clinic_", "");
   if (r === "staff") r = "coordinator";
   return Object.entries(MODULE_ACCESS).filter(([, roles]) => roles[r] === true).map(([mod]) => mod);
 }

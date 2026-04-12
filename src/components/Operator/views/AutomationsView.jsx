@@ -155,7 +155,7 @@ export default function AutomationsView() {
         <div style={{ padding: '12px 20px', borderRadius: 14, marginBottom: 16, background: '#ef444412', border: '1px solid #ef444430', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: '#ef4444', boxShadow: '0 0 8px #ef4444', animation: 'fmPulse 2s infinite' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: '#ef4444' }}>
-            {criticalInactive.length} critical inactive: {criticalInactive.map(w => safeStr(w.name).replace('Flowmatix — ', '')).join(', ')}
+            {criticalInactive.length} critical inactive: {criticalInactive.map(w => safeStr(w.name).replaceAll('Flowmatix — ', '')).join(', ')}
           </span>
         </div>
       )}

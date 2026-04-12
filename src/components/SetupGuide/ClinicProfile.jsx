@@ -25,7 +25,7 @@ export default function ClinicProfile({ clinic, isDone, localData, setLocalData,
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>{t("timezone") || "Zeitzone"}</div>
         <select value={d.timezone} onChange={e => set("timezone", e.target.value)} disabled={locked} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated)", border: "1px solid var(--border-strong)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 13, outline: "none", cursor: "pointer" }}>
-          {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz.replace(/_/g, " ")}</option>)}
+          {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz.replaceAll(/_/g, " ")}</option>)}
         </select>
       </div>
       {!autoSave && <SaveBtn onClick={() => { updateClinic(d); setLocalData(p => ({ ...p, profile: {} })); showT(t("saved")); }} t={t} />}

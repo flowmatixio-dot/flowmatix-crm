@@ -11,7 +11,7 @@ function tFb(t, key, fallback) { const val = t(key); return (val && val !== key)
 /* ── HTML escape for safe innerHTML ── */
 function escHtml(s) {
   if (!s) return "";
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  return String(s).replaceAll(/&/g, "&amp;").replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;").replaceAll(/"/g, "&quot;").replaceAll(/'/g, "&#39;");
 }
 
 /* ── Time formatter (matches v71 Or()) ── */
@@ -176,7 +176,7 @@ export default function ActionNeededView() {
 
                   html += '<div style="flex:1"><div style="font-weight:700;font-size:13px;color:rgba(232,238,252,0.9)">' + escHtml(dr.name || "") + '</div>';
                   html += '<div style="font-size:11px;color:rgba(167,177,195,0.6);margin-top:2px"><a href="tel:' +
-                    encodeURI((dr.phone || "").replace(/\s/g, "")) + '" style="color:#4cc9ff;text-decoration:none">' + escHtml(dr.phone || "") + '</a></div></div>';
+                    encodeURI((dr.phone || "").replaceAll(/\s/g, "")) + '" style="color:#4cc9ff;text-decoration:none">' + escHtml(dr.phone || "") + '</a></div></div>';
 
                   if (declined) {
                     html += '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;color:#ef4444;background:rgba(239,68,68,0.08)">' + (t("declined") || "ABGELEHNT") + '</span>';
@@ -211,7 +211,7 @@ export default function ActionNeededView() {
                       })
                     })
                   }).then(() => {
-                    showT((t("driver_assigned_msg") || "Fahrer {name} zugewiesen").replace("{name}", dName) + " \u2705");
+                    showT((t("driver_assigned_msg") || "Fahrer {name} zugewiesen").replaceAll("{name}", dName) + " \u2705");
                     panel.remove();
                     window.dispatchEvent(new Event("resize"));
                   }).catch(() => {
@@ -282,7 +282,7 @@ export default function ActionNeededView() {
                   hotelInfo: { name, link: link || null, checkIn: checkin || null, checkOut: checkout || null }
                 })
               }).then(() => {
-                showT((t("hotel_assigned_msg") || "Hotel {name} zugewiesen").replace("{name}", name) + " \u2705");
+                showT((t("hotel_assigned_msg") || "Hotel {name} zugewiesen").replaceAll("{name}", name) + " \u2705");
                 panel.remove();
                 window.dispatchEvent(new Event("resize"));
               }).catch(() => showT(t("error") || "Fehler"));

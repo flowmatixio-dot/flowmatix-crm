@@ -21,8 +21,8 @@ export function validateUuid(paramName = 'id') {
 
 // Validate pagination params
 export function validatePagination(req) {
-  const page = Math.max(1, parseInt(req.query?.page) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(req.query?.limit) || 20));
+  const page = Math.max(1, Number.parseInt(req.query?.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number.parseInt(req.query?.limit) || 20));
   const offset = (page - 1) * limit;
   return { page, limit, offset };
 }
@@ -30,7 +30,7 @@ export function validatePagination(req) {
 // Sanitize string input (strip HTML tags)
 export function sanitizeString(str) {
   if (typeof str !== 'string') return str;
-  return str.replace(/<[^>]*>/g, '').trim();
+  return str.replaceAll(/<[^>]*>/g, '').trim();
 }
 
 // Validate required fields in body

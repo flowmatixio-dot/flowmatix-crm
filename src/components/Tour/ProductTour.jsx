@@ -108,7 +108,7 @@ export default function ProductTour() {
       </div>
 
       <div style={{ fontSize: 10, fontWeight: 700, color: "#4cc9ff", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>
-        {t("step_x_of_y").replace("{x}",tourStep + 1).replace("{y}",TOUR_STEPS.length)}
+        {t("step_x_of_y").replaceAll("{x}",tourStep + 1).replaceAll("{y}",TOUR_STEPS.length)}
       </div>
       <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>{step?.title}</div>
       <div style={{ fontSize: 14, color: "rgba(167,177,195,0.7)", lineHeight: 1.5, marginBottom: 20 }}>{step?.desc}</div>

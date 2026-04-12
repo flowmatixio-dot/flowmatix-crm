@@ -103,7 +103,7 @@ function FlightsPanel({ clinic, updateClinic, t }) {
     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>{t("wa_notification_timing") || "WhatsApp-Benachrichtigung"}</div>
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>{t("escalation_timeout") || "Eskalation nach (Minuten)"}</div>
-      <input type="number" value={config.escalationTimeoutMin || 30} onChange={e => updateClinic({ logisticsConfig: { ...config, escalationTimeoutMin: parseInt(e.target.value) || 30 } })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated)", border: "1px solid var(--border-strong)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+      <input type="number" value={config.escalationTimeoutMin || 30} onChange={e => updateClinic({ logisticsConfig: { ...config, escalationTimeoutMin: Number.parseInt(e.target.value) || 30 } })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg-card-elevated)", border: "1px solid var(--border-strong)", color: "var(--text-primary)", fontFamily: "inherit", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
       <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 4 }}>{t("escalation_timeout_desc") || "Nach dieser Zeit wird der naechste Fahrer benachrichtigt, falls keine Bestaetigung erfolgt."}</div>
     </div>
   </div>;

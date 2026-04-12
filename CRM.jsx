@@ -371,7 +371,7 @@ export default function App() {
   const generateDepositLink=(leadId,amount)=>{
     const lead=leads.find(l=>l.id===leadId);if(!lead)return;
     /* ⚠️ DEMO: Not a real Stripe link — replace with actual Stripe Checkout in production */
-    const link=`#DEMO-stripe-deposit/cs_dep_${genId().substring(0,8)}?amount=${amount}&currency=eur&desc=Deposit_${lead.name.replace(/\s/g,"_")}`;
+    const link=`#DEMO-stripe-deposit/cs_dep_${genId().substring(0,8)}?amount=${amount}&currency=eur&desc=Deposit_${lead.name.replaceAll(/\s/g,"_")}`;
     navigator.clipboard?.writeText(link).then(()=>showT(`Deposit link €${amount} copied!`)).catch(()=>showT("Deposit link generated"));
     /* Simulate bot message in chat */
     setMsgs(prev=>{
@@ -584,7 +584,7 @@ export default function App() {
     const activeAutos = myAutomations.filter(a=>a.active).length;
     const storageMB = (clinic.files||[]).reduce((s,f)=>{
       const str = f.size||"0";
-      const num = parseFloat(str);
+      const num = Number.parseFloat(str);
       if(str.toLowerCase().includes("gb")) return s+num*1024;
       if(str.toLowerCase().includes("kb")) return s+num/1024;
       return s+num;
@@ -660,7 +660,7 @@ export default function App() {
     /* Needs medical review */
     if(l.convStatus==="needs_medical_review")s.push({id:"do_review",icon:"⚕️",label:"Complete medical review",desc:`${l.photoUrls?.length||0} photos waiting for evaluation`,action:()=>openPatient(l.id),priority:0});
     /* Has review but no deposit */
-    if(l.reviewData&&!invoices.some(i=>i.leadId===l.id&&i.status==="paid")&&l.convStatus!=="deposit_paid")s.push({id:"send_deposit",icon:"💳",label:"Send deposit link",desc:`${l.reviewData.price} — send 25% deposit request`,action:()=>{const price=parseInt(l.reviewData.price?.replace(/[^0-9]/g,""))||0;sendPaymentLink(Math.max(Math.round(price*0.25),500),l.id,"auto");},priority:1});
+    if(l.reviewData&&!invoices.some(i=>i.leadId===l.id&&i.status==="paid")&&l.convStatus!=="deposit_paid")s.push({id:"send_deposit",icon:"💳",label:"Send deposit link",desc:`${l.reviewData.price} — send 25% deposit request`,action:()=>{const price=Number.parseInt(l.reviewData.price?.replaceAll(/[^0-9]/g,""))||0;sendPaymentLink(Math.max(Math.round(price*0.25),500),l.id,"auto");},priority:1});
     /* Treatment plan sent but no reply (48h) */
     if(l.treatmentPlanSentAt){const hrs=(Date.now()-new Date(l.treatmentPlanSentAt).getTime())/3600000;if(hrs>=48&&l.convStatus==="booking_pending")s.push({id:"followup",icon:"🔄",label:"Send follow-up",desc:`No reply for ${Math.round(hrs)}h — send reminder`,action:()=>{const tpl=MSG_TEMPLATES.find(t=>t.id==="t6");if(tpl)sendTemplateMsg(l.id,tpl);},priority:0});}
     /* Has booking but no flight */
@@ -717,7 +717,7 @@ export default function App() {
     /* ⚠️ DEMO: Not a real Stripe link — replace with actual Stripe Checkout in production */
     const link=`#DEMO-stripe-payment/cs_live_${genId().substring(0,8)}?amount=${amount}&currency=eur`;
     // TODO: In production, call n8n webhook: fetch('https://n8n.flowmatix.io/webhook/stripe-link', {method:'POST', body: JSON.stringify({amount,leadId,clinicId:activeClinicId,link})})
-    const paymentCard={type:"payment_card",amount:parseInt(amount),currency:"EUR",status:"pending",link,created:new Date().toISOString(),id:genId()};
+    const paymentCard={type:"payment_card",amount:Number.parseInt(amount),currency:"EUR",status:"pending",link,created:new Date().toISOString(),id:genId()};
     /* Add payment card + bot message to chat */
     setMsgs(prev=>{
       const cm=[...(prev[activeClinicId]||[])];
@@ -789,12 +789,12 @@ export default function App() {
         const rev=estimateRevenue(a);const lead=myLeads.find(l=>l.id===a.leadId);
         const belegNr=`FM-${year}${monthStr}-${String(i+1).padStart(3,"0")}`;
         const datum=a.date.split("-").reverse().join("").substring(0,4); /* DDMM */
-        return `${rev.toFixed(2).replace(".",",")};"S";"EUR";"";"";"";"10000";"8400";"";"${datum}";"${belegNr}";"";"";"\${a.patient} - ${a.treatment}"`;
+        return `${rev.toFixed(2).replaceAll(".",",")};"S";"EUR";"";"";"";"10000";"8400";"";"${datum}";"${belegNr}";"";"";"\${a.patient} - ${a.treatment}"`;
       });
       const csv=[header,...rows].join("\n");
       const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
       const el=document.createElement("a");el.href=URL.createObjectURL(blob);
-      el.download=`DATEV_Buchungen_${year}-${monthStr}_${clinic?.name?.replace(/\\s/g,"_")||"clinic"}.csv`;el.click();
+      el.download=`DATEV_Buchungen_${year}-${monthStr}_${clinic?.name?.replaceAll(/\\s/g,"_")||"clinic"}.csv`;el.click();
       logAction("datev_export",clinic?.name||"","DATEV export: "+monthAppts.length+" bookings, "+MONTHS[month]+" "+year);
     } else {
       /* Simple CSV for tax advisor */
@@ -809,7 +809,7 @@ export default function App() {
       const csv=[header,...rows].join("\n");
       const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
       const el=document.createElement("a");el.href=URL.createObjectURL(blob);
-      el.download=`Revenue_${year}-${monthStr}_${clinic?.name?.replace(/\\s/g,"_")||"clinic"}.csv`;el.click();
+      el.download=`Revenue_${year}-${monthStr}_${clinic?.name?.replaceAll(/\\s/g,"_")||"clinic"}.csv`;el.click();
       logAction("revenue_export",clinic?.name||"","CSV export: "+monthAppts.length+" bookings, €"+total);
     }
     showT(`${format==="datev"?"DATEV":"CSV"} exported — ${monthAppts.length} bookings`);
@@ -1223,7 +1223,7 @@ export default function App() {
 
   /* ======== CALENDAR ======== */
   const CalMonth=()=>{const days=getMonthDays(calDate.getFullYear(),calDate.getMonth());return<div><div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}}>{DAYS.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,color:"rgba(167,177,195,0.4)",padding:"8px 0"}}>{d}</div>)}</div><div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2}}>{days.map((d,i)=>{const ds=fmtDate(d.date);const da=myAppts.filter(a=>a.date===ds);const td=isToday(d.date);const dayRev=da.filter(a=>a.status!=="cancelled").reduce((s,a)=>s+estimateRevenue(a),0);const isWeekday=d.date.getDay()>0&&d.date.getDay()<6;const isEmpty=da.length===0&&isWeekday&&d.current&&d.date>=new Date();return<div key={i} className={isEmpty&&showRevenue?"empty-day":""} style={{minHeight:100,padding:6,borderRadius:10,background:td?"rgba(76,201,255,0.06)":isEmpty&&showRevenue?"rgba(251,191,36,0.03)":"rgba(255,255,255,0.02)",border:`1px solid ${td?"rgba(76,201,255,0.2)":isEmpty&&showRevenue?"rgba(251,191,36,0.12)":"rgba(255,255,255,0.04)"}`,opacity:d.current?1:0.35,cursor:"pointer"}} onClick={()=>{setCalDate(d.date);setCalView("day");}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{fontSize:12,fontWeight:td?800:600,color:td?"#4cc9ff":"rgba(232,238,252,0.7)"}}>{d.date.getDate()}</span>{showRevenue&&dayRev>0&&<span style={{fontSize:9,fontWeight:700,color:"#10b981",background:"rgba(16,185,129,0.1)",padding:"1px 5px",borderRadius:4}}>€{(dayRev/1000).toFixed(1)}k</span>}{isEmpty&&showRevenue&&<span style={{fontSize:8,color:"#fbbf24",fontWeight:700}}>open</span>}</div>{da.slice(0,2).map(a=>{const ac=APPT_C[a.status];return<div key={a.id} onClick={e=>{e.stopPropagation();setSelAppt(a.id);}} style={{padding:"2px 6px",borderRadius:5,background:`${ac.c}15`,borderLeft:`3px solid ${ac.c}`,marginBottom:2,fontSize:10,fontWeight:600,color:ac.c,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",cursor:"pointer"}}>{a.time} {a.patient}</div>;})}{da.length>2&&<div style={{fontSize:10,color:"rgba(167,177,195,0.4)"}}>+{da.length-2}</div>}</div>;})}</div></div>;};
-  const CalDay=()=>{const ds=fmtDate(calDate);const da=myAppts.filter(a=>a.date===ds);const hours=Array.from({length:14},(_,i)=>i+7);return<div>{da.length===0&&<div style={{textAlign:"center",padding:40,color:"rgba(167,177,195,0.4)"}}>No appointments.</div>}{hours.map(h=>{const ha=da.filter(a=>parseInt(a.time)>=h&&parseInt(a.time)<h+1);return<div key={h} style={{display:"grid",gridTemplateColumns:"60px 1fr",gap:12,minHeight:60,borderBottom:"1px solid rgba(255,255,255,0.04)"}}><div style={{fontSize:13,color:"rgba(167,177,195,0.3)",textAlign:"right",paddingTop:8,fontWeight:600}}>{String(h).padStart(2,"0")}:00</div><div style={{padding:"6px 0"}}>{ha.map(a=>{const ac=APPT_C[a.status];return<div key={a.id} onClick={()=>setSelAppt(a.id)} style={{padding:"12px 16px",borderRadius:12,background:`${ac.c}08`,border:`1px solid ${ac.c}20`,borderLeft:`4px solid ${ac.c}`,marginBottom:6,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:15}}>{a.patient}</div><div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginTop:2}}>{a.treatment} · {a.time}–{a.endTime}</div></div><span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:`${ac.c}18`,color:ac.c}}>{ac.l}</span></div>;})}</div></div>;})}</div>;};
+  const CalDay=()=>{const ds=fmtDate(calDate);const da=myAppts.filter(a=>a.date===ds);const hours=Array.from({length:14},(_,i)=>i+7);return<div>{da.length===0&&<div style={{textAlign:"center",padding:40,color:"rgba(167,177,195,0.4)"}}>No appointments.</div>}{hours.map(h=>{const ha=da.filter(a=>Number.parseInt(a.time)>=h&&Number.parseInt(a.time)<h+1);return<div key={h} style={{display:"grid",gridTemplateColumns:"60px 1fr",gap:12,minHeight:60,borderBottom:"1px solid rgba(255,255,255,0.04)"}}><div style={{fontSize:13,color:"rgba(167,177,195,0.3)",textAlign:"right",paddingTop:8,fontWeight:600}}>{String(h).padStart(2,"0")}:00</div><div style={{padding:"6px 0"}}>{ha.map(a=>{const ac=APPT_C[a.status];return<div key={a.id} onClick={()=>setSelAppt(a.id)} style={{padding:"12px 16px",borderRadius:12,background:`${ac.c}08`,border:`1px solid ${ac.c}20`,borderLeft:`4px solid ${ac.c}`,marginBottom:6,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:15}}>{a.patient}</div><div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginTop:2}}>{a.treatment} · {a.time}–{a.endTime}</div></div><span style={{padding:"3px 10px",borderRadius:7,fontSize:11,fontWeight:700,background:`${ac.c}18`,color:ac.c}}>{ac.l}</span></div>;})}</div></div>;})}</div>;};
 
   /* ======== SYSTEM STATUS ======== */
   const SystemStatus=()=>{
@@ -1394,7 +1394,7 @@ export default function App() {
                 {!wp.number_registered&&wp.partner_invited&&<div style={{padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px solid rgba(76,201,255,0.1)",marginBottom:16,textAlign:"left"}}>
                   <div style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)",marginBottom:8}}>{ob.sms_title}</div>
                   <div style={{display:"flex",gap:10}}>
-                    <input id="ob_sms" placeholder="6-stelliger Code" maxLength={6} style={{width:160,padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"monospace",fontSize:20,letterSpacing:8,textAlign:"center",outline:"none"}} onChange={e=>{e.target.value=e.target.value.replace(/\D/g,"");}}/>
+                    <input id="ob_sms" placeholder="6-stelliger Code" maxLength={6} style={{width:160,padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",color:"#fff",fontFamily:"monospace",fontSize:20,letterSpacing:8,textAlign:"center",outline:"none"}} onChange={e=>{e.target.value=e.target.value.replaceAll(/\D/g,"");}}/>
                     <button onClick={()=>{const code=document.getElementById("ob_sms")?.value;if(code?.length===6){setClinics(cs=>cs.map(c=>c.id===clinic.id?{...c,waSetupProgress:{...(c.waSetupProgress||{}),number_registered:true}}:c));showT(ob.done+"!");}else{showT("6-digit code required");}}} style={{padding:"10px 20px",borderRadius:10,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>{ob.verify}</button>
                   </div>
                   <div style={{fontSize:11,color:"rgba(167,177,195,0.4)",marginTop:8}}>{ob.sms_hint}</div>
@@ -1423,7 +1423,7 @@ export default function App() {
             <h1 style={{fontSize:28,fontWeight:800,margin:"0 0 8px"}}>Verification in progress</h1>
             <p style={{fontSize:16,color:"rgba(167,177,195,0.7)",margin:"0 0 32px",lineHeight:1.6}}>WhatsApp is connected. We're running final checks on your messaging and automation setup.</p>
             <div style={{padding:16,borderRadius:14,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",marginBottom:24}}>
-              {["WhatsApp connected ✓","Test messages verified ✓","Automation rules loading…"].map((s,i)=><div key={i} style={{display:"flex",gap:8,alignItems:"center",padding:"6px 0",fontSize:14}}><span style={{color:s.includes("✓")?"#10b981":"#4cc9ff",fontWeight:700}}>{s.includes("✓")?"✓":"⏳"}</span><span style={{color:s.includes("✓")?"#10b981":"rgba(232,238,252,0.7)"}}>{s.replace(" ✓","")}</span></div>)}
+              {["WhatsApp connected ✓","Test messages verified ✓","Automation rules loading…"].map((s,i)=><div key={i} style={{display:"flex",gap:8,alignItems:"center",padding:"6px 0",fontSize:14}}><span style={{color:s.includes("✓")?"#10b981":"#4cc9ff",fontWeight:700}}>{s.includes("✓")?"✓":"⏳"}</span><span style={{color:s.includes("✓")?"#10b981":"rgba(232,238,252,0.7)"}}>{s.replaceAll(" ✓","")}</span></div>)}
             </div>
             <button onClick={()=>{completeOnboarding(clinic.id,"Clinic activated!");}} style={{width:"100%",padding:18,borderRadius:16,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:800,fontSize:18,cursor:"pointer",fontFamily:"inherit",boxShadow:"0 2px 8px rgba(16,185,129,0.15)"}}>✅ Activate & Go Live</button>
           </div>}
@@ -1511,7 +1511,7 @@ export default function App() {
             </div>
             <div>
               <div style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.5)",marginBottom:6}}>Total (Gross)</div>
-              <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",fontSize:16,fontWeight:800,color:"#10b981"}}>€{((parseInt(invAmount)||0)+(parseInt(invAmount)||0)*(parseInt(invVat)||0)/100).toLocaleString()}</div>
+              <div style={{padding:"10px 14px",borderRadius:10,background:"rgba(16,185,129,0.06)",border:"1px solid rgba(16,185,129,0.15)",fontSize:16,fontWeight:800,color:"#10b981"}}>€{((Number.parseInt(invAmount)||0)+(Number.parseInt(invAmount)||0)*(Number.parseInt(invVat)||0)/100).toLocaleString()}</div>
             </div>
           </div>
           {/* Deposit option */}
@@ -1519,15 +1519,15 @@ export default function App() {
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{fontSize:12,fontWeight:700,color:"#a78bfa"}}>💳 Generate Stripe Deposit Link?</div>
               <div style={{display:"flex",gap:6}}>
-                {[25,50].map(pct=><button key={pct} onClick={()=>setInvDeposit(String(Math.round((parseInt(invAmount)||0)*pct/100)))} style={{padding:"4px 10px",borderRadius:6,background:invDeposit===String(Math.round((parseInt(invAmount)||0)*pct/100))?"rgba(167,107,255,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${invDeposit===String(Math.round((parseInt(invAmount)||0)*pct/100))?"rgba(167,107,255,0.3)":"rgba(255,255,255,0.08)"}`,color:invDeposit===String(Math.round((parseInt(invAmount)||0)*pct/100))?"#a78bfa":"rgba(167,177,195,0.5)",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{pct}% — €{Math.round((parseInt(invAmount)||0)*pct/100)}</button>)}
+                {[25,50].map(pct=><button key={pct} onClick={()=>setInvDeposit(String(Math.round((Number.parseInt(invAmount)||0)*pct/100)))} style={{padding:"4px 10px",borderRadius:6,background:invDeposit===String(Math.round((Number.parseInt(invAmount)||0)*pct/100))?"rgba(167,107,255,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${invDeposit===String(Math.round((Number.parseInt(invAmount)||0)*pct/100))?"rgba(167,107,255,0.3)":"rgba(255,255,255,0.08)"}`,color:invDeposit===String(Math.round((Number.parseInt(invAmount)||0)*pct/100))?"#a78bfa":"rgba(167,177,195,0.5)",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{pct}% — €{Math.round((Number.parseInt(invAmount)||0)*pct/100)}</button>)}
               </div>
             </div>
           </div>
           <div style={{display:"flex",gap:8}}>
             <button onClick={()=>{
-              const net=parseInt(invAmount)||0;if(!net){showT("Enter an amount");return;}
-              const inv=createInvoice(lead.id,invItems,net,parseInt(invVat)||0);
-              if(inv&&invDeposit){generateDepositLink(lead.id,parseInt(invDeposit));}
+              const net=Number.parseInt(invAmount)||0;if(!net){showT("Enter an amount");return;}
+              const inv=createInvoice(lead.id,invItems,net,Number.parseInt(invVat)||0);
+              if(inv&&invDeposit){generateDepositLink(lead.id,Number.parseInt(invDeposit));}
               if(inv)setInvoiceModal(null);
             }} style={{flex:1,padding:"12px 20px",borderRadius:12,background:"linear-gradient(135deg,#10b981,#059669)",border:"none",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>🧾 Create Invoice{invDeposit?" + Deposit Link":""}</button>
             <button onClick={()=>setInvoiceModal(null)} style={{padding:"12px 20px",borderRadius:12,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"rgba(167,177,195,0.6)",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>Cancel</button>
@@ -1536,7 +1536,7 @@ export default function App() {
       </div>;})()}
 
       {/* ═══ PAYMENT LINK MODAL (Manual Review) ═══ */}
-      {paymentModal&&(()=>{const lead=getLeadById(paymentModal.leadId);if(!lead)return null;const amt=parseInt(payAmount)||0;return<div style={{position:"fixed",inset:0,zIndex:1100,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      {paymentModal&&(()=>{const lead=getLeadById(paymentModal.leadId);if(!lead)return null;const amt=Number.parseInt(payAmount)||0;return<div style={{position:"fixed",inset:0,zIndex:1100,display:"flex",alignItems:"center",justifyContent:"center"}}>
         <div onClick={()=>setPaymentModal(null)} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}/>
         <div style={{position:"relative",width:"min(440px,90vw)",background:"#0d1220",border:"1px solid rgba(0,180,216,0.2)",borderRadius:20,padding:0,overflow:"hidden",animation:"slI .2s ease"}}>
           {/* Card header gradient */}
@@ -1562,7 +1562,7 @@ export default function App() {
             {/* Quick amount buttons */}
             <div style={{display:"flex",gap:6,marginBottom:16}}>
               {[250,500,1000].map(a=><button key={a} onClick={()=>setPayAmount(String(a))} style={{flex:1,padding:"8px 0",borderRadius:8,background:payAmount===String(a)?"rgba(0,180,216,0.12)":"rgba(255,255,255,0.03)",border:`1px solid ${payAmount===String(a)?"rgba(0,180,216,0.25)":"rgba(255,255,255,0.06)"}`,color:payAmount===String(a)?"#4cc9ff":"rgba(167,177,195,0.5)",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>€{a}</button>)}
-              {lead.reviewData?.price&&<button onClick={()=>{const p=parseInt(lead.reviewData.price.replace(/[^0-9]/g,""))||0;setPayAmount(String(Math.round(p*0.25)));}} style={{flex:1,padding:"8px 0",borderRadius:8,background:"rgba(167,107,255,0.08)",border:"1px solid rgba(167,107,255,0.15)",color:"#a78bfa",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>25%</button>}
+              {lead.reviewData?.price&&<button onClick={()=>{const p=Number.parseInt(lead.reviewData.price.replaceAll(/[^0-9]/g,""))||0;setPayAmount(String(Math.round(p*0.25)));}} style={{flex:1,padding:"8px 0",borderRadius:8,background:"rgba(167,107,255,0.08)",border:"1px solid rgba(167,107,255,0.15)",color:"#a78bfa",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>25%</button>}
             </div>
             {/* Preview card */}
             <div style={{padding:14,borderRadius:12,background:"rgba(0,180,216,0.04)",border:"1px solid rgba(0,180,216,0.1)",display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
@@ -1593,7 +1593,7 @@ export default function App() {
           <div style={{width:24,height:24,borderRadius:8,background:"#ff8a2a",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:"#fff"}}>{totalActions}</div>
           {sidebar&&<span style={{fontSize:12,fontWeight:700,color:"#ff8a2a"}}>Action Needed</span>}
         </div>}
-        <nav style={{flex:1,padding:"8px 10px",overflowY:"auto",minHeight:0}}>{nav.map((it,idx)=>{if(it==="div")return<div key={idx} style={{height:1,background:"rgba(255,255,255,0.04)",margin:"10px 8px"}}/>;const isOpSub=it.id.startsWith("op_");const activeId=isOpSub?it.id:(view===it.id?it.id:null);const isActive=isOpSub?(view==="operator"&&opSubTab===it.id.replace("op_","")):(it.id==="operator"?(view==="operator"&&(opSubTab==="dashboard"||opSubTab==="overview")):(view===it.id));return<div key={it.id} data-tour={it.id} onClick={()=>{if(isOpSub){setView("operator");setOpSubTab(it.id.replace("op_",""));}else if(it.id==="operator"){setView("operator");setOpSubTab("dashboard");}else{setView(it.id);}setSelChat(null);if(it.id==="settings")setSettingsData(clinic?{...clinic}:null);if(it.id==="ai_control")setAiConfigData(clinic?.aiConfig?{...clinic.aiConfig}:null);}} style={{display:"flex",alignItems:"center",gap:12,padding:sidebar?"10px 14px":"10px 0",justifyContent:sidebar?"flex-start":"center",borderRadius:10,cursor:"pointer",marginBottom:3,background:isActive?"rgba(76,201,255,0.08)":"transparent",borderLeft:isActive?"3px solid #4cc9ff":"3px solid transparent",color:isActive?"#fff":"rgba(200,215,235,0.75)",fontWeight:isActive?700:500,fontSize:14,transition:"all .2s cubic-bezier(.4,0,.2,1)",letterSpacing:isActive?"0.01em":"0"}}><span style={{fontSize:16,flexShrink:0,opacity:isActive?1:0.85,transition:"opacity .2s"}}>{it.icon}</span>{sidebar&&<span>{it.l}</span>}{sidebar&&it.badge&&<span style={{marginLeft:"auto",background:"#ff8a2a",color:"#fff",fontSize:10,fontWeight:800,padding:"2px 7px",borderRadius:99,minWidth:16,textAlign:"center"}}>{it.badge}</span>}</div>;})}</nav>
+        <nav style={{flex:1,padding:"8px 10px",overflowY:"auto",minHeight:0}}>{nav.map((it,idx)=>{if(it==="div")return<div key={idx} style={{height:1,background:"rgba(255,255,255,0.04)",margin:"10px 8px"}}/>;const isOpSub=it.id.startsWith("op_");const activeId=isOpSub?it.id:(view===it.id?it.id:null);const isActive=isOpSub?(view==="operator"&&opSubTab===it.id.replaceAll("op_","")):(it.id==="operator"?(view==="operator"&&(opSubTab==="dashboard"||opSubTab==="overview")):(view===it.id));return<div key={it.id} data-tour={it.id} onClick={()=>{if(isOpSub){setView("operator");setOpSubTab(it.id.replaceAll("op_",""));}else if(it.id==="operator"){setView("operator");setOpSubTab("dashboard");}else{setView(it.id);}setSelChat(null);if(it.id==="settings")setSettingsData(clinic?{...clinic}:null);if(it.id==="ai_control")setAiConfigData(clinic?.aiConfig?{...clinic.aiConfig}:null);}} style={{display:"flex",alignItems:"center",gap:12,padding:sidebar?"10px 14px":"10px 0",justifyContent:sidebar?"flex-start":"center",borderRadius:10,cursor:"pointer",marginBottom:3,background:isActive?"rgba(76,201,255,0.08)":"transparent",borderLeft:isActive?"3px solid #4cc9ff":"3px solid transparent",color:isActive?"#fff":"rgba(200,215,235,0.75)",fontWeight:isActive?700:500,fontSize:14,transition:"all .2s cubic-bezier(.4,0,.2,1)",letterSpacing:isActive?"0.01em":"0"}}><span style={{fontSize:16,flexShrink:0,opacity:isActive?1:0.85,transition:"opacity .2s"}}>{it.icon}</span>{sidebar&&<span>{it.l}</span>}{sidebar&&it.badge&&<span style={{marginLeft:"auto",background:"#ff8a2a",color:"#fff",fontSize:10,fontWeight:800,padding:"2px 7px",borderRadius:99,minWidth:16,textAlign:"center"}}>{it.badge}</span>}</div>;})}</nav>
         <div style={{padding:sidebar?"14px 16px":"14px 10px",borderTop:"1px solid rgba(255,255,255,0.06)",flexShrink:0,marginTop:"auto",background:"#131c2e"}}>{sidebar?<div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><div style={{display:"flex",alignItems:"center",gap:10}}><div style={{width:32,height:32,borderRadius:10,background:isAdmin?"rgba(76,201,255,0.1)":"rgba(16,185,129,0.1)",border:`1px solid ${isAdmin?"rgba(76,201,255,0.12)":"rgba(16,185,129,0.12)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:isAdmin?"#4cc9ff":"#10b981"}}>{user.name.charAt(0)}</div><div><div style={{fontWeight:600,color:"rgba(235,242,255,0.92)",fontSize:13}}>{user.name}</div><div style={{fontSize:10,color:"rgba(180,195,215,0.6)",fontWeight:500}}>{isAdmin?"Admin":clinic?.name}</div></div></div><button onClick={handleLogout} style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.06)",color:"rgba(167,177,195,0.5)",cursor:"pointer",fontSize:13,width:28,height:28,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}} title="Logout">↗</button></div>:<div onClick={handleLogout} style={{cursor:"pointer",textAlign:"center",color:"rgba(167,177,195,0.4)",fontSize:13,width:32,height:32,borderRadius:8,background:"rgba(255,255,255,0.04)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto"}}>↗</div>}</div>
       </div>
 
@@ -1829,7 +1829,7 @@ function OperatorHeaderPills({ setView, setOpSubTab, totalActions }) {
         // Visitors
         try {
           const res = await fmApi.getVisitorStats();
-          const v = parseInt(res?.today?.visitors) || parseInt(res?.month?.visitors) || 0;
+          const v = Number.parseInt(res?.today?.visitors) || Number.parseInt(res?.month?.visitors) || 0;
           setVisitors(v);
         } catch (e) { console.warn("[header] visitors failed:", e); }
       } catch {}

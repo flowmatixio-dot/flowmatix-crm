@@ -119,7 +119,7 @@ export default function AutomationsView() {
                         <span style={{ fontSize: 11, color: "rgba(167,177,195,0.75)" }}>
                           ℹ️ {t("auto_aftercare_lang_note") || "Message is automatically sent in the patient's language"}
                         </span>
-                        {sel(clinic?.aftercareDelayHours || 4, v => saveSetting("aftercareDelayHours", parseInt(v)), [
+                        {sel(clinic?.aftercareDelayHours || 4, v => saveSetting("aftercareDelayHours", Number.parseInt(v)), [
                           ["2", t("auto_aftercare_2h") || "2h after surgery"], ["4", t("auto_aftercare_4h") || "4h after surgery"], ["6", t("auto_aftercare_6h") || "6h after surgery"], ["12", t("auto_aftercare_12h") || "12h after surgery"], ["24", t("auto_aftercare_24h") || "24h after surgery"]
                         ])}
                       </div>

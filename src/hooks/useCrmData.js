@@ -120,7 +120,7 @@ export function useCrmData({
     if (!l) return s;
     if (!l.photos && (!l.photoUrls || l.photoUrls.length === 0) && l.convStatus !== "closed") s.push({ id: "ask_photos", icon: "📸", label: "Ask for photos", desc: "Patient hasn't sent photos yet", action: () => { const tpl = MSG_TEMPLATES.find(t => t.id === "t3"); if (tpl) sendTemplateMsg(l.id, tpl); }, priority: 1 });
     if (l.convStatus === "needs_medical_review") s.push({ id: "do_review", icon: "⚕️", label: "Complete medical review", desc: `${l.photoUrls?.length || 0} photos waiting for evaluation`, action: () => openPatient(l.id), priority: 0 });
-    if (l.reviewData && !invoices.some(i => i.leadId === l.id && i.status === "paid") && l.convStatus !== "deposit_paid") s.push({ id: "send_deposit", icon: "💳", label: "Send deposit link", desc: `${l.reviewData.price} — send 25% deposit request`, action: () => { const price = parseInt(String(l.reviewData.price || 0).replace(/[^0-9]/g, "")) || 0; sendPaymentLink(Math.max(Math.round(price * 0.25), 500), l.id, "auto"); }, priority: 1 });
+    if (l.reviewData && !invoices.some(i => i.leadId === l.id && i.status === "paid") && l.convStatus !== "deposit_paid") s.push({ id: "send_deposit", icon: "💳", label: "Send deposit link", desc: `${l.reviewData.price} — send 25% deposit request`, action: () => { const price = Number.parseInt(String(l.reviewData.price || 0).replaceAll(/[^0-9]/g, "")) || 0; sendPaymentLink(Math.max(Math.round(price * 0.25), 500), l.id, "auto"); }, priority: 1 });
     if (l.treatmentPlanSentAt) { const hrs = (Date.now() - new Date(l.treatmentPlanSentAt).getTime()) / 3600000; if (hrs >= 48 && l.convStatus === "booking_pending") s.push({ id: "followup", icon: "🔄", label: "Send follow-up", desc: `No reply for ${Math.round(hrs)}h — send reminder`, action: () => { const tpl = MSG_TEMPLATES.find(t => t.id === "t6"); if (tpl) sendTemplateMsg(l.id, tpl); }, priority: 0 }); }
     if (l.booking && !l.flightConfirmed?.date) s.push({ id: "ask_flight", icon: "✈️", label: "Request flight details", desc: "Appointment booked but no flight info yet", action: () => { const tpl = MSG_TEMPLATES.find(t => t.id === "t7"); if (tpl) sendTemplateMsg(l.id, tpl); }, priority: 2 });
     if (l.stage === "contacted" && l.reviewData) s.push({ id: "move_booked", icon: "📅", label: "Move to Booked", desc: "Treatment plan sent — ready to book?", action: () => moveLead(l.id, "booked"), priority: 2 });
@@ -137,7 +137,7 @@ export function useCrmData({
     let _patientTime = _rawTime;
     if (_rawTime !== "TBD" && clinic?.checkinOffsetMinutes) {
       const [_h, _m] = _rawTime.split(":").map(Number);
-      if (!isNaN(_h)) { const _tot = Math.max(0, _h * 60 + (_m||0) - (clinic.checkinOffsetMinutes || 60)); _patientTime = `${String(Math.floor(_tot/60)).padStart(2,"0")}:${String(_tot%60).padStart(2,"0")}`; }
+      if (!Number.isNaN(_h)) { const _tot = Math.max(0, _h * 60 + (_m||0) - (clinic.checkinOffsetMinutes || 60)); _patientTime = `${String(Math.floor(_tot/60)).padStart(2,"0")}:${String(_tot%60).padStart(2,"0")}`; }
     }
     const vars = { "{first_name}": lead.name?.split(" ")[0] || lead.name, "{name}": lead.name, "{treatment}": lead.treatment || "", "{doctor}": lead.assigned || "Dr. Yilmaz", "{date}": lead.booking?.date || "TBD", "{time}": _patientTime, "{price}": lead.reviewData?.price || "", "{payment_link}": "checkout.stripe.com/pay/...", "{clinic}": clinic?.name || "Flowmatix" };
     Object.entries(vars).forEach(([k, v]) => { text = text.replaceAll(k, v); });

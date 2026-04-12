@@ -104,7 +104,7 @@ export default function PatientCard({ lead, t }) {
               const a = document.createElement("a");
               a.style.display = "none";
               a.href = url;
-              a.download = `Patientenkarte-${(lead.name || "Patient").replace(/\s/g, "-")}.pdf`;
+              a.download = `Patientenkarte-${(lead.name || "Patient").replaceAll(/\s/g, "-")}.pdf`;
               document.body.appendChild(a);
               a.click();
               setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
@@ -139,7 +139,7 @@ export default function PatientCard({ lead, t }) {
         })}
         {extraKeys.map(key => (
           <div key={key}>
-            <div style={s.fieldLabel}>{String(key).replace(/_/g, " ")}</div>
+            <div style={s.fieldLabel}>{String(key).replaceAll(/_/g, " ")}</div>
             <div style={s.fieldValue}>{String(fields[key])}</div>
           </div>
         ))}

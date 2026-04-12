@@ -417,7 +417,7 @@ export default function WhatsAppSetupPage() {
         <input id="wa-phone" type="tel" placeholder={tx.phone_hint} defaultValue={ob.phone_number || n?.phone || ""} style={ip} />
         <button id="wa-connect-btn" style={{ ...bt, background: "#10b981", color: "#fff", marginTop: 16 }} onClick={() => {
           const ph = document.getElementById("wa-phone")?.value;
-          if (!ph || ph.replace(/[^0-9+]/g, "").length < 8) return;
+          if (!ph || ph.replaceAll(/[^0-9+]/g, "").length < 8) return;
           const b = document.getElementById("wa-connect-btn");
           if (b) { b.textContent = tx.connecting; b.disabled = true; b.style.opacity = "0.7"; }
           api("submit-number", { phone: ph.trim() }).then(go);

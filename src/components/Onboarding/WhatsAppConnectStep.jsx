@@ -250,7 +250,7 @@ export default function WhatsAppConnectStep() {
           <input
             type="text"
             value={otpCode}
-            onChange={e => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onChange={e => setOtpCode(e.target.value.replaceAll(/\D/g, "").slice(0, 6))}
             placeholder={tx.otp_placeholder}
             maxLength={6}
             autoFocus

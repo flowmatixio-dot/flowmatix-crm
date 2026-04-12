@@ -89,7 +89,7 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     const hash = window.location.hash;
     if (hash.startsWith('#trial-auth=')) {
       try {
-        const encoded = hash.replace('#trial-auth=', '');
+        const encoded = hash.replaceAll('#trial-auth=', '');
         const decoded = atob(encoded);
         const params = new URLSearchParams(decoded);
         const access = params.get('access');
@@ -118,7 +118,7 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     const hash = window.location.hash;
     if (hash.startsWith('#impersonate=')) {
       try {
-        const encoded = hash.replace('#impersonate=', '');
+        const encoded = hash.replaceAll('#impersonate=', '');
         const decoded = atob(encoded);
         const params = new URLSearchParams(decoded);
         const access = params.get('access');

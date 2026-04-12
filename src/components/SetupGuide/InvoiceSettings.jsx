@@ -96,8 +96,8 @@ export default function InvoiceSettings({ clinic, isDone, localData, setLocalDat
           </button>
         </div>
         {clinic.depositEnabled && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <Field label={t("deposit_percentage")} value={String(clinic.depositPercentage || 25)} onChange={v => updateClinic({ depositPercentage: parseInt(v) || 25 })} placeholder="25" />
-          <Field label={t("deposit_min")} value={String(clinic.depositMinAmount || 500)} onChange={v => updateClinic({ depositMinAmount: parseInt(v) || 500 })} placeholder="500" />
+          <Field label={t("deposit_percentage")} value={String(clinic.depositPercentage || 25)} onChange={v => updateClinic({ depositPercentage: Number.parseInt(v) || 25 })} placeholder="25" />
+          <Field label={t("deposit_min")} value={String(clinic.depositMinAmount || 500)} onChange={v => updateClinic({ depositMinAmount: Number.parseInt(v) || 500 })} placeholder="500" />
         </div>}
       </div>
     </div>

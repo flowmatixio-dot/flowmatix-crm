@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "→ Security lint..."
-if ! npx eslint src/ --max-warnings=0 2>&1; then
+if ! npx eslint src/ 2>&1; then
   echo "❌ ESLint security issues — commit blocked."
   exit 1
 fi

@@ -601,8 +601,8 @@ function TabOutreach({ d, load }) {
     const contact = lead.contact_name || lead.contact_title || 'there';
     const clinic = lead.clinic_name;
     const text = OUTREACH_TEMPLATES[templateKey]
-      .replace(/\{contact\}/g, contact)
-      .replace(/\{clinic\}/g, clinic);
+      .replaceAll(/\{contact\}/g, contact)
+      .replaceAll(/\{clinic\}/g, clinic);
     navigator.clipboard?.writeText(text);
     showToast('Kopiert!');
   };
@@ -1761,7 +1761,7 @@ function TabApiKeys({ d, load }) {
   const handleCreate = async () => {
     if (!newKeyName) return;
     try {
-      const res = await api.createApiKey({ name: newKeyName, expiresInDays: newKeyExpiry ? parseInt(newKeyExpiry) : undefined });
+      const res = await api.createApiKey({ name: newKeyName, expiresInDays: newKeyExpiry ? Number.parseInt(newKeyExpiry) : undefined });
       setCreatedKey(res.apiKey);
       setNewKeyName('');
       setNewKeyExpiry('');

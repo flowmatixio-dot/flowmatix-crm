@@ -95,7 +95,7 @@ export default function MonitoringView({ actions }) {
   const backupOk = backupAge !== null && backupAge < 25;
 
   // DB — databaseSize comes as bytes integer, format to MB/GB
-  const dbSizeBytes = typeof db?.databaseSize === 'number' ? db.databaseSize : parseInt(db?.databaseSize) || 0;
+  const dbSizeBytes = typeof db?.databaseSize === 'number' ? db.databaseSize : Number.parseInt(db?.databaseSize) || 0;
   const dbSize = dbSizeBytes > 1e9 ? `${(dbSizeBytes / 1e9).toFixed(1)} GB` : dbSizeBytes > 1e6 ? `${(dbSizeBytes / 1e6).toFixed(0)} MB` : dbSizeBytes > 0 ? `${(dbSizeBytes / 1e3).toFixed(0)} KB` : '—';
   const dbConns = safeNum(db?.activeConnections);
   const topTables = Array.isArray(db?.topTables) ? db.topTables : [];

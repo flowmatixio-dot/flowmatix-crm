@@ -32,7 +32,7 @@ export default function AuditLogView() {
           <div style={{color:"rgba(167,177,195,0.7)",fontSize:12,fontFamily:"monospace"}}>{new Date(e.time).toLocaleString("de",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"})}</div>
           <div style={{fontWeight:600}}>{e.user}</div>
           <div><span style={{padding:"2px 8px",borderRadius:5,fontSize:10,fontWeight:700,background:"rgba(167,177,195,0.08)",color:"rgba(167,177,195,0.6)"}}>{e.role}</span></div>
-          <div><span style={{padding:"3px 8px",borderRadius:6,fontSize:11,fontWeight:700,background:`${ac}15`,color:ac}}>{e.action?.replace(/_/g," ")}</span></div>
+          <div><span style={{padding:"3px 8px",borderRadius:6,fontSize:11,fontWeight:700,background:`${ac}15`,color:ac}}>{e.action?.replaceAll(/_/g," ")}</span></div>
           <div style={{color:"rgba(232,238,252,0.95)",fontSize:12}}><strong>{e.target}</strong> {e.details&&`— ${e.details}`}</div>
         </div>;
       })}
