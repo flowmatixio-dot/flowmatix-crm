@@ -17,6 +17,15 @@ const COUNTRY_NAMES = {
   AR: 'Argentinien', IL: 'Israel', IR: 'Iran', JO: 'Jordanien', LB: 'Libanon',
   SY: 'Syrien', TN: 'Tunesien', NG: 'Nigeria', ZA: 'Südafrika', KE: 'Kenia',
   PK: 'Pakistan', BD: 'Bangladesch', SG: 'Singapur', MY: 'Malaysia', TH: 'Thailand',
+  PH: 'Philippinen', VN: 'Vietnam', ID: 'Indonesien', TW: 'Taiwan', HK: 'Hongkong',
+  CY: 'Zypern', LT: 'Litauen', LV: 'Lettland', EE: 'Estland', SK: 'Slowakei',
+  SI: 'Slowenien', MK: 'Nordmazedonien', AL: 'Albanien', BA: 'Bosnien', ME: 'Montenegro',
+  GE: 'Georgien', AM: 'Armenien', AZ: 'Aserbaidschan', KZ: 'Kasachstan', UZ: 'Usbekistan',
+  MM: 'Myanmar', KH: 'Kambodscha', LK: 'Sri Lanka', NP: 'Nepal', AF: 'Afghanistan',
+  YE: 'Jemen', OM: 'Oman', BH: 'Bahrain', LU: 'Luxemburg', MT: 'Malta', IS: 'Island',
+  CL: 'Chile', CO: 'Kolumbien', PE: 'Peru', VE: 'Venezuela', UY: 'Uruguay',
+  EC: 'Ecuador', BO: 'Bolivien', PY: 'Paraguay', CU: 'Kuba', DO: 'Dominikanische Rep.',
+  TZ: 'Tansania', ET: 'Äthiopien', GH: 'Ghana', CI: 'Elfenbeinküste', CM: 'Kamerun',
 };
 
 const biz = (path) => fmApi.apiFetch(`/api/v1/ops/analytics-biz${path}`).catch(() => null);
