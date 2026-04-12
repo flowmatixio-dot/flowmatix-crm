@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "→ Security lint..."
+if ! npx eslint src/ --max-warnings=0 2>&1; then
+  echo "❌ ESLint security issues — commit blocked."
+  exit 1
+fi
+echo "✓ ESLint OK"
+
+echo "→ Dependency audit..."
+npm audit --audit-level=critical --silent 2>&1
+if [ $? -ne 0 ]; then
+  echo "⚠️  Critical vulnerability in dependencies — run: npm audit"
+  exit 1
+fi
+echo "✓ No critical vulnerabilities"
