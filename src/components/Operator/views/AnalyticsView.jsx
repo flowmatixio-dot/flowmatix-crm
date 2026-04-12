@@ -1,8 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import DataTable from '../shared/DataTable.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
+
+const COUNTRY_NAMES = {
+  DE: 'Deutschland', AT: 'Österreich', CH: 'Schweiz', TR: 'Türkei', GB: 'Großbritannien',
+  US: 'USA', FR: 'Frankreich', NL: 'Niederlande', PL: 'Polen', RU: 'Russland',
+  SA: 'Saudi-Arabien', AE: 'Vereinigte Arab. Emirate', KW: 'Kuwait', QA: 'Katar',
+  IQ: 'Irak', EG: 'Ägypten', LY: 'Libyen', MA: 'Marokko', DZ: 'Algerien',
+  IT: 'Italien', ES: 'Spanien', PT: 'Portugal', BE: 'Belgien', SE: 'Schweden',
+  NO: 'Norwegen', DK: 'Dänemark', FI: 'Finnland', GR: 'Griechenland', CZ: 'Tschechien',
+  RO: 'Rumänien', HU: 'Ungarn', BG: 'Bulgarien', HR: 'Kroatien', RS: 'Serbien',
+  UA: 'Ukraine', CA: 'Kanada', AU: 'Australien', NZ: 'Neuseeland', JP: 'Japan',
+  KR: 'Südkorea', CN: 'China', IN: 'Indien', BR: 'Brasilien', MX: 'Mexiko',
+  AR: 'Argentinien', IL: 'Israel', IR: 'Iran', JO: 'Jordanien', LB: 'Libanon',
+  SY: 'Syrien', TN: 'Tunesien', NG: 'Nigeria', ZA: 'Südafrika', KE: 'Kenia',
+  PK: 'Pakistan', BD: 'Bangladesch', SG: 'Singapur', MY: 'Malaysia', TH: 'Thailand',
+};
 
 const biz = (path) => fmApi.apiFetch(`/api/v1/ops/analytics-biz${path}`).catch(() => null);
 const noData = (v) => (v === null || v === undefined) ? 'No data' : v;
@@ -19,9 +34,10 @@ export default function AnalyticsView() {
   const [daily, setDaily] = useState([]);
   const [loading, setLoading] = useState(true);
   const [recentVisitors, setRecentVisitors] = useState([]);
+  const initialLoad = useRef(true);
 
   const loadAnalytics = useCallback(() => {
-    setLoading(true);
+    if (initialLoad.current) setLoading(true);
     Promise.all([
       fmApi.getRevenue().catch(() => null),
       fmApi.getVisitorStats().catch(() => null),
@@ -41,7 +57,8 @@ export default function AnalyticsView() {
       setDaily(Array.isArray(met?.metrics) ? met.metrics : []);
       setRecentVisitors(Array.isArray(rv) ? rv : []);
       setLoading(false);
-    }).catch(() => setLoading(false));
+      initialLoad.current = false;
+    }).catch(() => { setLoading(false); initialLoad.current = false; });
   }, [period]);
 
   useEffect(() => {
@@ -252,7 +269,7 @@ export default function AnalyticsView() {
                 return (
                   <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                     <td style={{ padding: '7px 10px 7px 0', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{ago}</td>
-                    <td style={{ padding: '7px 10px 7px 0', whiteSpace: 'nowrap' }}>{flag} {v.city || v.country || '—'}</td>
+                    <td style={{ padding: '7px 10px 7px 0', whiteSpace: 'nowrap' }}>{flag} {v.city ? `${v.city}, ` : ''}{COUNTRY_NAMES[v.country?.toUpperCase()] || v.country || '—'}</td>
                     <td style={{ padding: '7px 10px 7px 0', color: 'var(--text-primary)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{path}</td>
                     <td style={{ padding: '7px 10px 7px 0' }}>{isMobile ? '📱' : '🖥️'}</td>
                     <td style={{ padding: '7px 0', color: v.duration_seconds ? '#22c55e' : 'var(--text-muted)' }}>{v.duration_seconds ? `${v.duration_seconds}s` : '—'}</td>
