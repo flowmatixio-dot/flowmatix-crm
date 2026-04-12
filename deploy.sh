@@ -17,6 +17,26 @@ npm run build
 echo "✓ Build complete"
 echo ""
 
+# SonarQube analysis — uploads source, scans, cleans up
+echo "→ SonarQube analysis..."
+SONAR_TMP="/tmp/flowmatix-crm-scan-$(date +%s)"
+rsync -az --delete --exclude='node_modules' --exclude='dist' --exclude='.git' \
+  src/ flowmatix:${SONAR_TMP}/src/ 2>/dev/null
+SONAR_RESULT=$(ssh flowmatix "sonar-scanner \
+  -Dsonar.projectKey=flowmatix-crm \
+  -Dsonar.sources=${SONAR_TMP}/src \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=\$(grep '^SONAR_SCANNER_TOKEN=' /opt/flowmatix/.env | cut -d= -f2-) \
+  -Dsonar.exclusions='**/*.test.{js,jsx},**/node_modules/**' 2>&1; \
+  rm -rf ${SONAR_TMP}" | grep -E "EXECUTION|ANALYSIS|ERROR" | tail -3)
+if echo "$SONAR_RESULT" | grep -q "SUCCESS"; then
+  echo "✓ SonarQube analysis complete → https://sonar.flowmatix.io/dashboard?id=flowmatix-crm"
+else
+  echo "⚠  SonarQube analysis failed (non-blocking):"
+  echo "$SONAR_RESULT"
+fi
+echo ""
+
 # 3. Backup current production
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 echo "→ Backing up production..."
