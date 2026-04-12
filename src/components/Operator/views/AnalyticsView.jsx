@@ -18,6 +18,7 @@ export default function AnalyticsView() {
   const [revenue, setRevenue] = useState(null);
   const [daily, setDaily] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recentVisitors, setRecentVisitors] = useState([]);
 
   const loadAnalytics = useCallback(() => {
     setLoading(true);
@@ -29,7 +30,8 @@ export default function AnalyticsView() {
       biz('/revenue').catch(() => null),
       biz('/clinics').catch(() => null),
       fmApi.getPlatformMetrics(parseInt(period)).catch(() => null),
-    ]).then(([rev, vis, fn, wa, br, cl, met]) => {
+      fmApi.getRecentVisitors().catch(() => []),
+    ]).then(([rev, vis, fn, wa, br, cl, met, rv]) => {
       setRevenue(rev);
       setVisitors(vis);
       setFunnel(fn);
@@ -37,6 +39,7 @@ export default function AnalyticsView() {
       setBizRev(br);
       setClinicRank(Array.isArray(cl?.clinics) ? cl.clinics : []);
       setDaily(Array.isArray(met?.metrics) ? met.metrics : []);
+      setRecentVisitors(Array.isArray(rv) ? rv : []);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [period]);
@@ -225,6 +228,40 @@ export default function AnalyticsView() {
             )}
           </div>
         </div>
+      </div>
+      {/* ═══ 8. WEBSITE BESUCHER ═══ */}
+      <SectionTitle sub="Marketing">Website Besucher</SectionTitle>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', marginBottom: 28 }}>
+        {recentVisitors.length === 0 ? (
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 16 }}>Keine Daten</div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                {['Zeit', 'Ort', 'Seite', 'Gerät', 'Dauer'].map(h => (
+                  <th key={h} style={{ padding: '4px 10px 8px 0', textAlign: 'left', fontWeight: 700, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {recentVisitors.map((v, i) => {
+                const flag = v.country && v.country.length === 2 ? String.fromCodePoint(...[...v.country.toUpperCase()].map(c => 0x1F1E0 + c.charCodeAt(0) - 65)) : '';
+                const isMobile = /mobile|android|iphone|ipad/i.test(v.user_agent || '');
+                const path = (() => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } })();
+                const ago = (() => { const d = Math.floor((Date.now() - new Date(v.created_at)) / 1000); return d < 60 ? `${d}s` : d < 3600 ? `${Math.floor(d/60)}min` : `${Math.floor(d/3600)}h`; })();
+                return (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                    <td style={{ padding: '7px 10px 7px 0', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{ago}</td>
+                    <td style={{ padding: '7px 10px 7px 0', whiteSpace: 'nowrap' }}>{flag} {v.city || v.country || '—'}</td>
+                    <td style={{ padding: '7px 10px 7px 0', color: 'var(--text-primary)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{path}</td>
+                    <td style={{ padding: '7px 10px 7px 0' }}>{isMobile ? '📱' : '🖥️'}</td>
+                    <td style={{ padding: '7px 0', color: v.duration_seconds ? '#22c55e' : 'var(--text-muted)' }}>{v.duration_seconds ? `${v.duration_seconds}s` : '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
