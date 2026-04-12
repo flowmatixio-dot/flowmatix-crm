@@ -153,6 +153,7 @@ export default function AppointmentsPage() {
           patientStage: lead.stage,
           patientCountry: lead.country,
           clinicCountry: clinic?.country || "",
+          noFlightNeeded: !!(lead.metadata?.noFlightNeeded || lead.metadata?.noTransferNeeded),
         };
       });
     // Doctor: filter to own appointments + unassigned (e.g. Google imports)
@@ -910,11 +911,11 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
       { label: t("op_photos") || "Fotos", done: !!appt.photos_complete || !!appt.photosComplete },
     ];
     if (depositActive) items.push({ label: t("op_deposit") || "Anzahlung", done: !!appt.deposit_paid || !!appt.depositPaid });
-    items.push(
+    if (!appt.noFlightNeeded) items.push(
       { label: t("appt_flight") || "Flug", done: !!appt.flight_received || !!appt.flightReceived },
       { label: t("appt_driver_short") || "Fahrer", done: !!appt.driver_assigned || !!appt.driverAssigned },
-      { label: t("appt_hotel_short") || "Hotel", done: !!appt.hotel_booked || !!appt.hotelBooked },
     );
+    items.push({ label: t("appt_hotel_short") || "Hotel", done: !!appt.hotel_booked || !!appt.hotelBooked });
     return items;
   }, [appt]);
 
