@@ -60,6 +60,7 @@ export default function AnalyticsView() {
   const [clinicRank, setClinicRank] = useState([]);
   const [revenue, setRevenue] = useState(null);
   const [daily, setDaily] = useState([]);
+  const [dailyVisitors, setDailyVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [recentVisitors, setRecentVisitors] = useState([]);
   const initialLoad = useRef(true);
@@ -75,7 +76,8 @@ export default function AnalyticsView() {
       biz('/clinics').catch(() => null),
       fmApi.getPlatformMetrics(parseInt(period)).catch(() => null),
       fmApi.getRecentVisitors().catch(() => []),
-    ]).then(([rev, vis, fn, wa, br, cl, met, rv]) => {
+      fmApi.getDailyVisitors().catch(() => []),
+    ]).then(([rev, vis, fn, wa, br, cl, met, rv, dv]) => {
       setRevenue(rev);
       setVisitors(vis);
       setFunnel(fn);
@@ -84,6 +86,7 @@ export default function AnalyticsView() {
       setClinicRank(Array.isArray(cl?.clinics) ? cl.clinics : []);
       setDaily(Array.isArray(met?.metrics) ? met.metrics : []);
       setRecentVisitors(Array.isArray(rv) ? rv : []);
+      setDailyVisitors(Array.isArray(dv) ? dv : []);
       setLoading(false);
       initialLoad.current = false;
     }).catch(() => { setLoading(false); initialLoad.current = false; });
@@ -200,20 +203,21 @@ export default function AnalyticsView() {
         </div>
       )}
 
-      {/* ═══ 6. DAILY ACTIVITY ═══ */}
-      <SectionTitle>Daily Messages</SectionTitle>
+      {/* ═══ 6. DAILY HOMEPAGE VISITORS ═══ */}
+      <SectionTitle>Daily Visitors (Homepage)</SectionTitle>
       <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '22px 24px', border: '1px solid var(--border-subtle)', marginBottom: 28 }}>
-        {daily.length > 0 ? (
+        {dailyVisitors.length > 0 ? (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 100 }}>
-            {daily.slice(-14).map((d, i) => {
-              const maxV = Math.max(1, ...daily.slice(-14).map(x => safeNum(x.messages || x.messages_sent || x.views || x.visitors, 1)));
-              const val = safeNum(d.messages || d.messages_sent || d.views || d.visitors);
+            {dailyVisitors.slice(-30).map((d, i) => {
+              const vals = dailyVisitors.slice(-30).map(x => safeNum(x.visitors));
+              const maxV = Math.max(1, ...vals);
+              const val = safeNum(d.visitors);
               const h = Math.max(4, (val / maxV) * 80);
               const dateStr = typeof d.day === 'string' ? d.day.slice(5, 10) : '';
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                   <div style={{ fontSize: 8, color: 'var(--text-muted)' }}>{val}</div>
-                  <div style={{ width: '100%', maxWidth: 20, height: h, background: '#5ee0ff', borderRadius: '3px 3px 0 0', opacity: 0.7 }} />
+                  <div style={{ width: '100%', maxWidth: 20, height: h, background: '#a78bfa', borderRadius: '3px 3px 0 0', opacity: 0.8 }} />
                   <div style={{ fontSize: 7, color: 'var(--text-muted)', marginTop: 2 }}>{dateStr}</div>
                 </div>
               );
@@ -287,6 +291,71 @@ function countryFlag(cc) {
   return String.fromCodePoint(...[...cc.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
 }
 
+// ── Format relative time, >24h as date ──
+function fmtAgo(dateStr) {
+  const d = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (d < 60) return `${d}s`;
+  if (d < 3600) return `${Math.floor(d / 60)}min`;
+  if (d < 86400) return `${Math.floor(d / 3600)}h`;
+  return new Date(dateStr).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+}
+
+// ── Sessions within a country ──
+function SessionList({ rows }) {
+  const [openSess, setOpenSess] = useState({});
+
+  // Group by session_id (fallback: ip)
+  const sessions = {};
+  rows.forEach(v => {
+    const key = v.session_id || v.ip || 'unknown';
+    if (!sessions[key]) sessions[key] = [];
+    sessions[key].push(v);
+  });
+  const sorted = Object.entries(sessions).sort((a, b) => {
+    const la = new Date(a[1][0].created_at); const lb = new Date(b[1][0].created_at);
+    return lb - la;
+  });
+
+  return (
+    <div style={{ background: 'var(--bg-section)' }}>
+      {sorted.map(([sid, svs], si) => {
+        const first = svs[0];
+        const isMobile = /mobile|android|iphone|ipad/i.test(first.user_agent || '');
+        const pages = [...new Set(svs.map(v => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } }))];
+        const isOpen = !!openSess[sid];
+        const shortIp = (first.ip || '').replace(/(\d+\.\d+)\.\d+\.\d+/, '$1.x.x');
+        return (
+          <div key={si} style={{ borderBottom: si < sorted.length - 1 ? '1px solid var(--border-subtle)' : 'none' }}>
+            <div onClick={() => setOpenSess(p => ({ ...p, [sid]: !p[sid] }))}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 20px 6px 32px', cursor: 'pointer', background: isOpen ? 'rgba(255,255,255,0.03)' : 'transparent' }}>
+              <span style={{ fontSize: 13 }}>{isMobile ? '📱' : '🖥️'}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', flex: 1 }}>{shortIp}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{first.city || ''}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{fmtAgo(first.created_at)}</span>
+              <span style={{ fontSize: 10, color: '#a78bfa', fontWeight: 700, marginLeft: 8 }}>{svs.length} Seite{svs.length !== 1 ? 'n' : ''}</span>
+              <span style={{ fontSize: 9, color: 'var(--text-muted)', marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
+            </div>
+            {isOpen && (
+              <div style={{ padding: '4px 20px 8px 48px', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {svs.map((v, vi) => {
+                  const path = (() => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } })();
+                  return (
+                    <div key={vi} style={{ display: 'flex', gap: 12, fontSize: 11, alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)', width: 40, flexShrink: 0 }}>{fmtAgo(v.created_at)}</span>
+                      <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{path}</span>
+                      {v.duration_seconds ? <span style={{ color: '#22c55e', marginLeft: 'auto' }}>{v.duration_seconds}s</span> : null}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Website Besucher grouped by country ──
 function VisitorsByCountry({ visitors }) {
   const [open, setOpen] = useState({});
@@ -324,27 +393,8 @@ function VisitorsByCountry({ visitors }) {
               <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{rows.length} Besuch{rows.length !== 1 ? 'e' : ''}</span>
               <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 6 }}>{isOpen ? '▲' : '▼'}</span>
             </div>
-            {/* Expanded visits */}
-            {isOpen && (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                <tbody>
-                  {rows.map((v, i) => {
-                    const isMobile = /mobile|android|iphone|ipad/i.test(v.user_agent || '');
-                    const path = (() => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } })();
-                    const ago = (() => { const d = Math.floor((Date.now() - new Date(v.created_at)) / 1000); return d < 60 ? `${d}s` : d < 3600 ? `${Math.floor(d / 60)}min` : `${Math.floor(d / 3600)}h`; })();
-                    return (
-                      <tr key={i} style={{ borderBottom: i < rows.length - 1 ? '1px solid var(--border-subtle)' : 'none', background: 'var(--bg-section)' }}>
-                        <td style={{ padding: '6px 20px', color: 'var(--text-muted)', whiteSpace: 'nowrap', width: 60 }}>{ago}</td>
-                        <td style={{ padding: '6px 10px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{v.city || '—'}</td>
-                        <td style={{ padding: '6px 10px', color: 'var(--text-primary)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{path}</td>
-                        <td style={{ padding: '6px 10px', fontSize: 14 }}>{isMobile ? '📱' : '🖥️'}</td>
-                        <td style={{ padding: '6px 20px 6px 0', color: v.duration_seconds ? '#22c55e' : 'var(--text-muted)', textAlign: 'right' }}>{v.duration_seconds ? `${v.duration_seconds}s` : '—'}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+            {/* Expanded: group by session (= one person) */}
+            {isOpen && <SessionList rows={rows} />}
           </div>
         );
       })}
