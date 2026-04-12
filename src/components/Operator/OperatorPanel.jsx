@@ -1039,7 +1039,7 @@ function TabClinics({ d, load }) {
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Name</th><th style={S.th}>Status</th><th style={S.th}>Plan</th><th style={S.th}>WhatsApp</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
+              <th style={S.th}>Name</th><th style={S.th}>Status</th><th style={S.th}>Plan</th><th style={S.th}>WhatsApp</th><th style={S.th}>Quelle</th><th style={S.th}>Erstellt</th><th style={S.th}>Aktionen</th>
             </tr></thead>
             <tbody>
               {clinics.clinics.map(c => {
@@ -1063,6 +1063,18 @@ function TabClinics({ d, load }) {
                       </Btn>
                     )}
                   </td>
+                  <td style={S.td}>{(() => {
+                    const src = c.signup_source;
+                    if (!src || src === 'direct') return <span style={{ fontSize: 11, color: '#555' }}>—</span>;
+                    const label = src === 'google_ads' ? 'Google Ads' : src === 'google_organic' ? 'Google' : src === 'social' ? 'Social' : src === 'referral' ? 'Empfehlung' : src === 'email' ? 'E-Mail' : src;
+                    const color = src === 'google_ads' ? '#4cc9ff' : src === 'google_organic' ? '#10b981' : src === 'social' ? '#a78bfa' : '#a7b1c3';
+                    return (
+                      <div>
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5, background: color + '18', color, border: `1px solid ${color}30` }}>{label}</span>
+                        {c.utm_campaign && <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>{c.utm_campaign}</div>}
+                      </div>
+                    );
+                  })()}</td>
                   <td style={S.td}>{c.created_at ? timeAgo(c.created_at) : '-'}</td>
                   <td style={S.td}>
                     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
