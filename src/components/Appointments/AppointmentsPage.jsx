@@ -8,7 +8,6 @@ import listPlugin from "@fullcalendar/list";
 
 import { useApp } from "../../context/AppContext";
 import { APPT_C } from "../../data/constants";
-import { useAppointmentStore } from "../../stores/appointmentStore";
 import { mapAllEvents, getDayStats } from "./calendarMappers";
 import { useCalendarFilters } from "./useCalendarFilters";
 import DoctorFilter from "./DoctorFilter";
@@ -18,7 +17,6 @@ import BlockDayModal from "./BlockDayModal";
 import DoctorSettingsModal from "./DoctorSettingsModal";
 import * as fmApi from "../../api/client";
 import RoomScheduler from "./RoomScheduler";
-import HintBox from "../shared/HintBox.jsx";
 import { fmLocale } from "../../utils/helpers";
 
 const FC_VIEW_MAP = { month: "dayGridMonth", week: "timeGridWeek", day: "timeGridDay" };
@@ -90,27 +88,6 @@ export default function AppointmentsPage() {
   } = useApp();
   const isDoctor = userRole === "doctor";
 
-  // Closed days from clinic working hours
-  const [clinicHours, setClinicHours] = useState(null);
-  useEffect(() => {
-    fmApi.apiFetch('/api/v1/clinic/settings').then(res => {
-      try {
-        const raw = res?.hours || res?.clinic?.hours;
-        const wh = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        if (wh && typeof wh === 'object') setClinicHours(wh);
-      } catch {}
-    }).catch(() => {});
-  }, []);
-  const closedDays = useMemo(() => {
-    if (!clinicHours) return [0, 6]; // default SA+SO
-    const dayMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-    const closed = [];
-    for (const [key, dow] of Object.entries(dayMap)) {
-      if (!clinicHours[key]) closed.push(dow);
-    }
-    return closed;
-  }, [clinicHours]);
-
   const calRef = useRef(null);
   const [doctors, setDoctors] = useState([]);
   const [blockedDays, setBlockedDays] = useState([]);
@@ -148,17 +125,9 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     fmApi.getBlockedDays().then((data) => {
-      const arr = Array.isArray(data) ? data : Array.isArray(data?.blockedDays) ? data.blockedDays : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
+      const arr = Array.isArray(data) ? data : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
       setBlockedDays(arr);
     }).catch(() => {});
-  }, []);
-
-  // Auto-refresh appointments every 15s as WebSocket fallback
-  useEffect(() => {
-    const { fetchAppointments } = useAppointmentStore.getState();
-    fetchAppointments();
-    const iv = setInterval(() => fetchAppointments(), 15000);
-    return () => clearInterval(iv);
   }, []);
 
   // Enrich appointments with patient data from pipeline
@@ -178,13 +147,13 @@ export default function AppointmentsPage() {
         return {
           ...a,
           grafts: a.grafts || lead.reviewData?.grafts || lead.grafts || null,
-          consentGiven: a.documents_signed || a.documentsSigned || lead.consentGiven || false,
           photosComplete: a.photos_complete || a.photosComplete || (lead.photoUrls || []).length >= 3 || lead.photos || false,
           reviewDone: !!lead.reviewData,
           depositPaid: a.depositPaid || a.deposit_paid || lead.depositPaid || lead.convStatus === "deposit_paid",
           patientStage: lead.stage,
           patientCountry: lead.country,
           clinicCountry: clinic?.country || "",
+          noFlightNeeded: !!(lead.metadata?.noFlightNeeded || lead.metadata?.noTransferNeeded),
         };
       });
     // Doctor: filter to own appointments + unassigned (e.g. Google imports)
@@ -198,18 +167,15 @@ export default function AppointmentsPage() {
     return appts;
   }, [myAppts, myLeads, isDoctor, myDoctorName]);
 
-  const ACTIVE_STATUSES = ['pending','confirmed','booked','reserved','awaiting_deposit'];
-  const activeAppts = useMemo(() => enrichedAppts.filter(a => ACTIVE_STATUSES.includes(a.status)), [enrichedAppts]);
-
   const allEvents = useMemo(
-    () => mapAllEvents(activeAppts, blockedDays, doctors),
-    [activeAppts, blockedDays, doctors]
+    () => mapAllEvents(enrichedAppts, blockedDays, doctors),
+    [enrichedAppts, blockedDays, doctors]
   );
 
   const {
     selectedDoctorIds, filteredEvents: rawFilteredEvents,
     toggleDoctor, selectAll,
-  } = useCalendarFilters(allEvents, isDoctor && user ? doctors.find(d => (d.email || '').toLowerCase() === (user.email || '').toLowerCase())?.id : null);
+  } = useCalendarFilters(allEvents);
 
   // Apply search filter on top of doctor filter
   const filteredEvents = useMemo(() => {
@@ -224,7 +190,7 @@ export default function AppointmentsPage() {
     });
   }, [rawFilteredEvents, searchQuery]);
 
-  const dayStats = useMemo(() => getDayStats(activeAppts), [activeAppts]);
+  const dayStats = useMemo(() => getDayStats(myAppts), [myAppts]);
 
   const [currentView, setCurrentView] = useState(calView || "month");
   const [currentDate, setCurrentDate] = useState(isDemoMode() ? getDemoDate() : (calDate || (myAppts.length > 0 ? new Date(myAppts[0].scheduledAt || myAppts[0].date || getNow()) : getNow())));
@@ -285,24 +251,26 @@ export default function AppointmentsPage() {
     if (props.type !== "appointment") return;
     const rect = info.el.getBoundingClientRect();
     clearTimeout(tooltipTimeout.current);
-    setTooltip({
-      x: rect.left + rect.width / 2,
-      y: rect.top - 8,
-      appt: props.appt,
-      doctorName: props.doctorName,
-      doctorColor: props.doctorColor,
-      treatmentColor: props.treatmentColor,
-      grafts: props.grafts,
-      room: props.room,
-      time: props.time,
-      endTime: props.endTime,
-      status: props.status,
-    });
+    tooltipTimeout.current = setTimeout(() => {
+      setTooltip({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 8,
+        appt: props.appt,
+        doctorName: props.doctorName,
+        doctorColor: props.doctorColor,
+        treatmentColor: props.treatmentColor,
+        grafts: props.grafts,
+        room: props.room,
+        time: props.time,
+        endTime: props.endTime,
+        status: props.status,
+      });
+    }, 300);
   }, []);
 
   const handleEventMouseLeave = useCallback(() => {
     clearTimeout(tooltipTimeout.current);
-    tooltipTimeout.current = setTimeout(() => setTooltip(null), 500);
+    setTooltip(null);
   }, []);
 
   const handleConfirm = useCallback((id) => {
@@ -317,11 +285,10 @@ export default function AppointmentsPage() {
     setDrawerAppt(null);
   }, [updateAppt, showT]);
 
-  const handleCancel = useCallback(async (id) => {
-    await updateAppt(id, { status: "canceled" });
-    showT(t("appt_cancelled") || "Storniert");
+  const handleCancel = useCallback((id) => {
+    updateAppt(id, { status: "cancelled" });
+    showT(t("appt_cancelled") || "Cancelled");
     setDrawerAppt(null);
-    useAppointmentStore.getState().fetchAppointments();
   }, [updateAppt, showT]);
 
   const handleReschedule = useCallback((id, date, time) => {
@@ -330,52 +297,16 @@ export default function AppointmentsPage() {
     setDrawerAppt(null);
   }, [updateAppt, showT]);
 
-  const handleArchive = useCallback(async (id) => {
-    try {
-      await updateAppt(id, { archived: true });
-      showT(tFb(t, "cal_archived", "Ins Archiv verschoben"));
-      setDrawerAppt(null);
-      useAppointmentStore.getState().fetchAppointments();
-    } catch {
-      showT("Fehler");
-    }
-  }, [showT, t, updateAppt]);
-
-  const handleSaveAppt = useCallback(async (data) => {
-    const res = await fmApi.createAppointment(data);
-    if (res?.error) return res;
-    showT(tFb(t, "cal_appt_created", "Termin erstellt"));
-    setDrawerAppt(null);
-    useAppointmentStore.getState().fetchAppointments();
-    return res;
-  }, [showT, t]);
-
-  const reloadBlockedDays = useCallback(async () => {
-    const fresh = await fmApi.getBlockedDays();
-    const arr = Array.isArray(fresh) ? fresh : Array.isArray(fresh?.blockedDays) ? fresh.blockedDays : Array.isArray(fresh?.blocked_days) ? fresh.blocked_days : [];
-    setBlockedDays(arr);
-    return arr;
-  }, []);
-
   const handleBlockDaySave = useCallback(async (data) => {
     try {
-      await fmApi.createBlockedDay(data);
-      await reloadBlockedDays();
+      const result = await fmApi.createBlockedDay(data);
+      setBlockedDays((prev) => [...prev, result]);
       showT(tFb(t, "cal_blocked_day", "Tag wurde geblockt"));
     } catch (e) {
-      showT((e?.message || t("error_block_day")) || "Fehler beim Blockieren");
+      showT(t("error_block_day"));
     }
-  }, [showT, t, reloadBlockedDays]);
-
-  const handleBlockDayDelete = useCallback(async (id) => {
-    try {
-      await fmApi.deleteBlockedDay(id);
-      await reloadBlockedDays();
-      showT(tFb(t, "cal_unblocked", "Blockierung aufgehoben"));
-    } catch (e) {
-      showT("Fehler beim Aufheben");
-    }
-  }, [showT, t, reloadBlockedDays]);
+    setShowBlockModal(false);
+  }, [showT, t]);
 
   const handleDoctorSettingsSave = useCallback(async (settings) => {
     try {
@@ -422,7 +353,7 @@ export default function AppointmentsPage() {
     const viewDate = currentDate || getNow();
     const month = viewDate.getMonth();
     const year = viewDate.getFullYear();
-    const monthAppts = activeAppts.filter(a => {
+    const monthAppts = myAppts.filter(a => {
       if (!a.date) return false;
       const d = new Date(a.date);
       return d.getMonth() === month && d.getFullYear() === year;
@@ -436,51 +367,59 @@ export default function AppointmentsPage() {
     const confirmed = monthAppts.filter(a => a.status === "confirmed").length;
     const pending = monthAppts.filter(a => a.status === "pending" || a.status === "reserved").length;
     return { totalCount, totalGrafts, totalRevenue, confirmed, pending };
-  }, [activeAppts, currentDate]);
+  }, [myAppts, currentDate]);
 
   // Revenue per day for month cells
   const dayRevenue = useMemo(() => {
     const map = {};
-    activeAppts.forEach(a => {
+    myAppts.forEach(a => {
       if (!a.date) return;
       const rev = a.price ? Number(a.price) : (TREAT_REVENUE[a.treatment] || 0);
       map[a.date] = (map[a.date] || 0) + rev;
     });
     return map;
-  }, [activeAppts]);
+  }, [myAppts]);
 
-  const dayCellDidMount = useCallback((arg) => {
+  const dayCellContent = useCallback((arg) => {
+    // Use local date to avoid UTC timezone shift
     const dd = arg.date;
     const dateStr = `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, "0")}-${String(dd.getDate()).padStart(2, "0")}`;
     const stats = dayStats[dateStr];
-    const el = arg.el;
-    // Color weekend day numbers
-    if (closedDays.includes(dd.getDay())) {
-      const numEl = el.querySelector('.fc-daygrid-day-number');
-      if (numEl) numEl.style.color = 'rgba(255,80,80,0.6)';
-    }
-    // Add OP badge
-    if (stats && stats.ops > 0) {
-      const top = el.querySelector('.fc-daygrid-day-top');
-      if (top && !top.querySelector('.fm-op-badge')) {
-        const isBusy = stats.ops >= 4;
-        const badge = document.createElement('span');
-        badge.className = 'fm-op-badge';
-        badge.style.cssText = `font-size:9px;font-weight:700;letter-spacing:0.02em;border-radius:4px;padding:1px 5px;margin-left:auto;color:${isBusy ? '#ef4444' : stats.ops >= 3 ? '#f59e0b' : 'rgba(167,177,195,0.6)'};background:${isBusy ? 'rgba(239,68,68,0.1)' : stats.ops >= 3 ? 'rgba(245,158,11,0.08)' : 'transparent'}`;
-        badge.textContent = `${stats.ops} OP`;
-        top.appendChild(badge);
-      }
-    }
-    // Today highlight
+    const rev = dayRevenue[dateStr];
     const now = getNow();
     const isToday = dateStr === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-    if (isToday) {
-      const numEl = el.querySelector('.fc-daygrid-day-number');
-      if (numEl) {
-        numEl.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#4cc9ff;color:#0a0e17;font-weight:800;font-size:12px';
-      }
-    }
-  }, [dayStats, closedDays]);
+    const isBusy = stats && stats.ops >= 4;
+    return (
+      <>
+        {/* OP badge — will be placed left by CSS flex on .fc-daygrid-day-top */}
+        {stats && stats.ops > 0 && (
+          <span className="fm-op-badge" style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: "0.02em",
+            color: isBusy ? "#ef4444" : stats.ops >= 3 ? "#f59e0b" : "rgba(167,177,195,0.6)",
+            background: isBusy ? "rgba(239,68,68,0.1)" : stats.ops >= 3 ? "rgba(245,158,11,0.08)" : "transparent",
+            borderRadius: 4, padding: "1px 5px",
+            display: "inline-flex", alignItems: "center", gap: 3,
+            order: 1,
+          }}>
+            {isBusy && <span style={{ fontSize: 8 }}>●</span>}
+            {stats.ops} OP
+          </span>
+        )}
+        {/* Day number */}
+        <span style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: isToday ? 26 : "auto", height: isToday ? 26 : "auto",
+          borderRadius: isToday ? "50%" : 0,
+          background: isToday ? "#4cc9ff" : "transparent",
+          color: isToday ? "#0a0e17" : "inherit",
+          fontWeight: isToday ? 800 : 600,
+          fontSize: 12,
+        }}>
+          {arg.dayNumberText}
+        </span>
+      </>
+    );
+  }, [dayStats, dayRevenue]);
 
   return (
     <div style={{ padding: "24px 28px", }}>
@@ -548,8 +487,8 @@ export default function AppointmentsPage() {
         <div style={{ marginBottom: 14, padding: "10px 16px", borderRadius: 10, background: "rgba(76,201,255,0.03)", border: "1px solid rgba(76,201,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 16 }}>📅</span>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.95)" }}>{t("doc_personal_calendar") || "Persönlicher Kalender"}</div>
-            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{t("doc_personal_calendar_desc") || "Deine Termine und OP-Blöcke. Urlaub und Blocker werden vom Admin verwaltet."}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(232,238,252,0.95)" }}>Persönlicher Kalender</div>
+            <div style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>Deine Termine und OP-Blöcke. Urlaub und Blocker werden vom Admin verwaltet.</div>
           </div>
         </div>
       )}
@@ -650,14 +589,13 @@ export default function AppointmentsPage() {
 
       {/* ── Empty state when no appointments ── */}
       {myAppts.length === 0 && (
-        <HintBox id="appointments_empty">{t("hint_appointments_empty")}</HintBox>
+        <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:12}}>{"ℹ️"} {t("hint_appointments_empty")}</div>
       )}
 
       {/* ── Calendar ── */}
       <div className="fm-calendar-wrap" style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.04)" }}>
         <style>{calendarStyles}</style>
         <FullCalendar
-          key={`cal-${blockedDays.length}-${activeAppts.length}`}
           ref={calRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView={FC_VIEW_MAP[currentView] || "dayGridMonth"}
@@ -665,9 +603,8 @@ export default function AppointmentsPage() {
           headerToolbar={false}
           footerToolbar={false}
           events={filteredEvents}
-          locale={fmLocale()}
+          locale="de"
           firstDay={1}
-          weekends={true}
           height="auto"
           editable={true}
           droppable={true}
@@ -680,14 +617,14 @@ export default function AppointmentsPage() {
           nowIndicator={true}
           now={isDemoMode() ? getDemoDate() : undefined}
           dayMaxEvents={3}
-          businessHours={{ daysOfWeek: [0,1,2,3,4,5,6].filter(d => !closedDays.includes(d)), startTime: "08:00", endTime: "18:00" }}
+          businessHours={{ daysOfWeek: [1, 2, 3, 4, 5], startTime: "08:00", endTime: "18:00" }}
           dayCellClassNames={(arg) => {
             const dow = arg.date.getDay();
-            if (closedDays.includes(dow)) return ["fm-closed-day"];
+            if (dow === 0 || dow === 6) return ["fm-weekend"];
             const dateStr = `${arg.date.getFullYear()}-${String(arg.date.getMonth()+1).padStart(2,"0")}-${String(arg.date.getDate()).padStart(2,"0")}`;
-            const isBlocked = blockedDays.some(bd => (bd.date || bd.blocked_date || '').slice(0, 10) === dateStr);
+            const isBlocked = blockedDays.some(bd => bd.date === dateStr || bd.blocked_date === dateStr);
             if (isBlocked) return ["fm-blocked-day"];
-            const dayApptCount = activeAppts.filter(a => a.date === dateStr).length;
+            const dayApptCount = enrichedAppts.filter(a => a.date === dateStr).length;
             if (dayApptCount === 0 && arg.date >= new Date(getNow().setHours(0,0,0,0))) return ["fm-free-day"];
             if (dayApptCount >= 4) return ["fm-full-day"];
             return [];
@@ -708,12 +645,12 @@ export default function AppointmentsPage() {
           eventMouseLeave={handleEventMouseLeave}
           datesSet={handleDatesSet}
           eventContent={renderEventContent}
-          dayCellDidMount={currentView === "month" ? dayCellDidMount : undefined}
+          dayCellContent={currentView === "month" ? dayCellContent : undefined}
         />
       </div>
 
       {/* ── Tooltip ── */}
-      {tooltip && <EventTooltip {...tooltip} t={t} doctors={doctors} allAppts={enrichedAppts} clinic={clinic} updateAppt={updateAppt} tooltipTimeout={tooltipTimeout} setTooltip={setTooltip} />}
+      {tooltip && <EventTooltip {...tooltip} t={t} doctors={doctors} allAppts={enrichedAppts} clinic={clinic} />}
 
       {/* ── Drawer ── */}
       {drawerAppt && (
@@ -724,10 +661,6 @@ export default function AppointmentsPage() {
           onComplete={handleComplete}
           onCancel={handleCancel}
           onReschedule={handleReschedule}
-          onSave={handleSaveAppt}
-          onArchive={handleArchive}
-          doctors={doctors}
-          patients={myLeads}
           t={t}
         />
       )}
@@ -735,9 +668,7 @@ export default function AppointmentsPage() {
       {showBlockModal && (
         <BlockDayModal
           doctors={doctors}
-          blockedDays={blockedDays}
           onSave={handleBlockDaySave}
-          onDelete={handleBlockDayDelete}
           onClose={() => setShowBlockModal(false)}
           t={t}
         />
@@ -963,7 +894,7 @@ function renderEventContent(eventInfo) {
 }
 
 /* ─── Premium Tooltip ─── */
-function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic, updateAppt, tooltipTimeout, setTooltip }) {
+function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, grafts, room, time, endTime, status, t, doctors, allAppts, clinic }) {
   const sc = APPT_C[status] || APPT_C.booked;
   const revenue = appt?.price || TREAT_REVENUE[appt?.treatment] || null;
   const procColor = TREAT_COLORS[appt?.treatment] || treatmentColor || "rgba(167,177,195,0.7)";
@@ -976,15 +907,15 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
     if (!isSurgical) return null;
     const depositActive = clinic?.booking_funnel !== 'no_deposit' && clinic?.deposit_enabled !== false && clinic?.depositEnabled !== false;
     const items = [
-      { label: t("appt_dsgvo") || "DSGVO", done: !!appt.consentGiven, field: "documents_signed" },
-      { label: t("op_photos") || "Fotos", done: !!appt.photos_complete || !!appt.photosComplete, field: "photos_complete" },
+      { label: t("appt_dsgvo") || "DSGVO", done: !!appt.documents_signed || !!appt.documentsSigned },
+      { label: t("op_photos") || "Fotos", done: !!appt.photos_complete || !!appt.photosComplete },
     ];
-    if (depositActive) items.push({ label: t("op_deposit") || "Anzahlung", done: !!appt.deposit_paid || !!appt.depositPaid, field: "deposit_paid" });
-    items.push(
-      { label: t("appt_flight") || "Flug", done: !!appt.flight_received || !!appt.flightReceived, field: "flight_received" },
-      { label: t("appt_driver_short") || "Fahrer", done: !!appt.driver_assigned || !!appt.driverAssigned, field: "driver_assigned" },
-      { label: t("appt_hotel_short") || "Hotel", done: !!appt.hotel_booked || !!appt.hotelBooked, field: "hotel_booked" },
+    if (depositActive) items.push({ label: t("op_deposit") || "Anzahlung", done: !!appt.deposit_paid || !!appt.depositPaid });
+    if (!appt.noFlightNeeded) items.push(
+      { label: t("appt_flight") || "Flug", done: !!appt.flight_received || !!appt.flightReceived },
+      { label: t("appt_driver_short") || "Fahrer", done: !!appt.driver_assigned || !!appt.driverAssigned },
     );
+    items.push({ label: t("appt_hotel_short") || "Hotel", done: !!appt.hotel_booked || !!appt.hotelBooked });
     return items;
   }, [appt]);
 
@@ -1021,14 +952,14 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
   const graftFormatted = grafts ? Number(grafts).toLocaleString("de-DE") : null;
 
   return (
-    <div onMouseEnter={() => clearTimeout(tooltipTimeout?.current)} onMouseLeave={() => { tooltipTimeout.current = setTimeout(() => setTooltip?.(null), 500); }} style={{
+    <div style={{
       position: "fixed", left: x, top: adjustedY, transform,
       background: "#111827",
       border: "1px solid rgba(255,255,255,0.08)",
       borderRadius: 14, padding: 0, fontSize: 12, color: "#e8eefc",
       lineHeight: 1.5, zIndex: 10000,
       boxShadow: "0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
-      maxWidth: 300, minWidth: 240, pointerEvents: "auto", overflow: "hidden",
+      maxWidth: 300, minWidth: 240, pointerEvents: "none", overflow: "hidden",
     }}>
       {/* ── Header: Patient + Status ── */}
       <div style={{
@@ -1119,9 +1050,9 @@ function EventTooltip({ x, y, appt, doctorName, doctorColor, treatmentColor, gra
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 14px" }}>
             {prep.map(p => (
-              <div key={p.label} onClick={(e) => { e.stopPropagation(); if (p.field && appt?.id) { updateAppt(appt.id, { [p.field]: !p.done }); } }} style={{
+              <div key={p.label} style={{
                 display: "flex", alignItems: "center", gap: 6, fontSize: 11,
-                padding: "3px 0", cursor: p.field ? "pointer" : "default",
+                padding: "3px 0",
               }}>
                 <span style={{
                   width: 16, height: 16, borderRadius: 4,
@@ -1202,9 +1133,8 @@ function DetailCell({ label, value, valueColor, bold, children }) {
 
 /* ─── Calendar CSS ─── */
 const calendarStyles = `
-.fm-closed-day { border: 1.5px solid rgba(255,80,80,0.2) !important; background: transparent !important; }
-.fm-closed-day .fc-daygrid-day-number { color: rgba(255,80,80,0.5) !important; }
-.fm-calendar-wrap .fc .fc-daygrid-day-top { flex-direction: row !important; justify-content: space-between !important; align-items: center; }
+.fm-weekend { border: 1.5px solid rgba(255,80,80,0.2) !important; background: transparent !important; }
+.fm-weekend .fc-daygrid-day-number { color: rgba(255,80,80,0.35) !important; }
 .fm-blocked-day { border: 2px solid rgba(239,68,68,0.4) !important; background: rgba(239,68,68,0.02) !important; }
 .fm-blocked-day .fc-daygrid-day-number { color: rgba(239,68,68,0.5) !important; }
 .fm-full-day { background: rgba(255,255,255,0.01) !important; opacity: 0.7; }
