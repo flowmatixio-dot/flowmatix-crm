@@ -210,6 +210,7 @@ export default function OperatorPanel() {
           {tab === 'whatsapp' && <TabWhatsApp d={d} load={load} />}
           {tab === 'integrations' && <TabIntegrations d={d} load={load} />}
           {tab === 'automations' && <TabAutomations d={d} load={load} />}
+          {tab === 'analytics' && <TabAnalytics />}
           {tab === 'monitoring' && <TabMonitoring d={d} />}
           {tab === 'incidents' && <TabIncidents d={d} load={load} />}
           {tab === 'logs' && <TabLogs d={d} load={load} />}
@@ -1539,6 +1540,132 @@ function TabAutomations({ d, load }) {
         </div>
       )}
     </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WEBSITE ANALYTICS
+   ═══════════════════════════════════════════════════════════ */
+function TabAnalytics() {
+  const [stats, setStats] = React.useState(null);
+  const [visitors, setVisitors] = React.useState(null);
+
+  React.useEffect(() => {
+    api.getVisitorStats().then(setStats).catch(() => {});
+    api.getRecentVisitors().then(setVisitors).catch(() => {});
+  }, []);
+
+  const CARD = { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '16px 20px' };
+  const MUTED = 'rgba(167,177,195,0.6)';
+
+  function deviceIcon(ua) {
+    if (!ua) return '🖥️';
+    if (/mobile|android|iphone|ipad/i.test(ua)) return '📱';
+    return '🖥️';
+  }
+
+  function countryFlag(code) {
+    if (!code || code.length !== 2) return '';
+    return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E0 + c.charCodeAt(0) - 65));
+  }
+
+  function shortUrl(url) {
+    try { const u = new URL(url); return u.pathname || '/'; } catch { return url; }
+  }
+
+  function timeAgo(ts) {
+    const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+    if (diff < 60) return `${diff}s`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}min`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+    return `${Math.floor(diff / 86400)}d`;
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 4 }}>Website Analytics</div>
+
+      {/* Summary Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        {[
+          { label: 'Heute', val: stats?.today?.visitors },
+          { label: 'Diese Woche', val: stats?.week?.visitors },
+          { label: 'Dieser Monat', val: stats?.month?.visitors },
+        ].map(({ label, val }) => (
+          <div key={label} style={CARD}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: MUTED, marginBottom: 6 }}>{label}</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#d4af37' }}>{val ?? '—'}</div>
+            <div style={{ fontSize: 11, color: MUTED }}>Besucher</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Top Pages */}
+      {stats?.topPages?.length > 0 && (
+        <div style={CARD}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, marginBottom: 10 }}>TOP SEITEN (30 TAGE)</div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+            <tbody>
+              {stats.topPages.map((p, i) => (
+                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '6px 0', color: '#e8eafc' }}>{shortUrl(p.url)}</td>
+                  <td style={{ padding: '6px 0', textAlign: 'right', color: '#d4af37', fontWeight: 700 }}>{p.visitors} <span style={{ color: MUTED, fontWeight: 400 }}>Besucher</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Countries */}
+      {stats?.countries?.length > 0 && (
+        <div style={CARD}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, marginBottom: 10 }}>LÄNDER (30 TAGE)</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {stats.countries.map((c, i) => (
+              <div key={i} style={{ padding: '4px 10px', borderRadius: 6, background: 'rgba(212,175,55,0.08)', fontSize: 12 }}>
+                {countryFlag(c.country)} {c.country} <span style={{ color: '#d4af37', fontWeight: 700 }}>{c.visitors}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Visitors */}
+      <div style={CARD}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, marginBottom: 10 }}>LETZTE BESUCHER</div>
+        {!visitors ? (
+          <div style={{ color: MUTED, fontSize: 12 }}>Laden...</div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                {['Zeit', 'Ort', 'Seite', 'Gerät', 'Dauer'].map(h => (
+                  <th key={h} style={{ padding: '4px 8px 8px 0', textAlign: 'left', fontWeight: 600, color: MUTED, fontSize: 11 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {visitors.map((v, i) => (
+                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                  <td style={{ padding: '7px 8px 7px 0', color: MUTED, whiteSpace: 'nowrap' }}>{timeAgo(v.created_at)}</td>
+                  <td style={{ padding: '7px 8px 7px 0', whiteSpace: 'nowrap' }}>
+                    {countryFlag(v.country)} {v.city || v.country || '—'}
+                  </td>
+                  <td style={{ padding: '7px 8px 7px 0', color: '#e8eafc', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {shortUrl(v.url)}
+                  </td>
+                  <td style={{ padding: '7px 8px 7px 0' }}>{deviceIcon(v.user_agent)}</td>
+                  <td style={{ padding: '7px 0', color: v.duration_seconds ? '#10b981' : MUTED }}>
+                    {v.duration_seconds ? `${v.duration_seconds}s` : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
   );
 }
 

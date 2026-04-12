@@ -1616,6 +1616,7 @@ export async function aiSupportChat({ messages, context, lang }) {
 
 // ── Visitor Analytics ───────────────────────────────────
 export const getVisitorStats = () => apiFetch('/api/v1/analytics/stats');
+export const getRecentVisitors = () => apiFetch('/api/v1/analytics/recent-visitors');
 
 // ── Checkout Session ────────────────────────────────────
 
