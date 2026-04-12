@@ -387,14 +387,14 @@ export default function App() {
       if (l.convStatus === "human_takeover") count++;
       // 2. Driver — ONLY after automation failed
       if (!isLocal(l) && (l.stage === "booked" || l.stage === "done") && !lg.driverName && (lg.status === "all_declined" || lg.status === "failed_auto_assignment" || (lg.retryCount || 0) >= 2)) count++;
-      // 3. Hotel — immediately when requested, or delayed flight-based escalation
-      if (!isLocal(l) && (l.stage === "booked" || l.stage === "done") && !(l.hotelInfo?.name || l.hotel?.name)) {
+      // 3. Hotel — immediately when requested (even local), or delayed flight-based escalation
+      if ((l.stage === "booked" || l.stage === "done") && !(l.hotelInfo?.name || l.hotel?.name)) {
         const hotelReq = l.metadata?.hotelRequested === true;
         const hba = l.bookedAt || l.metadata?.bookedAt || l.updatedAt;
         const had = l.appointmentDate || l.booking?.date;
         const hsb = hba ? (_now() - new Date(hba).getTime()) / 3600000 : 999;
         const hua = had ? (new Date(had).getTime() - _now()) / 3600000 : 999;
-        if (hotelReq || (!!(l.flightConfirmed?.date) && (hsb > 24 || hua < 48))) count++;
+        if (hotelReq || (!isLocal(l) && !!(l.flightConfirmed?.date) && (hsb > 24 || hua < 48))) count++;
       }
       // 4. DSGVO — shown inside tasks only, NOT counted in sidebar
       // 5. Flight — only escalation (<48h + reminder sent)

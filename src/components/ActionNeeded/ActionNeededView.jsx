@@ -247,7 +247,7 @@ export default function ActionNeededView() {
       const hotelEscalated = hoursSinceBooking > 24 || hoursUntilAppt < 48;
       const hasFlightConfirmed = !!(p.flightConfirmed && p.flightConfirmed.date);
       const hotelRequestedExplicitly = p.metadata?.hotelRequested === true;
-      if (!isLocal && (p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && (hotelRequestedExplicitly || (hasFlightConfirmed && hotelEscalated))) {
+      if ((p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && (hotelRequestedExplicitly || (!isLocal && hasFlightConfirmed && hotelEscalated))) {
         items.push({
           id: "hotel_" + p.id,
           type: "hotel",
