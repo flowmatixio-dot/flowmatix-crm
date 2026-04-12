@@ -65,7 +65,7 @@ export default function DashboardView() {
           else if (["declined", "escalated", "backup_declined", "retry_scheduled"].includes(ls)) wt.driverWait.push(p);
           else wt.driverAuto.push(p);
         }
-        if (hasF && !p.metadata?.hotelInfo?.name && !p.hotelBooked) cr.hotel.push(p);
+        if (hasF && !(p.hotelInfo?.name || p.hotel?.name) && !p.hotelBooked) cr.hotel.push(p);
       }
 
       if (p.stage === "booked" && !p.flightConfirmed?.date && !isLoc(p)) wt.flight.push(p);

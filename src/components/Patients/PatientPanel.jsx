@@ -331,7 +331,8 @@ export default function PatientPanel() {
   const isBookedOrDone = lead.stage === "booked" || lead.stage === "done";
   const noFlightNeeded = lead.metadata?.noFlightNeeded;
   const noTransferNeeded = lead.metadata?.noTransferNeeded;
-  const showTravel = isBookedOrDone && !noFlightNeeded && !noTransferNeeded && !isDrHaiLe;
+  const isLocalPatient = !!(noFlightNeeded || noTransferNeeded);
+  const showTravel = isBookedOrDone && !isDrHaiLe && (!isLocalPatient || !!(hotel?.name || lead.metadata?.hotelRequested));
 
   return<div style={{position:"fixed",inset:0,zIndex:1000,display:"flex"}}><div onClick={()=>{setSelLead(null);setPatientTab("timeline");}} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(4px)"}}/>
     <div style={{position:"relative",marginLeft:"auto",width:"min(700px,90vw)",height:"100vh",background:"#131c2e",borderLeft:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",animation:"slI .25s ease",boxShadow:"-4px 0 12px rgba(0,0,0,0.2)"}}><style>{`@keyframes slI{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}`}</style>
@@ -614,8 +615,8 @@ export default function PatientPanel() {
 
           {/* ── SECTION 5: Travel & Logistics ── */}
           {showTravel && <Accordion icon={"✈️"} title={t("arrival_logistics") || "Anreise & Logistik"} defaultOpen={false}>
-            {/* Flight Section */}
-            {!lead.flightConfirmed?.date && (
+            {/* Flight Section — hidden for local patients */}
+            {!isLocalPatient && !lead.flightConfirmed?.date && (
               <div style={{marginBottom:14,padding:14,borderRadius:12,background:"rgba(76,201,255,0.03)",border:"1px dashed rgba(76,201,255,0.15)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <span style={{fontSize:12,fontWeight:700,color:"rgba(167,177,195,0.7)"}}>{t("flight_tracking")}</span>
@@ -633,8 +634,8 @@ export default function PatientPanel() {
               </div>
             )}
 
-            {/* Flight confirmed — full info */}
-            {lead.flightConfirmed?.date&&(()=>{
+            {/* Flight confirmed — full info (hidden for local patients) */}
+            {!isLocalPatient && lead.flightConfirmed?.date&&(()=>{
               const isMismatch=!!flightAlerts.find(a=>a.id===lead.id);
               const daysUntil=Math.round((new Date(lead.flightConfirmed.date)-new Date())/(1000*60*60*24));
               const lg=lead.logistics;const ds=lg?DRIVER_STATUS[lg.status]:null;

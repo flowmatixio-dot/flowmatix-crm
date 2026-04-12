@@ -60,7 +60,7 @@ function getAssignedInfo(lead) {
 }
 
 /* ── Right Panel: Fallübersicht (Case Overview) ── */
-function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
+function CaseOverviewPanel({ chat, lead, t, onClose, clinic, openPatient }) {
   if (!lead) return (
     <div style={{width:320,minWidth:320,maxWidth:320,borderLeft:"1px solid #2a2a3a",background:"#131c2e",padding:16,overflowY:"auto",overflowX:"hidden"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
@@ -244,7 +244,7 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic }) {
         {/* Quick actions */}
         <div style={{marginTop:18,display:"flex",flexDirection:"column",gap:6}}>
           {chat?.leadId && (
-            <button onClick={() => {}} id="overview-open-patient" style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"transparent",border:"1px solid #4cc9ff",color:"#4cc9ff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+            <button onClick={() => openPatient(chat.leadId)} id="overview-open-patient" style={{width:"100%",padding:"10px 14px",borderRadius:10,background:"transparent",border:"1px solid #4cc9ff",color:"#4cc9ff",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
               {t("open_patient_profile") || "Patientenprofil öffnen"}
             </button>
           )}
@@ -1012,7 +1012,7 @@ export default function InboxView() {
       {/* ═══════════════════════════════════════════════════════════
           RIGHT PANEL - Fallübersicht (Case Overview)
          ═══════════════════════════════════════════════════════════ */}
-      {selChat && showOverview && <CaseOverviewPanel chat={selChat} lead={overviewLead} t={t} clinic={clinic} onClose={() => setShowOverview(false)} />}
+      {selChat && showOverview && <CaseOverviewPanel chat={selChat} lead={overviewLead} t={t} clinic={clinic} onClose={() => setShowOverview(false)} openPatient={openPatient} />}
 
       {/* ══ Reactivation Template Modal ══ */}
       {reactivationPicker && selChat && (() => {

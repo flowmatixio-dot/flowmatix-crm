@@ -15,6 +15,7 @@ function getStatusMap(t) {
   return {
     new:       { label: t("new_request") || "Neue Anfrage",    color: "#4cc9ff" },
     contacted: { label: t("doctor_review") || "Arzt-Review",     color: "#ff8a2a" },
+    quoted:    { label: t("stage_quoted") || "Angebot",           color: "#fb923c" },
     booked:    { label: t("stage_booked") || "Gebucht",         color: "#a78bfa" },
     done:      { label: t("stage_done") || "Abgeschlossen",   color: "#10b981" },
     cancelled: { label: t("stage_cancelled") || "Storniert",       color: "#ef4444" },

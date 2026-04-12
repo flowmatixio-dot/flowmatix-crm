@@ -44,6 +44,7 @@ export default function ActionNeededView() {
   }
 
   const [collapsed, setCollapsed] = useState({});
+  const [hotelDone, setHotelDone] = useState(new Set());
   const { myLeads, myAppts, openPatient, setView, showT, t, activeClinicId, clinic } = useApp();
   const { msgs, setSelChat } = useInboxStore();
 
@@ -247,14 +248,14 @@ export default function ActionNeededView() {
       const hotelEscalated = hoursSinceBooking > 24 || hoursUntilAppt < 48;
       const hasFlightConfirmed = !!(p.flightConfirmed && p.flightConfirmed.date);
       const hotelRequestedExplicitly = p.metadata?.hotelRequested === true;
-      if ((p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && (hotelRequestedExplicitly || (!isLocal && hasFlightConfirmed && hotelEscalated))) {
+      if ((p.stage === "booked" || p.stage === "done") && !hotelDone.has(p.id) && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && (hotelRequestedExplicitly || (!isLocal && hasFlightConfirmed && hotelEscalated))) {
         items.push({
           id: "hotel_" + p.id,
           type: "hotel",
           icon: "\u{1F3E8}",
           color: "#f59e0b",
           title: t("hotel_assign_title") || "Hotel zuweisen",
-          desc: "\u26A0 " + (t("hotel_missing_desc") || "Kein Hotel zugewiesen — Hotel muss manuell zugewiesen werden"),
+          desc: "\u26A0 " + (hotelRequestedExplicitly ? (t("hotel_missing_requested_desc") || "Hotel vom Patienten angefragt — muss zugewiesen werden") : (t("hotel_missing_desc") || "Flug bestätigt aber kein Hotel zugewiesen")),
           patient: p.name, patientId: p.id,
           time: p.lastAiInteraction || p.updatedAt || p.createdAt,
           action: () => {
@@ -287,15 +288,19 @@ export default function ActionNeededView() {
               const link = document.getElementById("fm-hotel-link").value.trim();
               const checkin = document.getElementById("fm-hotel-checkin").value;
               const checkout = document.getElementById("fm-hotel-checkout").value;
+              const hotelData = { name, link: link || null, checkIn: checkin || null, checkOut: checkout || null };
 
-              apiFetch("/api/v1/crm/patients/" + p.id, {
-                method: "PATCH",
-                body: JSON.stringify({
-                  hotelInfo: { name, link: link || null, checkIn: checkin || null, checkOut: checkout || null }
-                })
+              // send-hotel-info saves hotelInfo to DB + sends WA in one call
+              apiFetch("/api/v1/crm/patients/" + p.id + "/send-hotel-info", {
+                method: "POST",
+                body: JSON.stringify(hotelData)
               }).then(() => {
                 showT((t("hotel_assigned_msg") || "Hotel {name} zugewiesen").replace("{name}", name) + " \u2705");
                 panel.remove();
+                // Mark hotel as done locally so task card disappears immediately (immune to poll race conditions)
+                setHotelDone(prev => { const n = new Set(prev); n.add(p.id); return n; });
+                // Also update store + refetch for consistency
+                usePatientStore.getState().setLeads(leads => leads.map(l => l.id === p.id ? { ...l, hotelInfo: hotelData } : l));
                 usePatientStore.getState().fetchPatients();
               }).catch(() => showT(t("error") || "Fehler"));
             });
@@ -433,7 +438,7 @@ export default function ActionNeededView() {
     });
 
     return items;
-  }, [myLeads]);
+  }, [myLeads, hotelDone]);
 
   /* ── Load DB tasks (followup etc.) and merge into action items ── */
   const [dbTasks, setDbTasks] = useState([]);
