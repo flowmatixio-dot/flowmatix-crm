@@ -2,9 +2,8 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
 import { getNow } from "../../utils/demoTime";
-import { fmLocale, translateValue } from "../../utils/helpers";
+import { fmLocale } from "../../utils/helpers";
 import ConsentTracker from "../Files/ConsentTracker";
-import HintBox from "../shared/HintBox.jsx";
 
 /* ─── Shared helpers ─── */
 
@@ -18,8 +17,10 @@ function getReadiness(a, opts = {}) {
     { key: "photosComplete", label: _t("op_photos") || "Fotos" },
   ].filter(Boolean);
   const logistics = [
-    { key: "flightReceived", label: _t("op_flight_data") || "Flugdaten" },
-    { key: "driverAssigned", label: _t("op_driver") || "Fahrer" },
+    ...(!opts.isLocal ? [
+      { key: "flightReceived", label: _t("op_flight_data") || "Flugdaten" },
+      { key: "driverAssigned", label: _t("op_driver") || "Fahrer" },
+    ] : []),
     { key: "hotelBooked", label: _t("op_hotel") || "Hotel" },
     { key: "transferConfirmed", label: _t("op_transfer") || "Transfer" },
   ];
@@ -145,9 +146,9 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
   const dateStr = dt.toLocaleDateString(fmLocale(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const timeStr = localAppt.time || dt.toLocaleTimeString(fmLocale(), { hour: "2-digit", minute: "2-digit" });
   const doctor = localAppt.doctorName || localAppt.doctor || (t("op_not_assigned") || "Nicht zugewiesen");
-  const r = getReadiness(localAppt, { depositEnabled, t });
+  const r = getReadiness(localAppt, { depositEnabled, t, isLocal: !!(localAppt.noFlightNeeded || localAppt.noTransferNeeded) });
   const pctColor = r.pct <= 40 ? "rgba(245,158,11,0.8)" : r.pct <= 80 ? "#f59e0b" : "#10b981";
-  const _dtD = new Date(dt); _dtD.setHours(0,0,0,0); const _nD = new Date(); _nD.setHours(0,0,0,0); const daysUntil = Math.round((_dtD - _nD) / 86400000);
+  const daysUntil = Math.ceil((dt - new Date()) / 86400000);
 
   useEffect(() => {
     if (!localAppt.patientId) { setFilesLoading(false); return; }
@@ -269,16 +270,27 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
         <span style={{ fontSize: 12, fontWeight: 600, color: checked ? "rgba(16,185,129,0.9)" : "rgba(167,177,195,0.6)", flex: 1 }}>
           {item.label}
         </span>
-        {!checked && item.upload && (
-          <label onClick={e => e.stopPropagation()} style={{
-            padding: "3px 8px", borderRadius: 5, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)",
-            color: "#f59e0b", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
-          }}>
-            {upState === "uploading" ? t("loading") : upState === "uploaded" ? "\u2713" : "Upload"}
-            <input type="file" style={{ display: "none" }} accept="image/*,.pdf,.doc,.docx" onChange={e => {
-              if (e.target.files?.[0]) handleUpload(item.key, item.dbKey, item.upload, e.target.files[0]);
-            }} />
-          </label>
+        {!checked && (
+          <>
+            {item.upload && (
+              <label onClick={e => e.stopPropagation()} style={{
+                padding: "3px 8px", borderRadius: 5, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)",
+                color: "#f59e0b", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+              }}>
+                {upState === "uploading" ? t("loading") : upState === "uploaded" ? "\u2713" : "Upload"}
+                <input type="file" style={{ display: "none" }} accept="image/*,.pdf,.doc,.docx" onChange={e => {
+                  if (e.target.files?.[0]) handleUpload(item.key, item.dbKey, item.upload, e.target.files[0]);
+                }} />
+              </label>
+            )}
+            <button onClick={e => { e.stopPropagation(); requestItem(item.key, item.reqMsg); }} style={{
+              padding: "3px 8px", borderRadius: 5, background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.15)",
+              color: reqState === "sent" ? "#10b981" : reqState === "error" ? "#ef4444" : "#4cc9ff",
+              fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+            }}>
+              {reqState === "sending" ? "..." : reqState === "sent" ? ("\u2713 " + t("sent_status")) : reqState === "error" ? t("error_status") : t("request_action") || "Anfordern"}
+            </button>
+          </>
         )}
         {checked && <span style={{ color: "rgba(16,185,129,0.4)", fontSize: 13, fontWeight: 700 }}>{"\u2713"}</span>}
       </div>
@@ -296,6 +308,14 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
       }}>
         <ToggleSwitch checked={checked} />
         <span style={{ fontSize: 12, fontWeight: 600, color: checked ? "rgba(16,185,129,0.9)" : "rgba(167,177,195,0.6)", flex: 1 }}>{label}</span>
+        {!checked && key === "flightReceived" && (
+          <button onClick={e => { e.stopPropagation(); requestItem(key, t("flight_data_request_msg") || "Bitte teile uns deine Flugdaten mit (Flugnummer, Datum, Ankunftszeit)."); }} style={{
+            padding: "3px 8px", borderRadius: 5, background: "rgba(76,201,255,0.06)", border: "1px solid rgba(76,201,255,0.15)",
+            color: reqState === "sent" ? "#10b981" : "#4cc9ff", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+          }}>
+            {reqState === "sending" ? "..." : reqState === "sent" ? ("\u2713 " + t("sent_status")) : t("request_action") || "Anfordern"}
+          </button>
+        )}
         {checked && <span style={{ color: "rgba(16,185,129,0.4)", fontSize: 13, fontWeight: 700 }}>{"\u2713"}</span>}
       </div>
     );
@@ -314,10 +334,9 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
         background: "rgba(0,0,0,0.3)", backdropFilter: "blur(2px)",
       }} />
       <div style={{
-        position: "fixed", top: 0, right: 0, width: 420, height: "100vh", background: "#0f1420",
+        position: "fixed", top: 0, right: 0, width: 460, height: "100vh", background: "#0f1420",
         borderLeft: "1px solid rgba(255,255,255,0.06)", zIndex: 10000, overflowY: "auto",
         boxShadow: "-8px 0 40px rgba(0,0,0,0.5)", animation: "fm-slide-in 0.2s ease",
-        fontSize: 12.5,
       }}>
         <style>{`@keyframes fm-slide-in{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
 
@@ -378,69 +397,36 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
             ))}
           </div>
 
-          {/* ── Medical Details (from patient intake) ──
-              Inline DE/EN/TR translations because the i18n keys for
-              several of these labels don't exist in i18n.js and t()
-              would return the raw key string. Layout: small label on
-              top, value below — easier to scan than "label: value"
-              inline. */}
-          {localAppt._intake && Object.keys(localAppt._intake).length > 0 && (() => {
-            const _lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
-            const _T = (de, en, tr) => ({ de, en, tr }[_lang] || de);
-            const fields = [
-              { k: "treatment",          l: _T("Behandlung", "Treatment", "Tedavi") },
-              { k: "concern",            l: _T("Anliegen", "Concern", "Sorun") },
-              { k: "age",                l: _T("Alter", "Age", "Yaş") },
-              { k: "country",            l: _T("Land", "Country", "Ülke") },
-              { k: "hair_loss_type",     l: _T("Haarausfall", "Hair loss", "Saç dökülmesi") },
-              { k: "medications",        l: _T("Medikamente", "Medications", "İlaçlar") },
-              { k: "allergies",          l: _T("Allergien", "Allergies", "Alerjiler") },
-              { k: "previous_treatments",l: _T("Vorbehandlungen", "Previous treatments", "Önceki tedaviler") },
-              { k: "medical_conditions", l: _T("Vorerkrankungen", "Medical history", "Tıbbi geçmiş") },
-              { k: "smoker",             l: _T("Raucher", "Smoker", "Sigara") },
-              { k: "blood_thinners",     l: _T("Blutverdünner", "Blood thinners", "Kan sulandırıcı") },
-            ];
-            return (
-              <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
-                <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>
-                  {"🩺"} {_T("Medizinische Details", "Medical details", "Tıbbi detaylar")}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 14px" }}>
-                  {fields.map(f => {
-                    const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
-                    if (!v || v === '—') return null;
-                    return (
-                      <div key={f.k}>
-                        <div style={{ fontSize: 9, color: "rgba(167,177,195,0.55)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700, marginBottom: 2 }}>
-                          {f.l}
-                        </div>
-                        <div style={{ fontSize: 12, color: "rgba(232,238,252,0.92)", fontWeight: 600, lineHeight: 1.35 }}>
-                          {translateValue(v)}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+          {/* ── Medical Details (from patient intake) ── */}
+          {localAppt._intake && Object.keys(localAppt._intake).length > 0 && (
+            <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 8, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(167,177,195,0.6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>{"🩺"} {t("medical_details") || "Medizinische Details"}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px" }}>
+                {[
+                  { k: "treatment", l: t("treatment") || "Behandlung" },
+                  { k: "concern", l: t("concern") || "Anliegen" },
+                  { k: "age", l: t("age") || "Alter" },
+                  { k: "country", l: t("country") || "Land" },
+                  { k: "hair_loss_type", l: t("hair_loss") || "Haarausfall" },
+                  { k: "medications", l: t("medications") || "Medikamente" },
+                  { k: "allergies", l: t("allergies") || "Allergien" },
+                  { k: "previous_treatments", l: t("prev_treatments") || "Vorbehandlungen" },
+                  { k: "medical_conditions", l: t("medical_conditions") || "Vorerkrankungen" },
+                  { k: "smoker", l: t("smoker") || "Raucher" },
+                  { k: "blood_thinners", l: t("blood_thinners") || "Blutverdünner" },
+                ].map(f => {
+                  const v = localAppt._intake[f.k] || localAppt._intake[f.k.replace(/_/g, '')] || '';
+                  if (!v || v === '—') return null;
+                  return <div key={f.k} style={{ fontSize: 11 }}>
+                    <span style={{ color: "rgba(167,177,195,0.6)" }}>{f.l}: </span>
+                    <span style={{ color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>{v}</span>
+                  </div>;
+                })}
               </div>
-            );
-          })()}
+            </div>
+          )}
 
           {/* ── Readiness progress ── */}
-          {!localStorage.getItem("fm_opprep_drive_hint_dismissed") && (() => {
-            const hints = {
-              de: "Hochgeladene Dokumente werden automatisch in Google Drive gespeichert, wenn Sie Google Drive in den Einstellungen verbunden haben.",
-              en: "Uploaded documents are automatically saved to Google Drive when you have connected Google Drive in your settings.",
-              tr: "Yüklenen belgeler, ayarlarınızda Google Drive'ı bağladığınızda otomatik olarak Google Drive'a kaydedilir.",
-            };
-            const lang = (localStorage.getItem("fm_lang") || "de").substring(0, 2);
-            return (
-              <div style={{ padding: "10px 14px", borderRadius: 8, marginBottom: 12, background: "rgba(76,201,255,0.04)", border: "1px solid rgba(76,201,255,0.1)", display: "flex", alignItems: "flex-start", gap: 10 }}>
-                <span style={{ fontSize: 12, color: "rgba(76,201,255,0.8)", lineHeight: 1.5, flex: 1 }}>💡 {hints[lang] || hints.en}</span>
-                <button onClick={() => { localStorage.setItem("fm_opprep_drive_hint_dismissed", "1"); window.location.reload(); }} style={{ background: "none", border: "none", color: "rgba(167,177,195,0.5)", fontSize: 16, cursor: "pointer", padding: "0 4px", lineHeight: 1, flexShrink: 0 }}>✕</button>
-              </div>
-            );
-          })()}
-
           <div style={{
             padding: "12px 14px", borderRadius: 8, marginBottom: 20,
             background: `${pctColor}06`, border: `1px solid ${pctColor}15`,
@@ -632,34 +618,13 @@ export default function OpPrepView() {
       appts = appts.filter(a => {
         const dt = new Date(a.scheduledAt || a.scheduled_at || a.date);
         const st = a.status || "";
-        return dt > now && st !== "canceled" && st !== "cancelled" && st !== "completed" && st !== "rescheduled" && st !== "no_show";
+        return dt > now && st !== "canceled" && st !== "cancelled" && st !== "completed";
       }).sort((a, b) => new Date(a.scheduledAt || a.scheduled_at || a.date) - new Date(b.scheduledAt || b.scheduled_at || b.date));
       setApiAppts(appts);
     }).catch(e => { console.error("[op-prep] fetch failed:", e.message); setApiError(true); });
   }, []);
 
   useEffect(() => { loadApiData(); }, [loadApiData]);
-
-  // Demo tour bridge — open the prep drawer for a specific appointment.
-  // Listens for window 'fm-open-op-prep' { detail: { appointmentId } }.
-  // Used by AutoDemoPlayer at step 8 (op_prep) to show the drawer
-  // automatically. Falls back to the first available appt when no id
-  // is given so the demo still works if the player can't pin one.
-  useEffect(() => {
-    const openHandler = (e) => {
-      const id = e?.detail?.appointmentId;
-      const list = apiAppts || [];
-      const target = id ? list.find(a => a.id === id) : list[0];
-      if (target) setSelectedAppt(target);
-    };
-    const closeHandler = () => setSelectedAppt(null);
-    window.addEventListener("fm-open-op-prep", openHandler);
-    window.addEventListener("fm-close-op-prep", closeHandler);
-    return () => {
-      window.removeEventListener("fm-open-op-prep", openHandler);
-      window.removeEventListener("fm-close-op-prep", closeHandler);
-    };
-  }, [apiAppts]);
 
   const useApiData = apiAppts !== null && apiAppts.length > 0;
 
@@ -670,7 +635,7 @@ export default function OpPrepView() {
       if (lead.stage !== "booked" && lead.stage !== "done") return;
       const appt = myAppts.find(a =>
         (a.leadId === lead.id || a.patientId === lead.id || a.patient === lead.name) &&
-        new Date(a.date) >= new Date(now.toDateString()) && a.status !== "cancelled" && a.status !== "canceled" && a.status !== "rescheduled" && a.status !== "no_show"
+        new Date(a.date) >= new Date(now.toDateString()) && a.status !== "cancelled"
       );
       if (!appt && lead.stage !== "booked") return;
       const opDate = appt ? new Date(appt.date) : null;
@@ -682,7 +647,7 @@ export default function OpPrepView() {
         { key: "deposit", done: lead.convStatus === "deposit_paid" || !!lead.depositPaid },
         { key: "flight", done: !!(lead.flightConfirmed?.date) || !!(lead.metadata?.noFlightNeeded) },
         { key: "hotel", done: !!(lead.hotelInfo?.name || lead.hotel?.name || lead.logistics?.hotelName) },
-        { key: "driver", done: !!(lead.logistics?.driverName) },
+        { key: "driver", done: !!(lead.logistics?.driverName) || !!(lead.metadata?.noFlightNeeded || lead.metadata?.noTransferNeeded) },
         { key: "bloodwork", done: !!lead.bloodworkDone },
         { key: "aftercare", done: !!lead.aftercarePrepped },
       ];
@@ -694,7 +659,6 @@ export default function OpPrepView() {
         id: lead.id, name: lead.name, treatment: lead.treatment || "FUE Haar",
         grafts: lead.reviewData?.grafts || lead.grafts || "-",
         doctor: lead.assignedDoctor || lead.reviewData?.doctor || "-",
-        location: lead.intake?.preferred_location || null,
         opDate, daysUntil, missing, isReady, doneSteps, totalSteps,
         isUrgent: daysUntil !== null && daysUntil <= 3 && !isReady,
         isThisWeek: daysUntil !== null && daysUntil <= 7,
@@ -707,13 +671,17 @@ export default function OpPrepView() {
 
   const apiPrepData = useMemo(() => {
     if (!apiAppts) return [];
+    const leadMap = {};
+    (myLeads || []).forEach(l => { leadMap[l.id] = l; });
     const now = getNow();
     return apiAppts.map(a => {
+      const lead = leadMap[a.patientId || a.patient_id] || {};
+      const isLocal = !!(lead.metadata?.noFlightNeeded || lead.metadata?.noTransferNeeded || a.noFlightNeeded);
       const dt = new Date(a.scheduledAt || a.scheduled_at || a.date);
       const todayStr = now.toISOString().split('T')[0];
       const apptStr = dt.toISOString().split('T')[0];
       const daysUntil = Math.round((new Date(apptStr) - new Date(todayStr)) / 86400000);
-      const r = getReadiness(a, { depositEnabled: clinic?.depositPolicy && clinic.depositPolicy !== "none" && clinic?.booking_funnel !== "no_deposit", t });
+      const r = getReadiness(a, { depositEnabled: clinic?.depositPolicy && clinic.depositPolicy !== "none" && clinic?.booking_funnel !== "no_deposit", t, isLocal });
       let pName = getPatientName(a);
       let treat = a.treatment || a.treatmentType || a.treatment_type || "";
       treat = treat.replace(/hair\s*transplant(ation)?/gi, "").replace(/haartransplantation/gi, "").replace(/saç\s*ekimi/gi, "").replace(/transplant(ation)?/gi, "").trim();
@@ -870,7 +838,7 @@ export default function OpPrepView() {
       {/* ── Table ── */}
       {apiAppts !== null && filtered.length === 0 ? (
         <div>
-          <HintBox id="opprep_empty" style={{marginBottom:16}}>{t("hint_opprep_empty")}</HintBox>
+          <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(76,201,255,0.04)",border:"1px solid rgba(76,201,255,0.1)",color:"rgba(167,177,195,0.75)",fontSize:11,display:"flex",alignItems:"center",gap:8,marginBottom:16}}>{"ℹ️"} {t("hint_opprep_empty")}</div>
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(232,238,252,0.9)", marginBottom: 6 }}>{t("no_upcoming_ops")}</div>
             <div style={{ fontSize: 13, color: "rgba(167,177,195,0.6)" }}>{t("all_patients_prepared") || "Alle Patienten sind vorbereitet oder es stehen keine Termine an."}</div>
@@ -917,9 +885,8 @@ export default function OpPrepView() {
                 onMouseLeave={e => e.currentTarget.style.background = isUrgentRow ? "rgba(239,68,68,0.02)" : "transparent"}
               >
                 {/* Patient */}
-                <div>
-                  <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700, color: "rgba(232,238,252,0.9)", fontSize: 13 }}>{item.name}</div>
-                  {item.location && <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 4, background: "rgba(76,201,255,0.12)", color: "#4cc9ff" }}>📍 {item.location}</span>}
+                <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700, color: "rgba(232,238,252,0.9)", fontSize: 13 }}>
+                  {item.name}
                 </div>
                 {/* Treatment */}
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
