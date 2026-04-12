@@ -710,32 +710,33 @@ export default function PatientPanel() {
                   </div>}
                 </div>
 
-                {/* Hotel Section */}
-                {(()=>{
-                  const h = lead.hotelInfo || lead.hotel || {};
-                  const hasHotel = !!(h.name || lead.notes?.toLowerCase().includes("hotel"));
-                  return <div style={{padding:14,borderRadius:12,background:"rgba(167,107,255,0.04)",border:"1px solid rgba(167,107,255,0.15)"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                      <span style={{fontSize:11,fontWeight:700,color:"#a78bfa",textTransform:"uppercase",letterSpacing:"0.5px",display:"flex",alignItems:"center",gap:6}}>{"\uD83C\uDFE8"} HOTEL</span>
-                      {hasHotel&&<span style={{fontSize:10,fontWeight:700,color:"#10b981"}}>{"✓"} {t("hotel_confirmed") || "Bestätigt"}</span>}
-                    </div>
-                    {hasHotel?<>
-                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
-                        <div><div style={fieldLabelStyle}>{t("hotel_label") || "Hotel"}</div><div style={{fontSize:14,fontWeight:700}}>{h.name||"Hotel Istanbul"}</div></div>
-                        <div><div style={fieldLabelStyle}>{t("room_label") || "Zimmer"}</div><div style={{fontSize:14,fontWeight:600}}>{h.room||"Standard"}</div></div>
-                        <div><div style={fieldLabelStyle}>{t("check_in") || "Check-in"}</div><div style={{fontSize:13,fontWeight:600,color:"#4cc9ff"}}>{h.checkIn||lead.flightConfirmed?.date||"—"}</div></div>
-                        <div><div style={fieldLabelStyle}>{t("check_out") || "Check-out"}</div><div style={{fontSize:13,fontWeight:600}}>{h.checkOut||(lead.booking?.date?(() => { const d = new Date(lead.booking.date); d.setDate(d.getDate() + 2); return d.toISOString().slice(0,10); })():"—")}</div></div>
-                      </div>
-                      <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
-                    </>:<>
-                    <div style={{textAlign:"center",padding:"12px 0",color:"rgba(167,177,195,0.6)",fontSize:12}}>
-                      {t("no_hotel") || "No hotel assigned"}
-                    </div>
-                    <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6,marginTop:8}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
-                    </>}
-                  </div>;
-                })()}
               </>;
+            })()}
+
+            {/* Hotel Section — shown for all patients (local + international) */}
+            {(()=>{
+              const h = lead.hotelInfo || lead.hotel || {};
+              const hasHotel = !!(h.name || lead.notes?.toLowerCase().includes("hotel"));
+              return <div style={{padding:14,borderRadius:12,background:"rgba(167,107,255,0.04)",border:"1px solid rgba(167,107,255,0.15)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                  <span style={{fontSize:11,fontWeight:700,color:"#a78bfa",textTransform:"uppercase",letterSpacing:"0.5px",display:"flex",alignItems:"center",gap:6}}>{"\uD83C\uDFE8"} HOTEL</span>
+                  {hasHotel&&<span style={{fontSize:10,fontWeight:700,color:"#10b981"}}>{"✓"} {t("hotel_confirmed") || "Bestätigt"}</span>}
+                </div>
+                {hasHotel?<>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+                    <div><div style={fieldLabelStyle}>{t("hotel_label") || "Hotel"}</div><div style={{fontSize:14,fontWeight:700}}>{h.name||"Hotel Istanbul"}</div></div>
+                    <div><div style={fieldLabelStyle}>{t("room_label") || "Zimmer"}</div><div style={{fontSize:14,fontWeight:600}}>{h.room||"Standard"}</div></div>
+                    <div><div style={fieldLabelStyle}>{t("check_in") || "Check-in"}</div><div style={{fontSize:13,fontWeight:600,color:"#4cc9ff"}}>{h.checkIn||lead.flightConfirmed?.date||"—"}</div></div>
+                    <div><div style={fieldLabelStyle}>{t("check_out") || "Check-out"}</div><div style={{fontSize:13,fontWeight:600}}>{h.checkOut||(lead.booking?.date?(() => { const d = new Date(lead.booking.date); d.setDate(d.getDate() + 2); return d.toISOString().slice(0,10); })():"—")}</div></div>
+                  </div>
+                  <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
+                </>:<>
+                <div style={{textAlign:"center",padding:"12px 0",color:"rgba(167,177,195,0.6)",fontSize:12}}>
+                  {t("no_hotel") || "No hotel assigned"}
+                </div>
+                <div style={{padding:"8px 12px",borderRadius:10,background:"rgba(167,107,255,0.06)",border:"1px solid rgba(167,107,255,0.12)",color:"rgba(167,177,195,0.7)",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:6,marginTop:8}}>{"📬"} {t("hotel_auto_hint") || "Wird automatisch 3 Tage vor Termin an Patient gesendet (inkl. Termin & Flugticket-Anfrage)"}</div>
+                </>}
+              </div>;
             })()}
           </Accordion>}
 
