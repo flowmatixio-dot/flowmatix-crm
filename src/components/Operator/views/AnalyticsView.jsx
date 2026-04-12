@@ -386,7 +386,7 @@ function VisitorsByCountry({ visitors }) {
         return (
           <div key={cc}>
             {/* Country header row */}
-            <div onClick={() => setOpen(p => ({ ...p, [cc]: !p[cc] }))}
+            <div onClick={() => setOpen(p => ({ [cc]: !p[cc] }))}
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 20px', cursor: 'pointer', borderBottom: isOpen || gi < sorted.length - 1 ? '1px solid var(--border-subtle)' : 'none', background: isOpen ? 'var(--bg-hover)' : 'transparent', transition: 'background 0.15s' }}>
               <span style={{ fontSize: 18, lineHeight: 1 }}>{flag}</span>
               <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)', flex: 1 }}>{name}</span>
