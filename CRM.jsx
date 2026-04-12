@@ -387,13 +387,14 @@ export default function App() {
       if (l.convStatus === "human_takeover") count++;
       // 2. Driver — ONLY after automation failed
       if (!isLocal(l) && (l.stage === "booked" || l.stage === "done") && !lg.driverName && (lg.status === "all_declined" || lg.status === "failed_auto_assignment" || (lg.retryCount || 0) >= 2)) count++;
-      // 3. Hotel — delayed (>24h since booking OR <48h before appointment)
-      if (!isLocal(l) && !!(l.flightConfirmed?.date) && (l.stage === "booked" || l.stage === "done") && !(l.hotelInfo?.name || l.hotel?.name)) {
+      // 3. Hotel — immediately when requested, or delayed flight-based escalation
+      if (!isLocal(l) && (l.stage === "booked" || l.stage === "done") && !(l.hotelInfo?.name || l.hotel?.name)) {
+        const hotelReq = l.metadata?.hotelRequested === true;
         const hba = l.bookedAt || l.metadata?.bookedAt || l.updatedAt;
         const had = l.appointmentDate || l.booking?.date;
         const hsb = hba ? (_now() - new Date(hba).getTime()) / 3600000 : 999;
         const hua = had ? (new Date(had).getTime() - _now()) / 3600000 : 999;
-        if (hsb > 24 || hua < 48) count++;
+        if (hotelReq || (!!(l.flightConfirmed?.date) && (hsb > 24 || hua < 48))) count++;
       }
       // 4. DSGVO — shown inside tasks only, NOT counted in sidebar
       // 5. Flight — only escalation (<48h + reminder sent)
@@ -591,7 +592,7 @@ export default function App() {
   /* WebSocket: listen for task:completed */
   useEffect(() => {
     if (!user || !activeClinicId) return;
-    const token = localStorage.getItem('fm_access_token');
+    const token = sessionStorage.getItem('fm_access_token');
     if (!token) return;
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsHost = window.location.hostname.replace('app.', 'api.').replace('crm.', 'api.');

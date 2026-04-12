@@ -7,6 +7,7 @@ export const CONV_STATUS = {
   needs_medical_review: { label: "conv_medical_review", color: "#ff8a2a", icon: "⚕️", desc: "conv_medical_review_desc" },
   waiting_for_clinic_reply: { label: "conv_waiting_reply", color: "#fbbf24", icon: "⏳", desc: "conv_waiting_reply_desc" },
   booking_pending: { label: "conv_booking_pending", color: "#4cc9ff", icon: "📅", desc: "conv_booking_pending_desc" },
+  appointment_booked: { label: "conv_appointment_booked", color: "#a78bfa", icon: "✅", desc: "conv_appointment_booked_desc" },
   deposit_paid: { label: "conv_deposit_paid", color: "#10b981", icon: "💰", desc: "conv_deposit_paid_desc" },
   human_takeover: { label: "conv_human_takeover", color: "#ef4444", icon: "👤", desc: "conv_human_takeover_desc" },
   awaiting_reactivation: { label: "conv_awaiting_reactivation", color: "#f59e0b", icon: "📨", desc: "conv_awaiting_reactivation_desc" },

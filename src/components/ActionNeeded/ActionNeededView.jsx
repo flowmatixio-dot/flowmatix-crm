@@ -239,14 +239,15 @@ export default function ActionNeededView() {
         });
       }
 
-      /* 4. Hotel assignment — delayed: only after 24h since booking OR <48h before appointment */
+      /* 4. Hotel assignment — immediately when patient requested hotel, or delayed flight-based escalation */
       const hotelBookedAt = p.bookedAt || p.metadata?.bookedAt || p.updatedAt;
       const hotelApptDate = p.appointmentDate || p.booking?.date;
       const hoursSinceBooking = hotelBookedAt ? (getNowMs() - new Date(hotelBookedAt).getTime()) / 3600000 : 999;
       const hoursUntilAppt = hotelApptDate ? (new Date(hotelApptDate).getTime() - getNowMs()) / 3600000 : 999;
       const hotelEscalated = hoursSinceBooking > 24 || hoursUntilAppt < 48;
       const hasFlightConfirmed = !!(p.flightConfirmed && p.flightConfirmed.date);
-      if (!isLocal && hasFlightConfirmed && (p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && hotelEscalated) {
+      const hotelRequestedExplicitly = p.metadata?.hotelRequested === true;
+      if (!isLocal && (p.stage === "booked" || p.stage === "done") && !(p.hotelInfo && p.hotelInfo.name) && !(p.hotel && p.hotel.name) && (hotelRequestedExplicitly || (hasFlightConfirmed && hotelEscalated))) {
         items.push({
           id: "hotel_" + p.id,
           type: "hotel",
