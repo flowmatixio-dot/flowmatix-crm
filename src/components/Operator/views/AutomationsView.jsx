@@ -8,11 +8,11 @@ import * as fmApi from '../../../api/client.js';
 function classifyWorkflow(name, isActive) {
   const n = (name || '').toLowerCase();
 
-  // ── CRITICAL PRODUCTION (must always be active) ──
+  // ── LEGACY (replaced by API workers — intentionally inactive) ──
   if (n.includes('whatsapp flow') || n.includes('send router') || n.includes('inbound bridge'))
-    return { type: 'core', label: 'CRITICAL CORE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'automatic', hint: 'Critical production workflow — must be active' };
+    return { type: 'legacy', label: 'LEGACY', color: '#8899b0', priority: 'low', critical: false, requiredForProd: false, trigger: 'automatic', hint: 'Replaced by API worker — intentionally inactive' };
   if (n.includes('zahlung erhalten') || n.includes('zahlung fehlgeschlagen'))
-    return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'event-based', hint: 'Processes Stripe payment webhooks' };
+    return { type: 'legacy', label: 'LEGACY', color: '#8899b0', priority: 'low', critical: false, requiredForProd: false, trigger: 'event-based', hint: 'Replaced by API worker (webhook-processing) — intentionally inactive' };
   if (n.includes('subscription') || n.includes('expiry'))
     return { type: 'revenue', label: 'CRITICAL REVENUE', color: '#ef4444', priority: 'high', critical: true, requiredForProd: true, trigger: 'scheduled', hint: 'Daily subscription expiry check' };
   if (n.includes('overdue'))
