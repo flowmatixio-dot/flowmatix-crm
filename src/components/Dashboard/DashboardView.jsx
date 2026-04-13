@@ -373,32 +373,37 @@ export default function DashboardView() {
           { label: T("Setup (optional)", "Einrichtung (optional)", "Kurulum (isteğe bağlı)"), done: false, onClick: () => setView("setup") },
         ];
         return (
-          <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20, padding: "16px 24px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 8 }}>
             {STEPS.map((s, idx) => (
-              <div key={idx} style={{ display: "flex", alignItems: "center", ...(idx < STEPS.length - 1 ? { flex: 1 } : {}) }}>
-                <div
-                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: s.onClick ? "pointer" : "default" }}
-                  onClick={s.onClick}
-                >
-                  <div style={{
-                    width: 32, height: 32, borderRadius: "50%",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 700,
-                    background: s.done ? "rgba(16,185,129,0.18)" : idx === activeStep ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.04)",
-                    border: `2px solid ${s.done ? "#10b981" : idx === activeStep ? "#a855f7" : "rgba(255,255,255,0.1)"}`,
-                    color: s.done ? "#10b981" : idx === activeStep ? "#c084fc" : "rgba(167,177,195,0.4)",
-                  }}>
-                    {s.done ? "✓" : idx + 1}
-                  </div>
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, textAlign: "center", maxWidth: 82, lineHeight: 1.3,
-                    color: s.done ? "rgba(167,177,195,0.7)" : idx === activeStep ? "rgba(232,238,252,0.9)" : "rgba(167,177,195,0.35)",
-                  }}>
-                    {s.label}
-                  </span>
+              <div
+                key={idx}
+                onClick={s.onClick}
+                style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  cursor: s.onClick ? "pointer" : "default",
+                  opacity: !s.done && idx > activeStep ? 0.4 : 1,
+                  padding: "4px 0",
+                }}
+              >
+                <div style={{
+                  width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontWeight: 700,
+                  background: s.done ? "rgba(16,185,129,0.18)" : idx === activeStep ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.04)",
+                  border: `2px solid ${s.done ? "#10b981" : idx === activeStep ? "#a855f7" : "rgba(255,255,255,0.1)"}`,
+                  color: s.done ? "#10b981" : idx === activeStep ? "#c084fc" : "rgba(167,177,195,0.4)",
+                }}>
+                  {s.done ? "✓" : idx + 1}
                 </div>
-                {idx < STEPS.length - 1 && (
-                  <div style={{ flex: 1, height: 2, background: s.done ? "rgba(16,185,129,0.25)" : "rgba(255,255,255,0.06)", margin: "0 8px", marginBottom: 20 }} />
+                <span style={{
+                  fontSize: 13, fontWeight: 600, flex: 1,
+                  color: s.done ? "rgba(167,177,195,0.6)" : idx === activeStep ? "rgba(232,238,252,0.9)" : "rgba(167,177,195,0.4)",
+                  textDecoration: s.done ? "line-through" : "none",
+                }}>
+                  {s.label}
+                </span>
+                {!s.done && idx === activeStep && s.onClick && (
+                  <span style={{ fontSize: 12, color: "#a855f7" }}>→</span>
                 )}
               </div>
             ))}
