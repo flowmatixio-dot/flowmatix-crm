@@ -45,7 +45,56 @@ const COUNTRY_NAMES = {
   UY:'Uruguay', UZ:'Usbekistan', VU:'Vanuatu', VE:'Venezuela', VN:'Vietnam',
   YE:'Jemen', ZM:'Sambia', ZW:'Simbabwe', HK:'Hongkong', MO:'Macau',
   PS:'Palästina', XK:'Kosovo', TF:'Franz. Südgebiete', AX:'Ålandinseln',
+  XX:'Unbekannt / VPN',
 };
+
+// Reverse map: English country names/variants → ISO-2 (for backends that send full names)
+const ENGLISH_TO_ISO = {
+  'AFGHANISTAN':'AF','ALBANIA':'AL','ALGERIA':'DZ','ANGOLA':'AO','ARGENTINA':'AR',
+  'ARMENIA':'AM','AUSTRALIA':'AU','AUSTRIA':'AT','AZERBAIJAN':'AZ','BAHAMAS':'BS',
+  'BAHRAIN':'BH','BANGLADESH':'BD','BARBADOS':'BB','BELARUS':'BY','BELGIUM':'BE',
+  'BELIZE':'BZ','BENIN':'BJ','BHUTAN':'BT','BOLIVIA':'BO','BOSNIA':'BA',
+  'BOTSWANA':'BW','BRAZIL':'BR','BRUNEI':'BN','BULGARIA':'BG','CAMBODIA':'KH',
+  'CAMEROON':'CM','CANADA':'CA','CHAD':'TD','CHILE':'CL','CHINA':'CN',
+  'COLOMBIA':'CO','COMOROS':'KM','CONGO':'CG','COSTA RICA':'CR','CROATIA':'HR',
+  'CUBA':'CU','CYPRUS':'CY','CZECHIA':'CZ','CZECH REPUBLIC':'CZ','DENMARK':'DK',
+  'DJIBOUTI':'DJ','ECUADOR':'EC','EGYPT':'EG','EL SALVADOR':'SV','ERITREA':'ER',
+  'ESTONIA':'EE','ESWATINI':'SZ','ETHIOPIA':'ET','FIJI':'FJ','FINLAND':'FI',
+  'FRANCE':'FR','GABON':'GA','GAMBIA':'GM','GEORGIA':'GE','GERMANY':'DE',
+  'GHANA':'GH','GREECE':'GR','GRENADA':'GD','GUATEMALA':'GT','GUINEA':'GN',
+  'GUYANA':'GY','HAITI':'HT','HONDURAS':'HN','HUNGARY':'HU','ICELAND':'IS',
+  'INDIA':'IN','INDIAN':'IN','INDONESIA':'ID','IRAN':'IR','IRAQ':'IQ',
+  'IRELAND':'IE','ISRAEL':'IL','ITALY':'IT','JAMAICA':'JM','JAPAN':'JP',
+  'JORDAN':'JO','KAZAKHSTAN':'KZ','KENYA':'KE','NORTH KOREA':'KP','SOUTH KOREA':'KR',
+  'KUWAIT':'KW','KYRGYZSTAN':'KG','LAOS':'LA','LATVIA':'LV','LEBANON':'LB',
+  'LESOTHO':'LS','LIBERIA':'LR','LIBYA':'LY','LIECHTENSTEIN':'LI','LITHUANIA':'LT',
+  'LUXEMBOURG':'LU','MADAGASCAR':'MG','MALAWI':'MW','MALAYSIA':'MY','MALDIVES':'MV',
+  'MALI':'ML','MALTA':'MT','MAURITANIA':'MR','MAURITIUS':'MU','MEXICO':'MX',
+  'MOLDOVA':'MD','MONACO':'MC','MONGOLIA':'MN','MONTENEGRO':'ME','MOROCCO':'MA',
+  'MOZAMBIQUE':'MZ','MYANMAR':'MM','NAMIBIA':'NA','NEPAL':'NP','NETHERLANDS':'NL',
+  'NEW ZEALAND':'NZ','NICARAGUA':'NI','NIGER':'NE','NIGERIA':'NG','NORWAY':'NO',
+  'OMAN':'OM','PAKISTAN':'PK','PALAU':'PW','PANAMA':'PA','PARAGUAY':'PY',
+  'PERU':'PE','PHILIPPINES':'PH','POLAND':'PL','PORTUGAL':'PT','QATAR':'QA',
+  'ROMANIA':'RO','RUSSIA':'RU','RWANDA':'RW','SAUDI ARABIA':'SA','SENEGAL':'SN',
+  'SERBIA':'RS','SEYCHELLES':'SC','SIERRA LEONE':'SL','SINGAPORE':'SG',
+  'SLOVAKIA':'SK','SLOVENIA':'SI','SOMALIA':'SO','SOUTH AFRICA':'ZA',
+  'SOUTH SUDAN':'SS','SPAIN':'ES','SRI LANKA':'LK','SUDAN':'SD','SURINAME':'SR',
+  'SWEDEN':'SE','SWITZERLAND':'CH','SYRIA':'SY','TAIWAN':'TW','TAJIKISTAN':'TJ',
+  'TANZANIA':'TZ','THAILAND':'TH','TOGO':'TG','TONGA':'TO','TRINIDAD':'TT',
+  'TRINIDAD AND TOBAGO':'TT','TUNISIA':'TN','TURKEY':'TR','TURKMENISTAN':'TM',
+  'UGANDA':'UG','UKRAINE':'UA','UNITED ARAB EMIRATES':'AE','UAE':'AE',
+  'UNITED KINGDOM':'GB','UK':'GB','UNITED STATES':'US','UNITED STATES OF AMERICA':'US',
+  'URUGUAY':'UY','UZBEKISTAN':'UZ','VENEZUELA':'VE','VIETNAM':'VN',
+  'YEMEN':'YE','ZAMBIA':'ZM','ZIMBABWE':'ZW','HONG KONG':'HK','MACAU':'MO',
+  'PALESTINE':'PS','KOSOVO':'XK',
+};
+
+function normalizeCountry(raw) {
+  if (!raw) return 'XX';
+  const up = raw.trim().toUpperCase();
+  if (up.length === 2) return up;
+  return ENGLISH_TO_ISO[up] || 'XX';
+}
 
 const biz = (path) => fmApi.apiFetch(`/api/v1/ops/analytics-biz${path}`).catch(() => null);
 const noData = (v) => (v === null || v === undefined) ? 'No data' : v;
@@ -287,7 +336,7 @@ export default function AnalyticsView() {
 
 // ── Country flag from 2-letter ISO code ──
 function countryFlag(cc) {
-  if (!cc || cc.length !== 2) return '🌐';
+  if (!cc || cc === 'XX' || cc.length !== 2) return '🌐';
   return String.fromCodePoint(...[...cc.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
 }
 
@@ -368,10 +417,10 @@ function VisitorsByCountry({ visitors }) {
     );
   }
 
-  // Group by country code
+  // Group by normalized ISO country code
   const groups = {};
   visitors.forEach(v => {
-    const key = v.country?.toUpperCase() || 'XX';
+    const key = normalizeCountry(v.country);
     if (!groups[key]) groups[key] = [];
     groups[key].push(v);
   });
