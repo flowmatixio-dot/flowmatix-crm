@@ -55,7 +55,7 @@ export default function OperatorApp() {
     else if (selectedClinic) setSelectedClinic(null);
   }
 
-  const viewProps = { events: eventState, actions: actionState, navigateTo };
+  const viewProps = { events: eventState, actions: actionState, navigateTo, onRefresh: actionState.reload };
   if (tab === 'clinics') {
     viewProps.selectedClinic = selectedClinic;
     viewProps.onSelectClinic = setSelectedClinic;
