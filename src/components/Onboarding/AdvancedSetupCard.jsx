@@ -236,13 +236,21 @@ export default function AdvancedSetupCard() {
         marginBottom: 16,
       }}
     >
-      {/* Pulsing orange lamp at top */}
+      {/* Header: urgent in trial, optional after purchase */}
       <style>{`@keyframes fmOrangePulse{0%{box-shadow:0 0 0 0 rgba(255,138,42,0.7);opacity:1}70%{box-shadow:0 0 0 10px rgba(255,138,42,0);opacity:0.6}100%{box-shadow:0 0 0 0 rgba(255,138,42,0);opacity:1}}`}</style>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff8a2a", animation: "fmOrangePulse 1.6s infinite", flexShrink: 0 }} />
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#ff8a2a", letterSpacing: 0.3 }}>
-          {T("Action required — complete your setup", "Einrichtung erforderlich — bitte vervollständigen", "Kurulum gerekli — lütfen tamamlayın")}
-        </span>
+        {planActive ? (
+          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.55)", letterSpacing: 0.3 }}>
+            {T("OPTIONAL", "OPTIONAL", "İSTEĞE BAĞLI")}
+          </span>
+        ) : (
+          <>
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff8a2a", animation: "fmOrangePulse 1.6s infinite", flexShrink: 0 }} />
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#ff8a2a", letterSpacing: 0.3 }}>
+              {T("Action required — complete your setup", "Einrichtung erforderlich — bitte vervollständigen", "Kurulum gerekli — lütfen tamamlayın")}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Collapsible header */}

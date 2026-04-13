@@ -6,6 +6,7 @@ import HintBox from "../shared/HintBox.jsx";
 import SetupCard from "../Onboarding/SetupCard.jsx";
 import AdvancedSetupCard from "../Onboarding/AdvancedSetupCard.jsx";
 import PerformanceIndicator from "../Onboarding/PerformanceIndicator.jsx";
+import { navigateToSetupSection } from "../../lib/setupNav";
 
 /* ── Inline tri-language helper (matches production T()) ── */
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
@@ -411,7 +412,59 @@ export default function DashboardView() {
         );
       })()}
 
-      {/* ── Setup card (Einrichtung erforderlich) — above performance indicator ── */}
+      {/* ── Post-purchase 6-step stepper (active only) ── */}
+      {workspaceState === 'active' && (() => {
+        const mark = (key) => { try { return localStorage.getItem(`fm_setup_done_${key}`) === "1"; } catch { return false; } };
+        const waConnected = clinic?.connection_status === "connected";
+        const STEPS = [
+          { label: T("Connect WhatsApp", "WhatsApp verbinden", "WhatsApp bağla"),          done: waConnected,            onClick: () => setView("whatsapp_setup") },
+          { label: T("Set up AI bot",    "KI-Bot einrichten",  "AI botu kur"),             done: mark("ai_settings"),    onClick: () => { try { localStorage.setItem("fm_setup_done_ai_settings",  "1"); } catch {} navigateToSetupSection(setView, "ai_settings"); } },
+          { label: T("Check treatments", "Behandlungen prüfen","Tedavileri kontrol et"),   done: mark("treatments"),     onClick: () => { try { localStorage.setItem("fm_setup_done_treatments",   "1"); } catch {} navigateToSetupSection(setView, "treatments"); } },
+          { label: T("Invite team",      "Team einladen",       "Ekibi davet et"),         done: mark("team"),           onClick: () => { try { localStorage.setItem("fm_setup_done_team",         "1"); } catch {} navigateToSetupSection(setView, "team"); } },
+          { label: T("Add drivers",      "Fahrer hinzufügen",   "Şoför ekle"),             done: mark("drivers"),        onClick: () => { try { localStorage.setItem("fm_setup_done_drivers",      "1"); } catch {} navigateToSetupSection(setView, "drivers"); } },
+          { label: T("Activate automations", "Automationen aktivieren", "Otomasyonları etkinleştir"), done: mark("automations"), onClick: () => { try { localStorage.setItem("fm_setup_done_automations", "1"); } catch {} navigateToSetupSection(setView, "automations"); } },
+        ];
+        const allDone = STEPS.every(s => s.done);
+        if (allDone) return null;
+        const activeStep = STEPS.findIndex(s => !s.done);
+        return (
+          <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(167,177,195,0.55)", letterSpacing: "0.06em", marginBottom: 4 }}>
+              {T("SETUP", "EINRICHTUNG", "KURULUM")}
+            </div>
+            {STEPS.map((s, idx) => (
+              <div
+                key={idx}
+                onClick={s.onClick}
+                style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer", opacity: !s.done && idx > activeStep ? 0.4 : 1, padding: "4px 0" }}
+              >
+                <div style={{
+                  width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontWeight: 700,
+                  background: s.done ? "rgba(16,185,129,0.18)" : idx === activeStep ? "rgba(76,201,255,0.15)" : "rgba(255,255,255,0.04)",
+                  border: `2px solid ${s.done ? "#10b981" : idx === activeStep ? "#4cc9ff" : "rgba(255,255,255,0.1)"}`,
+                  color: s.done ? "#10b981" : idx === activeStep ? "#4cc9ff" : "rgba(167,177,195,0.4)",
+                }}>
+                  {s.done ? "✓" : idx + 1}
+                </div>
+                <span style={{
+                  fontSize: 13, fontWeight: 600, flex: 1,
+                  color: s.done ? "rgba(167,177,195,0.6)" : idx === activeStep ? "rgba(232,238,252,0.9)" : "rgba(167,177,195,0.4)",
+                  textDecoration: s.done ? "line-through" : "none",
+                }}>
+                  {s.label}
+                </span>
+                {!s.done && idx === activeStep && (
+                  <span style={{ fontSize: 12, color: "#4cc9ff" }}>→</span>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
+      {/* ── Setup card (Einrichtung) — above performance indicator ── */}
       <AdvancedSetupCard />
 
       {/* ── System performance indicator (Dein System läuft) ── */}
