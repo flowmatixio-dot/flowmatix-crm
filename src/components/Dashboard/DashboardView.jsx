@@ -362,11 +362,55 @@ export default function DashboardView() {
         );
       })()}
 
-      {/* ── System performance indicator ── */}
-      <PerformanceIndicator />
+      {/* ── 3-step onboarding stepper (live_test only) ── */}
+      {workspaceState === 'live_test' && (() => {
+        const demoSeen = (() => { try { return localStorage.getItem("fm_demo_tour_seen") === "1"; } catch { return false; } })();
+        const botTested = (testInfo?.session?.messagesCount || 0) > 0;
+        const activeStep = demoSeen ? (botTested ? 2 : 1) : 0;
+        const STEPS = [
+          { label: T("View demo", "Demo ansehen", "Demo izle"), done: demoSeen, onClick: () => setDemoTourOpen(true) },
+          { label: T("Test bot live", "Bot live testen", "Canlı bot testi"), done: botTested },
+          { label: T("Setup (optional)", "Einrichtung (optional)", "Kurulum (isteğe bağlı)"), done: false, onClick: () => setView("setup") },
+        ];
+        return (
+          <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20, padding: "16px 24px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            {STEPS.map((s, idx) => (
+              <div key={idx} style={{ display: "flex", alignItems: "center", ...(idx < STEPS.length - 1 ? { flex: 1 } : {}) }}>
+                <div
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: s.onClick ? "pointer" : "default" }}
+                  onClick={s.onClick}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: "50%",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 700,
+                    background: s.done ? "rgba(16,185,129,0.18)" : idx === activeStep ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.04)",
+                    border: `2px solid ${s.done ? "#10b981" : idx === activeStep ? "#a855f7" : "rgba(255,255,255,0.1)"}`,
+                    color: s.done ? "#10b981" : idx === activeStep ? "#c084fc" : "rgba(167,177,195,0.4)",
+                  }}>
+                    {s.done ? "✓" : idx + 1}
+                  </div>
+                  <span style={{
+                    fontSize: 10, fontWeight: 600, textAlign: "center", maxWidth: 82, lineHeight: 1.3,
+                    color: s.done ? "rgba(167,177,195,0.7)" : idx === activeStep ? "rgba(232,238,252,0.9)" : "rgba(167,177,195,0.35)",
+                  }}>
+                    {s.label}
+                  </span>
+                </div>
+                {idx < STEPS.length - 1 && (
+                  <div style={{ flex: 1, height: 2, background: s.done ? "rgba(16,185,129,0.25)" : "rgba(255,255,255,0.06)", margin: "0 8px", marginBottom: 20 }} />
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
-      {/* ── Optional optimization (was the Volles Potenzial card) ── */}
+      {/* ── Setup card (Einrichtung erforderlich) — above performance indicator ── */}
       <AdvancedSetupCard />
+
+      {/* ── System performance indicator (Dein System läuft) ── */}
+      <PerformanceIndicator />
 
       {/* ── First steps hint (combined) ── */}
       {o.filter(p => !p.is_demo).length === 0 && (
