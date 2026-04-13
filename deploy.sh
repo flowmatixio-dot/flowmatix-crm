@@ -21,7 +21,7 @@ echo ""
 echo "→ SonarQube analysis..."
 SONAR_TMP="/tmp/flowmatix-crm-scan-$(date +%s)"
 rsync -az --delete --exclude='node_modules' --exclude='dist' --exclude='.git' \
-  src/ flowmatix:${SONAR_TMP}/src/ 2>/dev/null
+  src/ flowmatix:${SONAR_TMP}/src/ 2>/dev/null || true
 SONAR_RESULT=$(ssh flowmatix "sonar-scanner \
   -Dsonar.projectKey=flowmatix-crm \
   -Dsonar.sources=${SONAR_TMP}/src \
