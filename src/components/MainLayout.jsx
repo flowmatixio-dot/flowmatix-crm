@@ -345,6 +345,26 @@ export default function MainLayout() {
     {ctx.demoTourOpen && <AutoDemoPlayer onClose={() => ctx.setDemoTourOpen(false)} />}
     <style>{`@keyframes fmHighlight{0%{box-shadow:0 0 0 0 rgba(76,201,255,0.5)}50%{box-shadow:0 0 24px 6px rgba(76,201,255,0.35)}100%{box-shadow:0 0 0 0 rgba(76,201,255,0)}}`}</style>
 
+    {/* ── Waitlist Popup (waitlist_pending state — blocks checkout until operator approves) ── */}
+    {ctx.workspaceState === 'waitlist_pending' && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 999990, background: "rgba(8,12,22,0.92)", backdropFilter: "blur(16px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ maxWidth: 480, width: "100%", background: "#0f1623", borderRadius: 20, border: "1px solid rgba(167,139,250,0.25)", padding: "48px 40px", textAlign: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.5)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 99, background: "rgba(167,139,250,0.08)", border: "1px solid rgba(167,139,250,0.2)", marginBottom: 24, fontSize: 11, fontWeight: 700, color: "#a78bfa" }}>
+            ⏳ {t("waitlist_badge") || "AUF WARTELISTE"}
+          </div>
+          <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.3 }}>
+            {t("waitlist_title") || "Wir melden uns bald bei Ihnen"}
+          </h2>
+          <p style={{ color: "rgba(200,215,240,0.75)", fontSize: 14, lineHeight: 1.7, margin: "0 0 12px" }}>
+            {t("waitlist_message") || "Aufgrund der hohen Nachfrage melden wir uns innerhalb der nächsten 24 Stunden bei Ihnen und nehmen Sie gerne auf."}
+          </p>
+          <p style={{ color: "rgba(167,177,195,0.5)", fontSize: 12, margin: 0 }}>
+            {t("waitlist_subtext") || "Sie müssen nichts weiter tun. Wir melden uns per E-Mail."}
+          </p>
+        </div>
+      </div>
+    )}
+
     {/* ── Plan Picker Modal (trial_expired forced OR manual trigger) ── */}
     {(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker) && (() => {
       const isForced = ctx.workspaceState === 'trial_expired';
@@ -427,8 +447,13 @@ export default function MainLayout() {
           await fmApi.setWorkspaceState('checkout_pending');
           ctx.setWorkspaceState('checkout_pending');
           const res = await fmApi.startTrialActivation(plan, billingCycle, promoCode.trim() || null);
-          if (res?.url) window.location.href = res.url;
-          else {
+          if (res?.waitlisted) {
+            // Waitlist gate: operator must approve before checkout is possible
+            ctx.setWorkspaceState('waitlist_pending');
+            ctx.setShowPlanPicker(false);
+          } else if (res?.url) {
+            window.location.href = res.url;
+          } else {
             // Failure path: revert BOTH local state AND DB state — otherwise the
             // customer is locked in checkout_pending and the green test banner stays hidden.
             await fmApi.setWorkspaceState('live_test').catch(() => {});
