@@ -288,7 +288,12 @@ export default function AnalyticsView() {
         <div>
           <SectionTitle sub="Marketing">Countries</SectionTitle>
           <DataTable columns={[
-            { key: 'country', label: 'Country', render: v => safeStr(v, 'Unknown') },
+            { key: 'country', label: 'Country', render: v => {
+              const cc = normalizeCountry(v);
+              const flag = countryFlag(cc);
+              const name = COUNTRY_NAMES[cc] || (cc === 'XX' ? 'Unbekannt / VPN' : (safeStr(v, 'Unknown')));
+              return <span>{flag} {name}</span>;
+            }},
             { key: 'visitors', label: 'Visitors', render: v => safeNum(v) },
           ]} data={countries} emptyText="No data" />
         </div>
