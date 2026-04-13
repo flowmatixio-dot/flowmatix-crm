@@ -1640,4 +1640,5 @@ export const resolveOperatorEvent = (id) => apiFetch(`/api/v1/ops/operator-event
 export const getClinicActions = () => apiFetch('/api/v1/ops/clinic-actions');
 export const activateClinic = (orgId) => apiFetch(`/api/v1/ops/clinic-actions/${orgId}/activate`, { method: 'POST' });
 export const updateWaSetupStatus = (orgId, status) => apiFetch(`/api/v1/ops/clinic-actions/${orgId}/wa-status`, { method: 'POST', body: JSON.stringify({ status }) });
+export const approveWaitlist = (orgId) => apiFetch(`/api/v1/ops/clinic-actions/${orgId}/waitlist-approve`, { method: 'POST' });
 export const getBusinessMetrics = () => apiFetch('/api/v1/ops/platform/business-metrics');

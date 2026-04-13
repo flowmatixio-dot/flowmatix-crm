@@ -1,12 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import StatusBadge from '../shared/StatusBadge.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
+import { approveWaitlist } from '../../../api/client.js';
 
 // Pipeline columns — reordered for conversion priority
 const PIPELINE_COLS = [
-  { id: 'setup', label: 'Setup Pending', color: '#ff8c2a', priority: true, filter: c => ['WAIT_FOR_NUMBER', 'CONNECT_WHATSAPP', 'START_SETUP', 'ACTIVATE', 'WA_PENDING'].includes(c.required_action) },
-  { id: 'trial', label: 'Trial', color: '#ffcf40', filter: c => c.required_action === 'TRIAL' || c.subscription_status === 'trialing' },
-  { id: 'action', label: 'Action Required', color: '#ef4444', filter: c => c.required_action === 'FIX_ERROR' || c.required_action === 'VERIFY_OTP' },
+  { id: 'waitlist', label: 'Waitlist', color: '#a78bfa', filter: c => c.workspace_state === 'waitlist_pending' },
+  { id: 'setup', label: 'Setup Pending', color: '#ff8c2a', priority: true, filter: c => c.workspace_state !== 'waitlist_pending' && ['WAIT_FOR_NUMBER', 'CONNECT_WHATSAPP', 'START_SETUP', 'ACTIVATE', 'WA_PENDING'].includes(c.required_action) },
+  { id: 'trial', label: 'Trial', color: '#ffcf40', filter: c => c.workspace_state !== 'waitlist_pending' && (c.required_action === 'TRIAL' || c.subscription_status === 'trialing') },
+  { id: 'action', label: 'Action Required', color: '#ef4444', filter: c => c.workspace_state !== 'waitlist_pending' && (c.required_action === 'FIX_ERROR' || c.required_action === 'VERIFY_OTP') },
   { id: 'converted', label: 'Live', color: '#22c55e', filter: c => c.workspace_state === 'active' && c.subscription_status === 'active' && c.whatsapp_connected === true },
   { id: 'expired', label: 'Expired', color: '#8899b0', filter: c => c.workspace_state === 'trial_expired' || c.subscription_status === 'canceled' },
 ];
@@ -32,8 +34,23 @@ function formatTimeLeft(daysLeft) {
   return { text: `${daysLeft}d left`, color: 'var(--text-muted)', urgent: false };
 }
 
-export default function TrialsView({ actions, navigateTo }) {
+export default function TrialsView({ actions, navigateTo, onRefresh }) {
   const { clinics = [] } = actions || {};
+  const [approvingId, setApprovingId] = useState(null);
+
+  const handleApprove = async (e, orgId) => {
+    e.stopPropagation();
+    if (!window.confirm('Klinik freischalten? Sie kann dann direkt zum Checkout.')) return;
+    setApprovingId(orgId);
+    try {
+      await approveWaitlist(orgId);
+      onRefresh?.();
+    } catch (err) {
+      alert('Fehler beim Freischalten: ' + (err.message || 'Unbekannt'));
+    } finally {
+      setApprovingId(null);
+    }
+  };
 
   const columns = useMemo(() => {
     const assigned = new Set();
@@ -47,7 +64,8 @@ export default function TrialsView({ actions, navigateTo }) {
     }).filter(col => col.items.length > 0); // HIDE empty columns
   }, [clinics]);
 
-  const activeTrials = clinics.filter(c => c.subscription_status === 'trialing' || (c.workspace_state !== 'active' && c.workspace_state !== 'trial_expired'));
+  const waitlist = columns.find(c => c.id === 'waitlist')?.items || [];
+  const activeTrials = clinics.filter(c => c.subscription_status === 'trialing' || (c.workspace_state !== 'active' && c.workspace_state !== 'trial_expired' && c.workspace_state !== 'waitlist_pending'));
   const critical = clinics.filter(c => c.trial_end && (new Date(c.trial_end) - Date.now()) / 3600000 < 48 && (new Date(c.trial_end) - Date.now()) > 0);
   const setupPending = columns.find(c => c.id === 'setup')?.items || [];
   const actionRequired = columns.find(c => c.id === 'action')?.items || [];
@@ -62,6 +80,7 @@ export default function TrialsView({ actions, navigateTo }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Pipeline</h1>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          {waitlist.length > 0 && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Waitlist: <strong style={{ color: '#a78bfa' }}>{waitlist.length}</strong></span>}
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Trials: <strong style={{ color: '#5ee0ff' }}>{activeTrials.length}</strong></span>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Live: <strong style={{ color: '#22c55e' }}>{converted.length}</strong></span>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>MRR: <strong style={{ color: '#22c55e' }}>€{pipelineMrr.toLocaleString('de-DE')}</strong></span>
@@ -98,6 +117,7 @@ export default function TrialsView({ actions, navigateTo }) {
                 const time = formatTimeLeft(daysLeft);
                 const steps = getSetupSteps(c);
                 const doneCount = steps.filter(s => s.done).length;
+                const isWaitlist = col.id === 'waitlist';
                 const isSetup = col.id === 'setup' || col.id === 'action';
                 const isAction = col.id === 'action';
 
@@ -150,6 +170,17 @@ export default function TrialsView({ actions, navigateTo }) {
                     <div style={{ height: 4, borderRadius: 2, background: 'var(--progress-track)', marginBottom: isSetup ? 10 : 0 }}>
                       <div style={{ height: '100%', borderRadius: 2, background: rs === 100 ? '#22c55e' : rs >= 50 ? '#ffcf40' : '#ef4444', width: `${rs}%`, transition: 'width 0.3s' }} />
                     </div>
+
+                    {/* Waitlist Approve Button */}
+                    {isWaitlist && (
+                      <button onClick={e => handleApprove(e, c.id)} disabled={approvingId === c.id}
+                        style={{
+                          width: '100%', padding: '8px 0', borderRadius: 6, border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                          background: approvingId === c.id ? 'rgba(167,139,250,0.3)' : '#a78bfa', color: '#fff', fontFamily: 'inherit', transition: 'opacity 0.15s', marginTop: 6,
+                        }}>
+                        {approvingId === c.id ? '...' : '✓ Freischalten'}
+                      </button>
+                    )}
 
                     {/* CTA Button */}
                     {isSetup && (
