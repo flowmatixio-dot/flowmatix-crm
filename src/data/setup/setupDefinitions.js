@@ -16,7 +16,10 @@
 
 export const SETUP_STEPS = [
   // ── Required ──
-  { id: "profile",    icon: "🏥", i18nKey: "sg_profile",    tier: "required",    desc: "Stammdaten deiner Klinik hinterlegen",                               time: "2 Min.", action: "setup",          order: 1 },
+  // kvkk step: shown only for Turkish clinics (country = 'TR'). order: 0 so it appears
+  // before all other steps — platform cannot be used until confirmed.
+  { id: "kvkk",      icon: "⚖️", i18nKey: "sg_kvkk",       tier: "required",    desc: "KVKK Uyumluluğunu Onayla (Türk klinikleri için zorunlu)",            time: "2 Min.", action: "setup",          order: 0, countryOnly: "TR" },
+  { id: "profile",   icon: "🏥", i18nKey: "sg_profile",    tier: "required",    desc: "Stammdaten deiner Klinik hinterlegen",                               time: "2 Min.", action: "setup",          order: 1 },
   { id: "treatments", icon: "💉", i18nKey: "sg_treatments", tier: "required",    desc: "Definiere deine angebotenen Behandlungen",                           time: "3 Min.", action: "setup",          order: 2 },
   { id: "team",       icon: "👥", i18nKey: "sg_team",       tier: "required",    desc: "Füge deine Ärzte und Mitarbeiter hinzu",                             time: "2 Min.", action: "setup",          order: 3 },
   { id: "calendar",   icon: "📅", i18nKey: "sg_calendar",   tier: "required",    desc: "Verbinde deinen Kalender und definiere Verfügbarkeiten",              time: "2 Min.", action: "setup",          order: 4 },

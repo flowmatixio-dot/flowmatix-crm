@@ -8,6 +8,8 @@
  */
 
 export const SETUP_CHECKS = {
+  // kvkk: only required for Turkish clinics. Non-TR orgs pass automatically.
+  kvkk:        c => c.country !== 'TR' || c.kvkkConfirmed === true,
   profile:     c => !!(c.name && c.address && c.phone && c.clinicEmail),
   treatments:  c => (c.aiConfig?.services?.length || 0) >= 1,
   team:        c => (c.team?.length || 0) >= 1,

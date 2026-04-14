@@ -2,7 +2,9 @@
 
 export const SETUP_CATS = [
   { id: "overview", icon: "📋", key: "setup_overview" },
-  // ── Required (6) ──
+  // ── Required (7 for TR, 6 for others) ──
+  // kvkk: only rendered when clinic.country === 'TR' (filtered in SetupGuide)
+  { id: "kvkk",       icon: "⚖️", key: "sg_kvkk",        descKey: "sg_kvkk_desc",       time: "2 Min.", tier: "required",    step: 0, countryOnly: "TR" },
   { id: "profile",    icon: "🏥", key: "sg_profile",     descKey: "sg_profile_desc",    time: "2 Min.", tier: "required",    step: 1 },
   { id: "treatments", icon: "💉", key: "sg_treatments",  descKey: "sg_treatments_desc", time: "3 Min.", tier: "required",    step: 2 },
   { id: "team",       icon: "👥", key: "sg_team",        descKey: "sg_team_desc",       time: "2 Min.", tier: "required",    step: 3 },
@@ -21,6 +23,7 @@ export const SETUP_CATS = [
 export const TEAM_LIMITS = { core: 1, pro: 3, operations: 5, enterprise: 999 };
 
 export const CHECKS = {
+  kvkk:       c => c.country !== 'TR' || c.kvkkConfirmed === true,
   profile:    c => !!(c.name && c.address && c.phone && c.clinicEmail),
   treatments: c => (c.aiConfig?.services?.length || 0) >= 1,
   team:       c => (c.team?.length || 0) >= 1,
