@@ -132,6 +132,11 @@ export default function App() {
   const [tourStep, setTourStep] = useState(0);
   const [tourCompleted, setTourCompleted] = useState(()=>{try{return localStorage.getItem("fm_tour_done")==="1";}catch{return false;}});
   const [pendingApps, setPendingApps] = useState(0);
+  const [showAccModal, setShowAccModal] = useState(false);
+  const [accPwForm, setAccPwForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [accPwLoading, setAccPwLoading] = useState(false);
+  const [accToast, setAccToast] = useState(null);
+  const [mfaState, setMfaState] = useState({ enabled: null, step: 'idle', qrUrl: '', secret: '', code: '', error: '', loading: false });
 
   /* i18n helper */
   const t = (key) => (T[lang]||T.en)[key] || (T.en)[key] || key;
@@ -1663,6 +1668,8 @@ export default function App() {
           </div>}
           {/* Theme toggle */}
           <ThemeToggle />
+          {/* Operator account button */}
+          {isOperator&&<button onClick={()=>{setShowAccModal(true);if(mfaState.enabled===null)fmApi.getMe().then(r=>setMfaState(s=>({...s,enabled:!!r?.user?.mfa_enabled}))).catch(()=>setMfaState(s=>({...s,enabled:false})));}} style={{width:32,height:32,borderRadius:8,background:"transparent",border:"1px solid rgba(212,175,55,0.2)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:"rgba(212,175,55,0.7)"}} title="Konto & 2FA">👤</button>}
           {/* System status mini */}
           <div style={{display:"flex",gap:6}}>
             {[{s:true,c:"#10b981",t:"AI Online"},{s:true,c:"#10b981",t:"WA Connected"}].map((it,i)=><div key={i} title={it.t} style={{width:8,height:8,borderRadius:99,background:it.c,boxShadow:`0 0 6px ${it.c}`}}/>)}
