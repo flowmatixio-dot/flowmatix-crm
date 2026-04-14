@@ -39,7 +39,8 @@ export default function ImpersonationDialog({ clinicName, onConfirm, onCancel })
 
   const reasonOk = reason.trim().length >= 10;
   const categoryOk = !!category;
-  const canSubmit = reasonOk && categoryOk && !loading;
+  const ticketOk = category !== 'incident' || ticketId.trim().length >= 3;
+  const canSubmit = reasonOk && categoryOk && ticketOk && !loading;
 
   async function handleSubmit() {
     if (!canSubmit) return;
@@ -88,7 +89,12 @@ export default function ImpersonationDialog({ clinicName, onConfirm, onCancel })
         </div>
 
         <div>
-          <label style={label}>Ticket-ID <span style={{ color: 'rgba(255,255,255,0.3)' }}>(optional)</span></label>
+          <label style={label}>
+            Ticket-ID{' '}
+            {category === 'incident'
+              ? <span style={{ color: '#ef4444' }}>* (Pflichtfeld bei Incident)</span>
+              : <span style={{ color: 'rgba(255,255,255,0.3)' }}>(optional)</span>}
+          </label>
           <input
             type="text"
             value={ticketId}
