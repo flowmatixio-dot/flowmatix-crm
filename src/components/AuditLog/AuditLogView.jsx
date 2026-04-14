@@ -67,8 +67,8 @@ export default function AuditLogView() {
   const load = useCallback(() => {
     setLoading(true);
     Promise.all([
-      fmApi.getClinicAuditLog({ page, limit: 50, action: filterAction || undefined }),
-      page === 1 ? fmApi.getClinicAuditStats() : Promise.resolve(null),
+      fmApi.getAuditLog({ page, limit: 50, action: filterAction || undefined }),
+      page === 1 ? fmApi.getAuditStats() : Promise.resolve(null),
     ]).then(([res, statsRes]) => {
       setEntries(Array.isArray(res?.entries) ? res.entries : []);
       setTotal(res?.pagination?.total || 0);
