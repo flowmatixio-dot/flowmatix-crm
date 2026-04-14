@@ -105,7 +105,7 @@ function useOperatorData() {
       case 'automations': await Promise.allSettled([load('queueStats', api.getQueueStats), load('queueJobs', () => api.getQueueJobs({ limit: 20 }))]); break;
       case 'incidents': await load('incidents', () => api.getIncidents({ limit: 50 })); break;
       case 'dashboard': await Promise.allSettled([load('platformStats', api.getPlatformStats), load('clinics', api.getPlatformClinics)]); break;
-      case 'logs': await load('unifiedLogs', () => api.getUnifiedLogs({ limit: 50 })); break;
+      case 'logs': await Promise.allSettled([load('unifiedLogs', () => api.getUnifiedLogs({ limit: 50 })), load('clinics', api.getPlatformClinics)]); break;
       case 'api': await load('apiKeys', api.getApiKeys); break;
       case 'billing':
         await Promise.allSettled([
@@ -1389,27 +1389,43 @@ function TabIncidents({ d, load }) {
    ═══════════════════════════════════════════════════════════ */
 function TabLogs({ d, load }) {
   const [source, setSource] = useState('');
+  const [clinicId, setClinicId] = useState('');
   const logData = d.unifiedLogs;
+  const clinicList = d.clinics?.clinics || [];
 
-  const doFilter = () => load('unifiedLogs', () => api.getUnifiedLogs({ limit: 50, source: source || undefined }));
+  const doFilter = () => load('unifiedLogs', () => api.getUnifiedLogs({
+    limit: 50,
+    source: source || undefined,
+    organization_id: clinicId || undefined,
+  }));
 
   const sourceBadge = (src) => {
     const colors = { audit: S.accent, webhook: S.yellow, provisioning: S.green };
     return badge(colors[src] || S.gray, src);
   };
 
+  // Resolve clinic name for display in log rows
+  const clinicMap = clinicList.reduce((m, c) => { m[c.id] = c.name; return m; }, {});
+
+  const selStyle = { padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13, fontFamily: 'inherit' };
+
   return (
     <>
       <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Plattform-Logs</h2>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <select value={source} onChange={e => setSource(e.target.value)} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        <select value={clinicId} onChange={e => setClinicId(e.target.value)} style={{ ...selStyle, minWidth: 220 }}>
+          <option value="">Alle Kliniken</option>
+          {clinicList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <select value={source} onChange={e => setSource(e.target.value)} style={selStyle}>
           <option value="">Alle Quellen</option>
           <option value="audit">Audit</option>
           <option value="webhook">Webhook</option>
           <option value="provisioning">Provisioning</option>
         </select>
         <Btn onClick={doFilter}>Filtern</Btn>
+        {(clinicId || source) && <Btn onClick={() => { setClinicId(''); setSource(''); load('unifiedLogs', () => api.getUnifiedLogs({ limit: 50 })); }}>Zurücksetzen</Btn>}
       </div>
 
       {!logData ? <Spin /> : !logData.entries?.length ? (
@@ -1418,17 +1434,20 @@ function TabLogs({ d, load }) {
         <div style={S.card}>
           <table style={S.table}>
             <thead><tr>
-              <th style={S.th}>Zeit</th><th style={S.th}>Quelle</th><th style={S.th}>Akteur</th><th style={S.th}>Ereignis</th><th style={S.th}>Ressource</th><th style={S.th}>Details</th>
+              <th style={S.th}>Zeit</th><th style={S.th}>Quelle</th>
+              {!clinicId && <th style={S.th}>Klinik</th>}
+              <th style={S.th}>Akteur</th><th style={S.th}>Ereignis</th><th style={S.th}>Ressource</th><th style={S.th}>Details</th>
             </tr></thead>
             <tbody>
               {logData.entries.map(e => (
                 <tr key={`${e.source}-${e.id}`}>
                   <td style={S.td}>{e.created_at ? timeAgo(e.created_at) : '-'}</td>
                   <td style={S.td}>{sourceBadge(e.source)}</td>
+                  {!clinicId && <td style={{ ...S.td, fontSize: 11, color: '#888', maxWidth: 120 }}>{clinicMap[e.organization_id] || e.organization_id?.slice(0, 8) || '-'}</td>}
                   <td style={S.td}>{e.actor || '-'}</td>
                   <td style={S.td}>{statusBadge(e.event_type)}</td>
                   <td style={S.td}>{e.resource_type || '-'}</td>
-                  <td style={S.td}><span style={{ fontSize: 11, color: '#888' }}>{e.details_text?.substring(0, 60) || '-'}</span></td>
+                  <td style={S.td}><span style={{ fontSize: 11, color: '#888' }}>{e.details_text?.substring(0, 80) || '-'}</span></td>
                 </tr>
               ))}
             </tbody>
