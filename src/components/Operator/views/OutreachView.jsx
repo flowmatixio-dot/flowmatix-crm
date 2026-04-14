@@ -70,12 +70,11 @@ export default function OutreachView() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const refresh = () => fetchData(filter && !['replied', 'dnc'].includes(filter) ? { status: filter } : {});
-  const doSearch = () => fetchData(search ? { search } : {});
+  const refresh = () => fetchData();
 
   const toggleDnc = async (lead) => {
     await api.updateOutreachLead(lead.id, { do_not_contact: !lead.do_not_contact });
-    refresh();
+    fetchData();
   };
 
   const loadLogs = async (id) => {
@@ -90,6 +89,10 @@ export default function OutreachView() {
     if (filter === 'replied') return l.replied_at;
     if (filter === 'dnc') return l.do_not_contact;
     if (filter) return l.status === filter;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      return (l.clinic_name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q);
+    }
     return true;
   });
 
@@ -100,7 +103,7 @@ export default function OutreachView() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ color: '#fff', fontSize: 20, margin: 0 }}>Outreach-Pipeline</h2>
-        <Btn onClick={refresh}>Aktualisieren</Btn>
+        <Btn onClick={refresh}>{loading ? '...' : 'Aktualisieren'}</Btn>
       </div>
 
       <div style={{ ...S.card, padding: 16, marginBottom: 12 }}>
@@ -144,11 +147,10 @@ export default function OutreachView() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && doSearch()}
-          placeholder="Klinik oder E-Mail suchen..."
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Klinik oder E-Mail suchen — filtert sofort..."
           style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #333366', background: '#1a1a2e', color: '#fff', fontSize: 13, fontFamily: 'inherit', outline: 'none' }} />
-        <Btn onClick={doSearch}>Suchen</Btn>
-        {(search || filter) && <Btn onClick={() => { setSearch(''); setFilter(null); fetchData(); }}>Reset</Btn>}
+        {(search || filter) && <Btn onClick={() => { setSearch(''); setFilter(null); }}>Reset</Btn>}
       </div>
 
       {loading && !leads ? (
