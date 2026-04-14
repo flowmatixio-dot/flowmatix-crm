@@ -299,7 +299,7 @@ export default function DashboardView() {
         const phoneClean = phoneDisplay.replace(/[\s\-\(\)]/g, '');
         const clinicCode = (activeClinicId || '').substring(0, 8).toUpperCase();
         const waLink = `https://wa.me/${phoneClean.replace('+', '')}?text=START-${clinicCode}`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(waLink)}&bgcolor=0f1623&color=10b981`;
         const msgUsed = ti?.session?.messagesCount || 0;
         const msgLimit = ti?.limits?.maxMessages || ti?.session?.messageLimit || 50;
         const msgRemaining = Math.max(0, msgLimit - msgUsed);
@@ -357,7 +357,7 @@ export default function DashboardView() {
               }}>
                 {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
               </a>
-              <img src={qrUrl} alt="QR" style={{ width: 56, height: 56, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", flexShrink: 0 }} />
+              <img src={qrUrl} alt="QR" style={{ width: 140, height: 140, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", flexShrink: 0 }} />
             </div>
           </div>
         );
