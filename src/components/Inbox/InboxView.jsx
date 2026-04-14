@@ -339,6 +339,13 @@ export default function InboxView() {
     };
   }, [selChat, leads]);
 
+  /* ── Format message text: replace [interactive:...] with readable labels ── */
+  const fmtMsg = (text) => {
+    if (!text) return text;
+    const labels = { main_menu: '📋 Hauptmenü', concern_menu: '📋 Anliegen-Auswahl', treatment_menu: '📋 Behandlungs-Auswahl', appointment_menu: '📋 Termin-Menü', yesno: '📋 Ja/Nein-Frage' };
+    return text.replace(/\[interactive:([\w_]+)\]/gi, (_, t) => labels[t.toLowerCase()] || `📋 ${t}`);
+  };
+
   /* ── Load + auto-refresh messages from API ── */
   const loadMessages = useCallback(() => {
     if (!selChat?.id || !activeClinicId) return;
@@ -542,7 +549,7 @@ export default function InboxView() {
                     </div>
                     {/* Last message preview */}
                     <div style={{fontSize:12,color:"var(--text-muted)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:6}}>
-                      {lastMsg?.text?.substring(0, 40) || ch.lastMessage?.substring(0, 40) || ch.snippet?.substring(0, 40) || "—"}
+                      {fmtMsg(lastMsg?.text)?.substring(0, 40) || fmtMsg(ch.lastMessage)?.substring(0, 40) || ch.snippet?.substring(0, 40) || "—"}
                     </div>
                     {/* Status badges — cancelled: only show Storniert, nothing else */}
                     <div style={{display:"flex",gap:5,alignItems:"center",flexWrap:"wrap"}}>
@@ -863,7 +870,7 @@ export default function InboxView() {
                                     <div style={{fontSize:12,lineHeight:1.5,color:"rgba(232,238,252,0.60)",marginTop:6,paddingTop:6,borderTop:"1px solid rgba(255,138,42,0.15)",fontStyle:"italic"}}>{msg.text}</div>
                                   </>
                                 ) : (
-                                  <div style={{fontSize:14,lineHeight:1.5}}>{msg.text}</div>
+                                  <div style={{fontSize:14,lineHeight:1.5}}>{fmtMsg(msg.text)}</div>
                                 )}
                                 <div style={{fontSize:11,color:"var(--text-faint)",marginTop:4,textAlign:msg.sender === "patient" ? "left" : "right"}}>
                                   {msg.time}
