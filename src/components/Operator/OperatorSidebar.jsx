@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { id: 'monitoring',   icon: '📡', label: 'Monitoring' },
   { id: 'incidents',    icon: '🚨', label: 'Incidents' },
   'divider',
+  { id: 'outreach',     icon: '📧', label: 'Outreach' },
   { id: 'logs',         icon: '📋', label: 'Logs' },
   { id: 'billing',      icon: '💳', label: 'Billing' },
   { id: 'settings',     icon: '⚙️', label: 'Settings' },

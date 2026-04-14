@@ -774,6 +774,10 @@ export async function deleteOutreachLead(id) {
   return apiFetch(`/api/v1/ops/outreach/${id}`, { method: 'DELETE' });
 }
 
+export async function getOutreachLogs(id) {
+  return apiFetch(`/api/v1/ops/outreach/logs/${id}`);
+}
+
 // ── Billing & Subscriptions ──────────────────────────────
 
 export async function getMySubscription() {
