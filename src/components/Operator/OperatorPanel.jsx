@@ -1806,13 +1806,15 @@ function TabSecurity({ d, load }) {
 
       {/* Data retention */}
       <div style={S.card}>
-        <div style={S.kpiLabel}>Datenspeicherung & Compliance</div>
+        <div style={S.kpiLabel}>Datenspeicherung & Löschfristen</div>
         <div style={{ fontSize: 13, color: '#ccc', lineHeight: 2, marginTop: 8 }}>
-          <div>Audit-Logs: <b style={{ color: '#fff' }}>90 Tage</b></div>
+          <div>Patientendaten: <b style={{ color: '#fff' }}>Vertragsdauer + 90 Tage</b> <span style={{ color: '#8D93A6', fontSize: 11 }}>(dann automatische Anonymisierung)</span></div>
+          <div>Audit-Logs: <b style={{ color: '#fff' }}>365 Tage</b></div>
+          <div>Technische Logs: <b style={{ color: '#fff' }}>30 Tage</b></div>
           <div>Webhook-Ereignisse: <b style={{ color: '#fff' }}>30 Tage</b></div>
-          <div>Backups: <b style={{ color: '#fff' }}>7 täglich / 4 wöchentlich / 6 monatlich</b></div>
-          <div>Session-Tokens: <b style={{ color: '#fff' }}>7 Tage (JWT Refresh)</b></div>
-          <div>DSGVO: <b style={{ color: '#fff' }}>Datenanfragen über Admin-Panel</b></div>
+          <div>Backups: <b style={{ color: '#fff' }}>7 täglich / 4 wöchentlich / 12 monatlich</b> <span style={{ color: '#8D93A6', fontSize: 11 }}>(GPG-verschlüsselt)</span></div>
+          <div>Session-Tokens: <b style={{ color: '#fff' }}>7 Tage</b> <span style={{ color: '#8D93A6', fontSize: 11 }}>(JWT Refresh)</span></div>
+          <div>Zahlungsdaten: <b style={{ color: '#fff' }}>10 Jahre</b> <span style={{ color: '#8D93A6', fontSize: 11 }}>(§ 147 AO)</span></div>
         </div>
       </div>
     </>
