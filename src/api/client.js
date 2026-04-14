@@ -614,6 +614,7 @@ export async function getUnifiedLogs(params = {}) {
   if (params.limit) qs.set('limit', params.limit);
   if (params.source) qs.set('source', params.source);
   if (params.organization_id) qs.set('organization_id', params.organization_id);
+  if (params.event_type_filter) qs.set('event_type_filter', params.event_type_filter);
   const q = qs.toString();
   return apiFetch(`/api/v1/ops/logs${q ? '?' + q : ''}`);
 }

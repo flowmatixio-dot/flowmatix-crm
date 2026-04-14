@@ -7,6 +7,8 @@ const SOURCES = [
   { key: 'audit', label: 'Audit' },
   { key: 'webhook', label: 'Webhook' },
   { key: 'provisioning', label: 'Provisioning' },
+  // Virtual filter: source=audit + event_type_filter=impersonation
+  { key: 'impersonation', label: 'Impersonation', _source: 'audit', _eventFilter: 'impersonation' },
 ];
 
 const SOURCE_COLORS = {
@@ -34,7 +36,16 @@ export default function LogsView() {
 
   const load = useCallback(() => {
     setLoading(true);
-    fmApi.getUnifiedLogs({ page, limit: 50, source: source || undefined, organization_id: clinicId || undefined })
+    // Resolve virtual 'impersonation' filter to real params
+    const activeSrc = SOURCES.find(s => s.key === source);
+    const resolvedSource = activeSrc?._source || (source && source !== 'impersonation' ? source : undefined);
+    const resolvedEventFilter = activeSrc?._eventFilter || undefined;
+    fmApi.getUnifiedLogs({
+      page, limit: 50,
+      source: resolvedSource,
+      organization_id: clinicId || undefined,
+      event_type_filter: resolvedEventFilter,
+    })
       .then(res => {
         setLogs(Array.isArray(res?.entries) ? res.entries : []);
         setTotal(res?.pagination?.total || 0);
@@ -124,14 +135,22 @@ export default function LogsView() {
               const resType = typeof l.resource_type === 'string' ? l.resource_type : '';
               const hasDetails = l.details_text && typeof l.details_text === 'string' && l.details_text.length > 1;
               const detailStr = l.details_text || '';
+              const isImpersonation = action.includes('impersonation');
 
               return (
                 <div key={i}>
                   <div
                     onClick={() => hasDetails ? setExpandedRow(isExpanded ? null : i) : null}
-                    style={{ padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)', fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12, cursor: hasDetails ? 'pointer' : 'default', transition: 'background 0.15s' }}
-                    onMouseEnter={e => { if (hasDetails) e.currentTarget.style.background = 'var(--bg-card)'; }}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    style={{
+                      padding: '10px 16px',
+                      borderBottom: '1px solid var(--border-subtle)',
+                      fontSize: 12, fontFamily: 'monospace', display: 'flex', gap: 12,
+                      cursor: hasDetails ? 'pointer' : 'default', transition: 'background 0.15s',
+                      borderLeft: isImpersonation ? '3px solid #ff8a2a' : '3px solid transparent',
+                      background: isImpersonation ? 'rgba(255,138,42,0.04)' : 'transparent',
+                    }}
+                    onMouseEnter={e => { if (hasDetails) e.currentTarget.style.background = isImpersonation ? 'rgba(255,138,42,0.08)' : 'var(--bg-card)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = isImpersonation ? 'rgba(255,138,42,0.04)' : 'transparent'; }}
                   >
                     <span style={{ color: 'var(--text-muted)', flexShrink: 0, width: 140 }}>
                       {l.created_at ? new Date(l.created_at).toLocaleString('de-DE') : ''}
