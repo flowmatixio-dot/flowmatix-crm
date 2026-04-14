@@ -51,7 +51,12 @@ function TotpCard() {
 
   const setup = async () => {
     setMfa(s => ({ ...s, loading: true, error: '' }));
-    try { const r = await fmApi.setupMfa(); setMfa(s => ({ ...s, step: 'setup', qrUrl: r.qrCodeUrl || r.qr_code_url || '', secret: r.secret || '', loading: false })); }
+    try {
+      const r = await fmApi.setupMfa();
+      const uri = r.otpauthUri || r.qrCodeUrl || r.qr_code_url || '';
+      const qrUrl = uri ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(uri)}` : '';
+      setMfa(s => ({ ...s, step: 'setup', qrUrl, secret: r.secret || '', loading: false }));
+    }
     catch (e) { setMfa(s => ({ ...s, error: e.message, loading: false })); }
   };
   const verify = async () => {
