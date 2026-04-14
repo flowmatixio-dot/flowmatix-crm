@@ -88,6 +88,8 @@ export default function MainLayout() {
   const effectiveRole = userRole || "admin";
   const canAccess = (mod) => hasModuleAccess(effectiveRole, mod, clinicPlan);
   const [billingCycle, setBillingCycle] = React.useState('monthly');
+  const [verbisDismissed, setVerbisDismissed] = React.useState(() => !!localStorage.getItem('verbis_dismissed_' + clinic?.id));
+  const showVerbisBanner = clinic?.country === 'TR' && !verbisDismissed;
   const [showPwModal, setShowPwModal] = React.useState(false);
   const [pwForm, setPwForm] = React.useState({ current: '', newPw: '', confirm: '' });
   const [pwLoading, setPwLoading] = React.useState(false);
@@ -467,7 +469,26 @@ export default function MainLayout() {
       );
     })()}
 
-    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "var(--bg-app)", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "var(--text-primary)", overflow: "hidden", transition: "background .25s ease, color .25s ease", ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
+    {showVerbisBanner && (
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 8500, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 20px', background: 'linear-gradient(90deg, #b45309, #92400e)', borderBottom: '1px solid rgba(251,191,36,0.3)', boxShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+          <span style={{ fontSize: 12, color: '#fef3c7', lineHeight: 1.5 }}>
+            <strong style={{ color: '#fde68a' }}>VERBİS Kaydı Zorunlu:</strong>{' '}
+            Türkiye'de kişisel veri işleyen klinikler, KVKK kapsamında{' '}
+            <a href="https://verbis.kvkk.gov.tr" target="_blank" rel="noopener noreferrer" style={{ color: '#fde68a', textDecoration: 'underline', fontWeight: 700 }}>verbis.kvkk.gov.tr</a>{' '}
+            adresinden Veri Sorumluları Siciline kayıt yaptırmakla yükümlüdür. Kayıt olmamanız halinde idari para cezasına tabi tutulabilirsiniz.
+          </span>
+        </div>
+        <button
+          onClick={() => { localStorage.setItem('verbis_dismissed_' + clinic.id, '1'); setVerbisDismissed(true); }}
+          style={{ flexShrink: 0, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 6, color: '#fef3c7', fontSize: 16, width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+          title="Schließen"
+        >✕</button>
+      </div>
+    )}
+
+    <div style={{ display: "flex", height: "calc(100vh / 1.04)", background: "var(--bg-app)", fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", color: "var(--text-primary)", overflow: "hidden", transition: "background .25s ease, color .25s ease", paddingTop: showVerbisBanner ? 44 : 0, ...(ctx.workspaceState === 'trial_expired' || ctx.showPlanPicker ? { filter: "blur(3px)", pointerEvents: "none" } : {}) }}>
       {toast && <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 9999, padding: "12px 24px", borderRadius: 12, background: "var(--bg-card-solid)", border: "1px solid var(--success-muted)", color: "var(--success)", fontWeight: 700, fontSize: 14, boxShadow: "var(--shadow-md)" }}>✓ {toast}</div>}
 
       {/* ── Doctor: New Task Popup (global, any view) ── */}
