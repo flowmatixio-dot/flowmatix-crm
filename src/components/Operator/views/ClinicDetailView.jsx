@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import StatCard from '../shared/StatCard.jsx';
 import StatusBadge from '../shared/StatusBadge.jsx';
 import WaOnboardingModal from '../shared/WaOnboardingModal.jsx';
+import ImpersonationDialog from '../shared/ImpersonationDialog.jsx';
 import { safe, safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 
@@ -10,6 +11,7 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
   const [waLogEntries, setWaLogEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showWaModal, setShowWaModal] = useState(false);
+  const [showImpersonateDialog, setShowImpersonateDialog] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState(null);
   const [trialLinks, setTrialLinks] = useState(null);
@@ -47,17 +49,8 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
       }
       else if (action === 'resume') { await fmApi.resumeClinic(orgId); flash('Clinic resumed'); }
       else if (action === 'impersonate') {
-        const reason = prompt('Impersonation reason (min 5 chars, for audit log):');
-        if (reason && reason.length >= 5) {
-          const res = await fmApi.impersonateClinic(orgId, reason);
-          const token = res?.impersonation?.accessToken || res?.token;
-          if (token) {
-            window.open(`https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`, '_blank');
-            flash('Impersonation session opened (30 min)');
-          } else {
-            flash('Impersonation failed: ' + (res?.error || 'No token'), 'err');
-          }
-        }
+        setShowImpersonateDialog(true);
+        return;
       }
       else if (action === 'trial') {
         const res = await fmApi.generateTrialLink(orgId);
@@ -95,6 +88,24 @@ export default function ClinicDetailView({ clinic, onClose, onRefresh }) {
 
   return (
     <div>
+      {/* Impersonation Dialog */}
+      {showImpersonateDialog && (
+        <ImpersonationDialog
+          clinicName={clinic?.name}
+          onCancel={() => setShowImpersonateDialog(false)}
+          onConfirm={async ({ reason, category, ticket_id }) => {
+            const res = await fmApi.impersonateClinic(orgId, reason, category, ticket_id);
+            setShowImpersonateDialog(false);
+            const token = res?.impersonation?.accessToken || res?.token;
+            if (token) {
+              window.open(`https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`, '_blank');
+              flash('Impersonation session opened (30 min)');
+            } else {
+              flash('Impersonation failed: ' + (res?.error || 'No token'), 'err');
+            }
+          }}
+        />
+      )}
       {/* Trial Links Modal */}
       {trialLinks && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => setTrialLinks(null)}>

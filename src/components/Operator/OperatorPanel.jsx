@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { timeAgo } from "../../utils/helpers";
 import * as api from "../../api/client";
 import TabOutreach from './TabOutreach.jsx';
+import ImpersonationDialog from './shared/ImpersonationDialog.jsx';
 
 /* ═══════════════════════════════════════════════════════════
    STYLES
@@ -557,6 +558,7 @@ function TabClinics({ d, load }) {
   const [promoModal, setPromoModal] = useState(false);
   const [promoGenLoading, setPromoGenLoading] = useState(false);
   const [generatedPromo, setGeneratedPromo] = useState(null);
+  const [impersonateTarget, setImpersonateTarget] = useState(null);
   const clinics = d.clinics;
 
   const doSearch = () => load('clinics', () => api.getPlatformClinics({ search }));
@@ -611,10 +613,8 @@ function TabClinics({ d, load }) {
         await api.resumeClinic(orgId, 'Resumed from operator console');
         setActionMsg({ type: 'ok', text: `${orgName} fortgesetzt` });
       } else if (action === 'impersonate') {
-        const reason = prompt('Grund für Impersonation (mind. 5 Zeichen):');
-        if (!reason || reason.length < 5) return;
-        const res = await api.impersonateClinic(orgId, reason);
-        setActionMsg({ type: 'ok', text: `Impersonation als ${res.impersonation?.targetUser} — läuft ab in ${res.impersonation?.expiresIn}` });
+        setImpersonateTarget({ id: orgId, name: orgName });
+        return;
       } else if (action === 'trial') {
         setTrialTarget({ id: orgId, name: orgName });
         setTrialPlan('core');
@@ -630,6 +630,19 @@ function TabClinics({ d, load }) {
 
   return (
     <>
+      {/* ═══ IMPERSONATION DIALOG ═══ */}
+      {impersonateTarget && (
+        <ImpersonationDialog
+          clinicName={impersonateTarget.name}
+          onCancel={() => setImpersonateTarget(null)}
+          onConfirm={async ({ reason, category, ticket_id }) => {
+            const res = await api.impersonateClinic(impersonateTarget.id, reason, category, ticket_id);
+            setImpersonateTarget(null);
+            setActionMsg({ type: 'ok', text: `Impersonation als ${res.impersonation?.targetUser} — läuft ab in ${res.impersonation?.expiresIn}` });
+            await refresh();
+          }}
+        />
+      )}
       {/* ═══ TRIAL LINK MODAL ═══ */}
       {trialTarget && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)' }} onClick={() => { setTrialTarget(null); setTrialUrl(''); }}>

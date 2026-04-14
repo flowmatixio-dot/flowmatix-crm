@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as api from "../../api/client";
 import { timeAgo } from "../../utils/helpers";
 import { computeHealthScore, healthLabel } from "./ClinicHealthBadge";
+import ImpersonationDialog from "./shared/ImpersonationDialog.jsx";
 
 /**
  * SupportCenter — Operator support page.
@@ -31,6 +32,7 @@ export default function SupportCenter() {
   const [filter, setFilter] = useState("all"); // all, critical, warning, setup
   const [loading, setLoading] = useState(true);
   const [actionMsg, setActionMsg] = useState(null);
+  const [impersonateTarget, setImpersonateTarget] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,15 +55,8 @@ export default function SupportCenter() {
     return () => { cancelled = true; };
   }, []);
 
-  const handleImpersonate = async (orgId, orgName) => {
-    try {
-      const reason = prompt(`Reason for opening ${orgName} CRM (min 5 chars):`);
-      if (!reason || reason.length < 5) return;
-      const res = await api.impersonateClinic(orgId, reason);
-      setActionMsg({ type: "ok", text: `Impersonating ${res.impersonation?.targetUser || orgName} — expires in ${res.impersonation?.expiresIn || "30 min"}` });
-    } catch (err) {
-      setActionMsg({ type: "err", text: err.message });
-    }
+  const handleImpersonate = (orgId, orgName) => {
+    setImpersonateTarget({ id: orgId, name: orgName });
   };
 
   // Compute health and categorize clinics
@@ -84,6 +79,17 @@ export default function SupportCenter() {
 
   return (
     <>
+      {impersonateTarget && (
+        <ImpersonationDialog
+          clinicName={impersonateTarget.name}
+          onCancel={() => setImpersonateTarget(null)}
+          onConfirm={async ({ reason, category, ticket_id }) => {
+            const res = await api.impersonateClinic(impersonateTarget.id, reason, category, ticket_id);
+            setImpersonateTarget(null);
+            setActionMsg({ type: "ok", text: `Impersonating ${res.impersonation?.targetUser || impersonateTarget.name} — expires in ${res.impersonation?.expiresIn || "30 min"}` });
+          }}
+        />
+      )}
       <h2 style={{ color: '#fff', fontSize: 20, marginBottom: 16 }}>Support Center</h2>
 
       {actionMsg && (

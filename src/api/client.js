@@ -461,10 +461,10 @@ export async function resumeClinic(orgId, reason) {
   });
 }
 
-export async function impersonateClinic(orgId, reason) {
+export async function impersonateClinic(orgId, reason, category, ticket_id) {
   return apiFetch(`/api/v1/ops/clinic/${orgId}/impersonate`, {
     method: 'POST',
-    body: JSON.stringify({ reason }),
+    body: JSON.stringify({ reason, category, ticket_id }),
   });
 }
 

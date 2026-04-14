@@ -3,6 +3,7 @@ import StatusBadge from '../shared/StatusBadge.jsx';
 import { safeNum, safeStr } from '../shared/safe.js';
 import * as fmApi from '../../../api/client.js';
 import ClinicDetailView from './ClinicDetailView.jsx';
+import ImpersonationDialog from '../shared/ImpersonationDialog.jsx';
 
 // Priority order for sorting — problems first
 const ACTION_PRIORITY = {
@@ -37,6 +38,7 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
   const [promoModal, setPromoModal] = useState(false);
   const [promoGenLoading, setPromoGenLoading] = useState(false);
   const [generatedPromo, setGeneratedPromo] = useState(null);
+  const [impersonateTarget, setImpersonateTarget] = useState(null);
 
   const brokenCount = clinics.filter(c => c.required_action && c.required_action !== 'NONE').length;
 
@@ -51,12 +53,10 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
     setActionLoading(`${orgId}-${action}`);
     try {
       if (action === 'impersonate') {
-        const reason = prompt('Impersonation reason (min 5 chars):');
-        if (reason && reason.length >= 5) {
-          const res = await fmApi.impersonateClinic(orgId, reason);
-          const token = res?.impersonation?.accessToken || res?.token;
-          if (token) window.open(`https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`, '_blank');
-        }
+        const clinic = clinics.find(c => c.id === orgId);
+        setImpersonateTarget({ id: orgId, name: clinic?.name });
+        setActionLoading(null);
+        return;
       } else if (action === 'wa-start') await fmApi.waStart(orgId);
       else if (action === 'wa-retry') await fmApi.waRetry(orgId);
       else if (action === 'wa-force') await fmApi.waForceConnect(orgId);
@@ -70,6 +70,19 @@ export default function ClinicsView({ actions, selectedClinic, onSelectClinic, n
 
   return (
     <div>
+      {/* Impersonation Dialog */}
+      {impersonateTarget && (
+        <ImpersonationDialog
+          clinicName={impersonateTarget.name}
+          onCancel={() => setImpersonateTarget(null)}
+          onConfirm={async ({ reason, category, ticket_id }) => {
+            const res = await fmApi.impersonateClinic(impersonateTarget.id, reason, category, ticket_id);
+            setImpersonateTarget(null);
+            const token = res?.impersonation?.accessToken || res?.token;
+            if (token) window.open(`https://crm.flowmatix.io#impersonate=${encodeURIComponent(token)}`, '_blank');
+          }}
+        />
+      )}
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>Clinics</h1>
