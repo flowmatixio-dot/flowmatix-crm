@@ -197,6 +197,14 @@ export async function getMe() {
   return res.user || res;
 }
 
+export async function enrollWithToken(setupToken) {
+  return apiFetch('/api/v1/auth/mfa/enroll-with-token', { method: 'POST', body: JSON.stringify({ setupToken }) });
+}
+
+export async function confirmWithToken(setupToken, totpCode) {
+  return apiFetch('/api/v1/auth/mfa/confirm-with-token', { method: 'POST', body: JSON.stringify({ setupToken, totpCode }) });
+}
+
 export async function setupMfa() {
   return apiFetch('/api/v1/auth/mfa/setup', { method: 'POST', body: '{}' });
 }

@@ -72,7 +72,12 @@ export default function App() {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPass, setLoginPass] = useState("");
   const [loginErr, setLoginErr] = useState("");
-  const [loginMode, setLoginMode] = useState(IS_CLIENT_MODE ? "magic" : "password"); /* magic | password | forgot | sent */
+  const [loginMode, setLoginMode] = useState(IS_CLIENT_MODE ? "magic" : "password"); /* magic | password | forgot | sent | mfaSetup */
+  const [mfaSetupToken, setMfaSetupToken] = useState(null);
+  const [mfaSetupQr, setMfaSetupQr] = useState('');
+  const [mfaSetupSecret, setMfaSetupSecret] = useState('');
+  const [mfaSetupCode, setMfaSetupCode] = useState('');
+  const [mfaSetupLoading, setMfaSetupLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [showPass, setShowPass] = useState(false);
   const [loginLang, setLoginLang] = useState("en");
@@ -448,7 +453,7 @@ export default function App() {
   const resolveUser=async(au)=>{try{const{data:p}=await supabase.from("users").select("*").eq("id",au.id).single();if(p){setUser({email:au.email,role:p.role,clinicId:p.clinic_id,name:p.display_name||au.email});if(p.clinic_id){setAdminClinic(p.clinic_id);await routeAfterLogin(au.id,p.clinic_id);}}else{const adm=au.email==="admin@flowmatix.io";setUser({email:au.email,role:adm?"admin":"clinic_staff",clinicId:adm?null:"c1",name:au.email.split("@")[0]});}}catch(e){const adm=au.email==="admin@flowmatix.io";setUser({email:au.email,role:adm?"admin":"clinic_staff",clinicId:adm?null:"c1",name:au.email.split("@")[0]});}setAuthLoading(false);};
   const handleLogin=async()=>{setLoginErr("");setAuthLoading(true);
     /* 1. Try Flowmatix API login first (operator accounts) */
-    try{const res=await fmApi.login(loginEmail,loginPass);if(res?.user){const u=res.user;const isOp=u.role==="platform_owner"||u.role==="admin";setUser({email:u.email,role:"admin",clinicId:isOp?null:"c1",name:u.name||u.email.split("@")[0],apiUser:true,apiRole:u.role,orgId:u.organizationId});if(isOp)setView("operator");setLang(loginLang);setAuthLoading(false);setAuditLog(prev=>[{id:genId(),time:new Date().toISOString(),user:u.name||u.email,role:u.role,clinicId:"admin",action:"login",target:"CRM",details:`API login from ${navigator.userAgent?.substring(0,50)}`},...prev]);return;}}catch(e){/* API login failed — continue to Supabase/demo */}
+    try{const res=await fmApi.login(loginEmail,loginPass);if(res?.user){const u=res.user;const isOp=u.role==="platform_owner"||u.role==="admin";setUser({email:u.email,role:"admin",clinicId:isOp?null:"c1",name:u.name||u.email.split("@")[0],apiUser:true,apiRole:u.role,orgId:u.organizationId});if(isOp)setView("operator");setLang(loginLang);setAuthLoading(false);setAuditLog(prev=>[{id:genId(),time:new Date().toISOString(),user:u.name||u.email,role:u.role,clinicId:"admin",action:"login",target:"CRM",details:`API login from ${navigator.userAgent?.substring(0,50)}`},...prev]);return;}if(res?.requiresMfaSetup&&res?.setupToken){setMfaSetupToken(res.setupToken);setMfaSetupCode('');setMfaSetupQr('');setMfaSetupSecret('');setAuthLoading(false);fmApi.enrollWithToken(res.setupToken).then(r=>{const uri=r.otpauthUri||'';const qr=uri?`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(uri)}`:'';setMfaSetupQr(qr);setMfaSetupSecret(r.secret||'');}).catch(()=>{});setLoginMode('mfaSetup');return;}if(res?.requiresMfa){setLoginErr("2FA code required");setAuthLoading(false);return;}}catch(e){/* API login failed — continue to Supabase/demo */}
     /* 2. Live mode: try Supabase */
     if(!isDemoMode){try{const{error}=await supabase.auth.signInWithPassword({email:loginEmail,password:loginPass});if(!error){setLang(loginLang);return;}}catch(e){/* Supabase unavailable — try demo fallback below */}}
     /* 3. Demo accounts (works in both modes — fallback for Live when Supabase is down) */
@@ -1082,6 +1087,20 @@ export default function App() {
       </div>
       {/* Card */}
       <div style={{width:420,padding:"36px 40px",borderRadius:20,background:"#162032",border:"1px solid rgba(255,255,255,0.08)",position:"relative",zIndex:1,boxShadow:"0 8px 24px rgba(0,0,0,0.3)"}}>
+
+        {/* ═══ MODE: MFA SETUP — scan QR, confirm code ═══ */}
+        {loginMode==="mfaSetup"&&<div style={{textAlign:"center"}}>
+          <div style={{fontSize:32,marginBottom:8}}>🔐</div>
+          <div style={{fontWeight:800,fontSize:20,marginBottom:4,color:"#fff"}}>2FA einrichten</div>
+          <div style={{fontSize:13,color:"rgba(167,177,195,0.6)",marginBottom:20}}>Pflicht für Operator-Accounts. Einmalig.</div>
+          {!mfaSetupQr&&<div style={{fontSize:13,color:"rgba(167,177,195,0.4)",marginBottom:16}}>Lade QR-Code…</div>}
+          {mfaSetupQr&&<div style={{margin:"0 auto 12px"}}><img src={mfaSetupQr} alt="2FA QR" width={160} height={160} style={{borderRadius:8}}/></div>}
+          {mfaSetupSecret&&<div style={{fontSize:10,color:"rgba(167,177,195,0.4)",marginBottom:16,wordBreak:"break-all"}}>Manuell: <code style={{background:"rgba(255,255,255,0.06)",padding:"2px 6px",borderRadius:4}}>{mfaSetupSecret}</code></div>}
+          <input type="text" inputMode="numeric" maxLength={6} value={mfaSetupCode} onChange={e=>setMfaSetupCode(e.target.value.replace(/\D/g,""))} onKeyDown={async e=>{if(e.key==="Enter"&&mfaSetupCode.length===6){setMfaSetupLoading(true);try{const r=await fmApi.confirmWithToken(mfaSetupToken,mfaSetupCode);if(r?.accessToken){fmApi.setTokens(r.accessToken,r.refreshToken);const me=await fmApi.getMe();if(me){setUser({email:me.email,role:"admin",name:me.name||me.email.split("@")[0],apiUser:true,apiRole:me.role,orgId:me.organizationId});setView("operator");setAuthLoading(false);setLoginMode("password");return;}}}catch(err){setLoginErr(err.message||"Ungültiger Code");}setMfaSetupLoading(false);}}} placeholder="000000" style={{width:"100%",padding:"14px",borderRadius:12,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(212,175,55,0.3)",color:"#fff",fontFamily:"inherit",fontSize:22,fontWeight:700,outline:"none",boxSizing:"border-box",textAlign:"center",letterSpacing:8,marginBottom:12}}/>
+          {loginErr&&<div style={{padding:"8px 12px",borderRadius:8,background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",marginBottom:12,color:"#ef4444",fontSize:13,fontWeight:600}}>{loginErr}</div>}
+          <button onClick={async()=>{if(mfaSetupCode.length!==6)return;setMfaSetupLoading(true);try{const r=await fmApi.confirmWithToken(mfaSetupToken,mfaSetupCode);if(r?.accessToken){fmApi.setTokens(r.accessToken,r.refreshToken);const me=await fmApi.getMe();if(me){setUser({email:me.email,role:"admin",name:me.name||me.email.split("@")[0],apiUser:true,apiRole:me.role,orgId:me.organizationId});setView("operator");setAuthLoading(false);setLoginMode("password");return;}}}catch(err){setLoginErr(err.message||"Ungültiger Code");}setMfaSetupLoading(false);}} disabled={mfaSetupLoading||mfaSetupCode.length!==6} style={{width:"100%",padding:14,borderRadius:12,background:mfaSetupCode.length===6?"rgba(212,175,55,0.15)":"rgba(255,255,255,0.04)",border:mfaSetupCode.length===6?"1px solid rgba(212,175,55,0.3)":"1px solid rgba(255,255,255,0.08)",color:mfaSetupCode.length===6?"#d4af37":"rgba(167,177,195,0.4)",fontWeight:700,fontSize:15,cursor:mfaSetupCode.length===6?"pointer":"default",fontFamily:"inherit"}}>{mfaSetupLoading?"…":"Bestätigen & einloggen"}</button>
+          <button onClick={()=>{setLoginMode("password");setLoginErr("");setMfaSetupToken(null);}} style={{background:"none",border:"none",color:"rgba(167,177,195,0.4)",cursor:"pointer",fontSize:12,fontFamily:"inherit",marginTop:12}}>← Zurück</button>
+        </div>}
 
         {/* ═══ MODE: SENT — Check your email ═══ */}
         {loginMode==="sent"?<div style={{textAlign:"center"}}>
