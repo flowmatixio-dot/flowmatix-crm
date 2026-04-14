@@ -109,6 +109,68 @@ export default function AuditLogView() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  // Human-readable detail summary
+  const renderDetails = (e) => {
+    const det = e.details;
+    if (!det || Object.keys(det).length === 0) return <span style={{ color: "rgba(167,177,195,0.4)" }}>—</span>;
+
+    // Viewed actions — show what was accessed
+    if (e.action === "photo_viewed") {
+      return <span style={{ color: "rgba(167,177,195,0.7)" }}>
+        {det.patient_id ? `Patient: …${det.patient_id.slice(-8)}` : "Foto-Zugriff"}
+        {det.photo_key ? ` · ${det.photo_key.split("/").pop()}` : ""}
+      </span>;
+    }
+    if (e.action === "conversation_viewed") {
+      return <span style={{ color: "rgba(167,177,195,0.7)" }}>
+        {det.patient_id ? `Patient: …${det.patient_id.slice(-8)}` : "Konversation geöffnet"}
+      </span>;
+    }
+    if (e.action === "appointment_viewed") {
+      const f = det.filters || {};
+      const parts = [];
+      if (f.patient_id) parts.push(`Patient: …${String(f.patient_id).slice(-8)}`);
+      if (f.from || f.to) parts.push(`${f.from || "?"} – ${f.to || "?"}`);
+      if (f.status) parts.push(`Status: ${f.status}`);
+      if (f.doctor_id) parts.push("Arzt-Filter");
+      if (f.location) parts.push(`Ort: ${f.location}`);
+      return <span style={{ color: "rgba(167,177,195,0.7)" }}>{parts.length ? parts.join(" · ") : "Terminliste"}</span>;
+    }
+    if (e.action === "patient_viewed") {
+      return <span style={{ color: "rgba(167,177,195,0.7)" }}>
+        {det.patient_id ? `Patient: …${det.patient_id.slice(-8)}` : "Patientendetails"}
+      </span>;
+    }
+
+    // Settings/integration changes — show field names
+    if (e.action?.startsWith("settings") || e.action?.startsWith("integration")) {
+      const keys = Object.keys(det);
+      if (keys.length <= 3) return <span style={{ color: "rgba(167,177,195,0.7)" }}>{keys.join(", ")}</span>;
+      return <span style={{ color: "rgba(167,177,195,0.7)" }}>{keys.slice(0, 3).join(", ")} +{keys.length - 3}</span>;
+    }
+
+    // Generic: try to extract a readable summary
+    const summaryKeys = ["message", "reason", "name", "email", "phone", "template", "status"];
+    for (const k of summaryKeys) {
+      if (det[k] && typeof det[k] === "string") {
+        const v = det[k];
+        return <span style={{ color: "rgba(167,177,195,0.7)" }}>{k}: {v.length > 60 ? v.slice(0, 57) + "…" : v}</span>;
+      }
+    }
+
+    // Fallback: compact JSON in expandable
+    const json = JSON.stringify(det);
+    if (json.length <= 80) return <code style={{ fontSize: 10, color: "rgba(167,177,195,0.6)" }}>{json}</code>;
+    return (
+      <details style={{ cursor: "pointer" }}>
+        <summary style={{ outline: "none", color: "rgba(167,177,195,0.6)", fontSize: 10 }}>{Object.keys(det).length} Felder</summary>
+        <pre style={{ marginTop: 4, padding: 6, background: "rgba(0,0,0,0.3)", borderRadius: 6, fontSize: 10, color: "rgba(167,177,195,0.8)", maxHeight: 160, overflow: "auto" }}>
+          {JSON.stringify(det, null, 2)}
+        </pre>
+      </details>
+    );
+  };
+
   // Color map per action category
   const actionColor = (a) => {
     if (!a) return "#a7b1c3";
@@ -211,11 +273,7 @@ export default function AuditLogView() {
 {JSON.stringify({ old: e.old_value, new: e.new_value }, null, 2)}
                 </pre>
               </details>
-            ) : e.details && Object.keys(e.details).length > 0 ? (
-              <code style={{ fontSize: 10, color: "rgba(167,177,195,0.7)" }}>{JSON.stringify(e.details)}</code>
-            ) : (
-              <span style={{ color: "rgba(167,177,195,0.4)" }}>—</span>
-            )}
+            ) : renderDetails(e)}
           </div>
         </div>;
       })}
