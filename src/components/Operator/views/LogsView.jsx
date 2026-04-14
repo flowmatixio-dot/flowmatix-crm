@@ -25,17 +25,23 @@ export default function LogsView() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [expandedRow, setExpandedRow] = useState(null);
+  const [clinics, setClinics] = useState([]);
+  const [clinicId, setClinicId] = useState('');
+
+  useEffect(() => {
+    fmApi.getPlatformClinics().then(r => setClinics(r?.clinics || [])).catch(() => {});
+  }, []);
 
   const load = useCallback(() => {
     setLoading(true);
-    fmApi.getUnifiedLogs({ page, limit: 50, source: source || undefined })
+    fmApi.getUnifiedLogs({ page, limit: 50, source: source || undefined, organization_id: clinicId || undefined })
       .then(res => {
         setLogs(Array.isArray(res?.entries) ? res.entries : []);
         setTotal(res?.pagination?.total || 0);
         setLoading(false);
       })
       .catch(() => { setLogs([]); setLoading(false); });
-  }, [page, source]);
+  }, [page, source, clinicId]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -74,7 +80,15 @@ export default function LogsView() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>Logs</h1>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <select
+            value={clinicId}
+            onChange={e => { setClinicId(e.target.value); setPage(1); }}
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 12px', color: clinicId ? 'var(--text-primary)' : 'var(--text-secondary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', minWidth: 160 }}
+          >
+            <option value="">Alle Kliniken</option>
+            {clinics.map(c => <option key={c.id} value={c.id}>{safeStr(c.name)}</option>)}
+          </select>
           {SOURCES.map(s => (
             <button key={s.key} onClick={() => { setSource(s.key); setPage(1); }}
               style={{ background: source === s.key ? 'var(--brand)' : 'var(--bg-card)', color: source === s.key ? '#fff' : 'var(--text-secondary)', border: source === s.key ? 'none' : '1px solid var(--border-subtle)', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
