@@ -197,6 +197,24 @@ export async function getMe() {
   return res.user || res;
 }
 
+export async function setupMfa() {
+  return apiFetch('/api/v1/auth/mfa/setup', { method: 'POST', body: '{}' });
+}
+
+export async function verifyMfa(code) {
+  return apiFetch('/api/v1/auth/mfa/verify', {
+    method: 'POST',
+    body: JSON.stringify({ totpCode: code }),
+  });
+}
+
+export async function disableMfa(code) {
+  return apiFetch('/api/v1/auth/mfa/disable', {
+    method: 'POST',
+    body: JSON.stringify({ totpCode: code }),
+  });
+}
+
 // ── Platform (Operator) ──────────────────────────────────
 
 export async function getPlatformOverview() {

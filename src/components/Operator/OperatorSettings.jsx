@@ -399,6 +399,87 @@ function StoragePanel({ state, set }) {
   );
 }
 
+function TotpSetup() {
+  const [mfa, setMfa] = React.useState({ enabled: null, step: 'idle', qrUrl: '', secret: '', code: '', error: '', loading: false });
+  const [toast, setToast] = React.useState(null);
+  const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000); };
+
+  React.useEffect(() => {
+    api.getMe().then(u => setMfa(s => ({ ...s, enabled: !!(u?.mfa_enabled) }))).catch(() => setMfa(s => ({ ...s, enabled: false })));
+  }, []);
+
+  const setup = async () => {
+    setMfa(s => ({ ...s, loading: true, error: '' }));
+    try { const r = await api.setupMfa(); setMfa(s => ({ ...s, step: 'setup', qrUrl: r.qrCodeUrl || r.qr_code_url || '', secret: r.secret || '', loading: false })); }
+    catch (e) { setMfa(s => ({ ...s, error: e.message, loading: false })); }
+  };
+  const verify = async () => {
+    setMfa(s => ({ ...s, loading: true, error: '' }));
+    try { await api.verifyMfa(mfa.code); setMfa(s => ({ ...s, enabled: true, step: 'idle', code: '', loading: false })); showToast('2FA aktiviert!'); }
+    catch (e) { setMfa(s => ({ ...s, error: e.message || 'Ungültiger Code', loading: false })); }
+  };
+  const disable = async () => {
+    setMfa(s => ({ ...s, loading: true, error: '' }));
+    try { await api.disableMfa(mfa.code); setMfa(s => ({ ...s, enabled: false, step: 'idle', code: '', loading: false })); showToast('2FA deaktiviert'); }
+    catch (e) { setMfa(s => ({ ...s, error: e.message, loading: false })); }
+  };
+
+  const inp = { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' };
+
+  return (
+    <div style={{ padding: '16px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(232,238,252,0.85)' }}>Two-Factor Authentication (TOTP)</div>
+          <div style={{ fontSize: 11, color: 'rgba(167,177,195,0.4)', marginTop: 2 }}>Google Authenticator, Authy, etc.</div>
+        </div>
+        {mfa.enabled === null && <span style={{ fontSize: 12, color: 'rgba(167,177,195,0.4)' }}>...</span>}
+        {mfa.enabled === true && mfa.step === 'idle' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#10b981' }}>Aktiv</span>
+            </div>
+            <button onClick={() => setMfa(s => ({ ...s, step: 'disable', code: '', error: '' }))} style={{ padding: '5px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444', fontWeight: 600, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>Deaktivieren</button>
+          </div>
+        )}
+        {mfa.enabled === false && mfa.step === 'idle' && (
+          <button onClick={setup} disabled={mfa.loading} style={{ padding: '7px 20px', borderRadius: 8, background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)', color: '#d4af37', fontWeight: 600, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>{mfa.loading ? '...' : '2FA aktivieren'}</button>
+        )}
+      </div>
+
+      {mfa.step === 'setup' && (
+        <div style={{ background: 'rgba(212,175,55,0.04)', border: '1px solid rgba(212,175,55,0.12)', borderRadius: 12, padding: 20 }}>
+          <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.6)', marginBottom: 12 }}>QR-Code mit Authenticator-App scannen:</div>
+          {mfa.qrUrl && <div style={{ textAlign: 'center', margin: '0 0 12px' }}><img src={mfa.qrUrl} alt="2FA QR" width={160} height={160} style={{ borderRadius: 8 }} /></div>}
+          {mfa.secret && <div style={{ fontSize: 10, color: 'rgba(167,177,195,0.4)', textAlign: 'center', marginBottom: 16, wordBreak: 'break-all' }}>Manuell: <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 4 }}>{mfa.secret}</code></div>}
+          <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,177,195,0.5)', textTransform: 'uppercase', marginBottom: 6 }}>6-stelligen Code eingeben</div>
+          <input type="text" inputMode="numeric" maxLength={6} value={mfa.code} onChange={e => setMfa(s => ({ ...s, code: e.target.value.replace(/\D/g, '') }))} onKeyDown={e => e.key === 'Enter' && mfa.code.length === 6 && verify()} style={{ ...inp, letterSpacing: 6, fontSize: 20, fontWeight: 700, textAlign: 'center', marginBottom: 12 }} placeholder="000000" />
+          {mfa.error && <div style={{ fontSize: 12, color: '#ef4444', marginBottom: 8 }}>{mfa.error}</div>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => setMfa(s => ({ ...s, step: 'idle', code: '', error: '' }))} style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(167,177,195,0.7)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Abbrechen</button>
+            <button onClick={verify} disabled={mfa.loading || mfa.code.length !== 6} style={{ flex: 1, padding: '9px', borderRadius: 8, background: mfa.code.length === 6 ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.04)', border: mfa.code.length === 6 ? '1px solid rgba(212,175,55,0.3)' : 'none', color: mfa.code.length === 6 ? '#d4af37' : 'rgba(167,177,195,0.4)', fontSize: 12, fontWeight: 700, cursor: mfa.code.length === 6 ? 'pointer' : 'default', fontFamily: 'inherit' }}>{mfa.loading ? '...' : 'Bestätigen'}</button>
+          </div>
+        </div>
+      )}
+
+      {mfa.step === 'disable' && (
+        <div style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.12)', borderRadius: 12, padding: 20 }}>
+          <div style={{ fontSize: 12, color: 'rgba(167,177,195,0.6)', marginBottom: 12 }}>Code aus Authenticator-App eingeben um 2FA zu deaktivieren:</div>
+          <input type="text" inputMode="numeric" maxLength={6} value={mfa.code} onChange={e => setMfa(s => ({ ...s, code: e.target.value.replace(/\D/g, '') }))} onKeyDown={e => e.key === 'Enter' && mfa.code.length === 6 && disable()} style={{ ...inp, letterSpacing: 6, fontSize: 20, fontWeight: 700, textAlign: 'center', marginBottom: 12 }} placeholder="000000" />
+          {mfa.error && <div style={{ fontSize: 12, color: '#ef4444', marginBottom: 8 }}>{mfa.error}</div>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => setMfa(s => ({ ...s, step: 'idle', code: '', error: '' }))} style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(167,177,195,0.7)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Abbrechen</button>
+            <button onClick={disable} disabled={mfa.loading || mfa.code.length !== 6} style={{ flex: 1, padding: '9px', borderRadius: 8, background: mfa.code.length === 6 ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.04)', border: mfa.code.length === 6 ? '1px solid rgba(239,68,68,0.3)' : 'none', color: mfa.code.length === 6 ? '#ef4444' : 'rgba(167,177,195,0.4)', fontSize: 12, fontWeight: 700, cursor: mfa.code.length === 6 ? 'pointer' : 'default', fontFamily: 'inherit' }}>{mfa.loading ? '...' : 'Deaktivieren'}</button>
+          </div>
+        </div>
+      )}
+
+      {toast && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: toast.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', color: toast.type === 'error' ? '#ef4444' : '#10b981', fontSize: 12, fontWeight: 600 }}>{toast.msg}</div>}
+    </div>
+  );
+}
+
 function SecurityPanel({ state, set }) {
   return (
     <>
@@ -406,7 +487,7 @@ function SecurityPanel({ state, set }) {
       <div style={S.sectionDesc}>Platform security and access controls.</div>
 
       <SettingsSection title="Authentication">
-        <SettingsToggle label="Two-Factor Authentication" desc="Require 2FA for all admin accounts" value={state.twoFactor} onChange={(v) => set("twoFactor", v)} />
+        <TotpSetup />
         <SettingsInput label="Session Timeout" desc="Minutes of inactivity before auto-logout" value={state.sessionTimeout} onChange={(v) => set("sessionTimeout", v)} type="number" placeholder="60" />
         <SettingsDropdown label="Password Policy" desc="Minimum password strength requirements" value={state.passwordPolicy} onChange={(v) => set("passwordPolicy", v)} options={[
           { value: "standard", label: "Standard (8+ chars)" },
