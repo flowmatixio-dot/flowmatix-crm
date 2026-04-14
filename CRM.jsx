@@ -1197,6 +1197,7 @@ export default function App() {
     {id:"op_monitoring",icon:"📡",l:"Monitoring"},
     {id:"op_incidents",icon:"🚨",l:"Incidents"},
     "div",
+    {id:"op_outreach",icon:"📧",l:"Outreach"},
     {id:"op_logs",icon:"📋",l:"Logs"},
     {id:"op_billing",icon:"💳",l:"Billing"},
     {id:"op_settings",icon:"⚙️",l:"Settings"},
