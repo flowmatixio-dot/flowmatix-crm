@@ -11,6 +11,35 @@ const ALERT_RULES = [
   { key: 'backup_overdue', label: 'Backup overdue', desc: 'Alert when no backup in 25 hours' },
 ];
 
+function CollapsibleSessions({ sessions, revokeSession }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div style={card}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setOpen(o => !o)}>
+        <h3 style={{ ...subH, margin: 0 }}>Active Sessions <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginLeft: 8 }}>({sessions.length})</span></h3>
+        <span style={{ fontSize: 18, color: 'var(--text-muted)', transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'none' }}>⌄</span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 14 }}>
+          {sessions.length === 0 ? <Muted>No active sessions</Muted> : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {sessions.map((s, i) => (
+                <div key={s.id || i} style={row}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{safeStr(s.user_email || s.email, 'Unknown')}</span>
+                  <span style={meta}>{safeStr(s.ip_address || s.ip, '—')}</span>
+                  <span style={meta}>{(safeStr(s.user_agent, '')).slice(0, 30) || '—'}</span>
+                  <span style={meta}>{s.last_active ? new Date(s.last_active).toLocaleString('de-DE') : '—'}</span>
+                  <button onClick={() => revokeSession(s.id)} style={dangerBtn}>Revoke</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TotpCard() {
   const [mfa, setMfa] = React.useState({ enabled: null, step: 'idle', qrUrl: '', secret: '', code: '', error: '', loading: false });
   const [toast, setToast] = React.useState(null);
@@ -177,23 +206,8 @@ export default function SettingsView() {
         <TotpCard />
       </div>
 
-      {/* Active Sessions */}
-      <div style={card}>
-        <h3 style={subH}>Active Sessions</h3>
-        {sessions.length === 0 ? <Muted>No active sessions</Muted> : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {sessions.map((s, i) => (
-              <div key={s.id || i} style={row}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{safeStr(s.user_email || s.email, 'Unknown')}</span>
-                <span style={meta}>{safeStr(s.ip_address || s.ip, '—')}</span>
-                <span style={meta}>{(safeStr(s.user_agent, '')).slice(0, 30) || '—'}</span>
-                <span style={meta}>{s.last_active ? new Date(s.last_active).toLocaleString('de-DE') : '—'}</span>
-                <button onClick={() => revokeSession(s.id)} style={dangerBtn}>Revoke</button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Active Sessions (collapsed by default) */}
+      <CollapsibleSessions sessions={sessions} revokeSession={revokeSession} />
 
       {/* ═══ 2. API KEYS ═══ */}
       <SectionTitle>API & Integrations</SectionTitle>
