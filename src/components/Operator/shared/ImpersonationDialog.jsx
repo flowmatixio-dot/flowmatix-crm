@@ -33,21 +33,19 @@ const btnRow = { display: 'flex', gap: 8, justifyContent: 'flex-end' };
 export default function ImpersonationDialog({ clinicName, onConfirm, onCancel }) {
   const [reason, setReason] = useState('');
   const [category, setCategory] = useState('');
-  const [ticketId, setTicketId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const reasonOk = reason.trim().length >= 10;
   const categoryOk = !!category;
-  const ticketOk = category !== 'incident' || ticketId.trim().length >= 3;
-  const canSubmit = reasonOk && categoryOk && ticketOk && !loading;
+  const canSubmit = reasonOk && categoryOk && !loading;
 
   async function handleSubmit() {
     if (!canSubmit) return;
     setLoading(true);
     setError(null);
     try {
-      await onConfirm({ reason: reason.trim(), category, ticket_id: ticketId.trim() || undefined });
+      await onConfirm({ reason: reason.trim(), category });
     } catch (e) {
       setError(e.message || 'Fehler');
       setLoading(false);
@@ -85,22 +83,6 @@ export default function ImpersonationDialog({ clinicName, onConfirm, onCancel })
             placeholder="Warum wird diese Klinik impersoniert? (mind. 10 Zeichen)"
             rows={3}
             style={{ ...input, resize: 'vertical' }}
-          />
-        </div>
-
-        <div>
-          <label style={label}>
-            Ticket-ID{' '}
-            {category === 'incident'
-              ? <span style={{ color: '#ef4444' }}>* (Pflichtfeld bei Incident)</span>
-              : <span style={{ color: 'rgba(255,255,255,0.3)' }}>(optional)</span>}
-          </label>
-          <input
-            type="text"
-            value={ticketId}
-            onChange={e => setTicketId(e.target.value)}
-            placeholder="z.B. TICKET-1234"
-            style={input}
           />
         </div>
 
