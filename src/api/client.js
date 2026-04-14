@@ -223,6 +223,13 @@ export async function disableMfa(code) {
   });
 }
 
+export async function verifyMfaLogin(mfaToken, totpCode) {
+  return apiFetch('/api/v1/auth/mfa/login', {
+    method: 'POST',
+    body: JSON.stringify({ mfaToken, totpCode }),
+  });
+}
+
 // ── Platform (Operator) ──────────────────────────────────
 
 export async function getPlatformOverview() {
