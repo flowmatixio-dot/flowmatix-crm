@@ -14,6 +14,7 @@ import IncidentsView from './views/IncidentsView.jsx';
 import LogsView from './views/LogsView.jsx';
 import BillingView from './views/BillingView.jsx';
 import SettingsView from './views/SettingsView.jsx';
+import OutreachView from './views/OutreachView.jsx';
 
 const VIEWS = {
   dashboard: OverviewView,
@@ -24,6 +25,7 @@ const VIEWS = {
   analytics: AnalyticsView,
   monitoring: MonitoringView,
   incidents: IncidentsView,
+  outreach: OutreachView,
   logs: LogsView,
   billing: BillingView,
   settings: SettingsView,
