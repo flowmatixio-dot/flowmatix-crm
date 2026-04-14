@@ -681,7 +681,7 @@ export default function MainLayout() {
                 <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>Du bist als <strong>{info.user || "Klinik"}</strong> eingeloggt</span>
                 {info.reason && <span style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", padding: "1px 8px", borderRadius: 4, background: "rgba(0,0,0,0.2)" }}>Grund: {info.reason}</span>}
               </div>
-              <button onClick={() => { window.close(); }} style={{ padding: "5px 16px", borderRadius: 6, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Impersonation beenden</button>
+              <button onClick={async () => { try { await fmApi.logout(); } catch {} window.close(); }} style={{ padding: "5px 16px", borderRadius: 6, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Impersonation beenden</button>
             </div>
           );
         })()}
