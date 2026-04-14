@@ -114,6 +114,25 @@ export default function AuditLogView() {
     const det = e.details;
     if (!det || Object.keys(det).length === 0) return <span style={{ color: "rgba(167,177,195,0.4)" }}>—</span>;
 
+    // Impersonation events — always show who impersonated and why
+    if (e.action === "impersonation_started") {
+      const op = det.operator_email || e.user_email || "Operator";
+      const target = det.target_user || det.targetUser || "?";
+      const cat = det.category || "—";
+      const reason = det.reason || "—";
+      return <span style={{ color: "#ff8a2a" }}>
+        {op} → {target} · {cat}
+        {reason !== "—" && <> · <em>{reason.length > 50 ? reason.slice(0, 47) + "…" : reason}</em></>}
+      </span>;
+    }
+    if (e.action === "impersonation_ended") {
+      const op = det.operator_email || e.user_email || "Operator";
+      const target = det.impersonated_user || det.impersonated_user_id || "?";
+      return <span style={{ color: "rgba(167,177,195,0.7)" }}>
+        {op} beendete Session als {target}
+      </span>;
+    }
+
     // Viewed actions — show what was accessed
     if (e.action === "photo_viewed") {
       return <span style={{ color: "rgba(167,177,195,0.7)" }}>
@@ -180,6 +199,7 @@ export default function AuditLogView() {
     if (a.startsWith("whatsapp")) return "#fbbf24";
     if (a.startsWith("settings") || a.startsWith("integration")) return "#a78bfa";
     if (a.startsWith("billing")) return "#10b981";
+    if (a.startsWith("impersonation")) return "#ff8a2a";
     return "#a7b1c3";
   };
 
@@ -258,7 +278,11 @@ export default function AuditLogView() {
             {e.resource_type ? <>{e.resource_type}<br /><span style={{ fontFamily: "monospace", fontSize: 9, opacity: 0.6 }}>{(e.resource_id || "").slice(0, 8)}</span></> : "—"}
           </div>
           <div style={{ fontWeight: 600, fontSize: 11 }}>
-            {e.user_email ? e.user_email.split("@")[0] : <span style={{ color: "rgba(167,177,195,0.5)" }}>system</span>}
+            {e.user_email
+              ? e.user_email.split("@")[0]
+              : e.details?.operator_email
+                ? <span style={{ color: "#ff8a2a" }}>{e.details.operator_email.split("@")[0]}</span>
+                : <span style={{ color: "rgba(167,177,195,0.5)" }}>system</span>}
           </div>
           <div style={{ color: "rgba(167,177,195,0.55)", fontFamily: "monospace", fontSize: 10 }}>
             {e.ip_address || "—"}
