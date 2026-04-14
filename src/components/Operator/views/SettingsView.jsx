@@ -46,7 +46,13 @@ function TotpCard() {
   const showToast = (msg, type = 'ok') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000); };
 
   React.useEffect(() => {
-    fmApi.getMe().then(u => setMfa(s => ({ ...s, enabled: !!(u?.mfa_enabled) }))).catch(() => setMfa(s => ({ ...s, enabled: false })));
+    fmApi.getMe()
+      .then(u => setMfa(s => ({ ...s, enabled: !!(u?.mfa_enabled) })))
+      .catch(e => {
+        // Auth error = session invalid, don't show buttons (stay null = "...")
+        if (e?.status === 401) return;
+        setMfa(s => ({ ...s, enabled: false }));
+      });
   }, []);
 
   const setup = async () => {

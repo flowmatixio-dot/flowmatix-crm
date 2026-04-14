@@ -178,8 +178,11 @@ export async function login(email, password) {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
-  setTokens(data.accessToken, data.refreshToken);
-  sessionStorage.setItem('fm_api_user', JSON.stringify(data.user));
+  // Only set tokens when we have a full session (not MFA-pending responses)
+  if (data.accessToken) {
+    setTokens(data.accessToken, data.refreshToken);
+    sessionStorage.setItem('fm_api_user', JSON.stringify(data.user));
+  }
   return data;
 }
 
