@@ -30,6 +30,12 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
 
   const { setLang } = useUiStore();
 
+  const resetMfaFlow = () => {
+    setMfaToken(null);
+    setMfaCode("");
+    setMfaSetupData(null);
+  };
+
   const handleLogout = async () => {
     try { await fmApi.logout(); } catch (e) {}
     fmApi.clearTokens();
@@ -248,13 +254,13 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
           setMfaSetupData({ otpauthUri: res.otpauthUri, secret: res.secret, email: res.email || "" });
         } else {
           setLoginErr("Could not start 2FA setup. Please log in again.");
+          resetMfaFlow();
           setLoginMode("password");
-          setMfaToken(null);
         }
       } catch (e) {
         setLoginErr(e.message || "Could not start 2FA setup. Please log in again.");
+        resetMfaFlow();
         setLoginMode("password");
-        setMfaToken(null);
       }
     })();
   }, [loginMode, mfaToken, mfaSetupData]);
@@ -340,6 +346,8 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       const res = await fmApi.login(loginEmail, loginPass);
       // MFA required — switch to MFA code entry
       if (res?.requiresMfa && res?.mfaToken) {
+        setMfaSetupData(null);
+        setMfaCode("");
         setMfaToken(res.mfaToken);
         setLoginMode("mfa");
         setAuthLoading(false);
@@ -348,11 +356,14 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       // MFA enforcement: org requires 2FA for this role and user has none yet
       // → switch to enrollment screen with QR code
       if (res?.requiresMfaSetup && res?.setupToken) {
+        setMfaCode("");
+        setMfaSetupData(null);
         setMfaToken(res.setupToken);
         setLoginMode("mfa-setup");
         setAuthLoading(false);
         return;
       }
+      resetMfaFlow();
       if (res?.user) {
         const u = res.user;
         const isOp = u.role === "platform_owner" || u.role === "admin";

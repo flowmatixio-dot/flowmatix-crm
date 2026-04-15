@@ -3515,12 +3515,7 @@ function TabBilling({ d, load }) {
     const to = document.getElementById('datev-to')?.value;
     if (!from || !to) return;
     try {
-      const res = await api.exportDatev(from, to);
-      if (res?.csv) {
-        const blob = new Blob([res.csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `datev_${from}_${to}.csv`; a.click();
-      }
+      await api.downloadDatevExport(from, to);
     } catch (err) { setActionMsg({ type: 'err', text: err.message }); }
   };
 

@@ -16,6 +16,11 @@ export default function LoginScreen({
   mfaSetupData, handleMfaSetupConfirm,
 }) {
   const tl = (key) => (T[loginLang] || T.en)[key] || T.en[key] || key;
+  const resetMfaUi = () => {
+    setMfaCode("");
+    setLoginErr("");
+    setLoginMode("password");
+  };
 
   /* ═══ AUTH CALLBACK SCREENS ═══ */
   if (authCallbackMode === "processing") return (
@@ -141,7 +146,7 @@ export default function LoginScreen({
             </>
           )}
           <div style={{ textAlign: "center", marginTop: 14 }}>
-            <button onClick={() => { setLoginMode("password"); setMfaCode(""); setLoginErr(""); }} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>
+            <button onClick={resetMfaUi} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>
           </div>
         </div> : loginMode === "mfa" ? <div>
           {/* ═══ MODE: MFA — Enter 2FA code ═══ */}
@@ -157,7 +162,7 @@ export default function LoginScreen({
           </div>
           <button onClick={handleMfaLogin} disabled={authLoading || (mfaCode || "").length !== 6} style={{ width: "100%", padding: 16, borderRadius: 14, background: (mfaCode || "").length === 6 ? "linear-gradient(135deg,rgba(76,201,255,.18),rgba(45,168,255,.12))" : "rgba(255,255,255,0.04)", border: (mfaCode || "").length === 6 ? "1px solid rgba(76,201,255,.3)" : "1px solid rgba(255,255,255,0.08)", color: (mfaCode || "").length === 6 ? "#fff" : "rgba(167,177,195,0.5)", fontWeight: 700, fontSize: 16, cursor: (mfaCode || "").length === 6 ? "pointer" : "default", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all .2s" }}>{authLoading ? tl("signing_in") : tl("sign_in")} {!authLoading && <span style={{ fontSize: 18 }}>→</span>}</button>
           <div style={{ textAlign: "center", marginTop: 14 }}>
-            <button onClick={() => { setLoginMode("password"); setMfaCode(""); setLoginErr(""); }} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>
+            <button onClick={resetMfaUi} style={{ background: "none", border: "none", color: "#4cc9ff", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 600 }}>← {tl("back_to_login")}</button>
           </div>
         </div> : <>
 

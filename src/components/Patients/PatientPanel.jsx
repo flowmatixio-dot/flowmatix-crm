@@ -173,7 +173,6 @@ function translateTimeline(text) {
     "OP-Termin gebucht": { en: "Surgery appointment booked", tr: "Ameliyat randevusu rezerve edildi" },
     "Flug bestaetigt": { en: "Flight confirmed", tr: "Uçuş onaylandı" },
     "Flug bestätigt": { en: "Flight confirmed", tr: "Uçuş onaylandı" },
-    "Hotel zugewiesen": { en: "Hotel assigned", tr: "Otel atandı" },
     "Transfer organisiert": { en: "Transfer organized", tr: "Transfer organize edildi" },
     "OP abgeschlossen": { en: "Surgery completed", tr: "Ameliyat tamamlandı" },
     "Nachsorge Tag 1 gesendet": { en: "Aftercare day 1 sent", tr: "1. gün bakım bilgisi gönderildi" },
