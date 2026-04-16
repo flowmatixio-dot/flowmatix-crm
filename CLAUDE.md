@@ -29,6 +29,7 @@
 - UI-Layouts/Designs NICHT anfassen ohne Rueckfrage
 - NIEMALS DoctorTasks/Arzt-Portal Popup-Komponenten aendern
 - NIEMALS dist/ auf dem Server direkt patchen
+- NIEMALS AppointmentsPage.jsx komplett neu schreiben — nur chirurgische Einzelaenderungen (max. 20 Zeilen pro Commit). Die Datei hat 15+ voneinander abhaengige Features. Jeder Grossrefactor zerstoert davon mehrere gleichzeitig.
 
 ## Deploy
 ```bash
