@@ -7,9 +7,9 @@ import { isDemoMode } from '../utils/demoTime';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'https://api.flowmatix.io';
 
-// sessionStorage = per-tab isolation (allows admin + coordinator in separate tabs)
-let accessToken = sessionStorage.getItem('fm_access_token');
-let refreshToken = sessionStorage.getItem('fm_refresh_token');
+// Tokens held in-memory only — httpOnly cookie persists across page reloads
+let accessToken = null;
+let refreshToken = null;
 let refreshPromise = null;
 
 // ── Token Management ──────────────────────────────────────
@@ -17,15 +17,11 @@ let refreshPromise = null;
 export function setTokens(access, refresh) {
   accessToken = access;
   refreshToken = refresh;
-  sessionStorage.setItem('fm_access_token', access);
-  sessionStorage.setItem('fm_refresh_token', refresh);
 }
 
 export function clearTokens() {
   accessToken = null;
   refreshToken = null;
-  sessionStorage.removeItem('fm_access_token');
-  sessionStorage.removeItem('fm_refresh_token');
   sessionStorage.removeItem('fm_api_user');
 }
 
@@ -109,8 +105,8 @@ export async function apiFetch(path, options = {}) {
 
   let res = await fetch(url, { ...options, headers, credentials: 'include' });
 
-  // Auto-refresh on 401
-  if (res.status === 401 && refreshToken && !options._isRetry) {
+  // Auto-refresh on 401 — works via in-memory refreshToken or httpOnly cookie
+  if (res.status === 401 && !options._isRetry) {
     await doRefresh();
     // Retry original request with new token
     headers['Authorization'] = `Bearer ${accessToken}`;
@@ -144,7 +140,8 @@ async function doRefresh() {
       const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        // Include in-memory refreshToken if available; backend falls back to fm_refresh_token cookie
+        body: refreshToken ? JSON.stringify({ refreshToken }) : JSON.stringify({}),
         credentials: 'include',
       });
 
@@ -162,6 +159,30 @@ async function doRefresh() {
   })();
 
   return refreshPromise;
+}
+
+/**
+ * Called on page load — tries to restore session from httpOnly cookie.
+ * Returns true if tokens were restored, false if no valid session.
+ */
+export async function tryRestoreFromCookie() {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+      credentials: 'include',
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (data.accessToken && data.refreshToken) {
+      setTokens(data.accessToken, data.refreshToken);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────

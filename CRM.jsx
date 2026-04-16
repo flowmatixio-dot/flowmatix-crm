@@ -592,13 +592,13 @@ export default function App() {
   /* WebSocket: listen for task:completed */
   useEffect(() => {
     if (!user || !activeClinicId) return;
-    const token = sessionStorage.getItem('fm_access_token');
+    const token = fmApi.getAccessToken();
     if (!token) return;
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsHost = window.location.hostname.replace('app.', 'api.').replace('crm.', 'api.');
     let ws, pingIv, reconnectTo, wsFails = 0;
     const connect = () => {
-      const freshToken = sessionStorage.getItem('fm_access_token') || token;
+      const freshToken = fmApi.getAccessToken() || token;
       ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime?token=${freshToken}`);
       ws.onopen = () => {
         wsFails = 0;

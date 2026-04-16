@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { useInboxStore, usePatientStore } from "../../stores";
-import { apiFetch } from "../../api/client";
+import { apiFetch, getAccessToken } from "../../api/client";
 import { getNowMs } from "../../utils/demoTime";
 import { TASK_COLORS, getTaskGroups, getTimeBadgeColor } from "../../data/badgeColors";
 import { getAvatarGradient, getInitials } from "../shared/index";
@@ -147,7 +147,7 @@ export default function ActionNeededView() {
             const existing = document.getElementById("fm-drv-assign");
             if (existing) { existing.remove(); return; }
 
-            const token = sessionStorage.getItem("fm_access_token");
+            const token = getAccessToken();
             if (!token) return;
 
             const xhr = new XMLHttpRequest();

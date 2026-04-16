@@ -313,30 +313,31 @@ export default function DashboardView() {
             border: "1px solid rgba(37,211,102,0.18)",
             marginBottom: 20,
           }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 240 }}>
-                <div style={{ width: 12, height: 12, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0 }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+              {/* ── Left: text + CTA ── */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12, flex: 1, minWidth: 260 }}>
+                <div style={{ width: 12, height: 12, borderRadius: 99, background: "#10b981", animation: "fmPulseGreen 2s infinite", flexShrink: 0, marginTop: 4 }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>
                       {T("Test the bot live yourself", "Bot live selbst testen", "Botu canlı kendiniz test edin")}
                     </div>
-                    <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 4, background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.25)", letterSpacing: 0.5 }}>
                       {T("TEST MODE", "TESTMODUS", "TEST MODU")}
                     </span>
-                    <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 4, background: `${counterColor}1a`, color: counterColor, border: `1px solid ${counterColor}40`, letterSpacing: 0.3 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 4, background: `${counterColor}1a`, color: counterColor, border: `1px solid ${counterColor}40`, letterSpacing: 0.3 }}>
                       {msgUsed} / {msgLimit} {T("msgs", "Nachr.", "msj")}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(200,215,240,0.7)", marginTop: 3 }}>
+                  <div style={{ fontSize: 13, color: "rgba(200,215,240,0.85)", marginTop: 2, lineHeight: 1.5 }}>
                     {T(
                       "Send a WhatsApp message — your bot replies instantly. No setup required.",
                       "Schicke eine WhatsApp-Nachricht — dein Bot antwortet sofort. Keine Einrichtung nötig.",
                       "Bir WhatsApp mesajı gönderin — botunuz anında yanıtlar. Kurulum gerekmez."
                     )}
                   </div>
-                  {/* Mini progress bar — gives a visual sense of remaining test budget */}
-                  <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, maxWidth: 360 }}>
+                  {/* Mini progress bar */}
+                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, maxWidth: 360 }}>
                     <div style={{ flex: 1, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
                       <div style={{ width: `${pct}%`, height: "100%", background: counterColor, transition: "width 0.3s, background 0.3s" }} />
                     </div>
@@ -344,20 +345,25 @@ export default function DashboardView() {
                       {msgRemaining} {T("left", "übrig", "kaldı")}
                     </span>
                   </div>
+                  <a href={waLink} target="_blank" rel="noopener" style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    marginTop: 14,
+                    padding: "12px 28px",
+                    background: "linear-gradient(135deg, #25D366, #128C7E)",
+                    color: "white", fontWeight: 700, fontSize: 14,
+                    border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
+                    boxShadow: "0 4px 24px rgba(37,211,102,0.35)",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
+                  </a>
                 </div>
               </div>
-              <a href={waLink} target="_blank" rel="noopener" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "11px 22px",
-                background: "linear-gradient(135deg, #25D366, #128C7E)",
-                color: "white", fontWeight: 700, fontSize: 13,
-                border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
-                boxShadow: "0 4px 18px rgba(37,211,102,0.25)",
-                flexShrink: 0, whiteSpace: "nowrap",
-              }}>
-                {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
-              </a>
-              <img src={qrUrl} alt="QR" style={{ width: 140, height: 140, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", flexShrink: 0 }} />
+              {/* ── Right: QR secondary ── */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0, opacity: 0.65 }}>
+                <img src={qrUrl} alt="QR" style={{ width: 100, height: 100, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)" }} />
+                <span style={{ fontSize: 10, color: "rgba(200,215,240,0.45)", fontWeight: 500 }}>{T("Or scan QR", "Oder QR scannen", "Ya da QR tara")}</span>
+              </div>
             </div>
           </div>
         );

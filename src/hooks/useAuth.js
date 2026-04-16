@@ -185,12 +185,18 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
   useEffect(() => {
     const onSessionExpired = () => { fmApi.clearTokens(); setUser(null); setAuthLoading(false); };
     window.addEventListener("fm:session-expired", onSessionExpired);
-    if (!fmApi.isAuthenticated()) {
-      setAuthLoading(false);
-      return () => window.removeEventListener("fm:session-expired", onSessionExpired);
-    }
-    /* Token exists — validate with getMe() */
-    fmApi.getMe().then(async (me) => {
+
+    (async () => {
+      // No in-memory token (e.g. page reload) — try to restore from httpOnly cookie
+      if (!fmApi.isAuthenticated()) {
+        const restored = await fmApi.tryRestoreFromCookie();
+        if (!restored) {
+          setAuthLoading(false);
+          return;
+        }
+      }
+      /* Token exists (in-memory or just restored from cookie) — validate with getMe() */
+      fmApi.getMe().then(async (me) => {
       const u = me.user || me;
       const isOp = u.role === "platform_owner" || u.role === "admin";
       const orgId = (IS_CLIENT_MODE || !isOp) ? (u.organizationId || u.organization_id || null) : null;
@@ -223,6 +229,8 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
       setUser(null);
       setAuthLoading(false);
     });
+    })();
+
     return () => window.removeEventListener("fm:session-expired", onSessionExpired);
   }, []);
 
@@ -270,6 +278,20 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
     if (!mfaToken) { setLoginErr("Setup token expired. Please log in again."); return; }
     setLoginErr(""); setAuthLoading(true);
     try {
+      if (mfaToken === "__session_setup__") {
+        await fmApi.verifyMfa(mfaCode);
+        const me = await fmApi.getMe();
+        const u = me.user || me;
+        const isOp = u.role === "platform_owner" || u.role === "admin";
+        const orgId = (IS_CLIENT_MODE || !isOp) ? (u.organizationId || u.organization_id || null) : null;
+        setUser({ email: u.email, role: u.role, clinicId: orgId, name: u.name || u.email.split("@")[0], apiUser: true, apiRole: u.role, orgId: u.organizationId || u.organization_id });
+        resetMfaFlow();
+        setLoginMode("password");
+        if (isOp && !IS_CLIENT_MODE) setView("operator");
+        setLang(loginLang);
+        setAuthLoading(false);
+        return;
+      }
       const res = await fmApi.confirmMfaWithToken(mfaToken, mfaCode);
       if (res?.user) {
         const u = res.user;
@@ -362,6 +384,28 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
         setLoginMode("mfa-setup");
         setAuthLoading(false);
         return;
+      }
+      // Fallback path: some environments already issue a session and flag
+      // that MFA setup is recommended/required for the role. In that case
+      // jump directly into the QR setup screen via the authenticated endpoint.
+      if (res?.user && res?.mfaSetupRecommended) {
+        try {
+          const setupRes = await fmApi.setupMfa();
+          if (setupRes?.otpauthUri && setupRes?.secret) {
+            setMfaToken("__session_setup__");
+            setMfaCode("");
+            setMfaSetupData({ otpauthUri: setupRes.otpauthUri, secret: setupRes.secret, email: res.user.email || "" });
+            setLoginMode("mfa-setup");
+            setAuthLoading(false);
+            return;
+          }
+        } catch (e) {
+          setLoginErr(e.message || "Could not start 2FA setup. Please log in again.");
+          resetMfaFlow();
+          setLoginMode("password");
+          setAuthLoading(false);
+          return;
+        }
       }
       resetMfaFlow();
       if (res?.user) {

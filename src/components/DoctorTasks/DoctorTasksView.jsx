@@ -108,13 +108,13 @@ export default function DoctorTasksView({ onLogout } = {}) {
   }, [tasks]);
   useEffect(() => { const iv = setInterval(loadTasks, 15000); return () => clearInterval(iv); }, [loadTasks]);
   useEffect(() => {
-    const token = sessionStorage.getItem('fm_access_token');
+    const token = fmApi.getAccessToken();
     if (!token) return;
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsHost = window.location.hostname.replace('app.', 'api.').replace('crm.', 'api.');
     let ws, pingIv, reconnectTo, failCount = 0;
     const connect = () => {
-      const freshToken = sessionStorage.getItem('fm_access_token');
+      const freshToken = fmApi.getAccessToken();
       if (!freshToken) return;
       ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime?token=${freshToken}`);
       ws.onopen = () => { failCount = 0; if (pingIv) clearInterval(pingIv); pingIv = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 30000); };

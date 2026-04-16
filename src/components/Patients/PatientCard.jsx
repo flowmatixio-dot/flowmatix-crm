@@ -92,7 +92,7 @@ export default function PatientCard({ lead, t }) {
             e.preventDefault();
             try {
               const { getAccessToken } = await import("../../api/client");
-              const token = getAccessToken() || sessionStorage.getItem("fm_access_token");
+              const token = getAccessToken();
               if (!token) { alert(t("not_logged_in") || "Nicht eingeloggt"); return; }
               const base = window.location.hostname === "localhost" ? "http://localhost:3000" : "https://api.flowmatix.io";
               const resp = await fetch(`${base}/api/v1/crm/pdf/patient-card/${lead.id}`, {

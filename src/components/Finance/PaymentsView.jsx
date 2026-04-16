@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useApp } from "../../context/AppContext";
-import { apiFetch } from "../../api/client";
+import { apiFetch, getAccessToken } from "../../api/client";
 import { fmLocale } from "../../utils/helpers";
 
 const T = (en, de, tr) => ({ en, de, tr }[localStorage.getItem("fm_lang") || "de"] || de);
@@ -113,7 +113,7 @@ export default function PaymentsView() {
         `${import.meta.env.VITE_API_URL || "https://api.flowmatix.io"}/api/v1/crm/patients/${patientId}/deposit-proof`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${sessionStorage.getItem("fm_access_token")}` },
+          headers: { Authorization: `Bearer ${getAccessToken()}` },
           body: formData,
         }
       );
