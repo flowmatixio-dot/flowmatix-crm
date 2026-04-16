@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+# Guard: AppointmentsPage.jsx darf pro Commit max. 40 Zeilen geaendert werden.
+PROTECTED="src/components/Appointments/AppointmentsPage.jsx"
+
+if git diff --cached --name-only | grep -q "$PROTECTED"; then
+  LINES_CHANGED=$(git diff --cached --unified=0 "$PROTECTED" | grep -c "^[+-][^+-]" || true)
+  if [ "$LINES_CHANGED" -gt 40 ]; then
+    echo ""
+    echo "  COMMIT GEBLOCKT: $PROTECTED"
+    echo "  Du aenderst $LINES_CHANGED Zeilen auf einmal."
+    echo "  Diese Datei hat 15+ voneinander abhaengige Features."
+    echo "  Letzter Grossrefactor hat Blockierungen, Archivieren, Tooltip, Auto-Refresh zerstoert."
+    echo ""
+    echo "  Teile die Aenderung in kleine Commits auf (max. 40 Zeilen)."
+    echo "  Oder: git commit --no-verify falls du wirklich weisst was du tust."
+    echo ""
+    exit 1
+  fi
+fi
