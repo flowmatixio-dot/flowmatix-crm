@@ -108,15 +108,12 @@ export default function DoctorTasksView({ onLogout } = {}) {
   }, [tasks]);
   useEffect(() => { const iv = setInterval(loadTasks, 15000); return () => clearInterval(iv); }, [loadTasks]);
   useEffect(() => {
-    const token = fmApi.getAccessToken();
-    if (!token) return;
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsHost = window.location.hostname.replace('app.', 'api.').replace('crm.', 'api.');
     let ws, pingIv, reconnectTo, failCount = 0;
     const connect = () => {
-      const freshToken = fmApi.getAccessToken();
-      if (!freshToken) return;
-      ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime?token=${freshToken}`);
+      // No ?token= in URL — backend authenticates via fm_token httpOnly cookie
+      ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime`);
       ws.onopen = () => { failCount = 0; if (pingIv) clearInterval(pingIv); pingIv = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 30000); };
       ws.onmessage = (e) => { try { const d = JSON.parse(e.data); if (d.type?.startsWith('task:')) loadTasks(); } catch {} };
       ws.onclose = () => { clearInterval(pingIv); failCount++; if (failCount < 5) reconnectTo = setTimeout(connect, Math.min(failCount * 5000, 30000)); };

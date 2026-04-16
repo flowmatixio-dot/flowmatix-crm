@@ -592,14 +592,12 @@ export default function App() {
   /* WebSocket: listen for task:completed */
   useEffect(() => {
     if (!user || !activeClinicId) return;
-    const token = fmApi.getAccessToken();
-    if (!token) return;
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const wsHost = window.location.hostname.replace('app.', 'api.').replace('crm.', 'api.');
     let ws, pingIv, reconnectTo, wsFails = 0;
     const connect = () => {
-      const freshToken = fmApi.getAccessToken() || token;
-      ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime?token=${freshToken}`);
+      // No ?token= in URL — backend authenticates via fm_token httpOnly cookie
+      ws = new WebSocket(`${wsProto}://${wsHost}/ws/v1/realtime`);
       ws.onopen = () => {
         wsFails = 0;
         pingIv = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 30000);
