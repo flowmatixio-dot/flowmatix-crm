@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useApp } from "../../context/AppContext";
 import * as fmApi from "../../api/client";
 import { getNow } from "../../utils/demoTime";
-import { fmLocale } from "../../utils/helpers";
+import { fmLocale, translateValue } from "../../utils/helpers";
 import ConsentTracker from "../Files/ConsentTracker";
 
 /* ─── Shared helpers ─── */
@@ -419,7 +419,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
                   if (!v || v === '—') return null;
                   return <div key={f.k} style={{ fontSize: 11 }}>
                     <span style={{ color: "rgba(167,177,195,0.6)" }}>{f.l}: </span>
-                    <span style={{ color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>{v}</span>
+                    <span style={{ color: "rgba(232,238,252,0.85)", fontWeight: 600 }}>{translateValue(v)}</span>
                   </div>;
                 })}
               </div>
