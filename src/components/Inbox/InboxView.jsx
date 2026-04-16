@@ -140,7 +140,7 @@ function CaseOverviewPanel({ chat, lead, t, onClose, clinic, openPatient }) {
           <div style={{display:"flex",gap:6,marginBottom:14,flexWrap:"wrap"}}>
             {photos.slice(0, 6).map((p, i) => {
               const photoUrl = typeof p === 'string' ? p : p?.url;
-              const authUrl = photoUrl ? fmApi.authPhotoUrl(photoUrl) : null;
+              const authUrl = photoUrl || null;
               const isReal = !!authUrl && (authUrl.startsWith('https://') || authUrl.startsWith('http://'));
               const labels = [t("photo_front")||"Front",t("photo_top")||"Top",t("photo_left")||"Left",t("photo_right")||"Right",t("photo_back")||"Back",t("photo_extra")||"Extra"];
               return (
@@ -821,7 +821,7 @@ export default function InboxView() {
                           /* Media message with URL */
                           : msg.msgType === "media" && msg.media?.url ? (
                             <div style={{maxWidth:"70%",borderRadius:14,overflow:"hidden",background:msg.sender === "patient" ? "rgba(255,255,255,0.06)" : "rgba(76,201,255,0.06)",border:`1px solid ${msg.sender === "patient" ? "var(--border-strong)" : "rgba(76,201,255,0.1)"}`,borderBottomLeftRadius:msg.sender === "patient" ? 4 : 14,borderBottomRightRadius:msg.sender !== "patient" ? 4 : 14}}>
-                              <img src={fmApi.authPhotoUrl(msg.media.url)} alt="Foto" style={{width:"100%",maxWidth:300,display:"block",borderRadius:"12px 12px 0 0",cursor:"pointer"}} onClick={() => window.open(fmApi.authPhotoUrl(msg.media.url), '_blank')} />
+                              <img src={msg.media.url} alt="Foto" style={{width:"100%",maxWidth:300,display:"block",borderRadius:"12px 12px 0 0",cursor:"pointer"}} onClick={() => window.open(msg.media.url, '_blank')} />
                               <div style={{padding:"6px 12px",fontSize:11,color:"var(--text-faint)",textAlign:msg.sender === "patient" ? "left" : "right"}}>{msg.time} 📷</div>
                             </div>
                           )

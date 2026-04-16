@@ -6,7 +6,6 @@ import { CONV_STATUS, APPT_C, TL, MSG_TEMPLATES, DRIVER_STATUS } from "../../dat
 import TreatmentPlanBuilder from "./TreatmentPlanBuilder";
 import HardDeleteModal from "./HardDeleteModal";
 import { useInboxStore } from "../../stores";
-import { authPhotoUrl } from "../../api/client";
 
 function PhotoLightbox({ photos, startIdx, onClose }) {
   const [idx, setIdx] = useState(startIdx || 0);
@@ -15,7 +14,7 @@ function PhotoLightbox({ photos, startIdx, onClose }) {
   const url = typeof photo === 'string' ? photo : photo.url;
   if (!url) return null;
   return <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.92)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"zoom-out"}}>
-    <img src={authPhotoUrl(url)} alt="Patient photo" style={{maxWidth:"90vw",maxHeight:"90vh",borderRadius:12,boxShadow:"0 8px 40px rgba(0,0,0,0.5)"}} onClick={e=>e.stopPropagation()}/>
+    <img src={url} alt="Patient photo" style={{maxWidth:"90vw",maxHeight:"90vh",borderRadius:12,boxShadow:"0 8px 40px rgba(0,0,0,0.5)"}} onClick={e=>e.stopPropagation()}/>
     {photos.length>1&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",bottom:30,display:"flex",gap:12,alignItems:"center"}}>
       <button onClick={()=>setIdx(p=>(p-1+photos.length)%photos.length)} style={{width:40,height:40,borderRadius:20,background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",color:"#fff",fontSize:18,cursor:"pointer",fontFamily:"inherit"}}>&#8592;</button>
       <span style={{color:"#fff",fontSize:14,fontWeight:600}}>{idx+1} / {photos.length}</span>
@@ -482,7 +481,7 @@ export default function PatientPanel() {
                 <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                   {(lead.photoUrls||[]).slice(0,6).map((p,pi) => {
                     const photoUrl = typeof p === 'string' ? p : p?.url;
-                    const authUrl = photoUrl ? authPhotoUrl(photoUrl) : null;
+                    const authUrl = photoUrl || null;
                     const isReal = !!authUrl && (authUrl.startsWith('https://') || authUrl.startsWith('http://'));
                     const labels = [t("photo_front")||"Vorne",t("photo_top")||"Oben",t("photo_left")||"Links",t("photo_right")||"Rechts",t("photo_back")||"Hinten","Extra"];
                     return (
@@ -829,7 +828,7 @@ export default function PatientPanel() {
           </div>}
           {(lead.photoUrls||[]).length>0&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16}}>
             {(lead.photoUrls||[]).map((p,i)=>{const url=typeof p==='string'?p:p?.url;const mime=typeof p==='object'?p?.mimeType:'';const created=typeof p==='object'&&p?.createdAt?new Date(p.createdAt).toLocaleString(fmLocale(),{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';return<div key={i} onClick={()=>url&&setLightbox({photos:lead.photoUrls,idx:i})} style={{aspectRatio:"1",borderRadius:14,background:"rgba(167,177,195,0.06)",border:"2px solid rgba(76,201,255,0.25)",overflow:"hidden",cursor:url?"pointer":"default",position:"relative"}}>
-              {url?<img src={authPhotoUrl(url)} alt={`Photo ${i+1}`} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{"\uD83D\uDCF7"}</div>}
+              {url?<img src={url} alt={`Photo ${i+1}`} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>{"\uD83D\uDCF7"}</div>}
               <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"4px 8px",background:"rgba(0,0,0,0.6)",fontSize:10,color:"#fff",fontWeight:600}}>{created||`Photo ${i+1}`}</div>
             </div>;})}
           </div>}

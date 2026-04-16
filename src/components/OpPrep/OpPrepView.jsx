@@ -529,7 +529,7 @@ function OpPrepDetail({ appt, onClose, onUpdate }) {
                 {localAppt._photoUrls.map((p, i) => {
                   const url = typeof p === 'string' ? p : p?.url;
                   if (!url) return null;
-                  const authUrl = fmApi.authPhotoUrl(url);
+                  const authUrl = url;
                   return <div key={i} onClick={() => setLightbox(authUrl)} style={{ aspectRatio: "1", borderRadius: 10, overflow: "hidden", cursor: "pointer", border: "1px solid rgba(255,255,255,0.06)" }}>
                     <img src={authUrl} alt={`Foto ${i+1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   </div>;
