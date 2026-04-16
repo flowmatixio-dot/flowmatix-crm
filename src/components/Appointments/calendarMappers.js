@@ -201,11 +201,12 @@ export function apptToEvent(appt, doctors) {
  * Map a blocked-day object to a FullCalendar event.
  */
 export function blockedDayToEvent(bd) {
+  const dateStr = bd.date || bd.blocked_date;
   return {
     id: `blocked_${bd.id}`,
     title: bd.reason || "Blocked",
-    start: bd.date,
-    end: bd.date,
+    start: dateStr,
+    end: dateStr,
     allDay: true,
     display: "background",
     backgroundColor: "rgba(239,68,68,0.12)",
@@ -213,7 +214,7 @@ export function blockedDayToEvent(bd) {
     extendedProps: {
       type: "blocked",
       blockedDay: bd,
-      doctorId: bd.doctorId,
+      doctorId: bd.doctorId || bd.staff_member_id,
     },
   };
 }

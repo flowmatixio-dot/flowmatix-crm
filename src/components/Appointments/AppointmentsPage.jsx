@@ -125,7 +125,7 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     fmApi.getBlockedDays().then((data) => {
-      const arr = Array.isArray(data) ? data : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
+      const arr = Array.isArray(data) ? data : Array.isArray(data?.blockedDays) ? data.blockedDays : Array.isArray(data?.blocked_days) ? data.blocked_days : [];
       setBlockedDays(arr);
     }).catch(() => {});
   }, []);
