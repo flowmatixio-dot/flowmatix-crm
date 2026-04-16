@@ -80,8 +80,9 @@ export const useAuthStore = create((set, get) => ({
         set({ user, authLoading: false });
         return { user, isOp };
       }
-    } catch {
-      // API login failed — caller should try other methods
+    } catch (e) {
+      // R47: log so failures are visible in browser console (not silently dropped)
+      console.warn('[auth] loginApi failed:', e?.message || e);
     }
     set({ authLoading: false });
     return null;
@@ -140,7 +141,7 @@ export const useAuthStore = create((set, get) => ({
               });
               return;
             }
-          } catch { fmApi.clearTokens(); sessionStorage.removeItem('fm_impersonating'); sessionStorage.removeItem('fm_impersonation'); }
+          } catch (e) { console.warn('[auth] Impersonation session restore failed:', e?.message || e); fmApi.clearTokens(); sessionStorage.removeItem('fm_impersonating'); sessionStorage.removeItem('fm_impersonation'); }
         }
       }
     } catch {}
@@ -167,7 +168,7 @@ export const useAuthStore = create((set, get) => ({
             authLoading: false,
           });
           return;
-        } catch { fmApi.clearTokens(); }
+        } catch (e) { console.warn('[auth] Session restore failed:', e?.message || e); fmApi.clearTokens(); }
       }
     }
     set({ authLoading: false });

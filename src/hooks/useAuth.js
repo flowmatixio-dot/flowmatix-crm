@@ -440,7 +440,21 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
         }
         setLang(loginLang); setAuthLoading(false); return;
       }
-    } catch (e) { /* API login failed */ }
+    } catch (e) {
+      // R47: surface API error message instead of silently swallowing it
+      // e.message comes from apiFetch which extracts body.error from the API response
+      // (e.g. "Invalid credentials", "Account temporarily locked", "Invalid role in token")
+      if (e?.message && e?.status) {
+        // Known API error — show its message directly
+        setLoginErr(e.message);
+      } else {
+        // Network error or unexpected failure
+        console.warn('[auth] Login failed:', e);
+        setLoginErr("Login failed. Check your connection and try again.");
+      }
+      setAuthLoading(false);
+      return;
+    }
     setLoginErr("Invalid credentials. Contact admin."); setAuthLoading(false);
   };
 
