@@ -385,28 +385,8 @@ export function useAuth({ setView, setTourStep, setTourActive, showToast, enrich
         setAuthLoading(false);
         return;
       }
-      // Fallback path: some environments already issue a session and flag
-      // that MFA setup is recommended/required for the role. In that case
-      // jump directly into the QR setup screen via the authenticated endpoint.
-      if (res?.user && res?.mfaSetupRecommended) {
-        try {
-          const setupRes = await fmApi.setupMfa();
-          if (setupRes?.otpauthUri && setupRes?.secret) {
-            setMfaToken("__session_setup__");
-            setMfaCode("");
-            setMfaSetupData({ otpauthUri: setupRes.otpauthUri, secret: setupRes.secret, email: res.user.email || "" });
-            setLoginMode("mfa-setup");
-            setAuthLoading(false);
-            return;
-          }
-        } catch (e) {
-          setLoginErr(e.message || "Could not start 2FA setup. Please log in again.");
-          resetMfaFlow();
-          setLoginMode("password");
-          setAuthLoading(false);
-          return;
-        }
-      }
+      // mfaSetupRecommended is only a non-blocking security nudge. Do not turn
+      // it into forced enrollment; only requiresMfaSetup may block login.
       resetMfaFlow();
       if (res?.user) {
         const u = res.user;
