@@ -958,12 +958,6 @@ function renderEventContent(eventInfo) {
             </span>
           )}
         </div>
-        {props.doctorName && (
-          <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 1 }}>
-            <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: props.doctorColor || "#4cc9ff", flexShrink: 0 }} />
-            <span style={{ fontSize: 9, fontWeight: 600, color: "rgba(167,177,195,0.65)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{props.doctorName}</span>
-          </div>
-        )}
       </div>
     </div>
   );
