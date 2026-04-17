@@ -234,7 +234,18 @@ export default function AutoDemoPlayer({ onClose }) {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fmApi.apiFetch("/api/v1/clinic/mode/demo/run-tour", { method: "POST" });
+        let res;
+        try {
+          res = await fmApi.apiFetch("/api/v1/clinic/mode/demo/run-tour", { method: "POST" });
+        } catch (e) {
+          // 409 = lock stuck from previous tour — auto-cleanup and retry once silently
+          if (e?.status === 409 || e?.message === "tour_already_running") {
+            try { await fmApi.apiFetch("/api/v1/clinic/mode/demo/cleanup-tour", { method: "POST" }); } catch {}
+            res = await fmApi.apiFetch("/api/v1/clinic/mode/demo/run-tour", { method: "POST" });
+          } else {
+            throw e;
+          }
+        }
         if (cancelled) return;
         if (!res?.ok) throw new Error(res?.error || "tour_failed");
         setTourMeta(res);
