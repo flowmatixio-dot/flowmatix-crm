@@ -270,7 +270,7 @@ export default function ActionNeededView() {
 
             panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
               '<h3 style="font-size:16px;font-weight:800;color:#fff;margin:0">\u{1F3E8} ' + (t("assign_hotel") || "Hotel zuweisen") + '</h3>' +
-              '<button onclick="document.getElementById(\'fm-hotel-assign\').remove()" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">\u2715</button></div>' +
+              '<button id="fm-hotel-close" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer">\u2715</button></div>' +
               '<div style="font-size:12px;color:rgba(167,177,195,0.7);margin-bottom:12px">' + (t("patient") || "Patient") + ': <strong style="color:#fff">' + escHtml(p.name) + '</strong></div>' +
               '<input id="fm-hotel-name" placeholder="' + (t("hotel_name") || "Hotelname") + '" style="' + iStyle + '">' +
               '<input id="fm-hotel-link" placeholder="' + (t("booking_link") || "Buchungslink (optional)") + '" style="' + iStyle + '">' +
@@ -281,6 +281,8 @@ export default function ActionNeededView() {
               '<button id="fm-hotel-save" style="width:100%;padding:10px;border-radius:10px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:#a78bfa;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">' + (t("assign_hotel") || "Hotel zuweisen") + '</button>';
 
             document.body.appendChild(panel);
+
+            document.getElementById("fm-hotel-close").addEventListener("click", () => panel.remove());
 
             document.getElementById("fm-hotel-save").addEventListener("click", () => {
               const name = document.getElementById("fm-hotel-name").value.trim();
