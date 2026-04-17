@@ -402,9 +402,14 @@ export default function MainLayout() {
           "Hatırlatmalar, takipler ve bakım otomatik çalışır"
         ),
         _ppT(
-          "Mehrsprachig: Deutsch, Englisch, Türkisch",
-          "Multilingual: German, English, Turkish",
-          "Çok dilli: Almanca, İngilizce, Türkçe"
+          "CRM in Deutsch, Englisch & Türkisch",
+          "CRM in German, English & Turkish",
+          "CRM Almanca, İngilizce ve Türkçe"
+        ),
+        _ppT(
+          "Bot antwortet in jeder Sprache",
+          "Bot replies in any language",
+          "Bot her dilde yanıt verir"
         ),
         _ppT(
           "Unbegrenzt viele Team-Mitglieder",
