@@ -282,22 +282,35 @@ export default function DashboardView() {
                 )}
               </p>
             </div>
-            <button
-              onClick={() => setDemoTourOpen(true)}
-              style={{
-                padding: "16px 32px", borderRadius: 12,
-                background: "linear-gradient(135deg, #a855f7, #7c3aed)",
-                color: "#fff", fontWeight: 800, fontSize: 15,
-                border: "none", cursor: "pointer", fontFamily: "inherit",
-                boxShadow: "0 8px 28px rgba(168,85,247,0.45)",
-                flexShrink: 0, whiteSpace: "nowrap",
-                transition: "transform .15s, box-shadow .15s",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 36px rgba(168,85,247,0.55)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 8px 28px rgba(168,85,247,0.45)"; }}
-            >
-              {T("Start demo", "Demo starten", "Demoyu başlat")} →
-            </button>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10, flexShrink: 0 }}>
+              <button
+                onClick={() => setDemoTourOpen(true)}
+                style={{
+                  padding: "16px 32px", borderRadius: 12,
+                  background: "linear-gradient(135deg, #a855f7, #7c3aed)",
+                  color: "#fff", fontWeight: 800, fontSize: 15,
+                  border: "none", cursor: "pointer", fontFamily: "inherit",
+                  boxShadow: "0 8px 28px rgba(168,85,247,0.45)",
+                  whiteSpace: "nowrap",
+                  transition: "transform .15s, box-shadow .15s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 36px rgba(168,85,247,0.55)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 8px 28px rgba(168,85,247,0.45)"; }}
+              >
+                {T("Start demo", "Demo starten", "Demoyu başlat")} →
+              </button>
+              <button onClick={handleDemoReset} disabled={demoResetting} style={{
+                padding: "8px 18px", borderRadius: 10,
+                background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
+                color: "#ef4444", fontWeight: 600, fontSize: 12,
+                cursor: demoResetting ? "not-allowed" : "pointer",
+                opacity: demoResetting ? 0.5 : 1, whiteSpace: "nowrap", fontFamily: "inherit",
+              }}>
+                {demoResetting
+                  ? T("Resetting…", "Zurücksetzen…", "Sıfırlanıyor…")
+                  : T("Reset demo", "Demo zurücksetzen", "Demoyu sıfırla")}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -363,31 +376,18 @@ export default function DashboardView() {
                       {msgRemaining} {T("left", "übrig", "kaldı")}
                     </span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                    <a href={waLink} target="_blank" rel="noopener" style={{
-                      display: "inline-flex", alignItems: "center", gap: 8,
-                      padding: "12px 28px",
-                      background: "linear-gradient(135deg, #25D366, #128C7E)",
-                      color: "white", fontWeight: 700, fontSize: 14,
-                      border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
-                      boxShadow: "0 4px 24px rgba(37,211,102,0.35)",
-                      whiteSpace: "nowrap",
-                    }}>
-                      {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
-                    </a>
-                    <button onClick={handleDemoReset} disabled={demoResetting} style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      padding: "12px 20px",
-                      background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
-                      color: "#ef4444", fontWeight: 600, fontSize: 13,
-                      borderRadius: 10, cursor: demoResetting ? "not-allowed" : "pointer",
-                      opacity: demoResetting ? 0.5 : 1, whiteSpace: "nowrap",
-                    }}>
-                      {demoResetting
-                        ? T("Resetting…", "Zurücksetzen…", "Sıfırlanıyor…")
-                        : T("Reset demo", "Demo zurücksetzen", "Demoyu sıfırla")}
-                    </button>
-                  </div>
+                  <a href={waLink} target="_blank" rel="noopener" style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    marginTop: 14,
+                    padding: "12px 28px",
+                    background: "linear-gradient(135deg, #25D366, #128C7E)",
+                    color: "white", fontWeight: 700, fontSize: 14,
+                    border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
+                    boxShadow: "0 4px 24px rgba(37,211,102,0.35)",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
+                  </a>
                 </div>
               </div>
               {/* ── Right: QR secondary ── */}
