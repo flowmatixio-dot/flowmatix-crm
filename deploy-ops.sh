@@ -35,6 +35,7 @@ BACKUP_NAME="ops-dist-$(date +%Y%m%d-%H%M%S)"
 echo "→ Backing up operator production..."
 ssh flowmatix "cp -r /opt/flowmatix/services/app/dist-ops /opt/flowmatix/backups/$BACKUP_NAME"
 echo "✓ Backup: $BACKUP_NAME"
+ssh flowmatix "ls -dt /opt/flowmatix/backups/ops-dist-* 2>/dev/null | tail -n +6 | xargs rm -rf"
 
 BACKUP_CHECK=$(ssh flowmatix "[ -d /opt/flowmatix/backups/$BACKUP_NAME ] && echo 'ok' || echo 'fail'" 2>/dev/null)
 if [ "$BACKUP_CHECK" != "ok" ]; then

@@ -42,6 +42,7 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 echo "→ Backing up production..."
 ssh flowmatix "cp -r /opt/flowmatix/services/app/dist /opt/flowmatix/backups/app-dist-$TIMESTAMP"
 echo "✓ Backup: app-dist-$TIMESTAMP"
+ssh flowmatix "ls -dt /opt/flowmatix/backups/app-dist-* 2>/dev/null | tail -n +6 | xargs rm -rf"
 
 BACKUP_CHECK=$(ssh flowmatix "[ -d /opt/flowmatix/backups/app-dist-$TIMESTAMP ] && echo 'ok' || echo 'fail'" 2>/dev/null)
 if [ "$BACKUP_CHECK" != "ok" ]; then
