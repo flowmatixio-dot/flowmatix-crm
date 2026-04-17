@@ -112,6 +112,8 @@ export default function AnalyticsView() {
   const [dailyVisitors, setDailyVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [recentVisitors, setRecentVisitors] = useState([]);
+  const [heatmap, setHeatmap] = useState([]);
+  const [ownerIps, setOwnerIps] = useState(null);
   const initialLoad = useRef(true);
 
   const loadAnalytics = useCallback(() => {
@@ -126,7 +128,9 @@ export default function AnalyticsView() {
       fmApi.getPlatformMetrics(Number.parseInt(period)).catch(() => null),
       fmApi.getRecentVisitors().catch(() => []),
       fmApi.getDailyVisitors().catch(() => []),
-    ]).then(([rev, vis, fn, wa, br, cl, met, rv, dv]) => {
+      fmApi.getVisitorHeatmap().catch(() => []),
+      fmApi.getOwnerIps().catch(() => null),
+    ]).then(([rev, vis, fn, wa, br, cl, met, rv, dv, hm, oips]) => {
       setRevenue(rev);
       setVisitors(vis);
       setFunnel(fn);
@@ -136,6 +140,8 @@ export default function AnalyticsView() {
       setDaily(Array.isArray(met?.metrics) ? met.metrics : []);
       setRecentVisitors(Array.isArray(rv) ? rv : []);
       setDailyVisitors(Array.isArray(dv) ? dv : []);
+      setHeatmap(Array.isArray(hm) ? hm : []);
+      if (oips?.ips) setOwnerIps(oips.ips);
       setLoading(false);
       initialLoad.current = false;
     }).catch(() => { setLoading(false); initialLoad.current = false; });
@@ -335,6 +341,16 @@ export default function AnalyticsView() {
       {/* ═══ 8. WEBSITE BESUCHER ═══ */}
       <SectionTitle sub="Marketing">Website Besucher</SectionTitle>
       <VisitorsByCountry visitors={recentVisitors} />
+
+      {/* ═══ 9. BESUCHER HEATMAP ═══ */}
+      <SectionTitle sub="Marketing">Wann kommen Besucher?</SectionTitle>
+      <VisitorHeatmap data={heatmap} />
+
+      {/* ═══ 10. OWNER IPs ═══ */}
+      <OwnerIpsEditor ips={ownerIps} onSave={async (newIps) => {
+        await fmApi.saveOwnerIps(newIps);
+        setOwnerIps(newIps);
+      }} />
     </div>
   );
 }
@@ -377,9 +393,18 @@ function SessionList({ rows }) {
         const first = svs[0];
         const lastVisit = svs.reduce((max, v) => new Date(v.created_at) > new Date(max) ? v.created_at : max, svs[0].created_at);
         const isMobile = /mobile|android|iphone|ipad/i.test(first.user_agent || '');
-        const pages = [...new Set(svs.map(v => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } }))];
+        const uniquePaths = [...new Set(svs.map(v => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } }))];
         const isOpen = !!openSess[sid];
         const shortIp = (first.ip || '').replace(/(\d+\.\d+)\.\d+\.\d+/, '$1.x.x');
+        // Hot lead: visited 3+ of the key sales pages
+        const SALES_PAGES = ['/pricing', '/product', '/crm', '/contact'];
+        const salesHits = SALES_PAGES.filter(p => uniquePaths.some(up => up.startsWith(p))).length;
+        const isHotLead = salesHits >= 3;
+        // Return visitor: visits on more than 1 distinct calendar day
+        const visitDays = new Set(svs.map(v => new Date(v.created_at).toDateString())).size;
+        const isReturn = visitDays > 1;
+        // Total session duration (sum of non-null duration_seconds, deduplicated by value+time proximity)
+        const totalDuration = svs.reduce((sum, v) => sum + (v.duration_seconds || 0), 0);
         return (
           <div key={si} style={{ borderBottom: si < sorted.length - 1 ? '1px solid var(--border-subtle)' : 'none' }}>
             <div onClick={() => setOpenSess(p => ({ ...p, [sid]: !p[sid] }))}
@@ -387,8 +412,11 @@ function SessionList({ rows }) {
               <span style={{ fontSize: 13 }}>{isMobile ? '📱' : '🖥️'}</span>
               <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', flex: 1 }}>{shortIp}</span>
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{first.city || ''}</span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{fmtAgo(lastVisit)}</span>
-              <span style={{ fontSize: 10, color: '#a78bfa', fontWeight: 700, marginLeft: 8 }}>{svs.length} Seite{svs.length !== 1 ? 'n' : ''}</span>
+              {isHotLead && <span style={{ fontSize: 9, fontWeight: 700, color: '#ff8c2a', background: '#ff8c2a18', padding: '1px 6px', borderRadius: 4 }}>HOT</span>}
+              {isReturn && <span style={{ fontSize: 9, fontWeight: 700, color: '#c4a6ff', background: '#c4a6ff18', padding: '1px 6px', borderRadius: 4 }}>{visitDays}×</span>}
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 4 }}>{fmtAgo(lastVisit)}</span>
+              <span style={{ fontSize: 10, color: '#a78bfa', fontWeight: 700, marginLeft: 8 }}>{uniquePaths.length} Seite{uniquePaths.length !== 1 ? 'n' : ''}</span>
+              {totalDuration > 0 && <span style={{ fontSize: 10, color: '#22c55e', marginLeft: 6 }}>{totalDuration >= 60 ? `${Math.round(totalDuration/60)}min` : `${totalDuration}s`}</span>}
               <span style={{ fontSize: 9, color: 'var(--text-muted)', marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
             </div>
             {isOpen && (
@@ -520,6 +548,100 @@ function FunnelSection({ funnel, visitors }) {
             </div>
           );
         })}
+      </div>
+      {/* Website → WA conversion */}
+      {visitors > 0 && steps[2].value > 0 && (
+        <div style={{ marginTop: 12, padding: '8px 14px', borderRadius: 8, background: '#5ee0ff10', border: '1px solid #5ee0ff25', fontSize: 12, color: '#5ee0ff', fontWeight: 600 }}>
+          Website → WhatsApp: {Math.round((steps[2].value / visitors) * 100)}% ({steps[2].value} von {visitors} Besuchern)
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Visitor Heatmap (hour × weekday) ──
+const DAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+function VisitorHeatmap({ data }) {
+  if (!data || data.length === 0) {
+    return <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', marginBottom: 28, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>Noch keine Daten</div>;
+  }
+  const grid = {};
+  let maxVal = 1;
+  data.forEach(({ dow, hour, sessions }) => {
+    const n = Number(sessions);
+    grid[`${dow}-${hour}`] = n;
+    if (n > maxVal) maxVal = n;
+  });
+  return (
+    <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: '1px solid var(--border-subtle)', marginBottom: 28, overflowX: 'auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `30px repeat(24, 1fr)`, gap: 2, minWidth: 500 }}>
+        <div />
+        {Array.from({ length: 24 }, (_, h) => (
+          <div key={h} style={{ fontSize: 8, color: 'var(--text-muted)', textAlign: 'center' }}>{h}</div>
+        ))}
+        {DAYS.map((day, dow) => (
+          <React.Fragment key={dow}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>{day}</div>
+            {Array.from({ length: 24 }, (_, h) => {
+              const val = grid[`${dow}-${h}`] || 0;
+              const opacity = val > 0 ? 0.15 + (val / maxVal) * 0.85 : 0.05;
+              return (
+                <div key={h} title={`${day} ${h}:00 — ${val} Sessions`}
+                  style={{ height: 14, borderRadius: 2, background: val > 0 ? `rgba(167,139,250,${opacity})` : 'var(--bg-section)' }} />
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
+      <div style={{ marginTop: 8, fontSize: 10, color: 'var(--text-muted)' }}>Uhrzeiten in Türkei-Zeit (letzte 30 Tage)</div>
+    </div>
+  );
+}
+
+// ── Owner IPs Editor ──
+function OwnerIpsEditor({ ips, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  if (ips === null) return null;
+
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <SectionTitle>Owner IPs (gefiltert)</SectionTitle>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 20px', border: '1px solid var(--border-subtle)' }}>
+        {!editing ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1 }}>
+              {ips.length === 0 ? 'Keine IPs konfiguriert' : ips.join(', ')}
+            </span>
+            <button onClick={() => { setValue(ips.join('\n')); setEditing(true); }}
+              style={{ fontSize: 11, padding: '4px 12px', borderRadius: 6, background: 'var(--bg-hover)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+              Bearbeiten
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <textarea value={value} onChange={e => setValue(e.target.value)} rows={4}
+              placeholder="Eine IP pro Zeile"
+              style={{ fontSize: 12, fontFamily: 'monospace', padding: '8px 10px', borderRadius: 6, background: 'var(--bg-section)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', resize: 'vertical' }} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button disabled={saving} onClick={async () => {
+                setSaving(true);
+                const newIps = value.split('\n').map(s => s.trim()).filter(Boolean);
+                await onSave(newIps);
+                setSaving(false);
+                setEditing(false);
+              }} style={{ fontSize: 11, padding: '4px 14px', borderRadius: 6, background: '#a78bfa', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>
+                {saving ? '...' : 'Speichern'}
+              </button>
+              <button onClick={() => setEditing(false)}
+                style={{ fontSize: 11, padding: '4px 12px', borderRadius: 6, background: 'var(--bg-hover)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                Abbrechen
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

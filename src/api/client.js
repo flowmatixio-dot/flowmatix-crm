@@ -1659,6 +1659,9 @@ export async function aiSupportChat({ messages, context, lang }) {
 export const getVisitorStats = () => apiFetch('/api/v1/analytics/stats');
 export const getRecentVisitors = () => apiFetch('/api/v1/analytics/recent-visitors');
 export const getDailyVisitors = () => apiFetch('/api/v1/analytics/daily-visitors');
+export const getVisitorHeatmap = () => apiFetch('/api/v1/analytics/visitor-heatmap');
+export const getOwnerIps = () => apiFetch('/api/v1/analytics/owner-ips');
+export const saveOwnerIps = (ips) => apiFetch('/api/v1/analytics/owner-ips', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ips }) });
 
 // ── Checkout Session ────────────────────────────────────
 
