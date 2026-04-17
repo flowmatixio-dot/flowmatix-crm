@@ -1140,7 +1140,7 @@ Timeline entries tracking everything that happens to a patient. Fields:
         bodyAfter: `All prices are net (excluding VAT). A one-time setup fee of €1,990 applies to all plans and covers onboarding, system configuration, and initial training. Enterprise pricing is negotiated individually based on clinic requirements and volume.`,
       },
     ],
-    footer: "© 2026 Flowmatix GmbH — All rights reserved.",
+    footer: "© 2026 Flowmatix — All rights reserved.",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1965,7 +1965,7 @@ Zeitleisten-Einträge, die alles protokollieren, was mit einem Patienten passier
         bodyAfter: `Alle Preise sind Nettopreise (zzgl. MwSt.). Eine einmalige Einrichtungsgebühr von €1.990 gilt für alle Pläne und deckt Onboarding, Systemkonfiguration und initiale Schulung ab. Enterprise-Preise werden individuell auf Basis der Klinikanforderungen und des Volumens verhandelt.`,
       },
     ],
-    footer: "© 2026 Flowmatix GmbH — Alle Rechte vorbehalten.",
+    footer: "© 2026 Flowmatix — Alle Rechte vorbehalten.",
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2790,7 +2790,7 @@ Bir hastayla ilgili her şeyi kaydeden zaman çizelgesi girişleri. Alanlar:
         bodyAfter: `Tüm fiyatlar net fiyatlardır (KDV hariç). Tüm planlar için €1.990 tutarında tek seferlik kurulum ücreti uygulanır; bu ücret kurulum, sistem yapılandırması ve ilk eğitimi kapsar. Enterprise fiyatlandırması, klinik gereksinimlerine ve hacme göre bireysel olarak müzakere edilir.`,
       },
     ],
-    footer: "© 2026 Flowmatix GmbH — Tüm hakları saklıdır.",
+    footer: "© 2026 Flowmatix — Tüm hakları saklıdır.",
   },
 };
 

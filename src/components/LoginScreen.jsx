@@ -242,7 +242,7 @@ export default function LoginScreen({
           ));
         })()}
       </div>
-      <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.65)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix GmbH</div>
+      <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.65)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix</div>
       <div style={{ marginTop: 12, fontSize: 12, color: "rgba(167,177,195,0.6)", position: "relative", zIndex: 1, textAlign: "center", maxWidth: 400 }}>{tl("accounts_created")} <a href="https://flowmatix.io" style={{ color: "rgba(76,201,255,0.4)" }}>flowmatix.io</a></div>
     </div>
   );
