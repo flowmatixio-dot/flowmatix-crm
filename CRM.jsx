@@ -1192,7 +1192,7 @@ export default function App() {
           <span key={i} style={{fontSize:12,color:"rgba(167,177,195,0.35)",cursor:"pointer",fontWeight:500}} onMouseEnter={e=>e.currentTarget.style.color="rgba(167,177,195,0.6)"} onMouseLeave={e=>e.currentTarget.style.color="rgba(167,177,195,0.35)"}>{l}</span>
         )}
       </div>
-      <div style={{marginTop:8,fontSize:11,color:"rgba(167,177,195,0.25)",position:"relative",zIndex:1}}>© 2026 Flowmatix GmbH</div>
+      <div style={{marginTop:8,fontSize:11,color:"rgba(167,177,195,0.25)",position:"relative",zIndex:1}}>© 2026 Flowmatix</div>
       {/* No self-registration note */}
       {!isDemoMode&&<div style={{marginTop:12,fontSize:12,color:"rgba(167,177,195,0.2)",position:"relative",zIndex:1,textAlign:"center",maxWidth:400}}>Accounts are created when you purchase a plan. <a href="https://flowmatix.io" style={{color:"rgba(76,201,255,0.4)"}}>flowmatix.io</a></div>}
     </div>

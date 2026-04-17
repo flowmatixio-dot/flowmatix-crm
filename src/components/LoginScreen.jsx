@@ -138,7 +138,7 @@ export default function LoginScreen({
           <span key={i} style={{ fontSize: 12, color: "rgba(167,177,195,0.75)", cursor: "pointer", fontWeight: 500 }} onMouseEnter={e => e.currentTarget.style.color = "rgba(167,177,195,0.6)"} onMouseLeave={e => e.currentTarget.style.color = "rgba(167,177,195,0.75)"}>{(T[loginLang] || T.en)[l.key] || l.fb}</span>
         )}
       </div>
-      <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.65)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix GmbH</div>
+      <div style={{ marginTop: 8, fontSize: 11, color: "rgba(167,177,195,0.65)", position: "relative", zIndex: 1 }}>© 2026 Flowmatix</div>
       <div style={{ marginTop: 12, fontSize: 12, color: "rgba(167,177,195,0.6)", position: "relative", zIndex: 1, textAlign: "center", maxWidth: 400 }}>{tl("accounts_created")} <a href="https://flowmatix.io" style={{ color: "rgba(76,201,255,0.4)" }}>flowmatix.io</a></div>
     </div>
   );
