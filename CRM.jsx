@@ -827,6 +827,7 @@ export default function App() {
     "div",
     {id:"settings",icon:"⚙️",l:t("settings"),mod:"settings"},
     {id:"support",icon:"❓",l:t("support")},
+    {id:"wa_support",icon:"💬",l:"WhatsApp Support",href:"https://wa.me/4917664189746?text=Hi%2C%20I%20need%20help%20setting%20up%20my%20clinic%20on%20Flowmatix.",color:"#25D366"},
   ]:[
     {id:"dashboard",icon:"🏠",l:t("dashboard")},
     {id:"inbox",icon:"💬",l:t("inbox"),badge:unread||null},
@@ -842,6 +843,7 @@ export default function App() {
     {id:"whatsapp_setup",icon:"📱",l:"WhatsApp"},
     {id:"settings",icon:"⚙️",l:t("settings"),mod:"settings"},
     {id:"support",icon:"❓",l:t("support")},
+    {id:"wa_support",icon:"💬",l:"WhatsApp Support",href:"https://wa.me/4917664189746?text=Hi%2C%20I%20need%20help%20setting%20up%20my%20clinic%20on%20Flowmatix.",color:"#25D366"},
     ...(isAdmin?["div",{id:"operator",icon:"🔐",l:"Operator"}]:[]),
   ];
   const VIEW_TO_MODULE={dashboard:"dashboard",action_needed:"action_needed",inbox:"inbox",pipeline:"pipeline",patients:"patients",patients_db:"patients_db",appointments:"appointments",op_prep:"op_prep",doctor_portal:"doctor_portal",analytics:"analytics",revenue:"revenue",payments:"payments",automations:"automations",files:"files",archive:"archive",setup:"setup",settings:"settings",subscription:"billing",billing:"billing",support:"support",addons:"billing",ai_control:"settings",audit_log:"settings",whatsapp_setup:"whatsapp_setup"};
