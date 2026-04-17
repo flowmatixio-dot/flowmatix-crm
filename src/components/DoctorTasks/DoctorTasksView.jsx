@@ -181,7 +181,12 @@ export default function DoctorTasksView({ onLogout } = {}) {
     setSubmitting(null);
   };
 
-  const pendingTasks = tasks.filter(t => (t.status === 'pending' || t.status === 'in_progress') && !skippedIds.has(t.id)).sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+  const pendingTasks = tasks.filter(t => (t.status === 'pending' || t.status === 'in_progress') && !skippedIds.has(t.id)).sort((a, b) => {
+    const demoA = a.patient?.isDemo ? 1 : 0;
+    const demoB = b.patient?.isDemo ? 1 : 0;
+    if (demoA !== demoB) return demoA - demoB;
+    return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+  });
   const completedTasks = tasks.filter(t => t.status === 'completed' || t.status === 'canceled').sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
 
   if (loading) return (
