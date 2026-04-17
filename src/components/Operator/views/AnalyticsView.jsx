@@ -366,7 +366,8 @@ function SessionList({ rows }) {
     sessions[key].push(v);
   });
   const sorted = Object.entries(sessions).sort((a, b) => {
-    const la = new Date(a[1][0].created_at); const lb = new Date(b[1][0].created_at);
+    const la = Math.max(...a[1].map(v => new Date(v.created_at).getTime()));
+    const lb = Math.max(...b[1].map(v => new Date(v.created_at).getTime()));
     return lb - la;
   });
 
@@ -374,6 +375,7 @@ function SessionList({ rows }) {
     <div style={{ background: 'var(--bg-section)' }}>
       {sorted.map(([sid, svs], si) => {
         const first = svs[0];
+        const lastVisit = svs.reduce((max, v) => new Date(v.created_at) > new Date(max) ? v.created_at : max, svs[0].created_at);
         const isMobile = /mobile|android|iphone|ipad/i.test(first.user_agent || '');
         const pages = [...new Set(svs.map(v => { try { return new URL(v.url).pathname || '/'; } catch { return v.url; } }))];
         const isOpen = !!openSess[sid];
@@ -385,7 +387,7 @@ function SessionList({ rows }) {
               <span style={{ fontSize: 13 }}>{isMobile ? '📱' : '🖥️'}</span>
               <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', flex: 1 }}>{shortIp}</span>
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{first.city || ''}</span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{fmtAgo(first.created_at)}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{fmtAgo(lastVisit)}</span>
               <span style={{ fontSize: 10, color: '#a78bfa', fontWeight: 700, marginLeft: 8 }}>{svs.length} Seite{svs.length !== 1 ? 'n' : ''}</span>
               <span style={{ fontSize: 9, color: 'var(--text-muted)', marginLeft: 4 }}>{isOpen ? '▲' : '▼'}</span>
             </div>
@@ -429,7 +431,11 @@ function VisitorsByCountry({ visitors }) {
     if (!groups[key]) groups[key] = [];
     groups[key].push(v);
   });
-  const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+  const sorted = Object.entries(groups).sort((a, b) => {
+    const la = Math.max(...a[1].map(v => new Date(v.created_at).getTime()));
+    const lb = Math.max(...b[1].map(v => new Date(v.created_at).getTime()));
+    return lb - la;
+  });
 
   return (
     <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-subtle)', marginBottom: 28, overflow: 'hidden' }}>
