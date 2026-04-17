@@ -282,7 +282,7 @@ export default function DashboardView() {
                 )}
               </p>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10, flexShrink: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, flexShrink: 0, minWidth: 200 }}>
               <button
                 onClick={() => setDemoTourOpen(true)}
                 style={{
@@ -291,7 +291,7 @@ export default function DashboardView() {
                   color: "#fff", fontWeight: 800, fontSize: 15,
                   border: "none", cursor: "pointer", fontFamily: "inherit",
                   boxShadow: "0 8px 28px rgba(168,85,247,0.45)",
-                  whiteSpace: "nowrap",
+                  whiteSpace: "nowrap", width: "100%",
                   transition: "transform .15s, box-shadow .15s",
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 36px rgba(168,85,247,0.55)"; }}
@@ -300,9 +300,9 @@ export default function DashboardView() {
                 {T("Start demo", "Demo starten", "Demoyu başlat")} →
               </button>
               <button onClick={handleDemoReset} disabled={demoResetting} style={{
-                padding: "8px 18px", borderRadius: 10,
+                padding: "10px 18px", borderRadius: 10, width: "100%",
                 background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
-                color: "#ef4444", fontWeight: 600, fontSize: 12,
+                color: "#ef4444", fontWeight: 600, fontSize: 13,
                 cursor: demoResetting ? "not-allowed" : "pointer",
                 opacity: demoResetting ? 0.5 : 1, whiteSpace: "nowrap", fontFamily: "inherit",
               }}>
