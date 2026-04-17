@@ -1511,7 +1511,7 @@ export async function setClinicMode(mode) {
 }
 
 export async function resetDemoData() {
-  return apiFetch('/api/v1/demo/reset', { method: 'POST' });
+  return apiFetch('/api/v1/clinic/workspace/reset-demo', { method: 'POST' });
 }
 
 export async function simulateDemoLead() {

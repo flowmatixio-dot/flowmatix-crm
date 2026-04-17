@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { getNow } from "../../utils/demoTime";
 import { fmLocale } from "../../utils/helpers";
+import { resetDemoData } from "../../api/client.js";
 import HintBox from "../shared/HintBox.jsx";
 import SetupCard from "../Onboarding/SetupCard.jsx";
 import AdvancedSetupCard from "../Onboarding/AdvancedSetupCard.jsx";
@@ -20,6 +21,23 @@ export default function DashboardView() {
     workspaceState, setShowPlanPicker, demoTourOpen, setDemoTourOpen,
     activeClinicId, testInfo,
   } = useApp();
+
+  const [demoResetting, setDemoResetting] = useState(false);
+  const handleDemoReset = async () => {
+    if (!window.confirm(T(
+      "Reset demo? All test messages and demo patients will be deleted.",
+      "Demo zurücksetzen? Alle Testnachrichten und Demo-Patienten werden gelöscht.",
+      "Demo sıfırlansın mı? Tüm test mesajları ve demo hastalar silinecek."
+    ))) return;
+    setDemoResetting(true);
+    try {
+      await resetDemoData();
+      window.location.reload();
+    } catch (e) {
+      setDemoResetting(false);
+      alert(T("Reset failed", "Reset fehlgeschlagen", "Sıfırlama başarısız"));
+    }
+  };
 
   // Persist demo-tour-seen flag (used by PerformanceIndicator).
   useEffect(() => {
@@ -345,18 +363,31 @@ export default function DashboardView() {
                       {msgRemaining} {T("left", "übrig", "kaldı")}
                     </span>
                   </div>
-                  <a href={waLink} target="_blank" rel="noopener" style={{
-                    display: "inline-flex", alignItems: "center", gap: 8,
-                    marginTop: 14,
-                    padding: "12px 28px",
-                    background: "linear-gradient(135deg, #25D366, #128C7E)",
-                    color: "white", fontWeight: 700, fontSize: 14,
-                    border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
-                    boxShadow: "0 4px 24px rgba(37,211,102,0.35)",
-                    whiteSpace: "nowrap",
-                  }}>
-                    {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
-                  </a>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                    <a href={waLink} target="_blank" rel="noopener" style={{
+                      display: "inline-flex", alignItems: "center", gap: 8,
+                      padding: "12px 28px",
+                      background: "linear-gradient(135deg, #25D366, #128C7E)",
+                      color: "white", fontWeight: 700, fontSize: 14,
+                      border: "none", borderRadius: 10, textDecoration: "none", cursor: "pointer",
+                      boxShadow: "0 4px 24px rgba(37,211,102,0.35)",
+                      whiteSpace: "nowrap",
+                    }}>
+                      {T("Send test message", "Testnachricht senden", "Test mesajı gönder")} →
+                    </a>
+                    <button onClick={handleDemoReset} disabled={demoResetting} style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      padding: "12px 20px",
+                      background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
+                      color: "#ef4444", fontWeight: 600, fontSize: 13,
+                      borderRadius: 10, cursor: demoResetting ? "not-allowed" : "pointer",
+                      opacity: demoResetting ? 0.5 : 1, whiteSpace: "nowrap",
+                    }}>
+                      {demoResetting
+                        ? T("Resetting…", "Zurücksetzen…", "Sıfırlanıyor…")
+                        : T("Reset demo", "Demo zurücksetzen", "Demoyu sıfırla")}
+                    </button>
+                  </div>
                 </div>
               </div>
               {/* ── Right: QR secondary ── */}
